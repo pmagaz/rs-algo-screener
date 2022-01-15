@@ -1,6 +1,7 @@
 use crate::error::Result;
 use crate::helpers::poly::fit;
 use crate::helpers::regression::kernel_regression;
+use friedrich::kernel;
 
 use find_peaks::PeakFinder;
 use std::collections::HashMap;
@@ -43,7 +44,9 @@ impl Peaks {
     pub fn local_maxima(&self) -> &Vec<(usize, f64)> {
         &self.local_maxima
     }
-
+    pub fn smooth_maxima(&self) -> &Vec<(usize, f64)> {
+        &self.smooth_maxima
+    }
     pub fn local_minima(&self) -> &Vec<(usize, f64)> {
         &self.local_minima
     }
@@ -80,7 +83,22 @@ impl Peaks {
             self.local_maxima.push((candle_id, price.abs()));
         }
 
-        let leches = kernel_regression(self.highs());
+        //let kernel = kernel_regression(&self.highs());
+        //let kernel = kernel_regression(&vec![0., 1., 2., 3., 4., 5.]);
+        //let leches = kernel(self.highs());
+        //let gp = GaussianProcess::default(training_inputs, training_outputs);
+        //CONTINUE HERE
+        let mut candle_id = 0;
+        for x in &self.highs {
+            //let kernel = kernel_regression(&self.highs(), candle_id as f64);
+            let leches = kernel::Gaussian::new(*x, candle_id as f64);
+            self.smooth_maxima.push((candle_id, leches.ampl));
+            candle_id += 1;
+        }
+
+        println!("{:?}", self.smooth_maxima);
+
+        //let mean = gp.predict(&self.highs);
 
         //CONTINUE HERE
 

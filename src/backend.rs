@@ -36,7 +36,7 @@ impl Backend {
 
         let data = instrument.data();
         let local_maxima = instrument.peaks().local_maxima();
-        //let smoth_maxima = instrument.peaks().smoth_maxima();
+        let smooth_maxima = instrument.peaks().smooth_maxima();
         let local_minima = instrument.peaks().local_minima();
         let extrema_maxima = instrument.peaks().extrema_maxima();
         let extrema_minima = instrument.peaks().extrema_minima();
@@ -101,10 +101,24 @@ impl Backend {
             .unwrap();
 
         // UPPER CHANNEL
-        for x in local_minima.iter() {
+        for x in local_maxima.iter() {
             chart
                 .draw_series(LineSeries::new(
                     (0..).zip(local_maxima.iter()).map(|(_k, highs)| {
+                        let idx = highs.0;
+                        let value = highs.1;
+                        let date = data[idx].date();
+                        (date, value)
+                    }),
+                    &BLUE,
+                ))
+                .unwrap();
+        }
+
+        for x in local_maxima.iter() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..).zip(smooth_maxima.iter()).map(|(_k, highs)| {
                         let idx = highs.0;
                         let value = highs.1;
                         let date = data[idx].date();
