@@ -1,3 +1,3 @@
 # rs-algo-screener
 
-Rust Algoritmic Screener
+Rust Algoritmic screener
