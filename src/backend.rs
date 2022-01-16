@@ -36,7 +36,8 @@ impl Backend {
 
         let data = instrument.data();
         let local_maxima = instrument.peaks().local_maxima();
-        let smooth_maxima = instrument.peaks().smooth_maxima();
+        let smooth_highs = instrument.peaks().smooth_highs();
+        let smooth_lows = instrument.peaks().smooth_lows();
         let local_minima = instrument.peaks().local_minima();
         let extrema_maxima = instrument.peaks().extrema_maxima();
         let extrema_minima = instrument.peaks().extrema_minima();
@@ -101,10 +102,24 @@ impl Backend {
             .unwrap();
 
         // UPPER CHANNEL
-        for x in local_maxima.iter() {
+        // for x in local_maxima.iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..).zip(local_maxima.iter()).map(|(_k, highs)| {
+        //                 let idx = highs.0;
+        //                 let value = highs.1;
+        //                 let date = data[idx].date();
+        //                 (date, value)
+        //             }),
+        //             &BLUE,
+        //         ))
+        //         .unwrap();
+        // }
+
+        for x in smooth_highs.iter() {
             chart
                 .draw_series(LineSeries::new(
-                    (0..).zip(local_maxima.iter()).map(|(_k, highs)| {
+                    (0..).zip(smooth_highs.iter()).map(|(_k, highs)| {
                         let idx = highs.0;
                         let value = highs.1;
                         let date = data[idx].date();
@@ -115,10 +130,10 @@ impl Backend {
                 .unwrap();
         }
 
-        for x in local_maxima.iter() {
+        for x in smooth_lows.iter() {
             chart
                 .draw_series(LineSeries::new(
-                    (0..).zip(smooth_maxima.iter()).map(|(_k, highs)| {
+                    (0..).zip(smooth_lows.iter()).map(|(_k, highs)| {
                         let idx = highs.0;
                         let value = highs.1;
                         let date = data[idx].date();
@@ -128,6 +143,20 @@ impl Backend {
                 ))
                 .unwrap();
         }
+
+        // for x in local_minima.iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..).zip(smooth_highs.iter()).map(|(_k, highs)| {
+        //                 let idx = highs.0;
+        //                 let value = highs.1;
+        //                 let date = data[idx].date();
+        //                 (date, value)
+        //             }),
+        //             &BLUE,
+        //         ))
+        //         .unwrap();
+        // }
         // chart
         //   .draw_series(LineSeries::new(
         //     (0..).zip(upper_channel.lower_band()[2].iter()).map(|(_k, highs)| {

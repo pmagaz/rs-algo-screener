@@ -1,7 +1,6 @@
 use crate::error::Result;
 use crate::helpers::poly::fit;
 use crate::helpers::regression::kernel_regression;
-use friedrich::kernel;
 
 use find_peaks::PeakFinder;
 use std::collections::HashMap;
@@ -14,7 +13,8 @@ pub struct Peaks {
     pub highs: Vec<f64>,
     pub lows: Vec<f64>,
     pub local_maxima: Vec<(usize, f64)>,
-    pub smooth_maxima: Vec<(usize, f64)>,
+    pub smooth_highs: Vec<(usize, f64)>,
+    pub smooth_lows: Vec<(usize, f64)>,
     pub local_minima: Vec<(usize, f64)>,
     pub extrema_maxima: Vec<(usize, f64)>,
     pub extrema_minima: Vec<(usize, f64)>,
@@ -27,7 +27,8 @@ impl Peaks {
             lows: vec![],
             local_maxima: vec![],
             local_minima: vec![],
-            smooth_maxima: vec![],
+            smooth_highs: vec![],
+            smooth_lows: vec![],
             extrema_maxima: vec![],
             extrema_minima: vec![],
         }
@@ -44,8 +45,11 @@ impl Peaks {
     pub fn local_maxima(&self) -> &Vec<(usize, f64)> {
         &self.local_maxima
     }
-    pub fn smooth_maxima(&self) -> &Vec<(usize, f64)> {
-        &self.smooth_maxima
+    pub fn smooth_highs(&self) -> &Vec<(usize, f64)> {
+        &self.smooth_highs
+    }
+    pub fn smooth_lows(&self) -> &Vec<(usize, f64)> {
+        &self.smooth_lows
     }
     pub fn local_minima(&self) -> &Vec<(usize, f64)> {
         &self.local_minima
@@ -83,24 +87,20 @@ impl Peaks {
             self.local_maxima.push((candle_id, price.abs()));
         }
 
-        //let kernel = kernel_regression(&self.highs());
-        //let kernel = kernel_regression(&vec![0., 1., 2., 3., 4., 5.]);
-        //let leches = kernel(self.highs());
-        //let gp = GaussianProcess::default(training_inputs, training_outputs);
         //CONTINUE HERE
         let mut candle_id = 0;
         for x in &self.highs {
-            //let kernel = kernel_regression(&self.highs(), candle_id as f64);
-            let leches = kernel::Gaussian::new(*x, candle_id as f64);
-            self.smooth_maxima.push((candle_id, leches.ampl));
+            let leches = kernel_regression(1., *x, &self.highs);
+            self.smooth_highs.push((candle_id, leches.abs()));
             candle_id += 1;
         }
 
-        println!("{:?}", self.smooth_maxima);
-
-        //let mean = gp.predict(&self.highs);
-
-        //CONTINUE HERE
+        // let mut candle_id = 0;
+        // for x in &self.lows {
+        //     let leches = kernel_regression(1., *x, &self.lows);
+        //     self.smooth_lows.push((candle_id, leches.abs()));
+        //     candle_id += 1;
+        // }
 
         let mut local_minima_fp = PeakFinder::new(&self.lows);
         local_minima_fp.with_min_prominence(local_prominence);

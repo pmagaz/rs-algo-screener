@@ -22,5 +22,3 @@ async-trait = "0.1.52"
 futures = "0.3.19"
 tungstenite = {version = "0.16.0", features = ["native-tls"]}
 friedrich = "0.4.1"
-ndarray ="0.15"
-ndarray-parallel = "0.9.1"

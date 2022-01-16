@@ -1,4 +1,3 @@
-
 use broker::xtb::Xtb;
 use broker::Broker;
 use error::Result;
@@ -19,18 +18,15 @@ mod instrument;
 mod patterns;
 mod screener;
 
-const TICKER: &str = "TTD.US_4";
+const TICKER: &str = "AAPL.US_4";
 
 #[tokio::main]
 async fn main() -> Result<()> {
-
-
-    
     dotenv().ok();
 
     let username = &env::var("BROKER_USERNAME").unwrap();
     let password = &env::var("BROKER_PASSWORD").unwrap();
-    let from = (Local::now() - date::Duration::days(365 * 3)).timestamp();
+    let from = (Local::now() - date::Duration::days(365 * 1)).timestamp();
 
     //TODO configure with builder (credentials, optional render)
     let mut screener = Screener::<Xtb>::new(TICKER).await?;
