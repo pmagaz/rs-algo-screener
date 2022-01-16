@@ -11,6 +11,7 @@ pub type HashData = HashMap<usize, f64>;
 #[derive(Debug, Clone)]
 pub struct Peaks {
     pub highs: Vec<f64>,
+    pub close: Vec<f64>,
     pub lows: Vec<f64>,
     pub local_maxima: Vec<(usize, f64)>,
     pub smooth_highs: Vec<(usize, f64)>,
@@ -24,6 +25,7 @@ impl Peaks {
     pub fn new() -> Peaks {
         Self {
             highs: vec![],
+            close: vec![],
             lows: vec![],
             local_maxima: vec![],
             local_minima: vec![],
@@ -72,9 +74,21 @@ impl Peaks {
             .unwrap()
             .parse::<f64>()
             .unwrap();
+
+        let kernel_bandwith = env::var("KERNEL_BANDWITH").unwrap().parse::<f64>().unwrap();
+        let mut arr: Vec<f64> = vec![];
+        //CONTINUE HERE
+        let mut candle_id = 0;
+        for x in &self.close {
+            let leches = kernel_regression(kernel_bandwith, *x, &self.close);
+            arr.push(leches.abs());
+            self.smooth_highs.push((candle_id, leches.abs()));
+            candle_id += 1;
+        }
+
         let local_prominence: f64 = max_price / local_prominence;
         let extrema_prominence: f64 = max_price / extrema_prominence;
-        let mut local_maxima_fp = PeakFinder::new(&self.highs);
+        let mut local_maxima_fp = PeakFinder::new(&arr);
         local_maxima_fp.with_min_prominence(local_prominence);
 
         let mut x_values: Vec<f64> = vec![];
@@ -85,14 +99,6 @@ impl Peaks {
             x_values.push(candle_id as f64);
             y_values.push(price);
             self.local_maxima.push((candle_id, price.abs()));
-        }
-
-        //CONTINUE HERE
-        let mut candle_id = 0;
-        for x in &self.highs {
-            let leches = kernel_regression(1., *x, &self.highs);
-            self.smooth_highs.push((candle_id, leches.abs()));
-            candle_id += 1;
         }
 
         // let mut candle_id = 0;

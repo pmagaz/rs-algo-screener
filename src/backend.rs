@@ -130,19 +130,36 @@ impl Backend {
                 .unwrap();
         }
 
-        for x in smooth_lows.iter() {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..).zip(smooth_lows.iter()).map(|(_k, highs)| {
-                        let idx = highs.0;
-                        let value = highs.1;
-                        let date = data[idx].date();
-                        (date, value)
-                    }),
-                    &BLUE,
-                ))
-                .unwrap();
-        }
+        chart
+            .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                if local_maxima.contains(&(i, candle.high())) {
+                    return TriangleMarker::new(
+                        (
+                            candle.date(),
+                            candle.high() + candle.high() / peaks_marker_distance + 5.,
+                        ),
+                        -4,
+                        BLUE.filled(),
+                    );
+                } else {
+                    return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
+                }
+            }))
+            .unwrap();
+
+        // for x in smooth_lows.iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..).zip(smooth_lows.iter()).map(|(_k, highs)| {
+        //                 let idx = highs.0;
+        //                 let value = highs.1;
+        //                 let date = data[idx].date();
+        //                 (date, value)
+        //             }),
+        //             &BLUE,
+        //         ))
+        //         .unwrap();
+        // }
 
         // for x in local_minima.iter() {
         //     chart
@@ -196,20 +213,21 @@ impl Backend {
         //   .unwrap();
 
         // HORIZONTAL LEVELS
-
         /*
         for x in horizontal_levels.iter() {
-          let color = match x.1.level_type() {
-            HorizontalLevelType::Support => BLUE.filled(),
-            HorizontalLevelType::Resistance => RED.filled(),
-            _ => TRANSPARENT.filled(),
-          };
-          chart
-            .draw_series(LineSeries::new(
-              (0..).zip(data.iter()).map(|(_id, candle)| (candle.date(), *x.1.price())),
-              color,
-            ))
-            .unwrap();
+            let color = match x.1.level_type() {
+                HorizontalLevelType::Support => BLUE.filled(),
+                HorizontalLevelType::Resistance => RED.filled(),
+                _ => TRANSPARENT.filled(),
+            };
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(_id, candle)| (candle.date(), *x.1.price())),
+                    color,
+                ))
+                .unwrap();
         }
 
         let mut ema20 = ExponentialMovingAverage::new(20).unwrap();

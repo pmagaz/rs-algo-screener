@@ -8,7 +8,9 @@ fn kernel_function_vec(h: f64, ker_x: &Vec<f64>, xi: f64) -> Vec<f64> {
 }
 
 fn gauss_exp(ker_x: f64, xi: f64, h: f64) -> f64 {
-    -(0.5 * (xi - ker_x).powf(2.)) / h * h
+    let den = h * h;
+    let num = -0.5 * (xi - ker_x).powf(2.);
+    num / den
 }
 
 fn kernel_function(h: f64, ker_x: f64, xi: f64) -> f64 {

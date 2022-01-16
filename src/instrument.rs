@@ -94,6 +94,7 @@ impl Instrument {
                 }
                 self.peaks.highs.push(high);
                 self.peaks.lows.push(-low);
+                self.peaks.close.push(close);
                 let key = match id {
                     0 => id,
                     _ => id - 1,
@@ -127,7 +128,9 @@ impl Instrument {
             .calculate_horizontal_highs(&self.current_price, &self.peaks)
             .unwrap();
 
-        self.horizontal_levels.calculate_horizontal_lows(&self.current_price, &self.peaks).unwrap();
+        self.horizontal_levels
+            .calculate_horizontal_lows(&self.current_price, &self.peaks)
+            .unwrap();
         self.data = parsed;
         Ok(())
     }
