@@ -70,74 +70,47 @@ impl Peaks {
             .unwrap()
             .parse::<f64>()
             .unwrap();
-        let extrema_prominence = env::var("EXTREMA_PROMINENCE")
+
+        let kernel_bandwidth = env::var("KERNEL_BANDWIDTH")
             .unwrap()
             .parse::<f64>()
             .unwrap();
+        let mut smooth_close: Vec<f64> = vec![];
 
-        let kernel_bandwith = env::var("KERNEL_BANDWITH").unwrap().parse::<f64>().unwrap();
-        let mut arr: Vec<f64> = vec![];
-        //CONTINUE HERE
         let mut candle_id = 0;
         for x in &self.close {
-            let leches = kernel_regression(kernel_bandwith, *x, &self.close);
-            arr.push(leches.abs());
+            let leches = kernel_regression(kernel_bandwidth, *x, &self.close);
+            smooth_close.push(leches.abs());
             self.smooth_highs.push((candle_id, leches.abs()));
             candle_id += 1;
         }
 
         let local_prominence: f64 = max_price / local_prominence;
-        let extrema_prominence: f64 = max_price / extrema_prominence;
-        let mut local_maxima_fp = PeakFinder::new(&arr);
+        let mut local_maxima_fp = PeakFinder::new(&smooth_close);
         local_maxima_fp.with_min_prominence(local_prominence);
 
         let mut x_values: Vec<f64> = vec![];
         let mut y_values: Vec<f64> = vec![];
         for x in local_maxima_fp.find_peaks() {
             let candle_id = x.middle_position();
-            let price = self.highs[candle_id];
+            let price = self.close[candle_id];
             x_values.push(candle_id as f64);
             y_values.push(price);
             self.local_maxima.push((candle_id, price.abs()));
         }
 
-        // let mut candle_id = 0;
-        // for x in &self.lows {
-        //     let leches = kernel_regression(1., *x, &self.lows);
-        //     self.smooth_lows.push((candle_id, leches.abs()));
-        //     candle_id += 1;
-        // }
-
-        let mut local_minima_fp = PeakFinder::new(&self.lows);
+        let leches: Vec<f64> = smooth_close.iter().map(|x| -x).collect();
+        let mut local_minima_fp = PeakFinder::new(&leches);
         local_minima_fp.with_min_prominence(local_prominence);
 
         let mut x_values: Vec<f64> = vec![];
         let mut y_values: Vec<f64> = vec![];
         for x in local_minima_fp.find_peaks() {
             let candle_id = x.middle_position();
-            let price = self.lows[candle_id];
+            let price = self.close[candle_id];
             x_values.push(candle_id as f64);
             y_values.push(price);
             self.local_minima.push((candle_id, price.abs()));
-        }
-
-        self.local_minima = fit(&x_values, &y_values, 7);
-        let mut extrema_maxima_fp = PeakFinder::new(&self.highs);
-        extrema_maxima_fp.with_min_prominence(extrema_prominence);
-
-        for x in extrema_maxima_fp.find_peaks() {
-            let candle_id = x.middle_position();
-            let price = self.highs[candle_id];
-            self.extrema_maxima.push((candle_id, price));
-        }
-
-        let mut extrema_minima_fp = PeakFinder::new(&self.lows);
-        extrema_minima_fp.with_min_prominence(extrema_prominence);
-
-        for x in extrema_minima_fp.find_peaks() {
-            let candle_id = x.middle_position();
-            let price = self.lows[candle_id];
-            self.extrema_minima.push((candle_id, price.abs()));
         }
 
         Ok(())

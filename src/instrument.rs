@@ -93,7 +93,7 @@ impl Instrument {
                     self.max_price = high;
                 }
                 self.peaks.highs.push(high);
-                self.peaks.lows.push(-low);
+                self.peaks.lows.push(low);
                 self.peaks.close.push(close);
                 let key = match id {
                     0 => id,
@@ -119,10 +119,11 @@ impl Instrument {
 
         self.set_current_price(parsed[0].close());
         self.peaks.calculate_peaks(&self.max_price).unwrap();
+        self.patterns.detect_pattern(&self.peaks);
 
         //self.indicators.calculate_macd(&parsed).unwrap();
 
-        self.patterns.detect_upper_channel(&self.peaks);
+        //self.patterns.detect_upper_channel(&self.peaks);
 
         self.horizontal_levels
             .calculate_horizontal_highs(&self.current_price, &self.peaks)

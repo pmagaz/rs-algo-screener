@@ -132,14 +132,31 @@ impl Backend {
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_maxima.contains(&(i, candle.high())) {
+                if local_maxima.contains(&(i, candle.close())) {
                     return TriangleMarker::new(
                         (
                             candle.date(),
-                            candle.high() + candle.high() / peaks_marker_distance + 5.,
+                            candle.high() + candle.close() / peaks_marker_distance + 5.,
                         ),
                         -4,
                         BLUE.filled(),
+                    );
+                } else {
+                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
+                }
+            }))
+            .unwrap();
+
+        chart
+            .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                if local_minima.contains(&(i, candle.close())) {
+                    return TriangleMarker::new(
+                        (
+                            candle.date(),
+                            candle.high() + candle.high() / peaks_marker_distance - 10.,
+                        ),
+                        4,
+                        RED.filled(),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
