@@ -119,7 +119,8 @@ impl Instrument {
 
         self.set_current_price(parsed[0].close());
         self.peaks.calculate_peaks(&self.max_price).unwrap();
-        self.patterns.detect_pattern(&self.peaks);
+        self.patterns
+            .detect_pattern(&self.peaks, &self.current_price);
 
         //self.indicators.calculate_macd(&parsed).unwrap();
 
