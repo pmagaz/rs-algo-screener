@@ -13,12 +13,12 @@ pub fn is_equal(x: f64, y: f64) -> bool {
     }
 }
 
-fn average(numbers: &[i32]) -> f64 {
-    numbers.iter().sum::<i32>() as f64 / numbers.len() as f64
+pub fn average(numbers: &[f64]) -> f64 {
+    numbers.iter().sum::<f64>() as f64 / numbers.len() as f64
 }
 
-fn median(numbers: &mut [i32]) -> i32 {
-    numbers.sort();
-    let mid = numbers.len() / 2;
-    numbers[mid]
-}
+// pub fn median(numbers: &mut [f64]) -> f64 {
+//     numbers.sort();
+//     let mid = numbers.len() / 2;
+//     numbers[mid]
+// }

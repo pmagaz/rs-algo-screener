@@ -4,7 +4,7 @@ use crate::helpers::date::{DateTime, Local};
 use crate::indicators::macd::Macd;
 use crate::indicators::{Indicator, Indicators};
 use crate::patterns::horizontal_levels::HorizontalLevels;
-use crate::patterns::pattern::Patterns;
+use crate::patterns::pattern::Pattern;
 use crate::patterns::peaks::Peaks;
 
 use std::env;
@@ -18,7 +18,7 @@ pub struct Instrument {
     max_price: f64,
     peaks: Peaks,
     horizontal_levels: HorizontalLevels,
-    patterns: Patterns,
+    patterns: Pattern,
     indicators: Indicators,
 }
 
@@ -59,7 +59,7 @@ impl Instrument {
     pub fn peaks(&self) -> &Peaks {
         &self.peaks
     }
-    pub fn patterns(&self) -> &Patterns {
+    pub fn patterns(&self) -> &Pattern {
         &self.patterns
     }
     pub fn horizontal_levels(&self) -> &HorizontalLevels {
@@ -164,7 +164,7 @@ impl InstrumentBuilder {
                 data: vec![],
                 peaks: Peaks::new(),
                 horizontal_levels: HorizontalLevels::new(),
-                patterns: Patterns::new(),
+                patterns: Pattern::new(),
                 indicators: Indicators::new().unwrap(),
                 current_price: 0.,
                 min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),

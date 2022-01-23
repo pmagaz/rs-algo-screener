@@ -42,7 +42,7 @@ impl Backend {
         let extrema_maxima = instrument.peaks().extrema_maxima();
         let extrema_minima = instrument.peaks().extrema_minima();
         let horizontal_levels = instrument.horizontal_levels().horizontal_levels();
-        let upper_channel = instrument.patterns().upper_channel();
+        //let upper_channel = instrument.patterns().upper_channel();
 
         let rsi = instrument.indicators().rsi();
         let rsi_a = rsi.data_a();
