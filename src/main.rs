@@ -18,7 +18,7 @@ mod instrument;
 mod patterns;
 mod screener;
 
-const TICKER: &str = "DE.US_4";
+const TICKER: &str = "ADSK.US_4";
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -26,7 +26,7 @@ async fn main() -> Result<()> {
 
     let username = &env::var("BROKER_USERNAME").unwrap();
     let password = &env::var("BROKER_PASSWORD").unwrap();
-    let from = (Local::now() - date::Duration::days(365 * 1)).timestamp();
+    let from = (Local::now() - date::Duration::days(365 * 2)).timestamp();
 
     //TODO configure with builder (credentials, optional render)
     let mut screener = Screener::<Xtb>::new(TICKER).await?;

@@ -42,6 +42,7 @@ impl Backend {
         let extrema_maxima = instrument.peaks().extrema_maxima();
         let extrema_minima = instrument.peaks().extrema_minima();
         let horizontal_levels = instrument.horizontal_levels().horizontal_levels();
+        let patterns = instrument.patterns();
         //let upper_channel = instrument.patterns().upper_channel();
 
         let rsi = instrument.indicators().rsi();
@@ -101,11 +102,25 @@ impl Backend {
             }))
             .unwrap();
 
-        // UPPER CHANNEL
-        // for x in local_maxima.iter() {
+        println!("[PATTERN] {:?}", patterns.pattern_type);
+
+        chart
+            .draw_series(LineSeries::new(
+                (0..).zip(patterns.data.iter()).map(|(_k, highs)| {
+                    let idx = highs.0;
+                    let value = highs.1;
+                    let date = data[idx].date();
+                    (date, value)
+                }),
+                &BLUE,
+            ))
+            .unwrap();
+        //  }
+
+        // for x in smooth_highs.iter() {
         //     chart
         //         .draw_series(LineSeries::new(
-        //             (0..).zip(local_maxima.iter()).map(|(_k, highs)| {
+        //             (0..).zip(smooth_highs.iter()).map(|(_k, highs)| {
         //                 let idx = highs.0;
         //                 let value = highs.1;
         //                 let date = data[idx].date();
@@ -115,20 +130,6 @@ impl Backend {
         //         ))
         //         .unwrap();
         // }
-
-        for x in smooth_highs.iter() {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..).zip(smooth_highs.iter()).map(|(_k, highs)| {
-                        let idx = highs.0;
-                        let value = highs.1;
-                        let date = data[idx].date();
-                        (date, value)
-                    }),
-                    &BLUE,
-                ))
-                .unwrap();
-        }
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {

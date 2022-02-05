@@ -158,7 +158,7 @@ impl InstrumentBuilder {
     // }
 
     pub fn build(self) -> Result<Instrument> {
-        if let (Some(ticker)) = (self.ticker) {
+        if let Some(ticker) = self.ticker {
             Ok(Instrument {
                 ticker,
                 data: vec![],

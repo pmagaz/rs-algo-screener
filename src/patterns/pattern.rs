@@ -3,8 +3,9 @@ use crate::helpers::comp;
 
 use std::cmp;
 use std::env;
-type point = (usize, f64);
-type data_points = (point, point, point, point, point);
+type Point = (usize, f64);
+type DataPoints = Vec<Point>;
+//type DataPoints = (Point, Point, Point, Point, Point);
 //TODO use TRAITS
 
 #[derive(Debug, Clone)]
@@ -22,8 +23,8 @@ pub enum PatternType {
 
 #[derive(Debug, Clone)]
 pub struct Pattern {
-    pattern_type: PatternType,
-    data: data_points,
+    pub pattern_type: PatternType,
+    pub data: DataPoints,
 }
 
 // #[derive(Debug, Clone)]
@@ -36,7 +37,7 @@ impl Pattern {
     pub fn new() -> Self {
         Pattern {
             pattern_type: PatternType::Default,
-            data: ((0, 0.), (0, 0.), (0, 0.), (0, 0.), (0, 0.)),
+            data: vec![],
         }
     }
 
@@ -45,7 +46,7 @@ impl Pattern {
             .unwrap()
             .parse::<usize>()
             .unwrap();
-        let num_data_points = env::var("PATTERNS_DATA_POINTS")
+        let num_DataPoints = env::var("PATTERNS_DATA_POINTS")
             .unwrap()
             .parse::<usize>()
             .unwrap();
@@ -53,165 +54,213 @@ impl Pattern {
 
         locals.sort_by(|(a, _), (b, _)| a.cmp(b));
         locals.reverse();
-        let mut iter = locals.windows(num_data_points);
-        let mut leches = true;
-        while leches {
+        let mut iter = locals.windows(num_DataPoints);
+        let mut no_pattern = true;
+        while no_pattern {
             match iter.next() {
-                Some(x) => {
-                    let data_points = self.get_data_points(x);
-                    self.detect_double_top(&data_points, current_price);
-                    self.detect_double_bottom(&data_points, current_price);
-                    self.detect_broadening_top(&data_points, current_price);
-                    self.detect_broadening_bottom(&data_points, current_price);
-                    self.detect_descendant_triangle(&data_points, current_price);
-                    self.detect_head_and_shoulders(&data_points, current_price);
-                    self.detect_inverse_head_and_shoulders(&data_points, current_price);
+                Some(window) => {
+                    let data_points = window.to_vec();
+                    if self.is_active_double_top(&data_points, current_price) {
+                        self.pattern_type = PatternType::DoubleTopActivated;
+                        // no_pattern = false;
+                        // } else if self.is_active_double_bottom(&data_points, current_price) {
+                        //     self.pattern_type = PatternType::DoubleBottomActivated;
+                        //     //  no_pattern = false;
+                        // } else if self.is_double_top(&data_points, current_price) {
+                        //     self.pattern_type = PatternType::DoubleTop;
+                        //     //no_pattern = false;
+                        // } else if self.is_double_bottom(&data_points, current_price) {
+                        //     self.pattern_type = PatternType::DoubleBottom;
+                        //     // no_pattern = false;
+                        // } else if self.is_descendant_triangle(&data_points, current_price) {
+                        //     self.pattern_type = PatternType::DoubleBottom;
+                        //     // no_pattern = false;
+                    } else if self.is_symmetrical_triangle(&data_points, current_price) {
+                        self.pattern_type = PatternType::DoubleBottom;
+                        // no_pattern = false;
+                    }
+                    //self.is_double_bottom(&DataPoints, current_price);
+                    // self.is_broadening_top(&DataPoints, current_price);
+                    // self.is_broadening_bottom(&DataPoints, current_price);
+                    // self.is_descendant_triangle(&DataPoints, current_price);
+                    // self.is_head_and_shoulders(&DataPoints, current_price);
+                    // self.is_inverse_head_and_shoulders(&DataPoints, current_price);
                 }
                 None => {
-                    leches = false;
+                    no_pattern = false;
                 }
             }
         }
     }
-    pub fn get_data_points(&self, data: &[(usize, f64)]) -> data_points {
-        let e1 = data[0];
-        let e2 = data[1];
-        let e3 = data[2];
-        let e4 = data[3];
-        let e5 = data[4];
-        (e1, e2, e3, e4, e5)
+
+    pub fn is_active_double_top(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
+        if data[0].1 < data[2].1 && comp::is_equal(data[1].1, data[3].1) {
+            println!("[DOUBLE TOP ACTIVATED] {:?}", data);
+            self.data = data.to_owned();
+            true
+        } else {
+            false
+        }
     }
 
-    pub fn detect_double_top(
-        &self,
-        data: &data_points,
-        _current_price: &f64,
-    ) -> Option<(point, point, point)> {
-        if comp::is_equal(data.0 .1, data.2 .1) && data.1 .1 < data.0 .1 && data.1 .1 < data.2 .1 {
+    pub fn is_double_top(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
+        if comp::is_equal(data[0].1, data[2].1) && data[1].1 < data[0].1 && data[1].1 < data[2].1 {
             println!("[DOUBLE TOP] {:?}", data);
-            Some((data.0, data.1, data.2))
+            self.data = data.to_owned();
+            true
         } else {
-            None
+            false
         }
     }
 
-    pub fn detect_double_bottom(
-        &self,
-        data: &data_points,
-        _current_price: &f64,
-    ) -> Option<(point, point, point)> {
-        if comp::is_equal(data.0 .1, data.2 .1) && data.1 .1 > data.0 .1 && data.1 .1 > data.2 .1 {
+    pub fn is_active_double_bottom(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
+        if data[0].1 > data[2].1 && comp::is_equal(data[1].1, data[3].1) {
+            println!("[DOUBLE BOTTOM ACTIVATED] {:?}", data);
+            self.data = data.to_owned();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_double_bottom(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
+        if comp::is_equal(data[0].1, data[2].1) && data[1].1 > data[0].1 && data[1].1 > data[2].1 {
             println!("[DOUBLE BOTTOM] {:?}", data);
-            Some((data.0, data.1, data.2))
+            self.data = data.to_owned();
+            true
         } else {
-            None
+            false
         }
     }
 
-    pub fn detect_broadening_top(
-        &self,
-        data: &data_points,
-        _current_price: &f64,
-    ) -> Option<(point, point, point)> {
-        if data.0 .1 > data.1 .1
-            && data.0 .1 < data.2 .1
-            && data.2 .1 < data.4 .1
-            && data.1 .1 > data.3 .1
-        {
-            println!("[BROADENING TOP] {:?}", data);
-            Some((data.0, data.1, data.2))
-        } else {
-            None
-        }
-    }
-
-    pub fn detect_broadening_bottom(
-        &self,
-        data: &data_points,
-        _current_price: &f64,
-    ) -> Option<(point, point, point)> {
-        if data.0 .1 < data.1 .1
-            && data.0 .1 > data.2 .1
-            && data.2 .1 > data.4 .1
-            && data.1 .1 < data.3 .1
-        {
-            println!("[BROADENING BOTTOM] {:?}", data);
-            Some((data.0, data.1, data.2))
-        } else {
-            None
-        }
-    }
-
-    pub fn detect_descendant_triangle(
-        &self,
-        data: &data_points,
-        _current_price: &f64,
-    ) -> Option<(point, point, point)> {
-        if comp::is_equal(data.0 .1, data.2 .1)
-            && data.0 .1 < data.1 .1
-            && data.2 .1 < data.1 .1
-            && data.2 .1 < data.3 .1
-            && data.1 .1 < data.3 .1
-        {
+    pub fn is_descendant_triangle(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
+        if comp::is_equal(data[3].1, data[1].1) && data[4].1 < data[2].1 && data[2].1 < data[0].1 {
             println!("[DESCENDANT TRIANGLE] {:?}", data);
-            Some((data.0, data.1, data.2))
+            self.data = data.to_owned();
+            true
         } else {
-            None
+            false
         }
     }
 
-    pub fn detect_head_and_shoulders(
-        &self,
-        data: &data_points,
-        _current_price: &f64,
-    ) -> Option<(point, point, point)> {
-        let hs_threshold = env::var("HEAD_AND_SHOULDERS_THRESHOLD")
-            .unwrap()
-            .parse::<f64>()
-            .unwrap();
-        if data.0 .1 > data.1 .1
-            && data.2 .1 > data.0 .1
-            && data.2 .1 > data.4 .1
-            && (data.0 .1 - data.4 .1).abs()
-                <= hs_threshold * comp::average(&[data.0 .1, data.4 .1])
-            && (data.1 .1 - data.3 .1).abs()
-                <= hs_threshold * comp::average(&[data.0 .1, data.4 .1])
+    pub fn is_symmetrical_triangle(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
+        if data[4].1 < data[2].1
+            && data[2].1 < data[0].1
+            && data[0].1 < data[1].1
+            && data[3].1 > data[1].1
         {
-            println!("[HEAD AND SHOULDERS] {:?}", data);
-            Some((data.0, data.1, data.2))
+            println!("[SYMMETRICAL TRIANGLE] {:?}", data);
+            self.data = data.to_owned();
+            true
         } else {
-            None
+            false
         }
     }
 
-    pub fn detect_inverse_head_and_shoulders(
-        &self,
-        data: &data_points,
-        _current_price: &f64,
-    ) -> Option<(point, point, point)> {
-        let hs_threshold = env::var("HEAD_AND_SHOULDERS_THRESHOLD")
-            .unwrap()
-            .parse::<f64>()
-            .unwrap();
-        if data.0 .1 < data.1 .1
-            && data.2 .1 < data.0 .1
-            && data.2 .1 < data.4 .1
-            && (data.0 .1 - data.4 .1).abs()
-                <= hs_threshold * comp::average(&[data.0 .1, data.4 .1])
-            && (data.1 .1 - data.3 .1).abs()
-                <= hs_threshold * comp::average(&[data.0 .1, data.4 .1])
-        {
-            println!("[INVERSE HEAD AND SHOULDERS] {:?}", data);
-            Some((data.0, data.1, data.2))
-        } else {
-            None
-        }
-    }
+    // pub fn is_broadening_top(
+    //     &self,
+    //     data: &DataPoints,
+    //     _current_price: &f64,
+    // ) -> Option<(Point, Point, Point)> {
+    //     if data[0] .1 > data[1] .1
+    //         && data[0] .1 < data[2] .1
+    //         && data[2] .1 < data[4] .1
+    //         && data[1] .1 > data[3] .1
+    //     {
+    //         println!("[BROADENING TOP] {:?}", data);
+    //         Some((data[0], data[1], data[2]))
+    //     } else {
+    //         None
+    //     }
+    // }
+
+    // pub fn is_broadening_bottom(
+    //     &self,
+    //     data: &DataPoints,
+    //     _current_price: &f64,
+    // ) -> Option<(Point, Point, Point)> {
+    //     if data[0] .1 < data[1] .1
+    //         && data[0] .1 > data[2] .1
+    //         && data[2] .1 > data[4] .1
+    //         && data[1] .1 < data[3] .1
+    //     {
+    //         println!("[BROADENING BOTTOM] {:?}", data);
+    //         Some((data[0], data[1], data[2]))
+    //     } else {
+    //         None
+    //     }
+    // }
+
+    // pub fn is_descendant_triangle(
+    //     &self,
+    //     data: &DataPoints,
+    //     _current_price: &f64,
+    // ) -> Option<(Point, Point, Point)> {
+    //     if comp::is_equal(data[0] .1, data[2] .1)
+    //         && data[0] .1 < data[1] .1
+    //         && data[2] .1 < data[1] .1
+    //         && data[2] .1 < data[3] .1
+    //         && data[1] .1 < data[3] .1
+    //     {
+    //         println!("[DESCENDANT TRIANGLE] {:?}", data);
+    //         Some((data[0], data[1], data[2]))
+    //     } else {
+    //         None
+    //     }
+    // }
+
+    // pub fn is_head_and_shoulders(
+    //     &self,
+    //     data: &DataPoints,
+    //     _current_price: &f64,
+    // ) -> Option<(Point, Point, Point)> {
+    //     let hs_threshold = env::var("HEAD_AND_SHOULDERS_THRESHOLD")
+    //         .unwrap()
+    //         .parse::<f64>()
+    //         .unwrap();
+    //     if data[0] .1 > data[1] .1
+    //         && data[2] .1 > data[0] .1
+    //         && data[2] .1 > data[4] .1
+    //         && (data[0] .1 - data[4] .1).abs()
+    //             <= hs_threshold * comp::average(&[data[0] .1, data[4] .1])
+    //         && (data[1] .1 - data[3] .1).abs()
+    //             <= hs_threshold * comp::average(&[data[0] .1, data[4] .1])
+    //     {
+    //         println!("[HEAD AND SHOULDERS] {:?}", data);
+    //         Some((data[0], data[1], data[2]))
+    //     } else {
+    //         None
+    //     }
+    // }
+
+    // pub fn is_inverse_head_and_shoulders(
+    //     &self,
+    //     data: &DataPoints,
+    //     _current_price: &f64,
+    // ) -> Option<(Point, Point, Point)> {
+    //     let hs_threshold = env::var("HEAD_AND_SHOULDERS_THRESHOLD")
+    //         .unwrap()
+    //         .parse::<f64>()
+    //         .unwrap();
+    //     if data[0] .1 < data[1] .1
+    //         && data[2] .1 < data[0] .1
+    //         && data[2] .1 < data[4] .1
+    //         && (data[0] .1 - data[4] .1).abs()
+    //             <= hs_threshold * comp::average(&[data[0] .1, data[4] .1])
+    //         && (data[1] .1 - data[3] .1).abs()
+    //             <= hs_threshold * comp::average(&[data[0] .1, data[4] .1])
+    //     {
+    //         println!("[INVERSE HEAD AND SHOULDERS] {:?}", data);
+    //         Some((data[0], data[1], data[2]))
+    //     } else {
+    //         None
+    //     }
+    // }
 
     // pub fn upper_channel(&self) -> &UpperChannel {
     //     &self.upper_channel
     // }
-    // pub fn detect_upper_channel(&mut self, peaks: &Peaks) -> &UpperChannel {
+    // pub fn is_upper_channel(&mut self, peaks: &Peaks) -> &UpperChannel {
     //     self.upper_channel.scan(peaks)
     // }
 }
