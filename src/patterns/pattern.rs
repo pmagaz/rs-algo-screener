@@ -4,7 +4,9 @@ use crate::helpers::comp;
 use std::cmp;
 use std::env;
 type Point = (usize, f64);
-type DataPoints = Vec<Point>;
+pub type DataPoints = Vec<Point>;
+use crate::patterns::triangle;
+
 //type DataPoints = (Point, Point, Point, Point, Point);
 //TODO use TRAITS
 
@@ -12,6 +14,12 @@ type DataPoints = Vec<Point>;
 pub enum PatternType {
     Default,
     DoubleTop,
+    TriangleSymmetricalTop,
+    TriangleSymmetricalBottom,
+    TriangleDescendantTop,
+    TriangleDescendantBottom,
+    TriangleAscendantTop,
+    TriangleAscendantBottom,
     DoubleTopActivated,
     DoubleBottom,
     DoubleBottomActivated,
@@ -72,12 +80,30 @@ impl Pattern {
                         // } else if self.is_double_bottom(&data_points, current_price) {
                         //     self.pattern_type = PatternType::DoubleBottom;
                         //     // no_pattern = false;
-                        // } else if self.is_descendant_triangle(&data_points, current_price) {
-                        //     self.pattern_type = PatternType::DoubleBottom;
-                        //     // no_pattern = false;
-                    } else if self.is_symmetrical_triangle(&data_points, current_price) {
-                        self.pattern_type = PatternType::DoubleBottom;
-                        // no_pattern = false;
+                        // } else if triangle::is_ascendant_top(&data_points, current_price) {
+                        //     self.set_pattern(&data_points, PatternType::TriangleAscendantTop);
+                        //     no_pattern = false;
+                        // } else if triangle::is_ascendant_bottom(&data_points, current_price) {
+                        //     self.set_pattern(&data_points, PatternType::TriangleAscendantBottom);
+                        //     no_pattern = false;
+                        // } else if triangle::is_ascendant_top(&data_points, current_price) {
+                        //     self.set_pattern(&data_points, PatternType::TriangleAscendantTop);
+                        //       no_pattern = false;
+                    } else if triangle::is_ascendant_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::TriangleAscendantBottom);
+                        //no_pattern = false;
+                    } else if triangle::is_descendant_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::TriangleDescendantTop);
+                        //   no_pattern = false;
+                    } else if triangle::is_descendant_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::TriangleDescendantBottom);
+                        //   no_pattern = false;
+                    } else if triangle::is_symmetrical_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::TriangleSymmetricalTop);
+                        //  no_pattern = false;
+                    } else if triangle::is_symmetrical_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::TriangleSymmetricalBottom);
+                        no_pattern = false;
                     }
                     //self.is_double_bottom(&DataPoints, current_price);
                     // self.is_broadening_top(&DataPoints, current_price);
@@ -91,6 +117,11 @@ impl Pattern {
                 }
             }
         }
+    }
+
+    fn set_pattern(&mut self, data_points: &DataPoints, pattern_type: PatternType) {
+        self.pattern_type = pattern_type;
+        self.data = data_points.to_owned();
     }
 
     pub fn is_active_double_top(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
@@ -126,30 +157,6 @@ impl Pattern {
     pub fn is_double_bottom(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
         if comp::is_equal(data[0].1, data[2].1) && data[1].1 > data[0].1 && data[1].1 > data[2].1 {
             println!("[DOUBLE BOTTOM] {:?}", data);
-            self.data = data.to_owned();
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_descendant_triangle(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
-        if comp::is_equal(data[3].1, data[1].1) && data[4].1 < data[2].1 && data[2].1 < data[0].1 {
-            println!("[DESCENDANT TRIANGLE] {:?}", data);
-            self.data = data.to_owned();
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_symmetrical_triangle(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
-        if data[4].1 < data[2].1
-            && data[2].1 < data[0].1
-            && data[0].1 < data[1].1
-            && data[3].1 > data[1].1
-        {
-            println!("[SYMMETRICAL TRIANGLE] {:?}", data);
             self.data = data.to_owned();
             true
         } else {
