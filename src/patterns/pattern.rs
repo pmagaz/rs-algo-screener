@@ -1,13 +1,10 @@
 use super::peaks::Peaks;
-use crate::helpers::comp;
-
-use std::cmp;
 use std::env;
 type Point = (usize, f64);
 pub type DataPoints = Vec<Point>;
+use crate::patterns::double;
 use crate::patterns::triangle;
-
-//type DataPoints = (Point, Point, Point, Point, Point);
+use std::fmt::{self, Display};
 //TODO use TRAITS
 
 #[derive(Debug, Clone)]
@@ -32,21 +29,32 @@ pub enum PatternType {
 #[derive(Debug, Clone)]
 pub struct Pattern {
     pub pattern_type: PatternType,
-    pub data: DataPoints,
+    pub data_points: DataPoints,
 }
 
-// #[derive(Debug, Clone)]
-// pub struct Patterns {
-//     patterns: Vec<Pattern>,
-//     upper_channel: UpperChannel,
+// impl Display for PatternType {
+//     fn fmt(&self, err: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         Display::fmt(&self, err)
+//     }
 // }
+
+#[derive(Debug, Clone)]
+pub struct Patterns {
+    pub patterns: Vec<Pattern>,
+}
 
 impl Pattern {
     pub fn new() -> Self {
         Pattern {
             pattern_type: PatternType::Default,
-            data: vec![],
+            data_points: vec![],
         }
+    }
+}
+
+impl Patterns {
+    pub fn new() -> Self {
+        Patterns { patterns: vec![] }
     }
 
     pub fn detect_pattern(&mut self, peaks: &Peaks, current_price: &f64) {
@@ -68,27 +76,12 @@ impl Pattern {
             match iter.next() {
                 Some(window) => {
                     let data_points = window.to_vec();
-                    if self.is_active_double_top(&data_points, current_price) {
-                        self.pattern_type = PatternType::DoubleTopActivated;
-                        // no_pattern = false;
-                        // } else if self.is_active_double_bottom(&data_points, current_price) {
-                        //     self.pattern_type = PatternType::DoubleBottomActivated;
-                        //     //  no_pattern = false;
-                        // } else if self.is_double_top(&data_points, current_price) {
-                        //     self.pattern_type = PatternType::DoubleTop;
-                        //     //no_pattern = false;
-                        // } else if self.is_double_bottom(&data_points, current_price) {
-                        //     self.pattern_type = PatternType::DoubleBottom;
-                        //     // no_pattern = false;
-                        // } else if triangle::is_ascendant_top(&data_points, current_price) {
-                        //     self.set_pattern(&data_points, PatternType::TriangleAscendantTop);
-                        //     no_pattern = false;
-                        // } else if triangle::is_ascendant_bottom(&data_points, current_price) {
-                        //     self.set_pattern(&data_points, PatternType::TriangleAscendantBottom);
-                        //     no_pattern = false;
-                        // } else if triangle::is_ascendant_top(&data_points, current_price) {
-                        //     self.set_pattern(&data_points, PatternType::TriangleAscendantTop);
-                        //       no_pattern = false;
+                    if double::is_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::DoubleTop);
+                        //no_pattern = false;
+                    } else if double::is_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::DoubleBottom);
+                        //no_pattern = false;
                     } else if triangle::is_ascendant_bottom(&data_points, current_price) {
                         self.set_pattern(&data_points, PatternType::TriangleAscendantBottom);
                         //no_pattern = false;
@@ -103,14 +96,14 @@ impl Pattern {
                         //  no_pattern = false;
                     } else if triangle::is_symmetrical_bottom(&data_points, current_price) {
                         self.set_pattern(&data_points, PatternType::TriangleSymmetricalBottom);
-                        no_pattern = false;
+                        //no_pattern = false;
                     }
                     //self.is_double_bottom(&DataPoints, current_price);
                     // self.is_broadening_top(&DataPoints, current_price);
                     // self.is_broadening_bottom(&DataPoints, current_price);
                     // self.is_descendant_triangle(&DataPoints, current_price);
                     // self.is_head_and_shoulders(&DataPoints, current_price);
-                    // self.is_inverse_head_and_shoulders(&DataPoints, current_price);
+                    // self.is_inverse_head_anfd_shoulders(&DataPoints, current_price);
                 }
                 None => {
                     no_pattern = false;
@@ -120,48 +113,13 @@ impl Pattern {
     }
 
     fn set_pattern(&mut self, data_points: &DataPoints, pattern_type: PatternType) {
-        self.pattern_type = pattern_type;
-        self.data = data_points.to_owned();
-    }
+        // self.pattern_type = pattern_type;
+        // self.data = data_points.to_owned();
 
-    pub fn is_active_double_top(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
-        if data[0].1 < data[2].1 && comp::is_equal(data[1].1, data[3].1) {
-            println!("[DOUBLE TOP ACTIVATED] {:?}", data);
-            self.data = data.to_owned();
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_double_top(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
-        if comp::is_equal(data[0].1, data[2].1) && data[1].1 < data[0].1 && data[1].1 < data[2].1 {
-            println!("[DOUBLE TOP] {:?}", data);
-            self.data = data.to_owned();
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_active_double_bottom(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
-        if data[0].1 > data[2].1 && comp::is_equal(data[1].1, data[3].1) {
-            println!("[DOUBLE BOTTOM ACTIVATED] {:?}", data);
-            self.data = data.to_owned();
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn is_double_bottom(&mut self, data: &DataPoints, _current_price: &f64) -> bool {
-        if comp::is_equal(data[0].1, data[2].1) && data[1].1 > data[0].1 && data[1].1 > data[2].1 {
-            println!("[DOUBLE BOTTOM] {:?}", data);
-            self.data = data.to_owned();
-            true
-        } else {
-            false
-        }
+        self.patterns.push(Pattern {
+            pattern_type,
+            data_points: data_points.to_owned(),
+        });
     }
 
     // pub fn is_broadening_top(
@@ -192,24 +150,6 @@ impl Pattern {
     //         && data[1] .1 < data[3] .1
     //     {
     //         println!("[BROADENING BOTTOM] {:?}", data);
-    //         Some((data[0], data[1], data[2]))
-    //     } else {
-    //         None
-    //     }
-    // }
-
-    // pub fn is_descendant_triangle(
-    //     &self,
-    //     data: &DataPoints,
-    //     _current_price: &f64,
-    // ) -> Option<(Point, Point, Point)> {
-    //     if comp::is_equal(data[0] .1, data[2] .1)
-    //         && data[0] .1 < data[1] .1
-    //         && data[2] .1 < data[1] .1
-    //         && data[2] .1 < data[3] .1
-    //         && data[1] .1 < data[3] .1
-    //     {
-    //         println!("[DESCENDANT TRIANGLE] {:?}", data);
     //         Some((data[0], data[1], data[2]))
     //     } else {
     //         None

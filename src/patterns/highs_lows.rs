@@ -1,6 +1,5 @@
 use super::pattern::DataPoints;
 use crate::helpers::comp::*;
-use std::env;
 
 pub fn is_lower_highs_top(data: &DataPoints, _current_price: &f64) -> bool {
     if data[4].1 > data[2].1 && data[2].1 > data[0].1 {
@@ -37,7 +36,7 @@ pub fn is_higher_lows_bottom(data: &DataPoints, _current_price: &f64) -> bool {
     }
 }
 
-pub fn is_equal_top(data: &DataPoints, _current_price: &f64) -> bool {
+pub fn upper_band_is_equal_top(data: &DataPoints, _current_price: &f64) -> bool {
     if is_equal(data[4].1, data[2].1) && is_equal(data[2].1, data[0].1) {
         true
     } else {
@@ -45,7 +44,23 @@ pub fn is_equal_top(data: &DataPoints, _current_price: &f64) -> bool {
     }
 }
 
-pub fn is_equal_bottom(data: &DataPoints, _current_price: &f64) -> bool {
+pub fn upper_band_is_equal_bottom(data: &DataPoints, _current_price: &f64) -> bool {
+    if is_equal(data[3].1, data[1].1) {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn lower_band_is_equal_bottom(data: &DataPoints, _current_price: &f64) -> bool {
+    if is_equal(data[4].1, data[2].1) && is_equal(data[2].1, data[0].1) {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn lower_band_is_equal_top(data: &DataPoints, _current_price: &f64) -> bool {
     if is_equal(data[3].1, data[1].1) {
         true
     } else {

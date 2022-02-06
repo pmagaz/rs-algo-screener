@@ -1,4 +1,5 @@
 pub mod broadening;
+pub mod double;
 pub mod highs_lows;
 pub mod horizontal_levels;
 pub mod pattern;

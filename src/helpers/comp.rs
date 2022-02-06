@@ -24,12 +24,6 @@ pub fn increase_equally(a: (f64, f64), b: (f64, f64)) -> bool {
         .unwrap()
         .parse::<f64>()
         .unwrap();
-    println!(
-        "111111 {:?} {:?}{:?}",
-        a,
-        b,
-        (percentage_increase_a - percentage_increase_b).abs()
-    );
 
     if (percentage_increase_a - percentage_increase_b).abs() < threshold {
         true

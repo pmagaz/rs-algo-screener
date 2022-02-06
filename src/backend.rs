@@ -74,6 +74,8 @@ impl Backend {
         chart
             .configure_mesh()
             .light_line_style(&WHITE)
+            .x_label_formatter(&|v| format!("{:.1}", v))
+            .y_label_formatter(&|v| format!("{:.1}", v))
             .draw()
             .unwrap();
         chart
@@ -102,34 +104,50 @@ impl Backend {
             }))
             .unwrap();
 
-        println!("[PATTERN] {:?}", patterns.pattern_type);
+        for (x, pattern) in patterns.patterns.iter().enumerate() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
+                        let idx = highs.0;
+                        let value = highs.1;
+                        let date = data[idx].date();
+                        (date, value)
+                    }),
+                    (if x < 1 { &BLUE } else { &BLUE }),
+                ))
+                .unwrap()
+                .label(format!("{:?}", pattern.pattern_type));
+        }
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..).zip(patterns.data.iter()).map(|(_k, highs)| {
-                    let idx = highs.0;
-                    let value = highs.1;
-                    let date = data[idx].date();
-                    (date, value)
-                }),
-                &BLUE,
-            ))
-            .unwrap();
-        //  }
+        for (x, pattern) in patterns.patterns.iter().enumerate() {
+            chart
+                .draw_series(PointSeries::of_element(
+                    (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
+                        let idx = highs.0;
+                        let value = highs.1;
+                        let date = data[idx].date();
+                        (date, value, i)
+                    }),
+                    0,
+                    ShapeStyle::from(&RED).filled(),
+                    &|coord, _size: i32, _style| {
+                        let new_coord = (coord.0, coord.1);
+                        let mut PatternName;
+                        if coord.2 == 4 {
+                            PatternName = Text::new(
+                                format!("{:?}", pattern.pattern_type),
+                                (0, 0),
+                                ("sans-serif", 15),
+                            )
+                        } else {
+                            PatternName = Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
+                        }
 
-        // for x in smooth_highs.iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..).zip(smooth_highs.iter()).map(|(_k, highs)| {
-        //                 let idx = highs.0;
-        //                 let value = highs.1;
-        //                 let date = data[idx].date();
-        //                 (date, value)
-        //             }),
-        //             &BLUE,
-        //         ))
-        //         .unwrap();
-        // }
+                        EmptyElement::at(new_coord) + PatternName
+                    },
+                ))
+                .unwrap();
+        }
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
@@ -157,7 +175,7 @@ impl Backend {
                             candle.high() + candle.high() / peaks_marker_distance - 10.,
                         ),
                         4,
-                        RED.filled(),
+                        BLUE.filled(),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
