@@ -8,7 +8,6 @@ use futures::future;
 
 pub struct Screener<BK> {
     broker: BK,
-    // instrument: Instrument,
     backend: Backend,
 }
 
@@ -35,7 +34,6 @@ where
     pub async fn new() -> Result<Self> {
         Ok(Self {
             broker: BK::new().await,
-            //instrument: Instrument::new().symbol(symbol).build().unwrap(),
             backend: Backend::new(),
         })
     }
@@ -47,7 +45,7 @@ where
                     println!("[Login] Ok");
                 }
                 MessageType::GetInstrumentPrice => {
-                    println!("[Data Prices] Ok");
+                    println!("[Data Prices] Ok {}", &res.symbol);
                     //res.data.reverse();
                     let mut instrument = Instrument::new().symbol(&res.symbol).build().unwrap();
                     instrument.set_data(res.data).unwrap();

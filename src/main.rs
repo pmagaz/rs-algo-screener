@@ -25,8 +25,6 @@ TODO
 - Add activated chart figures
 */
 
-const symbol: &str = "NFLX.US_4";
-
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
@@ -35,10 +33,10 @@ async fn main() -> Result<()> {
     let password = &env::var("BROKER_PASSWORD").unwrap();
     let from = (Local::now() - date::Duration::days(365 * 3)).timestamp();
 
-    //TODO configure with builder (credentials, optional render)
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
-    screener.load_data(symbol, 1440, from).await?;
+    screener.load_data("AAPL.US_4", 1440, from).await?;
+    screener.load_data("NFLX.US_4", 1440, from).await?;
     screener.start().await?;
     Ok(())
 }

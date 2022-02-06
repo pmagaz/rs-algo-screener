@@ -97,6 +97,7 @@ impl Broker for Xtb {
 
     async fn get_prices(&mut self, symbol: &str, time_frame: usize, from_date: i64) -> Result<()> {
         self.symbol = symbol.to_owned();
+        println!("11111 {}", symbol);
         self.send(&Command {
             command: "getChartLastRequest".to_owned(),
             arguments: Instrument {
@@ -124,6 +125,7 @@ impl Broker for Xtb {
             };
             let response = self.handle_response::<VEC_DOHLC>(&txt_msg).await.unwrap();
             tokio::spawn(callback(response));
+            println!("111");
         }
     }
 }
