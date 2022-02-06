@@ -12,7 +12,7 @@ use std::future::Future;
 #[derive(Debug)]
 pub struct Xtb {
     websocket: WebSocket,
-    ticker: String,
+    symbol: String,
     sessionId: String,
     time_frame: usize,
     from_date: i64,
@@ -62,13 +62,13 @@ pub struct InstrumentCandles {
 
 #[async_trait::async_trait]
 impl Broker for Xtb {
-    async fn new(ticker: &str) -> Self {
+    async fn new() -> Self {
         let url = &env::var("BROKER_URL").unwrap();
 
         Self {
             websocket: WebSocket::connect(url).await,
             sessionId: "".to_owned(),
-            ticker: ticker.to_owned(),
+            symbol: "".to_owned(),
             time_frame: 0,
             from_date: 0,
         }
@@ -88,11 +88,15 @@ impl Broker for Xtb {
     }
 
     async fn get_symbols(&mut self) -> Result<()> {
-        self.send(&Command2 { command: "getAllSymbols".to_owned() }).await?;
+        self.send(&Command2 {
+            command: "getAllSymbols".to_owned(),
+        })
+        .await?;
         Ok(())
     }
 
     async fn get_prices(&mut self, symbol: &str, time_frame: usize, from_date: i64) -> Result<()> {
+        self.symbol = symbol.to_owned();
         self.send(&Command {
             command: "getChartLastRequest".to_owned(),
             arguments: Instrument {
@@ -129,7 +133,9 @@ impl Xtb {
     where
         for<'de> T: Serialize + Deserialize<'de> + Debug,
     {
-        self.websocket.send(&serde_json::to_string(&command).unwrap()).await?;
+        self.websocket
+            .send(&serde_json::to_string(&command).unwrap())
+            .await?;
 
         Ok(())
     }
@@ -141,25 +147,26 @@ impl Xtb {
 
     async fn handle_response<'a, T>(&mut self, msg: &str) -> Result<Response<VEC_DOHLC>> {
         let data = self.parse_message(&msg).await.unwrap();
+
         let response: Response<VEC_DOHLC> = match &data {
             _x if matches!(&data["streamSessionId"], Value::String(_x)) => {
                 self.sessionId = data["streamSessionId"].to_string();
                 Response {
                     msg_type: MessageType::Login,
-                    // message: data,
+                    symbol: "".to_owned(),
                     data: vec![],
                 }
             }
             _x if matches!(&data["returnData"], Value::Object(_x)) => Response::<VEC_DOHLC> {
                 msg_type: MessageType::GetInstrumentPrice,
-                //    message: data.clone(),
+                symbol: self.symbol.to_owned(),
                 data: self.parse_price_data(&data).await.unwrap(),
             },
             _ => {
                 println!("[Error] {:?}", msg);
                 Response {
                     msg_type: MessageType::Other,
-                    //    message: data,
+                    symbol: "".to_owned(),
                     data: vec![],
                 }
             }

@@ -2,14 +2,13 @@ use crate::backend::Backend;
 use crate::broker::{Broker, Response, VEC_DOHLC};
 use crate::error::{Result, RsAlgoError};
 use crate::helpers::websocket::MessageType;
-use crate::indicators::macd::Macd;
 use crate::instrument::Instrument;
 
 use futures::future;
 
 pub struct Screener<BK> {
     broker: BK,
-    instrument: Instrument,
+    // instrument: Instrument,
     backend: Backend,
 }
 
@@ -23,18 +22,20 @@ where
 
     pub async fn load_data(
         &mut self,
-        ticker: &str,
+        symbol: &str,
         time_frame: usize,
         start_date: i64,
     ) -> Result<()> {
-        self.broker.get_prices(ticker, time_frame, start_date).await?;
+        self.broker
+            .get_prices(symbol, time_frame, start_date)
+            .await?;
         Ok(())
     }
 
-    pub async fn new(ticker: &str) -> Result<Self> {
+    pub async fn new() -> Result<Self> {
         Ok(Self {
-            broker: BK::new(ticker).await,
-            instrument: Instrument::new().ticker(ticker).build().unwrap(),
+            broker: BK::new().await,
+            //instrument: Instrument::new().symbol(symbol).build().unwrap(),
             backend: Backend::new(),
         })
     }
@@ -48,10 +49,11 @@ where
                 MessageType::GetInstrumentPrice => {
                     println!("[Data Prices] Ok");
                     //res.data.reverse();
-                    self.instrument.set_data(res.data).unwrap();
+                    let mut instrument = Instrument::new().symbol(&res.symbol).build().unwrap();
+                    instrument.set_data(res.data).unwrap();
                     println!("[Backend] rendering...");
 
-                    self.backend.render(&self.instrument).unwrap();
+                    self.backend.render(&instrument).unwrap();
                 }
                 MessageType::Other => {
                     println!("33333");

@@ -11,7 +11,7 @@ use std::env;
 
 #[derive(Debug, Clone)]
 pub struct Instrument {
-    ticker: String,
+    symbol: String,
     data: Vec<Candle>,
     current_price: f64,
     min_price: f64,
@@ -27,8 +27,8 @@ impl Instrument {
         InstrumentBuilder::new()
     }
 
-    pub fn ticker(&self) -> &str {
-        &self.ticker
+    pub fn symbol(&self) -> &str {
+        &self.symbol
     }
 
     pub fn indicators(&self) -> &Indicators {
@@ -122,7 +122,7 @@ impl Instrument {
         self.patterns
             .detect_pattern(&self.peaks, &self.current_price);
 
-        //self.indicators.calculate_macd(&parsed).unwrap();
+        self.indicators.calculate_macd(&parsed).unwrap();
 
         //self.patterns.detect_upper_channel(&self.peaks);
 
@@ -139,16 +139,16 @@ impl Instrument {
 }
 
 pub struct InstrumentBuilder {
-    ticker: Option<String>,
+    symbol: Option<String>,
     //indicators: Option<Indicators>,
 }
 
 impl InstrumentBuilder {
     pub fn new() -> InstrumentBuilder {
-        Self { ticker: None }
+        Self { symbol: None }
     }
-    pub fn ticker(mut self, val: &str) -> Self {
-        self.ticker = Some(String::from(val));
+    pub fn symbol(mut self, val: &str) -> Self {
+        self.symbol = Some(String::from(val));
         self
     }
 
@@ -158,9 +158,9 @@ impl InstrumentBuilder {
     // }
 
     pub fn build(self) -> Result<Instrument> {
-        if let Some(ticker) = self.ticker {
+        if let Some(symbol) = self.symbol {
             Ok(Instrument {
-                ticker,
+                symbol,
                 data: vec![],
                 peaks: Peaks::new(),
                 horizontal_levels: HorizontalLevels::new(),

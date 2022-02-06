@@ -18,7 +18,14 @@ mod instrument;
 mod patterns;
 mod screener;
 
-const TICKER: &str = "NFLX.US_4";
+/*
+TODO
+- Add degrees to higher_highs increment/decrement
+- Calculate divergences on indicators
+- Add activated chart figures
+*/
+
+const symbol: &str = "NFLX.US_4";
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -29,9 +36,9 @@ async fn main() -> Result<()> {
     let from = (Local::now() - date::Duration::days(365 * 3)).timestamp();
 
     //TODO configure with builder (credentials, optional render)
-    let mut screener = Screener::<Xtb>::new(TICKER).await?;
+    let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
-    screener.load_data(TICKER, 1440, from).await?;
+    screener.load_data(symbol, 1440, from).await?;
     screener.start().await?;
     Ok(())
 }

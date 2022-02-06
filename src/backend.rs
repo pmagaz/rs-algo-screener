@@ -27,7 +27,7 @@ impl Backend {
             .unwrap();
         let output_file = [
             &env::var("OUTPUT_FOLDER").unwrap(),
-            instrument.ticker(),
+            instrument.symbol(),
             ".png",
         ]
         .concat();
@@ -67,7 +67,7 @@ impl Backend {
             .x_label_area_size(40)
             .y_label_area_size(40)
             .margin(5)
-            .caption(instrument.ticker(), ("sans-serif", 14.0).into_font())
+            .caption(instrument.symbol(), ("sans-serif", 14.0).into_font())
             .build_cartesian_2d(from_date..to_date, min_price..max_price)
             .unwrap();
 
