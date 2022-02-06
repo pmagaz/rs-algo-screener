@@ -1,26 +1,16 @@
+use super::highs_lows::*;
 use super::pattern::DataPoints;
-use crate::helpers::comp;
 
-pub fn top(data: &DataPoints, _current_price: &f64) -> bool {
-    if data[4].1 > data[2].1
-        && data[2].1 > data[0].1
-        && data[3].1 < data[1].1
-        && data[2].1 < data[0].1
-    {
-        println!("[DESCENDANT TRIANGLE] {:?}", data);
+pub fn is_top(data: &DataPoints, _current_price: &f64) -> bool {
+    if is_higher_highs_top(data, _current_price) && is_lower_lows_top(data, _current_price) {
         true
     } else {
         false
     }
 }
 
-pub fn bottom(data: &DataPoints, _current_price: &f64) -> bool {
-    if data[4].1 < data[2].1
-        && data[2].1 < data[0].1
-        && data[3].1 > data[1].1
-        && data[2].1 > data[0].1
-    {
-        println!("[DESCENDANT TRIANGLE] {:?}", data);
+pub fn is_bottom(data: &DataPoints, _current_price: &f64) -> bool {
+    if is_higher_highs_bottom(data, _current_price) && is_lower_lows_bottom(data, _current_price) {
         true
     } else {
         false

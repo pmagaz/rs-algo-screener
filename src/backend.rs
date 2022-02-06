@@ -57,7 +57,7 @@ impl Backend {
         let macd_b = macd.data_b();
 
         let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
-        let (upper, lower) = root.split_vertically((70).percent());
+        let (upper, lower) = root.split_vertically((75).percent());
         let (lower_2, lower_1) = lower.split_vertically((70).percent());
         let (indicator_1, indicator_2) = lower_2.split_vertically((50).percent());
 

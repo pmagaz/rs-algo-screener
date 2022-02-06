@@ -18,7 +18,7 @@ mod instrument;
 mod patterns;
 mod screener;
 
-const TICKER: &str = "TTD.US_4";
+const TICKER: &str = "NFLX.US_4";
 
 #[tokio::main]
 async fn main() -> Result<()> {

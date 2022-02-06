@@ -2,28 +2,29 @@ use super::peaks::Peaks;
 use std::env;
 type Point = (usize, f64);
 pub type DataPoints = Vec<Point>;
-use crate::patterns::double;
-use crate::patterns::triangle;
+use crate::patterns::*;
 use std::fmt::{self, Display};
 //TODO use TRAITS
 
 #[derive(Debug, Clone)]
 pub enum PatternType {
     Default,
-    DoubleTop,
     TriangleSymmetricalTop,
     TriangleSymmetricalBottom,
     TriangleDescendantTop,
     TriangleDescendantBottom,
     TriangleAscendantTop,
     TriangleAscendantBottom,
-    DoubleTopActivated,
+    RectangleTop,
+    RectangleBottom,
+    ChannelUpTop,
+    ChannelUpBottom,
+    ChannelDownTop,
+    ChannelDownBottom,
+    BroadeningTop,
+    BroadeningBottom,
     DoubleBottom,
-    DoubleBottomActivated,
-    HeadAndShoulders,
-    HeadAndShouldersActivated,
-    InverseHeadAndShoulders,
-    InverseHeadAndShouldersActivated,
+    DoubleTop,
 }
 
 #[derive(Debug, Clone)]
@@ -32,24 +33,9 @@ pub struct Pattern {
     pub data_points: DataPoints,
 }
 
-// impl Display for PatternType {
-//     fn fmt(&self, err: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         Display::fmt(&self, err)
-//     }
-// }
-
 #[derive(Debug, Clone)]
 pub struct Patterns {
     pub patterns: Vec<Pattern>,
-}
-
-impl Pattern {
-    pub fn new() -> Self {
-        Pattern {
-            pattern_type: PatternType::Default,
-            data_points: vec![],
-        }
-    }
 }
 
 impl Patterns {
@@ -76,12 +62,9 @@ impl Patterns {
             match iter.next() {
                 Some(window) => {
                     let data_points = window.to_vec();
-                    if double::is_top(&data_points, current_price) {
-                        self.set_pattern(&data_points, PatternType::DoubleTop);
-                        //no_pattern = false;
-                    } else if double::is_bottom(&data_points, current_price) {
-                        self.set_pattern(&data_points, PatternType::DoubleBottom);
-                        //no_pattern = false;
+                    if triangle::is_ascendant_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::TriangleAscendantTop);
+                        no_pattern = false;
                     } else if triangle::is_ascendant_bottom(&data_points, current_price) {
                         self.set_pattern(&data_points, PatternType::TriangleAscendantBottom);
                         //no_pattern = false;
@@ -96,14 +79,38 @@ impl Patterns {
                         //  no_pattern = false;
                     } else if triangle::is_symmetrical_bottom(&data_points, current_price) {
                         self.set_pattern(&data_points, PatternType::TriangleSymmetricalBottom);
+                    //no_pattern = false;
+                    } else if rectangle::is_renctangle_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::RectangleTop);
+                        //no_pattern = false;
+                    } else if rectangle::is_renctangle_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::RectangleBottom);
+                        // no_pattern = false;
+                    } else if channel::is_ascendant_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::ChannelUpTop);
+                    //no_pattern = false;
+                    } else if channel::is_ascendant_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::ChannelUpBottom);
+                    //no_pattern = false;
+                    } else if channel::is_descendant_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::ChannelDownTop);
+                    //no_pattern = false;
+                    } else if channel::is_descendant_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::ChannelDownBottom);
+                        // no_pattern = false;
+                    } else if broadening::is_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::BroadeningTop);
+                        //no_pattern = false;
+                    } else if broadening::is_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::BroadeningBottom);
+                        //no_pattern = false;
+                    } else if double::is_top(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::DoubleTop);
+                        //no_pattern = false;
+                    } else if double::is_bottom(&data_points, current_price) {
+                        self.set_pattern(&data_points, PatternType::DoubleBottom);
                         //no_pattern = false;
                     }
-                    //self.is_double_bottom(&DataPoints, current_price);
-                    // self.is_broadening_top(&DataPoints, current_price);
-                    // self.is_broadening_bottom(&DataPoints, current_price);
-                    // self.is_descendant_triangle(&DataPoints, current_price);
-                    // self.is_head_and_shoulders(&DataPoints, current_price);
-                    // self.is_inverse_head_anfd_shoulders(&DataPoints, current_price);
                 }
                 None => {
                     no_pattern = false;
@@ -113,48 +120,11 @@ impl Patterns {
     }
 
     fn set_pattern(&mut self, data_points: &DataPoints, pattern_type: PatternType) {
-        // self.pattern_type = pattern_type;
-        // self.data = data_points.to_owned();
-
         self.patterns.push(Pattern {
             pattern_type,
             data_points: data_points.to_owned(),
         });
     }
-
-    // pub fn is_broadening_top(
-    //     &self,
-    //     data: &DataPoints,
-    //     _current_price: &f64,
-    // ) -> Option<(Point, Point, Point)> {
-    //     if data[0] .1 > data[1] .1
-    //         && data[0] .1 < data[2] .1
-    //         && data[2] .1 < data[4] .1
-    //         && data[1] .1 > data[3] .1
-    //     {
-    //         println!("[BROADENING TOP] {:?}", data);
-    //         Some((data[0], data[1], data[2]))
-    //     } else {
-    //         None
-    //     }
-    // }
-
-    // pub fn is_broadening_bottom(
-    //     &self,
-    //     data: &DataPoints,
-    //     _current_price: &f64,
-    // ) -> Option<(Point, Point, Point)> {
-    //     if data[0] .1 < data[1] .1
-    //         && data[0] .1 > data[2] .1
-    //         && data[2] .1 > data[4] .1
-    //         && data[1] .1 < data[3] .1
-    //     {
-    //         println!("[BROADENING BOTTOM] {:?}", data);
-    //         Some((data[0], data[1], data[2]))
-    //     } else {
-    //         None
-    //     }
-    // }
 
     // pub fn is_head_and_shoulders(
     //     &self,
