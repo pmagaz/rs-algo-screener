@@ -10,12 +10,16 @@ use std::fmt::Debug;
 use std::future::Future;
 
 #[derive(Debug)]
+pub struct Operator {}
+
+#[derive(Debug)]
 pub struct Xtb {
     websocket: WebSocket,
     symbol: String,
     sessionId: String,
     time_frame: usize,
     from_date: i64,
+    pub operator: Operator,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -71,6 +75,7 @@ impl Broker for Xtb {
             symbol: "".to_owned(),
             time_frame: 0,
             from_date: 0,
+            operator: Operator {},
         }
     }
 

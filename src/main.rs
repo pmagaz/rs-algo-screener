@@ -1,12 +1,14 @@
+use crate::error::{Result, RsAlgoError};
 use broker::xtb::Xtb;
 use broker::Broker;
-use error::Result;
 use helpers::date;
 use helpers::date::Local;
 use screener::Screener;
 
 use dotenv::dotenv;
+use futures::future;
 use std::env;
+use std::future::Future;
 
 mod backend;
 mod broker;
@@ -33,10 +35,18 @@ async fn main() -> Result<()> {
     let password = &env::var("BROKER_PASSWORD").unwrap();
     let from = (Local::now() - date::Duration::days(365 * 3)).timestamp();
 
-    let mut screener = Screener::<Xtb>::new().await?;
+    //let mut screener = Screener::<Xtb>::new().await?;
+    let mut screener = Screener::new().await?;
     screener.login(username, password).await?;
-    screener.load_data("AAPL.US_4", 1440, from).await?;
-    screener.load_data("NFLX.US_4", 1440, from).await?;
-    screener.start().await?;
+    //let leches = screener.to_owned();
+    //&screener.load_data("AAPL.US_4", 1440, from).await?;
+    let handler = |x: Screener| async {
+        //&screener.load_data("AAPL.US_4", 1440, from).await?;
+        //println!("1111 {}", x);
+        Ok(())
+        // future::ok::<(), RsAlgoError>(())
+    };
+    screener.start(handler).await?;
+    println!("1112222222111");
     Ok(())
 }

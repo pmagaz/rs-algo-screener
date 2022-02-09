@@ -4,13 +4,11 @@ use crate::indicators::macd::Macd;
 use crate::indicators::stoch::Stoch;
 use crate::indicators::Indicator;
 use crate::instrument::Instrument;
-use crate::patterns::horizontal_levels::HorizontalLevelType;
 
 use plotters::prelude::*;
 use std::env;
-use ta::indicators::{ExponentialMovingAverage, SimpleMovingAverage};
-use ta::Next;
 
+#[derive(Debug)]
 pub struct Backend;
 
 impl Backend {

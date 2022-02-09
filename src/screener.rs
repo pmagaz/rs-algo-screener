@@ -1,19 +1,23 @@
 use crate::backend::Backend;
+use crate::broker::xtb::Operator;
+use crate::broker::xtb::Xtb;
 use crate::broker::{Broker, Response, VEC_DOHLC};
 use crate::error::{Result, RsAlgoError};
 use crate::helpers::websocket::MessageType;
 use crate::instrument::Instrument;
-
 use futures::future;
+use std::future::Future;
 
-pub struct Screener<BK> {
-    broker: BK,
+#[derive(Debug)]
+pub struct Screener {
+    broker: Xtb,
     backend: Backend,
 }
 
-impl<BK> Screener<BK>
-where
-    BK: Broker,
+impl Screener
+//impl<BK> Screener<BK>
+// where
+//     BK: Broker,
 {
     pub async fn login(&mut self, username: &str, password: &str) -> Result<()> {
         Ok(self.broker.login(username, password).await?)
@@ -33,12 +37,16 @@ where
 
     pub async fn new() -> Result<Self> {
         Ok(Self {
-            broker: BK::new().await,
+            broker: Xtb::new().await,
             backend: Backend::new(),
         })
     }
 
-    pub async fn start(&mut self) -> Result<()> {
+    pub async fn start<F, T>(&mut self, mut callback: F) -> Result<()>
+    where
+        F: Send + FnMut(Self) -> T,
+        T: Future<Output = Result<()>> + Send + 'static,
+    {
         let handler = |res: Response<VEC_DOHLC>| {
             match &res.msg_type {
                 MessageType::Login => {
@@ -57,7 +65,10 @@ where
                     println!("33333");
                 }
             };
-
+            //CONTINUE HERE. TO return a handler or something
+            //tokio::spawn(callback(&mut self.broker.operator));
+            callback(self);
+            //tokio::spawn(async move { callback(true) });
             future::ok::<(), RsAlgoError>(())
         };
 
