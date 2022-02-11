@@ -14,7 +14,7 @@ pub struct Operator {}
 
 #[derive(Debug)]
 pub struct Xtb {
-    websocket: WebSocket,
+    pub websocket: WebSocket,
     symbol: String,
     sessionId: String,
     time_frame: usize,
@@ -147,12 +147,12 @@ impl Xtb {
         Ok(())
     }
 
-    async fn parse_message(&mut self, msg: &str) -> Result<Value> {
+    pub async fn parse_message(&mut self, msg: &str) -> Result<Value> {
         let parsed: Value = serde_json::from_str(&msg).expect("Can't parse to JSON");
         Ok(parsed)
     }
 
-    async fn handle_response<'a, T>(&mut self, msg: &str) -> Result<Response<VEC_DOHLC>> {
+    pub async fn handle_response<'a, T>(&mut self, msg: &str) -> Result<Response<VEC_DOHLC>> {
         let data = self.parse_message(&msg).await.unwrap();
 
         let response: Response<VEC_DOHLC> = match &data {
