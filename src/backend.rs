@@ -8,7 +8,7 @@ use crate::instrument::Instrument;
 use plotters::prelude::*;
 use std::env;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Backend;
 
 impl Backend {

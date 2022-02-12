@@ -23,7 +23,12 @@ pub trait Broker {
     where
         F: Send + FnMut(Response<VEC_DOHLC>) -> T,
         T: Future<Output = Result<()>> + Send + 'static;
-    async fn get_prices(&mut self, symbol: &str, period: usize, start: i64) -> Result<()>;
+    async fn get_instrument_data(
+        &mut self,
+        symbol: &str,
+        period: usize,
+        start: i64,
+    ) -> Result<Response<VEC_DOHLC>>;
     async fn get_symbols(&mut self) -> Result<()>;
     async fn login(&mut self, username: &str, password: &str) -> Result<()>
     where

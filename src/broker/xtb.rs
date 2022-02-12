@@ -89,6 +89,9 @@ impl Broker for Xtb {
             },
         })
         .await?;
+
+        let res = self.get_response().await?;
+
         Ok(())
     }
 
@@ -97,12 +100,18 @@ impl Broker for Xtb {
             command: "getAllSymbols".to_owned(),
         })
         .await?;
+        //let res = self.get_response().await?;
+
         Ok(())
     }
 
-    async fn get_prices(&mut self, symbol: &str, time_frame: usize, from_date: i64) -> Result<()> {
+    async fn get_instrument_data(
+        &mut self,
+        symbol: &str,
+        time_frame: usize,
+        from_date: i64,
+    ) -> Result<Response<VEC_DOHLC>> {
         self.symbol = symbol.to_owned();
-        println!("11111 {}", symbol);
         self.send(&Command {
             command: "getChartLastRequest".to_owned(),
             arguments: Instrument {
@@ -114,7 +123,10 @@ impl Broker for Xtb {
             },
         })
         .await?;
-        Ok(())
+
+        let res = self.get_response().await?;
+
+        Ok(res)
     }
 
     async fn listen<F, T>(&mut self, mut callback: F)
@@ -145,6 +157,17 @@ impl Xtb {
             .await?;
 
         Ok(())
+    }
+
+    async fn get_response(&mut self) -> Result<Response<VEC_DOHLC>> {
+        let msg = self.websocket.read().await.unwrap();
+        let txt_msg = match msg {
+            Message::Text(txt) => txt,
+            _ => panic!(),
+        };
+        let res = self.handle_response::<VEC_DOHLC>(&txt_msg).await.unwrap();
+
+        Ok(res)
     }
 
     pub async fn parse_message(&mut self, msg: &str) -> Result<Value> {
