@@ -34,10 +34,9 @@ impl WebSocket {
     }
 
     pub async fn send(&mut self, msg: &str) -> Result<()> {
-        println!("[Sending]: {}", msg);
+        //println!("[Sending]: {}", msg);
         self.socket.write_message(Message::text(msg)).unwrap();
         Ok(())
-        // self.socket.read_message().expect("Error reading message")
     }
 
     pub async fn read(&mut self) -> Result<Message> {
