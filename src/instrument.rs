@@ -131,8 +131,6 @@ impl Instrument {
         self.patterns
             .detect_pattern(maxima, minima, &self.current_price);
 
-        self.indicators.calculate_macd(&parsed).unwrap();
-
         self.horizontal_levels
             .calculate_horizontal_highs(&self.current_price, &self.peaks)
             .unwrap();

@@ -44,15 +44,15 @@ impl Backend {
         //let upper_channel = instrument.patterns().upper_channel();
 
         let rsi = instrument.indicators().rsi();
-        let rsi_a = rsi.data_a();
+        let rsi_a = rsi.get_data_a();
 
         let stoch = instrument.indicators().stoch();
-        let stoch_a = stoch.data_a();
-        let stoch_b = stoch.data_b();
+        let stoch_a = stoch.get_data_a();
+        let stoch_b = stoch.get_data_b();
 
         let macd = instrument.indicators().macd();
-        let macd_a = macd.data_a();
-        let macd_b = macd.data_b();
+        let macd_a = macd.get_data_a();
+        let macd_b = macd.get_data_b();
 
         let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
         let (upper, lower) = root.split_vertically((75).percent());

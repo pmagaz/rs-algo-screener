@@ -49,7 +49,7 @@ where
 
         let mut instrument = Instrument::new().symbol(&res.symbol).build().unwrap();
         instrument.set_data(res.data).unwrap();
-        //self.backend.render(&instrument).unwrap();
+        self.backend.render(&instrument).unwrap();
         tokio::spawn(callback(instrument));
         Ok(())
     }
