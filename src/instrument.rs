@@ -125,12 +125,13 @@ impl Instrument {
         self.set_current_price(parsed[0].close());
         self.peaks.calculate_peaks(&self.max_price).unwrap();
 
+        let maxima = self.peaks.local_maxima();
+        let minima = self.peaks.local_minima();
+
         self.patterns
-            .detect_pattern(&self.peaks, &self.current_price);
+            .detect_pattern(maxima, minima, &self.current_price);
 
         self.indicators.calculate_macd(&parsed).unwrap();
-
-        //self.patterns.detect_upper_channel(&self.peaks);
 
         self.horizontal_levels
             .calculate_horizontal_highs(&self.current_price, &self.peaks)

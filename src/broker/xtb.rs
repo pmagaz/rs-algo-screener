@@ -10,8 +10,23 @@ use std::fmt::Debug;
 use std::future::Future;
 
 #[derive(Debug)]
-pub struct Operator {}
+pub enum TimeFrame {
+    H1,
+    H4,
+    D,
+    W,
+}
 
+impl TimeFrame {
+    pub fn value(&self) -> usize {
+        match *self {
+            TimeFrame::H1 => 60,
+            TimeFrame::H4 => 240,
+            TimeFrame::D => 1440,
+            TimeFrame::W => 10080,
+        }
+    }
+}
 #[derive(Debug)]
 pub struct Xtb {
     pub websocket: WebSocket,
@@ -19,7 +34,6 @@ pub struct Xtb {
     sessionId: String,
     time_frame: usize,
     from_date: i64,
-    pub operator: Operator,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -75,7 +89,6 @@ impl Broker for Xtb {
             symbol: "".to_owned(),
             time_frame: 0,
             from_date: 0,
-            operator: Operator {},
         }
     }
 

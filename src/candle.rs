@@ -164,7 +164,7 @@ impl CandleBuilder {
         let (open, high, low, close) = &self.get_current_ohlc();
         let high_shadow = (high - close) / close;
         let low_shadow = (low - open) / open;
-        (open <= low && low_shadow < 0.3) && (high >= close && high_shadow < 0.3)
+        (open <= low && low_shadow < 0.1) && (high >= close && high_shadow < 0.1)
     }
 
     fn is_bearish_marubozu(&self) -> bool {
@@ -172,7 +172,7 @@ impl CandleBuilder {
         let (open, high, low, close) = &self.get_current_ohlc();
         let high_shadow = (high - open) / open;
         let low_shadow = (low - close) / close;
-        (open >= high && high_shadow < 0.3) && (low <= close && high_shadow < 0.3)
+        (open >= high && high_shadow < 0.1) && (low <= close && high_shadow < 0.1)
     }
 
     fn is_hanging_man(&self) -> bool {
@@ -198,6 +198,7 @@ impl CandleBuilder {
         //(C1 > O1) AND (O > C) AND (O >= C1) AND (O1 >= C) AND ((O – C) > (C1 – O1))
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc();
+        //println!("5555555 {:?} {:?}", prev_open, open);
         (prev_close > prev_open)
             && (open > close)
             && (open >= prev_close)
