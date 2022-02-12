@@ -1,4 +1,4 @@
-use super::{Broker, Response, VEC_DOHLC};
+use super::{Broker, Response, Symbol, VEC_DOHLC};
 use crate::error::Result;
 use crate::helpers::date::parse_time;
 use crate::helpers::websocket::{Message, MessageType, WebSocket};
@@ -95,14 +95,14 @@ impl Broker for Xtb {
         Ok(())
     }
 
-    async fn get_symbols(&mut self) -> Result<()> {
+    async fn get_symbols(&mut self) -> Result<Response<VEC_DOHLC>> {
         self.send(&Command2 {
             command: "getAllSymbols".to_owned(),
         })
         .await?;
-        //let res = self.get_response().await?;
+        let res = self.get_response().await?;
 
-        Ok(())
+        Ok(res)
     }
 
     async fn get_instrument_data(
@@ -142,7 +142,6 @@ impl Broker for Xtb {
             };
             let response = self.handle_response::<VEC_DOHLC>(&txt_msg).await.unwrap();
             tokio::spawn(callback(response));
-            println!("111");
         }
     }
 }
@@ -177,27 +176,40 @@ impl Xtb {
 
     pub async fn handle_response<'a, T>(&mut self, msg: &str) -> Result<Response<VEC_DOHLC>> {
         let data = self.parse_message(&msg).await.unwrap();
-
         let response: Response<VEC_DOHLC> = match &data {
+            // Login
             _x if matches!(&data["streamSessionId"], Value::String(_x)) => {
                 self.sessionId = data["streamSessionId"].to_string();
                 Response {
                     msg_type: MessageType::Login,
                     symbol: "".to_owned(),
                     data: vec![],
+                    symbols: vec![],
                 }
             }
-            _x if matches!(&data["returnData"], Value::Object(_x)) => Response::<VEC_DOHLC> {
+            // GetSymbols
+            _x if matches!(&data["returnData"], Value::Array(_x)) => Response::<VEC_DOHLC> {
                 msg_type: MessageType::GetInstrumentPrice,
                 symbol: self.symbol.to_owned(),
-                data: self.parse_price_data(&data).await.unwrap(),
+                data: vec![],
+                symbols: self.parse_symbols_data(&data).await.unwrap(),
             },
+            // GetInstrumentPrice
+            _x if matches!(&data["returnData"]["digits"], Value::Number(_x)) => {
+                Response::<VEC_DOHLC> {
+                    msg_type: MessageType::GetInstrumentPrice,
+                    symbol: self.symbol.to_owned(),
+                    symbols: vec![],
+                    data: self.parse_price_data(&data).await.unwrap(),
+                }
+            }
             _ => {
                 println!("[Error] {:?}", msg);
                 Response {
                     msg_type: MessageType::Other,
                     symbol: "".to_owned(),
                     data: vec![],
+                    symbols: vec![],
                 }
             }
         };
@@ -217,12 +229,40 @@ impl Xtb {
             let low = open + obj["low"].as_f64().unwrap() / pow;
             let close = open + obj["close"].as_f64().unwrap() / pow;
             let volume = obj["vol"].as_f64().unwrap();
-
-            //CONTINUE HERE
-            //WRONG DATES 2021-12-19T23:00:00+01:00 was SUNDAY!
             result.push((date, open, high, low, close, volume));
         }
 
+        Ok(result)
+    }
+
+    async fn parse_symbols_data(&mut self, data: &Value) -> Result<Vec<Symbol>> {
+        let mut result: Vec<Symbol> = vec![];
+        let symbols = data["returnData"].as_array().unwrap();
+        for s in symbols {
+            let symbol = match &s["symbol"] {
+                Value::String(s) => s.to_string(),
+                _ => panic!("Symbol parse error"),
+            };
+            let currency = match &s["currency"] {
+                Value::String(s) => s.to_string(),
+                _ => panic!("Currency parse error"),
+            };
+            let category = match &s["symbol"] {
+                Value::String(s) => s.to_string(),
+                _ => panic!("Category parse error"),
+            };
+
+            let description = match &s["description"] {
+                Value::String(s) => s.to_string(),
+                _ => panic!("Description parse error"),
+            };
+            result.push(Symbol {
+                symbol,
+                currency,
+                category,
+                description,
+            });
+        }
         Ok(result)
     }
 }

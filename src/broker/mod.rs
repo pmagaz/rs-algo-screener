@@ -10,10 +10,21 @@ pub type DOHLC = (DateTime<Local>, f64, f64, f64, f64, f64);
 pub type VEC_DOHLC = Vec<DOHLC>;
 
 #[derive(Debug)]
+pub struct Symbol {
+    pub symbol: String,
+    pub category: String,
+    pub currency: String,
+    pub description: String,
+}
+
+#[derive(Debug)]
 pub struct Response<R> {
     pub msg_type: MessageType,
+    // TODO move to Symbol
     pub symbol: String,
     pub data: R,
+    // TODO move to Symbol
+    pub symbols: Vec<Symbol>,
 }
 
 #[async_trait::async_trait]
@@ -29,7 +40,7 @@ pub trait Broker {
         period: usize,
         start: i64,
     ) -> Result<Response<VEC_DOHLC>>;
-    async fn get_symbols(&mut self) -> Result<()>;
+    async fn get_symbols(&mut self) -> Result<Response<VEC_DOHLC>>;
     async fn login(&mut self, username: &str, password: &str) -> Result<()>
     where
         Self: Sized;

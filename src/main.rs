@@ -1,15 +1,12 @@
-use crate::error::{Result, RsAlgoError};
+use crate::error::Result;
 use broker::xtb::Xtb;
-use broker::Broker;
 use helpers::date;
 use helpers::date::Local;
 use instrument::Instrument;
 use screener::Screener;
 
 use dotenv::dotenv;
-use futures::future;
 use std::env;
-use std::future::Future;
 use std::{thread, time};
 
 mod backend;
@@ -34,21 +31,22 @@ async fn main() -> Result<()> {
     dotenv().ok();
     let username = &env::var("BROKER_USERNAME").unwrap();
     let password = &env::var("BROKER_PASSWORD").unwrap();
-    let from = (Local::now() - date::Duration::days(365 * 3)).timestamp();
+    let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
+    let sleep = time::Duration::from_millis(*sleep_time);
 
-    let mut screener = Screener::new().await?;
+    let from = (Local::now() - date::Duration::days(365 * 2)).timestamp();
+    let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
-    let handler = |data: Instrument| async move {
-        println!("[INSTRUMENT] {:?}", data.symbol());
-        Ok(())
-    };
-    let symbols = screener.get_symbols().await.unwrap();
 
-    let symbols = vec!["AAPL.US_4", "TTD.US_4", "SQ.US_4"];
-    for symbol in symbols {
+    let symbols = screener.get_symbols().await.unwrap();
+    for s in symbols.symbols {
         screener
-            .get_instrument_data(symbol, 1440, from, handler)
+            .get_instrument_data(&s.symbol, 1440, from, |data: Instrument| async move {
+                println!("[INSTRUMENT] {:?}", data.symbol());
+                Ok(())
+            })
             .await?;
+        thread::sleep(sleep);
     }
     Ok(())
 }

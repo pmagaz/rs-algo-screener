@@ -9,6 +9,7 @@ use tungstenite::{connect, WebSocket as Ws};
 #[derive(Debug)]
 pub enum MessageType {
     Login,
+    GetSymbols,
     GetInstrumentPrice,
     Other,
 }
