@@ -1,5 +1,4 @@
 use crate::error::Result;
-use crate::helpers::date::{DateTime, Local};
 
 use std::net::TcpStream;
 use tungstenite::stream::MaybeTlsStream;
@@ -21,7 +20,7 @@ pub struct WebSocket {
 
 impl WebSocket {
     pub async fn connect(url: &str) -> Self {
-        let (mut socket, response) = connect(url).expect("Can't connect");
+        let (socket, response) = connect(url).expect("Can't connect");
 
         println!("Connected to the server");
         println!("Response HTTP code: {}", response.status());

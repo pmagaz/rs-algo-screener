@@ -1,8 +1,5 @@
-use super::peaks::{HashData, Peaks};
-use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
+use super::peaks::Peaks;
 
-use polyfit_rs::polyfit_rs::polyfit;
-use std::collections::BTreeMap;
 use std::env;
 
 pub type Band = Vec<Vec<(usize, f64)>>;

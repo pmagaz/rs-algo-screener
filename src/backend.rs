@@ -1,7 +1,5 @@
 use crate::candle::CandleType;
 use crate::error::Result;
-use crate::indicators::macd::Macd;
-use crate::indicators::stoch::Stoch;
 use crate::indicators::Indicator;
 use crate::instrument::Instrument;
 
@@ -34,11 +32,7 @@ impl Backend {
 
         let data = instrument.data();
         let local_maxima = instrument.peaks().local_maxima();
-        let smooth_highs = instrument.peaks().smooth_highs();
-        let smooth_lows = instrument.peaks().smooth_lows();
         let local_minima = instrument.peaks().local_minima();
-        let extrema_maxima = instrument.peaks().extrema_maxima();
-        let extrema_minima = instrument.peaks().extrema_minima();
         let horizontal_levels = instrument.horizontal_levels().horizontal_levels();
         let patterns = instrument.patterns();
         //let upper_channel = instrument.patterns().upper_channel();
@@ -104,21 +98,6 @@ impl Backend {
 
         for (x, pattern) in patterns.patterns.iter().enumerate() {
             chart
-                .draw_series(LineSeries::new(
-                    (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
-                        let idx = highs.0;
-                        let value = highs.1;
-                        let date = data[idx].date();
-                        (date, value)
-                    }),
-                    (if x < 1 { &BLUE } else { &BLUE }),
-                ))
-                .unwrap()
-                .label(format!("{:?}", pattern.pattern_type));
-        }
-
-        for (x, pattern) in patterns.patterns.iter().enumerate() {
-            chart
                 .draw_series(PointSeries::of_element(
                     (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
                         let idx = highs.0;
@@ -181,24 +160,57 @@ impl Backend {
             }))
             .unwrap();
 
-        // for x in smooth_lows.iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..).zip(smooth_lows.iter()).map(|(_k, highs)| {
-        //                 let idx = highs.0;
-        //                 let value = highs.1;
-        //                 let date = data[idx].date();
-        //                 (date, value)
-        //             }),
-        //             &BLUE,
-        //         ))
-        //         .unwrap();
-        // }
+        for x in instrument.peaks().smooth_highs().iter() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(instrument.peaks().smooth_highs().iter())
+                        .map(|(_k, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date();
+                            (date, value)
+                        }),
+                    &YELLOW,
+                ))
+                .unwrap();
+        }
 
-        // for x in local_minima.iter() {
+        for x in instrument.peaks().smooth_lows().iter() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(instrument.peaks().smooth_lows().iter())
+                        .map(|(_k, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date();
+                            (date, value)
+                        }),
+                    &YELLOW,
+                ))
+                .unwrap();
+        }
+
+        for (x, pattern) in patterns.patterns.iter().enumerate() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
+                        let idx = highs.0;
+                        let value = highs.1;
+                        let date = data[idx].date();
+                        (date, value)
+                    }),
+                    (if x < 1 { &BLUE } else { &BLUE }),
+                ))
+                .unwrap()
+                .label(format!("{:?}", pattern.pattern_type));
+        }
+
+        // for x in local_maxima.iter() {
         //     chart
         //         .draw_series(LineSeries::new(
-        //             (0..).zip(smooth_highs.iter()).map(|(_k, highs)| {
+        //             (0..).zip(local_maxima.iter()).map(|(_k, highs)| {
         //                 let idx = highs.0;
         //                 let value = highs.1;
         //                 let date = data[idx].date();

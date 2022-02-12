@@ -1,5 +1,4 @@
 use crate::error::Result;
-use crate::helpers::poly::fit;
 use crate::helpers::regression::kernel_regression;
 
 use find_peaks::PeakFinder;
@@ -14,9 +13,10 @@ pub struct Peaks {
     pub close: Vec<f64>,
     pub lows: Vec<f64>,
     pub local_maxima: Vec<(usize, f64)>,
+    pub local_minima: Vec<(usize, f64)>,
     pub smooth_highs: Vec<(usize, f64)>,
     pub smooth_lows: Vec<(usize, f64)>,
-    pub local_minima: Vec<(usize, f64)>,
+    pub smooth_close: Vec<(usize, f64)>,
     pub extrema_maxima: Vec<(usize, f64)>,
     pub extrema_minima: Vec<(usize, f64)>,
 }
@@ -31,6 +31,7 @@ impl Peaks {
             local_minima: vec![],
             smooth_highs: vec![],
             smooth_lows: vec![],
+            smooth_close: vec![],
             extrema_maxima: vec![],
             extrema_minima: vec![],
         }
@@ -46,6 +47,9 @@ impl Peaks {
 
     pub fn local_maxima(&self) -> &Vec<(usize, f64)> {
         &self.local_maxima
+    }
+    pub fn smooth_close(&self) -> &Vec<(usize, f64)> {
+        &self.smooth_close
     }
     pub fn smooth_highs(&self) -> &Vec<(usize, f64)> {
         &self.smooth_highs
@@ -75,17 +79,29 @@ impl Peaks {
             .unwrap()
             .parse::<f64>()
             .unwrap();
+
+        let local_prominence: f64 = max_price / local_prominence;
+
+        let mut smooth_highs: Vec<f64> = vec![];
+        let mut smooth_lows: Vec<f64> = vec![];
         let mut smooth_close: Vec<f64> = vec![];
 
         let mut candle_id = 0;
         for x in &self.close {
-            let leches = kernel_regression(kernel_bandwidth, *x, &self.close);
-            smooth_close.push(leches.abs());
-            self.smooth_highs.push((candle_id, leches.abs()));
+            let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
+            let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
+            let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
+
+            smooth_highs.push(smoothed_high.abs());
+            smooth_lows.push(smoothed_low.abs());
+            smooth_close.push(smoothed_close.abs());
+
+            self.smooth_highs.push((candle_id, smoothed_high.abs()));
+            self.smooth_lows.push((candle_id, smoothed_low.abs()));
+            self.smooth_close.push((candle_id, smoothed_close.abs()));
             candle_id += 1;
         }
 
-        let local_prominence: f64 = max_price / local_prominence;
         let mut local_maxima_fp = PeakFinder::new(&smooth_close);
         local_maxima_fp.with_min_prominence(local_prominence);
 
@@ -96,6 +112,7 @@ impl Peaks {
             let price = self.close[candle_id];
             x_values.push(candle_id as f64);
             y_values.push(price);
+
             self.local_maxima.push((candle_id, price.abs()));
         }
 

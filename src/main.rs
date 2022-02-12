@@ -25,6 +25,8 @@ TODO
 - Fix relative local minima
 - Fix stoch
 - Fix candle calculation
+- Add gap identification
+- Add EMAS to indicators
 - Fix horizontal levels
 - Add degrees to higher_highs increment/decrement
 - Calculate divergences on indicators
@@ -39,7 +41,7 @@ async fn main() -> Result<()> {
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
 
     let sleep = time::Duration::from_millis(*sleep_time);
-    let from = (Local::now() - date::Duration::days(365 * 2)).timestamp();
+    let from = (Local::now() - date::Duration::days(365 * 3)).timestamp();
     let time_frame = TimeFrame::D;
 
     let mut screener = Screener::<Xtb>::new().await?;
