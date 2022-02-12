@@ -48,6 +48,11 @@ impl Instrument {
         self.current_price
     }
 
+    pub fn current_candle(&self) -> &Candle {
+        let num_candles = &self.data().len() - 1;
+        &self.data()[num_candles]
+    }
+
     pub fn min_price(&self) -> f64 {
         self.min_price
     }
@@ -119,6 +124,7 @@ impl Instrument {
 
         self.set_current_price(parsed[0].close());
         self.peaks.calculate_peaks(&self.max_price).unwrap();
+
         self.patterns
             .detect_pattern(&self.peaks, &self.current_price);
 

@@ -111,6 +111,7 @@ impl Broker for Xtb {
         time_frame: usize,
         from_date: i64,
     ) -> Result<Response<VEC_DOHLC>> {
+        println!("11111 {:?}", from_date);
         self.symbol = symbol.to_owned();
         self.send(&Command {
             command: "getChartLastRequest".to_owned(),
@@ -223,6 +224,7 @@ impl Xtb {
         let x = 10.0_f64;
         let pow = x.powf(digits);
         for obj in data["returnData"]["rateInfos"].as_array().unwrap() {
+            //FIXME!!
             let date = parse_time(obj["ctm"].as_i64().unwrap() / 1000);
             let open = obj["open"].as_f64().unwrap() / pow;
             let high = open + obj["high"].as_f64().unwrap() / pow;
@@ -256,12 +258,15 @@ impl Xtb {
                 Value::String(s) => s.to_string(),
                 _ => panic!("Description parse error"),
             };
-            result.push(Symbol {
-                symbol,
-                currency,
-                category,
-                description,
-            });
+
+            if symbol.contains(".US") {
+                result.push(Symbol {
+                    symbol,
+                    currency,
+                    category,
+                    description,
+                });
+            }
         }
         Ok(result)
     }
