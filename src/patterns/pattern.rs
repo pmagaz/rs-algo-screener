@@ -79,7 +79,6 @@ impl Patterns {
             } else {
                 min = minima_length
             }
-            println!("144444444 {:?} {:?}", maxima_length, max_points);
 
             // if maxima_length < max_points {
             //     start = maxima_length
@@ -87,7 +86,7 @@ impl Patterns {
             //     start = maxima_length - max_points;
             // }
             // CONTINUE HERE SHOULD START max points from the end
-            println!("444444 {:?}", [&maxima[start..max]].concat());
+            //println!("444444 {:?}", [&maxima[start..max]].concat());
             //let mut locals = [maxima.clone(), minima.clone()].concat();
             // let mut locals = [maxima.clone(), minima.clone()].concat();
             let mut locals = [&maxima[0..max], &minima[0..min]].concat();
@@ -100,7 +99,6 @@ impl Patterns {
                 match iter.next() {
                     Some(window) => {
                         let data_points = window.to_vec();
-                        println!("33333 {:?}", data_points);
                         if triangle::is_ascendant_top(&data_points, current_price) {
                             self.set_pattern(&data_points, PatternType::TriangleAscendantTop);
                             //no_pattern = false;

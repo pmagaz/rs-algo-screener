@@ -33,6 +33,8 @@ impl Backend {
         let data = instrument.data();
         let local_maxima = instrument.peaks().local_maxima();
         let local_minima = instrument.peaks().local_minima();
+        let extrema_maxima = instrument.peaks().extrema_maxima();
+        let extrema_minima = instrument.peaks().extrema_minima();
         let horizontal_levels = instrument.horizontal_levels().horizontal_levels();
         let patterns = instrument.patterns();
         //let upper_channel = instrument.patterns().upper_channel();
@@ -126,6 +128,8 @@ impl Backend {
                 .unwrap();
         }
 
+        // LOCAL MAXIMA MINIMA
+
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
                 if local_maxima.contains(&(i, candle.close())) {
@@ -160,27 +164,79 @@ impl Backend {
             }))
             .unwrap();
 
-        for x in instrument.peaks().smooth_highs().iter() {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(instrument.peaks().smooth_highs().iter())
-                        .map(|(_k, highs)| {
-                            let idx = highs.0;
-                            let value = highs.1;
-                            let date = data[idx].date();
-                            (date, value)
-                        }),
-                    &YELLOW,
-                ))
-                .unwrap();
-        }
+        // EXTREMA MAXIMA MINIMA
 
-        for x in instrument.peaks().smooth_lows().iter() {
+        chart
+            .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                if extrema_maxima.contains(&(i, candle.close())) {
+                    return TriangleMarker::new(
+                        (
+                            candle.date(),
+                            candle.high() + candle.close() / peaks_marker_distance + 6.,
+                        ),
+                        -4,
+                        RED.filled(),
+                    );
+                } else {
+                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
+                }
+            }))
+            .unwrap();
+
+        chart
+            .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                if extrema_minima.contains(&(i, candle.close())) {
+                    return TriangleMarker::new(
+                        (
+                            candle.date(),
+                            candle.high() + candle.high() / peaks_marker_distance - 11.,
+                        ),
+                        4,
+                        RED.filled(),
+                    );
+                } else {
+                    return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
+                }
+            }))
+            .unwrap();
+
+        // for x in instrument.peaks().smooth_highs().iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(instrument.peaks().smooth_highs().iter())
+        //                 .map(|(_k, highs)| {
+        //                     let idx = highs.0;
+        //                     let value = highs.1;
+        //                     let date = data[idx].date();
+        //                     (date, value)
+        //                 }),
+        //             &YELLOW,
+        //         ))
+        //         .unwrap();
+        // }
+
+        // for x in instrument.peaks().smooth_lows().iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(instrument.peaks().smooth_lows().iter())
+        //                 .map(|(_k, highs)| {
+        //                     let idx = highs.0;
+        //                     let value = highs.1;
+        //                     let date = data[idx].date();
+        //                     (date, value)
+        //                 }),
+        //             &YELLOW,
+        //         ))
+        //         .unwrap();
+        // }
+
+        for x in instrument.peaks().smooth_close().iter() {
             chart
                 .draw_series(LineSeries::new(
                     (0..)
-                        .zip(instrument.peaks().smooth_lows().iter())
+                        .zip(instrument.peaks().smooth_close().iter())
                         .map(|(_k, highs)| {
                             let idx = highs.0;
                             let value = highs.1;
