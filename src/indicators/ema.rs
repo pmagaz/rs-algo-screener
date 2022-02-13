@@ -50,7 +50,6 @@ impl Indicator for Ema {
 
     fn get_status(&self, current_price: f64) -> IndicatorStatus {
         let a = self.get_current_a();
-        println!("111111  {:?} {:?}", a, current_price);
         let status = match a {
             _x if a > &current_price => IndicatorStatus::Bullish,
             _x if a < &current_price => IndicatorStatus::Bearish,

@@ -45,32 +45,32 @@ async fn main() -> Result<()> {
     screener.login(username, password).await?;
     let symbols = screener.get_symbols().await.unwrap().symbols;
 
-    let symbols = [
-        Symbol {
-            symbol: "TGNA.US_9".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
-        Symbol {
-            symbol: "BMRN.US_9".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
-        Symbol {
-            symbol: "SIRI.US_9".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
-        Symbol {
-            symbol: "GOOGL.US_9".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
-    ];
+    // let symbols = [
+    //     Symbol {
+    //         symbol: "TGNA.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "BMRN.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "SIRI.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "GOOGL.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    // ];
 
     for s in symbols {
         screener
@@ -97,11 +97,12 @@ async fn main() -> Result<()> {
                             inst.indicators().ema50().get_status(current_price)
                         ]
                     );
+
                     Ok(())
                 },
             )
             .await?;
-        // thread::sleep(sleep);
+        thread::sleep(sleep);
     }
     Ok(())
 }

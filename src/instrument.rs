@@ -1,8 +1,7 @@
 use crate::candle::Candle;
 use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
 use crate::helpers::date::{DateTime, Local};
-use crate::indicators::macd::Macd;
-use crate::indicators::{Indicator, Indicators};
+use crate::indicators::Indicators;
 use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
