@@ -36,7 +36,7 @@ impl Backend {
         let extrema_maxima = instrument.peaks().extrema_maxima();
         let extrema_minima = instrument.peaks().extrema_minima();
         let horizontal_levels = instrument.horizontal_levels().horizontal_levels();
-        let patterns = instrument.patterns();
+        let patterns = instrument.patterns().extrema_patterns.clone();
         //let upper_channel = instrument.patterns().upper_channel();
 
         let rsi = instrument.indicators().rsi();
@@ -98,7 +98,7 @@ impl Backend {
             }))
             .unwrap();
 
-        for (x, pattern) in patterns.patterns.iter().enumerate() {
+        for (x, pattern) in patterns.iter().enumerate() {
             chart
                 .draw_series(PointSeries::of_element(
                     (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
@@ -248,7 +248,7 @@ impl Backend {
                 .unwrap();
         }
 
-        for (x, pattern) in patterns.patterns.iter().enumerate() {
+        for (x, pattern) in patterns.iter().enumerate() {
             chart
                 .draw_series(LineSeries::new(
                     (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {

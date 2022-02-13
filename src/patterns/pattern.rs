@@ -26,28 +26,40 @@ pub enum PatternType {
 }
 
 #[derive(Debug, Clone)]
+pub enum PatternSize {
+    Local,
+    Extrema,
+}
+
+#[derive(Debug, Clone)]
 pub struct Pattern {
     pub pattern_type: PatternType,
+    pub pattern_size: PatternSize,
     pub data_points: DataPoints,
 }
 
 #[derive(Debug, Clone)]
 pub struct Patterns {
-    pub patterns: Vec<Pattern>,
+    pub local_patterns: Vec<Pattern>,
+    pub extrema_patterns: Vec<Pattern>,
 }
 
 impl Patterns {
     pub fn new() -> Self {
-        Patterns { patterns: vec![] }
+        Patterns {
+            local_patterns: vec![],
+            extrema_patterns: vec![],
+        }
     }
 
     pub fn detect_pattern(
         &mut self,
+        pattern_size: PatternSize,
         maxima: &Vec<(usize, f64)>,
         minima: &Vec<(usize, f64)>,
         current_price: &f64,
     ) {
-        let max_points = env::var("PATTERNS_MAX_POINTS")
+        let local_max_points = env::var("PATTERNS_MAX_POINTS")
             .unwrap()
             .parse::<usize>()
             .unwrap();
@@ -56,40 +68,36 @@ impl Patterns {
             .unwrap()
             .parse::<usize>()
             .unwrap();
+
         let window_size = env::var("PATTERNS_WINDOW_SIZE")
             .unwrap()
             .parse::<usize>()
             .unwrap();
 
-        let mut start = 0;
-        let mut max = 0;
-        let mut min = 0;
+        let mut max_start = 0;
+        let mut max_end = 0;
+        let mut min_start = 0;
+        let mut min_end = 0;
         let maxima_length = maxima.len();
         let minima_length = minima.len();
-
         if maxima_length >= min_points && minima_length >= min_points {
-            if maxima_length > max_points {
-                max = max_points
+            if maxima_length > local_max_points {
+                max_start = maxima_length - local_max_points;
+                max_end = maxima_length;
             } else {
-                max = maxima_length
+                max_start = 0;
+                max_end = maxima_length;
             }
 
-            if minima_length > min_points {
-                min = min_points
+            if minima_length > local_max_points {
+                min_start = minima_length - local_max_points;
+                min_end = minima_length;
             } else {
-                min = minima_length
+                min_start = 0;
+                min_end = minima_length;
             }
 
-            // if maxima_length < max_points {
-            //     start = maxima_length
-            // } else {
-            //     start = maxima_length - max_points;
-            // }
-            // CONTINUE HERE SHOULD START max points from the end
-            //println!("444444 {:?}", [&maxima[start..max]].concat());
-            //let mut locals = [maxima.clone(), minima.clone()].concat();
-            // let mut locals = [maxima.clone(), minima.clone()].concat();
-            let mut locals = [&maxima[0..max], &minima[0..min]].concat();
+            let mut locals = [&maxima[max_start..max_end], &minima[min_start..min_end]].concat();
 
             locals.sort_by(|(id_a, _price_a), (id_b, _price_b)| id_a.cmp(id_b));
             locals.reverse();
@@ -100,71 +108,144 @@ impl Patterns {
                     Some(window) => {
                         let data_points = window.to_vec();
                         if triangle::is_ascendant_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::TriangleAscendantTop);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::TriangleAscendantTop,
+                            );
                             //no_pattern = false;
                         } else if triangle::is_ascendant_bottom(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::TriangleAscendantBottom);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::TriangleAscendantBottom,
+                            );
                             //no_pattern = false;
                         } else if triangle::is_descendant_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::TriangleDescendantTop);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::TriangleDescendantTop,
+                            );
                             // no_pattern = false;
                         } else if triangle::is_descendant_bottom(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::TriangleDescendantBottom);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::TriangleDescendantBottom,
+                            );
                             // no_pattern = false;
                         } else if triangle::is_symmetrical_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::TriangleSymmetricalTop);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::TriangleSymmetricalTop,
+                            );
                             // no_pattern = false;
                         } else if triangle::is_symmetrical_bottom(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::TriangleSymmetricalBottom);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::TriangleSymmetricalBottom,
+                            );
                             // no_pattern = false;
                         } else if rectangle::is_renctangle_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::RectangleTop);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::RectangleTop,
+                            );
                             // no_pattern = false;
                         } else if rectangle::is_renctangle_bottom(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::RectangleBottom);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::RectangleBottom,
+                            );
                             //  no_pattern = false;
                         } else if channel::is_ascendant_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::ChannelUpTop);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::ChannelUpTop,
+                            );
                             //no_pattern = false;
                         } else if channel::is_ascendant_bottom(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::ChannelUpBottom);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::ChannelUpBottom,
+                            );
                             // no_pattern = false;
                         } else if channel::is_descendant_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::ChannelDownTop);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::ChannelDownTop,
+                            );
                             //  no_pattern = false;
                         } else if channel::is_descendant_bottom(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::ChannelDownBottom);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::ChannelDownBottom,
+                            );
                             // no_pattern = false;
                         } else if broadening::is_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::BroadeningTop);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::BroadeningTop,
+                            );
                             // no_pattern = false;
                         } else if broadening::is_bottom(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::BroadeningBottom);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::BroadeningBottom,
+                            );
                             // no_pattern = false;
                         } else if double::is_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::DoubleTop);
+                            self.set_pattern(&data_points, &pattern_size, PatternType::DoubleTop);
                             // no_pattern = false;
                         } else if double::is_bottom(&data_points, current_price) {
-                            self.set_pattern(&data_points, PatternType::DoubleBottom);
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                PatternType::DoubleBottom,
+                            );
                             // no_pattern = false;
                         }
                     }
                     None => {
-                        self.set_pattern(&vec![(0, 0.)], PatternType::None);
+                        self.set_pattern(&vec![(0, 0.)], &pattern_size, PatternType::None);
                         no_pattern = false;
                     }
                 }
             }
         } else {
-            self.set_pattern(&vec![(0, 0.)], PatternType::None);
+            self.set_pattern(&vec![(0, 0.)], &pattern_size, PatternType::None);
         }
     }
 
-    fn set_pattern(&mut self, data_points: &DataPoints, pattern_type: PatternType) {
-        self.patterns.push(Pattern {
-            pattern_type,
-            data_points: data_points.to_owned(),
-        });
+    fn set_pattern(
+        &mut self,
+        data_points: &DataPoints,
+        pattern_size: &PatternSize,
+        pattern_type: PatternType,
+    ) {
+        match &pattern_size {
+            PatternSize::Local => self.local_patterns.push(Pattern {
+                pattern_type,
+                pattern_size: pattern_size.clone(),
+                data_points: data_points.to_owned(),
+            }),
+            PatternSize::Extrema => self.extrema_patterns.push(Pattern {
+                pattern_type,
+                pattern_size: pattern_size.clone(),
+                data_points: data_points.to_owned(),
+            }),
+        };
     }
 
     // pub fn is_head_and_shoulders(

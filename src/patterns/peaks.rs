@@ -5,8 +5,6 @@ use find_peaks::PeakFinder;
 use std::collections::HashMap;
 use std::env;
 
-pub type HashData = HashMap<usize, f64>;
-
 #[derive(Debug, Clone)]
 pub struct Peaks {
     pub highs: Vec<f64>,

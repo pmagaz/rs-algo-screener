@@ -4,7 +4,7 @@ use crate::helpers::date::{DateTime, Local};
 use crate::indicators::macd::Macd;
 use crate::indicators::{Indicator, Indicators};
 use crate::patterns::horizontal_levels::HorizontalLevels;
-use crate::patterns::pattern::Patterns;
+use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
 
 use std::env;
@@ -125,11 +125,25 @@ impl Instrument {
         self.set_current_price(parsed[0].close());
         self.peaks.calculate_peaks(&self.max_price).unwrap();
 
-        let maxima = self.peaks.local_maxima();
-        let minima = self.peaks.local_minima();
+        let local_maxima = self.peaks.local_maxima();
+        let local_minima = self.peaks.local_minima();
 
-        self.patterns
-            .detect_pattern(maxima, minima, &self.current_price);
+        let extrema_maxima = self.peaks.extrema_maxima();
+        let extrema_minima = self.peaks.extrema_minima();
+
+        self.patterns.detect_pattern(
+            PatternSize::Local,
+            local_maxima,
+            local_minima,
+            &self.current_price,
+        );
+
+        self.patterns.detect_pattern(
+            PatternSize::Extrema,
+            extrema_maxima,
+            extrema_minima,
+            &self.current_price,
+        );
 
         self.horizontal_levels
             .calculate_horizontal_highs(&self.current_price, &self.peaks)

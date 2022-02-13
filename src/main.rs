@@ -42,7 +42,7 @@ async fn main() -> Result<()> {
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
 
     let sleep = time::Duration::from_millis(*sleep_time);
-    let from = (Local::now() - date::Duration::days(365 * 3)).timestamp();
+    let from = (Local::now() - date::Duration::days(365 * 2)).timestamp();
     let time_frame = TimeFrame::D;
 
     let mut screener = Screener::<Xtb>::new().await?;
@@ -84,15 +84,18 @@ async fn main() -> Result<()> {
                 from,
                 |inst: Instrument| async move {
                     println!(
-                        "[INSTRUMENT] {:?} {:?} {:?} {:?}",
+                        "[INSTRUMENT] {:?} [CANDLE] {:?} [PATTERNS] {:?} [INDICATORS] {:?}",
                         inst.symbol(),
                         inst.current_candle().candle_type(),
-                        inst.patterns().patterns[0].pattern_type,
-                        (
+                        [
+                            inst.patterns().extrema_patterns[0].pattern_type.clone(),
+                            inst.patterns().local_patterns[0].pattern_type.clone(),
+                        ],
+                        [
                             inst.indicators().macd().get_status(),
                             inst.indicators().rsi().get_status(),
                             inst.indicators().stoch().get_status()
-                        )
+                        ]
                     );
                     Ok(())
                 },
