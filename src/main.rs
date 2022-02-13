@@ -23,15 +23,12 @@ mod screener;
 
 /*
 TODO LIST
-- FIX pattern calculation for local and extrema
-- Fix stoch
-- Fix candle calculation (improve patterns with 3)
-- Add gap identification
+- Add activated chart figures
 - Add EMAS to indicators
 - Fix horizontal levels
-- Add degrees to higher_highs increment/decrement
 - Calculate divergences on indicators
-- Add activated chart figures
+- Review candles formulas
+- Add degrees to higher_highs increment/decrement
 */
 
 #[tokio::main]
@@ -47,34 +44,34 @@ async fn main() -> Result<()> {
 
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
-    //let symbols = screener.get_symbols().await.unwrap().symbols;
+    let symbols = screener.get_symbols().await.unwrap().symbols;
 
-    let symbols = [
-        Symbol {
-            symbol: "TGNA.US_9".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
-        Symbol {
-            symbol: "BMRN.US_9".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
-        Symbol {
-            symbol: "SIRI.US_9".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
-        Symbol {
-            symbol: "GOOGL.US_9".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
-    ];
+    // let symbols = [
+    //     Symbol {
+    //         symbol: "TGNA.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "BMRN.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "SIRI.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "GOOGL.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    // ];
 
     for s in symbols {
         screener

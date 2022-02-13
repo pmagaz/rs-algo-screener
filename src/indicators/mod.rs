@@ -53,6 +53,12 @@ impl Indicators {
     pub fn stoch(&self) -> &Stoch {
         &self.stoch
     }
+
+    pub fn calculate_indicators(&mut self, close: f64) {
+        &self.macd.next(close).unwrap();
+        &self.stoch.next(close).unwrap();
+        &self.rsi.next(close).unwrap();
+    }
 }
 
 pub trait Indicator {

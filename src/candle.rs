@@ -1,7 +1,7 @@
 use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
 use crate::helpers::date::{DateTime, Local};
-pub type VEC_DOHLC = (f64, f64, f64, f64);
-pub type DVEC_DOHLCV = (DateTime<Local>, f64, f64, f64, f64, f64);
+pub type OHLCV = (f64, f64, f64, f64);
+pub type DOHLCV = (DateTime<Local>, f64, f64, f64, f64, f64);
 
 #[derive(Debug, Clone)]
 pub enum CandleType {
@@ -16,6 +16,10 @@ pub enum CandleType {
     Engulfing,
     BearishEngulfing,
     HangingMan,
+    BullishCrows,
+    BearishCrows,
+    BullishGap,
+    BearishGap,
 }
 
 #[derive(Debug, Clone)]
@@ -68,7 +72,7 @@ pub struct CandleBuilder {
     low: Option<f64>,
     close: Option<f64>,
     volume: Option<f64>,
-    previous: Option<(DateTime<Local>, f64, f64, f64, f64, f64)>,
+    previous_candles: Option<Vec<DOHLCV>>,
 }
 
 impl CandleBuilder {
@@ -80,7 +84,7 @@ impl CandleBuilder {
             low: None,
             close: None,
             volume: None,
-            previous: None,
+            previous_candles: None,
         }
     }
 
@@ -114,12 +118,12 @@ impl CandleBuilder {
         self
     }
 
-    pub fn previous(mut self, val: DVEC_DOHLCV) -> Self {
-        self.previous = Some(val);
+    pub fn previous_candles(mut self, val: Vec<DOHLCV>) -> Self {
+        self.previous_candles = Some(val);
         self
     }
 
-    fn get_current_ohlc(&self) -> VEC_DOHLC {
+    fn get_current_ohlc(&self) -> OHLCV {
         (
             self.open.unwrap(),
             self.high.unwrap(),
@@ -128,12 +132,12 @@ impl CandleBuilder {
         )
     }
 
-    fn get_previous_ohlc(&self) -> VEC_DOHLC {
+    fn get_previous_ohlc(&self, index: usize) -> OHLCV {
         (
-            self.previous.unwrap().1,
-            self.previous.unwrap().2,
-            self.previous.unwrap().3,
-            self.previous.unwrap().4,
+            self.previous_candles.as_ref().unwrap()[index].1,
+            self.previous_candles.as_ref().unwrap()[index].2,
+            self.previous_candles.as_ref().unwrap()[index].3,
+            self.previous_candles.as_ref().unwrap()[index].4,
         )
     }
 
@@ -186,7 +190,7 @@ impl CandleBuilder {
     fn is_engulfing(&self) -> bool {
         //(O1 > C1) AND (C > O) AND (C >= O1) AND (C1 >= O) AND ((C – O) > (O1 – C1))
         let (open, _high, _low, close) = &self.get_current_ohlc();
-        let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc();
+        let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
         (prev_open > prev_close)
             && (close > open)
             && (close >= prev_open)
@@ -197,7 +201,7 @@ impl CandleBuilder {
     fn is_bearish_engulfing(&self) -> bool {
         //(C1 > O1) AND (O > C) AND (O >= C1) AND (O1 >= C) AND ((O – C) > (C1 – O1))
         let (open, _high, _low, close) = &self.get_current_ohlc();
-        let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc();
+        let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
         //println!("5555555 {:?} {:?}", prev_open, open);
         (prev_close > prev_open)
             && (open > close)
@@ -209,7 +213,7 @@ impl CandleBuilder {
     fn is_harami(&self) -> bool {
         //((O1 > C1) AND (C > O) AND (C <= O1) AND (C1 <= O) AND ((C – O) < (O1 – C1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
-        let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc();
+        let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
         (prev_open > prev_close)
             && (close > open)
             && (close <= prev_open)
@@ -220,13 +224,66 @@ impl CandleBuilder {
     fn is_bearish_harami(&self) -> bool {
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
-        let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc();
+        let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
         (prev_close > prev_open)
             && (open > close)
             && (open <= prev_close)
             && (prev_open <= close)
             && ((open - close) < (prev_close - prev_open))
     }
+
+    fn is_bullish_gap(&self) -> bool {
+        //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
+        let (open, _high, _low, close) = &self.get_current_ohlc();
+        let (prev_open, prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
+        (open > &(prev_high / 1.01) && open > &(prev_close / 1.01))
+    }
+
+    fn is_bearish_gap(&self) -> bool {
+        //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
+        let (open, _high, _low, close) = &self.get_current_ohlc();
+        let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);
+        open < &(prev_low / 1.01) && open < &(prev_close / 1.01)
+    }
+
+    fn is_bullish_crows(&self) -> bool {
+        //(C>O*1.01) AND(C1>O1*1.01) AND(C2>O2*1.01) AND(C>C1) AND
+        // (C1>C2) AND(OO1) AND(O1O2) AND (((H-C)/(H-L))<.2) AND(((H1-C1)/(H1-L1))<.2)AND(((H2-C2)/(H2-L2))<.2)
+        let (open, high, low, close) = &self.get_current_ohlc();
+        let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);
+        let (prev_open1, prev_high1, prev_low1, prev_close1) = &self.get_previous_ohlc(1);
+
+        (close > &(open * 1.01))
+            && (prev_close > &(prev_open * 1.01))
+            && (prev_close1 > &(prev_open1 * 1.01))
+            && (close > prev_close)
+            && (prev_close > prev_close1)
+            && (((high - close) / (high - low) < 0.2)
+                && ((prev_high - prev_close) / (prev_high - prev_low) < 0.2)
+                && ((prev_high1 - prev_close1) / (prev_high1 - prev_low1) < 0.2))
+    }
+
+    fn is_bearish_crows(&self) -> bool {
+        //(C>O*1.01) AND(C1>O1*1.01) AND(C2>O2*1.01) AND(C>C1) AND
+        // (C1>C2) AND(OO1) AND(O1O2) AND (((H-C)/(H-L))<.2) AND(((H1-C1)/(H1-L1))<.2)AND(((H2-C2)/(H2-L2))<.2)
+        let (open, high, low, close) = &self.get_current_ohlc();
+        let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);
+        let (prev_open1, prev_high1, prev_low1, prev_close1) = &self.get_previous_ohlc(1);
+
+        (open > &(close * 1.01))
+            && (prev_open > &(prev_close * 1.01))
+            && (prev_open1 > &(prev_close1 * 1.01))
+            && (close < prev_close)
+            && (prev_close < prev_close1)
+            && (open > prev_close)
+            && (open < prev_open)
+            && (prev_open > prev_close1)
+            && (prev_open < prev_open1)
+            && (((close - low) / (high - low) < 0.2)
+                && ((prev_close - prev_low) / (prev_high - prev_low) < 0.2)
+                && ((prev_close1 - prev_low1) / (prev_high1 - prev_low1) < 0.2))
+    }
+
     fn identify_candle_type(&self) -> CandleType {
         if self.is_doji() {
             CandleType::Doji
@@ -236,6 +293,14 @@ impl CandleBuilder {
             CandleType::BearishKarakasa
         } else if self.is_hanging_man() {
             CandleType::HangingMan
+        } else if self.is_bullish_gap() {
+            CandleType::BullishGap
+        } else if self.is_bearish_gap() {
+            CandleType::BearishGap
+        } else if self.is_bullish_crows() {
+            CandleType::BullishCrows
+        } else if self.is_bearish_crows() {
+            CandleType::BearishCrows
         } else if self.is_marubozu() {
             CandleType::Marubozu
         } else if self.is_bearish_marubozu() {
@@ -261,7 +326,7 @@ impl CandleBuilder {
             Some(low),
             Some(close),
             Some(volume),
-            Some(previous),
+            Some(previous_candles),
         ) = (
             self.date,
             self.open,
@@ -269,7 +334,7 @@ impl CandleBuilder {
             self.low,
             self.close,
             self.volume,
-            self.previous,
+            self.previous_candles.as_ref(),
         ) {
             Ok(Candle {
                 candle_type: self.identify_candle_type(),

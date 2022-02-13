@@ -100,7 +100,12 @@ impl Instrument {
                 self.peaks.highs.push(high);
                 self.peaks.lows.push(low);
                 self.peaks.close.push(close);
-                let key = match id {
+                let pre_0 = match id {
+                    0 => id,
+                    _ => id - 1,
+                };
+
+                let prev_1 = match pre_0 {
                     0 => id,
                     _ => id - 1,
                 };
@@ -116,7 +121,7 @@ impl Instrument {
                     .low(low)
                     .close(close)
                     .volume(volume)
-                    .previous(data[key])
+                    .previous_candles(vec![data[pre_0], data[prev_1]])
                     .build()
                     .unwrap()
             })
