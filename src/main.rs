@@ -24,7 +24,6 @@ mod screener;
 /*
 TODO LIST
 - Add activated chart figures
-- Add EMAS to indicators
 - Fix horizontal levels
 - Calculate divergences on indicators
 - Review candles formulas
@@ -46,32 +45,32 @@ async fn main() -> Result<()> {
     screener.login(username, password).await?;
     let symbols = screener.get_symbols().await.unwrap().symbols;
 
-    // let symbols = [
-    //     Symbol {
-    //         symbol: "TGNA.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "BMRN.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "SIRI.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "GOOGL.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    // ];
+    let symbols = [
+        Symbol {
+            symbol: "TGNA.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        Symbol {
+            symbol: "BMRN.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        Symbol {
+            symbol: "SIRI.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        Symbol {
+            symbol: "GOOGL.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+    ];
 
     for s in symbols {
         screener
@@ -80,6 +79,7 @@ async fn main() -> Result<()> {
                 time_frame.value(),
                 from,
                 |inst: Instrument| async move {
+                    let current_price = inst.current_price();
                     println!(
                         "[INSTRUMENT] {:?} [CANDLE] {:?} [PATTERNS] {:?} [INDICATORS] {:?}",
                         inst.symbol(),
@@ -89,16 +89,19 @@ async fn main() -> Result<()> {
                             inst.patterns().local_patterns[0].pattern_type.clone(),
                         ],
                         [
-                            inst.indicators().macd().get_status(),
-                            inst.indicators().rsi().get_status(),
-                            inst.indicators().stoch().get_status()
+                            inst.indicators().macd().get_status(current_price),
+                            inst.indicators().rsi().get_status(current_price),
+                            inst.indicators().stoch().get_status(current_price),
+                            inst.indicators().ema200().get_status(current_price),
+                            inst.indicators().ema100().get_status(current_price),
+                            inst.indicators().ema50().get_status(current_price)
                         ]
                     );
                     Ok(())
                 },
             )
             .await?;
-        thread::sleep(sleep);
+        // thread::sleep(sleep);
     }
     Ok(())
 }

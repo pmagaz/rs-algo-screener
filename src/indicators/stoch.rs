@@ -43,7 +43,7 @@ impl Indicator for Stoch {
         &self.data_b[max]
     }
 
-    fn get_status(&self) -> IndicatorStatus {
+    fn get_status(&self, _current_price: f64) -> IndicatorStatus {
         let a = self.get_current_a();
         let b = self.get_current_b();
         let status = match (a, b) {

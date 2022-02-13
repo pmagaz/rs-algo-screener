@@ -1,8 +1,10 @@
+pub mod ema;
 pub mod macd;
 pub mod rsi;
 pub mod stoch;
 
 use crate::error::Result;
+use crate::indicators::ema::Ema;
 use crate::indicators::macd::Macd;
 use crate::indicators::rsi::Rsi;
 use crate::indicators::stoch::Stoch;
@@ -14,6 +16,9 @@ pub enum IndicatorType {
     MacD,
     Stoch,
     Rsi,
+    Ema200,
+    Ema100,
+    Ema50,
 }
 #[derive(Debug, Clone)]
 pub enum IndicatorStatus {
@@ -31,6 +36,9 @@ pub struct Indicators {
     pub macd: Macd,
     pub stoch: Stoch,
     pub rsi: Rsi,
+    pub ema200: Ema,
+    pub ema100: Ema,
+    pub ema50: Ema,
 }
 
 impl Indicators {
@@ -39,6 +47,9 @@ impl Indicators {
             macd: Macd::new().unwrap(),
             stoch: Stoch::new().unwrap(),
             rsi: Rsi::new().unwrap(),
+            ema200: Ema::new_ema(200).unwrap(),
+            ema100: Ema::new_ema(100).unwrap(),
+            ema50: Ema::new_ema(50).unwrap(),
         })
     }
 
@@ -54,10 +65,26 @@ impl Indicators {
         &self.stoch
     }
 
-    pub fn calculate_indicators(&mut self, close: f64) {
-        &self.macd.next(close).unwrap();
-        &self.stoch.next(close).unwrap();
-        &self.rsi.next(close).unwrap();
+    pub fn ema200(&self) -> &Ema {
+        &self.ema200
+    }
+
+    pub fn ema100(&self) -> &Ema {
+        &self.ema100
+    }
+
+    pub fn ema50(&self) -> &Ema {
+        &self.ema50
+    }
+
+    pub fn calculate_indicators(&mut self, close: f64) -> Result<()> {
+        self.macd.next(close).unwrap();
+        self.stoch.next(close).unwrap();
+        self.rsi.next(close).unwrap();
+        self.ema200.next(close).unwrap();
+        self.ema100.next(close).unwrap();
+        self.ema50.next(close).unwrap();
+        Ok(())
     }
 }
 
@@ -70,5 +97,5 @@ pub trait Indicator {
     fn get_current_a(&self) -> &f64;
     fn get_current_b(&self) -> &f64;
     fn get_data_b(&self) -> &Vec<f64>;
-    fn get_status(&self) -> IndicatorStatus;
+    fn get_status(&self, current_price: f64) -> IndicatorStatus;
 }

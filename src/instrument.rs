@@ -110,9 +110,7 @@ impl Instrument {
                     _ => id - 1,
                 };
 
-                self.indicators.macd.next(close).unwrap();
-                self.indicators.stoch.next(close).unwrap();
-                self.indicators.rsi.next(close).unwrap();
+                self.indicators.calculate_indicators(close).unwrap();
 
                 Candle::new()
                     .date(date)
@@ -127,7 +125,7 @@ impl Instrument {
             })
             .collect();
 
-        self.set_current_price(parsed[0].close());
+        self.set_current_price(parsed.last().unwrap().close());
         self.peaks.calculate_peaks(&self.max_price).unwrap();
 
         let local_maxima = self.peaks.local_maxima();
