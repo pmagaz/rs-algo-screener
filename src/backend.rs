@@ -49,9 +49,9 @@ impl Backend {
 
         let rsi = instrument.indicators().rsi().get_data_a();
 
-        let ema200 = instrument.indicators().ema200().get_data_a();
-        let ema100 = instrument.indicators().ema100().get_data_a();
-        let ema50 = instrument.indicators().ema50().get_data_a();
+        let ema_a = instrument.indicators().ema_a().get_data_a();
+        let ema_b = instrument.indicators().ema_b().get_data_a();
+        let ema_c = instrument.indicators().ema_c().get_data_a();
 
         let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
         let (upper, lower) = root.split_vertically((75).percent());
@@ -339,7 +339,7 @@ impl Backend {
         //   .draw_series(LineSeries::new(
         //     (0..).zip(data.iter()).map(|(_id, candle)| {
         //       let date = candle.date();
-        //       //let value = ema200.next(candle.close());
+        //       //let value = ema_a.next(candle.close());
         //       (date, value)
         //     }),
         //     &BLUE,
@@ -350,7 +350,7 @@ impl Backend {
         //   .draw_series(LineSeries::new(
         //         (0..)
         //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date(), ema200[id])),
+        //             .map(|(id, candle)| (candle.date(), ema_a[id])),
         //         &RED,
         //     ))
         //     .unwrap();
@@ -359,7 +359,7 @@ impl Backend {
         //   .draw_series(LineSeries::new(
         //     (0..).zip(data.iter()).map(|(_id, candle)| {
         //       let date = candle.date();
-        //       let value = ema50.next(candle.close());
+        //       let value = ema_c.next(candle.close());
         //       (date, value)
         //     }),
         //     &RED,
@@ -370,7 +370,7 @@ impl Backend {
         //   .draw_series(LineSeries::new(
         //     (0..).zip(data.iter()).map(|(_id, candle)| {
         //       let date = candle.date();
-        //       let value = ema200.next(candle.close());
+        //       let value = ema_a.next(candle.close());
         //       (date, value)
         //     }),
         //     &YELLOW,
@@ -461,7 +461,7 @@ impl Backend {
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), ema200[id])),
+                    .map(|(id, candle)| (candle.date(), ema_a[id])),
                 &RED,
             ))
             .unwrap();
@@ -470,7 +470,7 @@ impl Backend {
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), ema100[id])),
+                    .map(|(id, candle)| (candle.date(), ema_b[id])),
                 &BLUE,
             ))
             .unwrap();
@@ -479,7 +479,7 @@ impl Backend {
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), ema50[id])),
+                    .map(|(id, candle)| (candle.date(), ema_c[id])),
                 &YELLOW,
             ))
             .unwrap();

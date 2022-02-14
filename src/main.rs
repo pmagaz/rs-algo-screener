@@ -92,9 +92,9 @@ async fn main() -> Result<()> {
                             inst.indicators().macd().get_status(current_price),
                             inst.indicators().rsi().get_status(current_price),
                             inst.indicators().stoch().get_status(current_price),
-                            inst.indicators().ema200().get_status(current_price),
-                            inst.indicators().ema100().get_status(current_price),
-                            inst.indicators().ema50().get_status(current_price)
+                            inst.indicators().ema_a().get_status(current_price),
+                            inst.indicators().ema_b().get_status(current_price),
+                            inst.indicators().ema_c().get_status(current_price)
                         ]
                     );
 
