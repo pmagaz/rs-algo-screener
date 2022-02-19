@@ -2,7 +2,7 @@
 
 ## Rust algorithmic stock screener
 
-Stock screener written in Rust. In this first iteration the idea is to construct just an screener that will help me to analyse the stock marked using Technical analysis. In a second iteration, this screener will be used by a bot to do algorithmic trading.
+Stock screener written in Rust. In this first iteration the idea is to construct just an screener that will help me to analyse the stock marked using Technical analysis. In a second iteration, this screener will be used by a bot to do algorithmic trading through the implementation of several strategies based on the data provided by the screener.
 
 ### Screener Status
 
@@ -27,4 +27,5 @@ Stock screener written in Rust. In this first iteration the idea is to construct
   - [x] Broadenings
   - [] Head & Shoulders
   - [] Divergences
+  - [] Active chart figure identification
 - [ ] Market regime filters

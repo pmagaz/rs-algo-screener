@@ -1,34 +1,18 @@
-use super::pattern::DataPoints;
+use super::pattern::{DataPoints, PatternType};
 use crate::helpers::comp::*;
 
-pub fn _is_active_double_top(data: &DataPoints, _current_price: &f64) -> bool {
-    if data[0].1 < data[2].1 && is_equal(data[1].1, data[3].1) {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_top(data: &DataPoints, _current_price: &f64) -> bool {
+pub fn is_top(data: &DataPoints, _current_price: &f64) -> PatternType {
     if is_equal(data[0].1, data[2].1) && data[1].1 < data[0].1 && data[1].1 < data[2].1 {
-        true
+        PatternType::DoubleTop
     } else {
-        false
+        PatternType::None
     }
 }
 
-pub fn _is_active_double_bottom(data: &DataPoints, _current_price: &f64) -> bool {
-    if data[0].1 > data[2].1 && is_equal(data[1].1, data[3].1) {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_bottom(data: &DataPoints, _current_price: &f64) -> bool {
+pub fn is_bottom(data: &DataPoints, _current_price: &f64) -> PatternType {
     if is_equal(data[0].1, data[2].1) && data[1].1 > data[0].1 && data[1].1 > data[2].1 {
-        true
+        PatternType::DoubleTop
     } else {
-        false
+        PatternType::None
     }
 }
