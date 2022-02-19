@@ -23,9 +23,10 @@ mod screener;
 
 /*
 TODO LIST
-- Add activated chart figures
+- Add activated chart figures for channels and broadenings
 - Fix horizontal levels
 - Calculate divergences on indicators
+- Calculate pattern size
 - Review candles formulas
 - Add degrees to higher_highs increment/decrement
 */

@@ -7,21 +7,38 @@ use std::env;
 #[derive(Debug, Clone)]
 pub enum PatternType {
     TriangleSymmetricalTop,
+    TriangleSymmetricalTopActivated,
     TriangleSymmetricalBottom,
+    TriangleSymmetricalBottomActivated,
     TriangleDescendantTop,
+    TriangleDescendantTopActivated,
     TriangleDescendantBottom,
+    TriangleDescendantBottomActivated,
     TriangleAscendantTop,
+    TriangleAscendantTopActivated,
     TriangleAscendantBottom,
+    TriangleAscendantBottomActivated,
     RectangleTop,
+    RectangleTopActivatedUp,
+    RectangleTopActivatedLow,
     RectangleBottom,
+    RectangleBottomActivated,
     ChannelUpTop,
+    ChannelUpTopActivated,
     ChannelUpBottom,
+    ChannelUpBottomActivated,
     ChannelDownTop,
+    ChannelDownTopActivated,
     ChannelDownBottom,
+    ChannelDownBottomActivated,
     BroadeningTop,
+    BroadeningTopActivated,
     BroadeningBottom,
+    BroadeningBottomActivated,
     DoubleBottom,
+    DoubleBottomActivated,
     DoubleTop,
+    DoubleTopActivated,
     None,
 }
 
@@ -106,113 +123,118 @@ impl Patterns {
             while no_pattern {
                 match iter.next() {
                     Some(window) => {
+                        //TODO Detect activated charts for channel, broadening, etc with poly
                         let data_points = window.to_vec();
-                        if triangle::is_ascendant_top(&data_points, current_price) {
+                        if triangle::is_ascendant_top(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
-                                PatternType::TriangleAscendantTop,
+                                triangle::ascendant_top_status(&data_points, current_price),
                             );
                             //no_pattern = false;
-                        } else if triangle::is_ascendant_bottom(&data_points, current_price) {
+                        } else if triangle::is_ascendant_bottom(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
-                                PatternType::TriangleAscendantBottom,
+                                triangle::ascendant_bottom_status(&data_points, current_price),
                             );
                             //no_pattern = false;
-                        } else if triangle::is_descendant_top(&data_points, current_price) {
+                        } else if triangle::is_descendant_top(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
-                                PatternType::TriangleDescendantTop,
+                                triangle::descendant_top_status(&data_points, current_price),
                             );
                             // no_pattern = false;
-                        } else if triangle::is_descendant_bottom(&data_points, current_price) {
+                        } else if triangle::is_descendant_bottom(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
-                                PatternType::TriangleDescendantBottom,
+                                triangle::descendant_bottom_status(&data_points, current_price),
                             );
                             // no_pattern = false;
-                        } else if triangle::is_symmetrical_top(&data_points, current_price) {
+                        } else if triangle::is_symmetrical_top(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
                                 PatternType::TriangleSymmetricalTop,
                             );
                             // no_pattern = false;
-                        } else if triangle::is_symmetrical_bottom(&data_points, current_price) {
+                        } else if triangle::is_symmetrical_bottom(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
                                 PatternType::TriangleSymmetricalBottom,
                             );
                             // no_pattern = false;
-                        } else if rectangle::is_renctangle_top(&data_points, current_price) {
+                        } else if rectangle::is_renctangle_top(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
-                                PatternType::RectangleTop,
+                                rectangle::rectangle_top_status(&data_points, current_price),
                             );
                             // no_pattern = false;
-                        } else if rectangle::is_renctangle_bottom(&data_points, current_price) {
+                        } else if rectangle::is_renctangle_bottom(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
-                                PatternType::RectangleBottom,
+                                rectangle::rectangle_bottom_status(&data_points, current_price),
                             );
                             //  no_pattern = false;
-                        } else if channel::is_ascendant_top(&data_points, current_price) {
+                        } else if channel::is_ascendant_top(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
                                 PatternType::ChannelUpTop,
                             );
                             //no_pattern = false;
-                        } else if channel::is_ascendant_bottom(&data_points, current_price) {
+                        } else if channel::is_ascendant_bottom(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
                                 PatternType::ChannelUpBottom,
                             );
                             // no_pattern = false;
-                        } else if channel::is_descendant_top(&data_points, current_price) {
+                        } else if channel::is_descendant_top(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
                                 PatternType::ChannelDownTop,
                             );
                             //  no_pattern = false;
-                        } else if channel::is_descendant_bottom(&data_points, current_price) {
+                        } else if channel::is_descendant_bottom(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
                                 PatternType::ChannelDownBottom,
                             );
                             // no_pattern = false;
-                        } else if broadening::is_top(&data_points, current_price) {
+                        } else if broadening::is_top(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
                                 PatternType::BroadeningTop,
                             );
                             // no_pattern = false;
-                        } else if broadening::is_bottom(&data_points, current_price) {
+                        } else if broadening::is_bottom(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
                                 PatternType::BroadeningBottom,
                             );
                             // no_pattern = false;
-                        } else if double::is_top(&data_points, current_price) {
-                            self.set_pattern(&data_points, &pattern_size, PatternType::DoubleTop);
-                            // no_pattern = false;
-                        } else if double::is_bottom(&data_points, current_price) {
+                        } else if double::is_top(&data_points) {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
-                                PatternType::DoubleBottom,
+                                double::top_status(&data_points, current_price),
+                            );
+                            // no_pattern = false;
+                        } else if double::is_bottom(&data_points) {
+                            self.set_pattern(
+                                &data_points,
+                                &pattern_size,
+                                double::bottom_status(&data_points, current_price),
                             );
                             // no_pattern = false;
                         }
