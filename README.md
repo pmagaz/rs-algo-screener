@@ -27,4 +27,5 @@ Stock screener written in Rust. In this first iteration the idea is to construct
   - [x] Broadenings
   - [] Head & Shoulders
   - [] Divergences
+  - [] Activated pattern
 - [ ] Market regime filters
