@@ -1,9 +1,23 @@
+use crate::db;
+use crate::error::CustomError;
+use crate::models::app_state::AppState;
+use crate::models::instrument::Instrument;
+
 use actix_web::{web, HttpResponse, Responder};
 
-use crate::models::app_state::AppState;
+pub async fn index(
+    data: web::Json<Instrument>,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, CustomError> {
+    // let db = db::instruments::find_access_code(doc! {"access_code": &data.access_code}, &state)
+    //     .await
+    //     .map_err(|_e| CustomError::Forbidden)?
+    //     .unwrap();
 
-pub async fn index(state: web::Data<AppState>) -> impl Responder {
-    let app_name = &state.app_name;
-
-    HttpResponse::Ok().body(format!("Welcome to {}!", app_name))
+    let response = Instrument {
+        grant_type: "".to_owned(),
+        access_code: "".to_owned(),
+        redirect_url: "".to_owned(),
+    };
+    Ok(HttpResponse::Ok().json(response))
 }
