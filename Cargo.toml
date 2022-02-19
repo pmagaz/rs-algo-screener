@@ -1,4 +1,5 @@
 [workspace]
 members = [
     "rs_algo_screener",
+    "rs_algo_backend",
 ]
