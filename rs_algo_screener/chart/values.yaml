@@ -14,7 +14,7 @@ jobs:
     #schedule: "22 10 * * *"
     failedJobsHistoryLimit: 1
     successfulJobsHistoryLimit: 3
-    concurrencyPolicy: Allow
+    concurrencyPolicy: Replace
     restartPolicy: OnFailure
     customConfigMap: rs-algo-screener-configmap
     configMaps: rs-algo-screener-configmap
