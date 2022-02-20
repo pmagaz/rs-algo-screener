@@ -3,4 +3,4 @@ members = [
     "rs_algo_screener",
     "rs_algo_backend",
 ]
-default-members = ["rs_algo_screener"]
+default-members = ["rs_algo_screener","rs_algo_backend"]
