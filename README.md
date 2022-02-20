@@ -8,6 +8,7 @@ Stock screener written in Rust. In this first iteration the idea is to construct
 
 - [x] Image output support
 - [x] WebSocket support
+- [] Side Backend for data processing
 - [x] XTB broker implementation
   - [x] Get all available symbols
   - [x] Process a symbol
@@ -29,3 +30,7 @@ Stock screener written in Rust. In this first iteration the idea is to construct
   - [] Divergences
   - [] Activated pattern
 - [ ] Market regime filters
+
+### Examples
+
+![PNG](./images/GOOGL.US_9.png)
