@@ -5,6 +5,11 @@ jobs:
       repository: pmagaz/rs-algo-screener
       tag: latest
       imagePullPolicy: Always
+      envFrom:
+      - configMapRef:
+          name: rs-algo-screener-configmap
+      - secretRef:
+          name: rs-algo-screener-secrets
     schedule: "*/1 * * * *"
     #schedule: "22 10 * * *"
     failedJobsHistoryLimit: 1
