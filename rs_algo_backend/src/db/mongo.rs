@@ -4,8 +4,18 @@ use std::env;
 use crate::error::CustomError;
 
 pub async fn connect() -> Result<Client, CustomError> {
-    let db_uri = &env::var("BACKEND_MONGO_DB_URI").expect("BACKEND_MONGO_DB_URI not found");
+    let db_user = &env::var("DB_USERNAME").expect("DB_USERNAME not found");
+    let db_password = &env::var("DB_PASSWORD").expect("DB_PASSWORD not found");
     let db_name = &env::var("BACKEND_DATABASE").expect("BACKEND_DATABASE not found");
+
+    let db_uri = [
+        "mongodb+srv://",
+        db_user,
+        ":",
+        db_password,
+        &env::var("BACKEND_MONGO_DB_URI").expect("BACKEND_MONGO_DB_URI not found"),
+    ]
+    .concat();
 
     let client_options = ClientOptions::parse(db_uri).await.unwrap();
 
@@ -16,6 +26,6 @@ pub async fn connect() -> Result<Client, CustomError> {
         .await
         .unwrap();
 
-    println!("[Server] Connecting to {} database", db_name,);
+    println!("[Server] Connecting to {} database", db_name);
     Ok(client)
 }
