@@ -15,12 +15,14 @@ mod models;
 use db::mongo;
 use error::CustomError;
 use handlers::index::index;
+use handlers::instrument::instrument;
 use models::app_state::AppState;
 use std::env;
 
 #[actix_web::main]
 async fn main() -> Result<()> {
     dotenv().ok();
+
     let port = env::var("BACKEND_PORT").unwrap();
     let app_name = env::var("BACKEND_NAME").unwrap();
 
@@ -34,6 +36,7 @@ async fn main() -> Result<()> {
         app_name,
         port.clone()
     );
+
     HttpServer::new(move || {
         App::new()
             .data(AppState {
@@ -42,7 +45,7 @@ async fn main() -> Result<()> {
             })
             .wrap(Logger::default())
             .route("/", web::get().to(index))
-            .service(web::scope("/data").route("/", web::get().to(index)))
+            .service(web::scope("/instruments").route("/", web::post().to(instrument)))
     })
     .bind(["0.0.0.0:", &port].concat())
     .expect("Can't launch server")
