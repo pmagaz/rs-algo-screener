@@ -12,11 +12,10 @@ serde_qs ="0.8.5"
 chrono = "0.4.19"
 thiserror = "1.0"
 dotenv = "0.15"
-magic-crypt = "3.1.9"
 lazy_static = "1.4"
 bson = "2"
 
 [dependencies.mongodb]
-version = "2"
+version = "2.1.0"
 default-features = false
 features = ["async-std-runtime"]
