@@ -1,25 +1,15 @@
-
 jobs:
   - name: rs-algo-screener
     image:
       repository: pmagaz/rs-algo-screener
       tag: latest
       imagePullPolicy: Always
-      envFrom:
-      - configMapRef:
-          name: rs-algo-screener-configmap
-      - secretRef:
-          name: rs-algo-screener-secrets
     schedule: "*/1 * * * *"
-    #schedule: "22 10 * * *"
     failedJobsHistoryLimit: 1
     successfulJobsHistoryLimit: 3
     concurrencyPolicy: Replace
     restartPolicy: OnFailure
-    customConfigMap: rs-algo-screener-configmap
-    configMaps: rs-algo-screener-configmap
-    secrets: rs-algo-screener-secrets
-
+    envSecretName: rs-algo-screener-secrets
 
 
 
