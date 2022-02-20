@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: pmagaz/rs_algo_screener
+  repository: pmagaz/rs-algo-screener
   pullPolicy: Always 
   tag: "latest"
 
