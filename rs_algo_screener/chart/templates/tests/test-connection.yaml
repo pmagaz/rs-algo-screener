@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "rs-algo-screener.fullname" . }}-test-connection"
+  labels:
+    {{- include "rs-algo-screener.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "rs-algo-screener.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

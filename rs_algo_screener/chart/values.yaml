@@ -1,0 +1,75 @@
+replicaCount: 1
+
+image:
+  repository: pmagaz/rs-algo-screener 
+  pullPolicy: IfNotPresent 
+  tag: "latest"
+
+envSecretName: rust-auth-secrets
+
+imagePullSecrets:
+ - name: docker-credentials 
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  metadata:
+    name: rs-algo-screener
+    labels:
+      app: rs-algo-screener
+
+ingress:
+  enabled: false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kubernetes.io/enable-cors: "true"
+  hosts:
+    - host: cluster.local
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rs-algo-screener 
+            port:
+              number: 80 
+      - path: /algo
+        pathType: Prefix
+        backend:
+          service:
+            name: rs-algo-screener 
+            port:
+              number: 80 
+  tls: []
+
+resources: {}
+  #requests:
+  #  cpu: 100m
+  #memory: 128Mi
+  #limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
