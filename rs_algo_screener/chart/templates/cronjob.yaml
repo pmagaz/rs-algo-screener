@@ -48,14 +48,12 @@ spec:
             env:
 {{ toYaml . | indent 12 }}
             {{- end }}
-            {{- with $job.envFrom }}
             envFrom:
             - configMapRef:
-              name: {{ $job.name }}-configmap
+                name: {{ $job.name }}-configmap
             - secretRef:
-              name: {{ $job.envSecretName }}
+                name: {{ $job.envSecretName }}
             command: {{ $job.command }}
-            {{- end }}
             {{- with $job.args }}
             args:
 {{ toYaml . | indent 12 }}
