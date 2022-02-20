@@ -1,74 +1,23 @@
-replicaCount: 1
 
-image:
-  repository: pmagaz/rs-algo-screener
-  pullPolicy: Always 
-  tag: "latest"
+jobs:
+  - name: rs-algo-screener
+    image:
+      repository: pmagaz/rs-algo-screener
+      tag: latest
+      imagePullPolicy: Always
+    schedule: "*/1 * * * *"
+    #schedule: "22 10 * * *"
+    failedJobsHistoryLimit: 1
+    successfulJobsHistoryLimit: 3
+    concurrencyPolicy: Allow
+    restartPolicy: OnFailure
+    env:
+      - name: ENV_VAR
+        value: ENV_VALUE
+    envFrom:
+    - secretRef:
+      name: <secret_name>
+    - configMapRef:
+      name: rs-algo-screener-configmap 
 
-envSecretName: rs-algo-screener-secrets
 
-imagePullSecrets:
- - name: docker-credentials 
-
-serviceAccount:
-  create: false
-  annotations: {}
-  name: ""
-
-podAnnotations: {}
-
-podSecurityContext:
-  fsGroup: 1000
-
-service:
-  type: ClusterIP
-  port: 80
-  targetPort: 8000
-  metadata:
-    name: rs-algo-backend
-    labels:
-      app: rs-algo-backend
-
-ingress:
-  enabled: false
-  annotations:
-    kubernetes.io/ingress.class: nginx
-  hosts:
-    - host: cluster.local
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: rs_algo_screener
-            port:
-              number: 80 
-      - path: /instruments
-        pathType: Prefix
-        backend:
-          service:
-            name: rs_algo_screener
-            port:
-              number: 80 
-  tls: []
-
-resources: {}
-  #requests:
-  #  cpu: 100m
-  #memory: 128Mi
-  #limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 2
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
