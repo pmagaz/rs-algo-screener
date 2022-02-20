@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: pmagaz/rs-algo-backend 
-  pullPolicy: IfNotPresent 
+  pullPolicy: Always 
   tag: "latest"
 
 envSecretName: rust-auth-secrets
