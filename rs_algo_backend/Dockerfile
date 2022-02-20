@@ -34,8 +34,9 @@ RUN addgroup -S $APP_USER \
   && adduser -S -g $APP_USER $APP_USER
 
 RUN apk update \
-  #&& apk add --no-cache tzdata\
+  && apk add --no-cache tzdata\
   && rm -rf /var/cache/apk/*
+ENV TZ=Europe/Madrid
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
 
