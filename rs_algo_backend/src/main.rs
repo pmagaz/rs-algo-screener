@@ -23,8 +23,8 @@ use std::env;
 async fn main() -> Result<()> {
     dotenv().ok();
 
-    let port = env::var("BACKEND_PORT").unwrap();
-    let app_name = env::var("BACKEND_NAME").unwrap();
+    let port = env::var("BACKEND_PORT").expect("BACKEND_PORT not found");
+    let app_name = env::var("BACKEND_NAME").expect("BACKEND_NAME not found");
 
     let mongodb: mongodb::Client = mongo::connect()
         .await
