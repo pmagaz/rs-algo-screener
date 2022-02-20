@@ -22,5 +22,5 @@ async-trait = "0.1.52"
 futures = "0.3.21"
 openssl = { version = "0.10.38", features = ["vendored"] }
 tungstenite = {version = "0.17.1", features = ["native-tls"]}
-[dependencies.rs_algo_shared]
-path = "../rs_algo_shared"
+[dependencies.shared]
+path = "../shared"

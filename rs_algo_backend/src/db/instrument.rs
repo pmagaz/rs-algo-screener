@@ -1,6 +1,6 @@
 use crate::models::app_state::AppState;
 
-use rs_algo_shared::models::InstrumentRes;
+use shared::models::InstrumentRes;
 
 use actix_web::web;
 use mongodb::error::Error;

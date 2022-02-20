@@ -2,6 +2,6 @@
 members = [
     "rs_algo_screener",
     "rs_algo_backend",
-    "rs_algo_shared",
+    "shared",
 ]
-default-members = ["rs_algo_screener","rs_algo_backend","rs_algo_shared"]
+default-members = ["rs_algo_screener","rs_algo_backend","shared"]

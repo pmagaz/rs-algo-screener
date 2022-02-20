@@ -3,7 +3,7 @@ use crate::error::CustomError;
 use crate::models::app_state::AppState;
 
 use actix_web::{web, HttpResponse, Responder};
-use rs_algo_shared::models::InstrumentRes;
+use shared::models::InstrumentRes;
 
 pub async fn instrument(
     data: String,

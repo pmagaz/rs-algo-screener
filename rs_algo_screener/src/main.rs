@@ -20,8 +20,8 @@ mod patterns;
 mod screener;
 
 use dotenv::dotenv;
-use rs_algo_shared::http::request;
-//use rs_algo_shared::models::InstrumentRes;
+use shared::http::request;
+//use shared::models::InstrumentRes;
 use std::env;
 use std::{thread, time};
 
