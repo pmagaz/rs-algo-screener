@@ -3,7 +3,9 @@ use crate::helpers::date::{DateTime, Local};
 pub type OHLCV = (f64, f64, f64, f64);
 pub type DOHLCV = (DateTime<Local>, f64, f64, f64, f64, f64);
 
-#[derive(Debug, Clone)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CandleType {
     Default,
     Doji,

@@ -9,10 +9,11 @@ use crate::indicators::macd::Macd;
 use crate::indicators::rsi::Rsi;
 use crate::indicators::stoch::Stoch;
 
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::marker::Sized;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum IndicatorType {
     MacD,
     Stoch,
@@ -21,7 +22,7 @@ pub enum IndicatorType {
     Ema_b,
     Ema_c,
 }
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum IndicatorStatus {
     Bearish,
     BearishBellowZero,

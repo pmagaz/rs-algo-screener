@@ -1,11 +1,12 @@
-use crate::candle::Candle;
+use crate::candle::{Candle, CandleType};
 use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
 use crate::helpers::date::{DateTime, Local};
-use crate::indicators::Indicators;
+use crate::indicators::{IndicatorStatus, Indicators};
 use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
 
+use serde::{Deserialize, Serialize};
 use std::env;
 
 #[derive(Debug, Clone)]
@@ -19,6 +20,15 @@ pub struct Instrument {
     horizontal_levels: HorizontalLevels,
     patterns: Patterns,
     indicators: Indicators,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstrumentRes {
+    pub symbol: String,
+    pub candle: CandleType,
+    pub current_price: f64,
+    pub patterns: Patterns,
+    pub indicators: Vec<IndicatorStatus>,
 }
 
 impl Instrument {

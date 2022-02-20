@@ -2,9 +2,10 @@ type Point = (usize, f64);
 pub type DataPoints = Vec<Point>;
 use crate::patterns::*;
 
+use serde::{Deserialize, Serialize};
 use std::env;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PatternType {
     TriangleSymmetricalTop,
     TriangleSymmetricalTopActivated,
@@ -42,20 +43,20 @@ pub enum PatternType {
     None,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PatternSize {
     Local,
     Extrema,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pattern {
     pub pattern_type: PatternType,
     pub pattern_size: PatternSize,
     pub data_points: DataPoints,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Patterns {
     pub local_patterns: Vec<Pattern>,
     pub extrema_patterns: Vec<Pattern>,
@@ -67,6 +68,10 @@ impl Patterns {
             local_patterns: vec![],
             extrema_patterns: vec![],
         }
+    }
+
+    pub fn patterns(&self) -> &Self {
+        self
     }
 
     pub fn detect_pattern(
