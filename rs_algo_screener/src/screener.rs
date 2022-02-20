@@ -3,7 +3,9 @@ use crate::broker::{Broker, Response, VEC_DOHLC};
 use crate::error::Result;
 use crate::instrument::Instrument;
 
+use std::env;
 use std::future::Future;
+
 #[derive(Debug)]
 pub struct Screener<BK> {
     broker: BK,
@@ -49,7 +51,16 @@ where
 
         let mut instrument = Instrument::new().symbol(&res.symbol).build().unwrap();
         instrument.set_data(res.data).unwrap();
-        self.backend.render(&instrument).unwrap();
+
+        let render_to_image = env::var("RENDER_TO_IMAGE")
+            .unwrap()
+            .parse::<bool>()
+            .unwrap();
+
+        if render_to_image {
+            self.backend.render(&instrument).unwrap();
+        }
+
         tokio::spawn(callback(instrument));
         Ok(())
     }
