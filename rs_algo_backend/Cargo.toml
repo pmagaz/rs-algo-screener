@@ -15,8 +15,11 @@ thiserror = "1.0.30"
 dotenv = "0.15.0"
 lazy_static = "1.4"
 bson = "2"
+[dependencies.rs_algo_shared]
+path = "../rs_algo_shared"
 
 [dependencies.mongodb]
 version = "2.1.0"
 default-features = false
 features = ["async-std-runtime"]
+

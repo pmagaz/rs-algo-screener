@@ -25,6 +25,7 @@ async fn main() -> Result<()> {
 
     let port = env::var("BACKEND_PORT").expect("BACKEND_PORT not found");
     let app_name = env::var("BACKEND_NAME").expect("BACKEND_NAME not found");
+    let db_name = env::var("BACKEND_DATABASE").expect("BACKEND_DATABASE not found");
 
     let mongodb: mongodb::Client = mongo::connect()
         .await
@@ -42,10 +43,11 @@ async fn main() -> Result<()> {
             .data(AppState {
                 app_name: String::from(&app_name),
                 db: mongodb.clone(),
+                db_name: db_name.to_owned(),
             })
             .wrap(Logger::default())
             .route("/", web::get().to(index))
-            .service(web::scope("/instruments").route("/", web::post().to(instrument)))
+            .service(web::scope("/api").route("/instruments", web::post().to(instrument)))
     })
     .bind(["0.0.0.0:", &port].concat())
     .expect("Can't launch server")

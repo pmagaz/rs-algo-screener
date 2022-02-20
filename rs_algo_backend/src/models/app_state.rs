@@ -4,4 +4,5 @@ use mongodb::Client;
 pub struct AppState {
     pub app_name: String,
     pub db: Client,
+    pub db_name: String,
 }

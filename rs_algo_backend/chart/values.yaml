@@ -43,7 +43,7 @@ ingress:
             name: rs-algo-backend 
             port:
               number: 80 
-      - path: /instruments
+      - path: /api
         pathType: Prefix
         backend:
           service:

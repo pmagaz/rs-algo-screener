@@ -1,24 +1,16 @@
 use crate::db;
 use crate::error::CustomError;
 use crate::models::app_state::AppState;
-use crate::models::instrument::Instrument;
 
 use actix_web::{web, HttpResponse, Responder};
+use rs_algo_shared::models::InstrumentRes;
 
 pub async fn instrument(
-    data: web::Json<Instrument>,
+    data: String,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, CustomError> {
-    println!("11111111111111 {:?}", data);
-    // let db = db::instruments::find_access_code(doc! {"access_code": &data.access_code}, &state)
-    //     .await
-    //     .map_err(|_e| CustomError::Forbidden)?
-    //     .unwrap();
+    let response: InstrumentRes = serde_json::from_str(&data).unwrap();
+    let _insert_result = db::instrument::insert(response, &state).await.unwrap();
 
-    let response = Instrument {
-        grant_type: "".to_owned(),
-        access_code: "".to_owned(),
-        redirect_url: "".to_owned(),
-    };
-    Ok(HttpResponse::Ok().json(response))
+    Ok(HttpResponse::Ok().body("ok"))
 }
