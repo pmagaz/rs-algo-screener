@@ -1,2 +1,4 @@
-APP_PORT: "8000"
-APP_NAME: "Rust Auth Server"
+BACKEND_PORT: "8000"
+BACKEND_NAME: "Rust Auth Server"
+BACKEND_DATABASE: "screener-db"
+BACKEND_DATABASE_COLLECTION: "screener-db"
