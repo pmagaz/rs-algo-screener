@@ -5,7 +5,7 @@ image:
   pullPolicy: Always
   tag: "latest"
 
-envSecretName: rust-auth-secrets
+envSecretName: rs-algo-screener-secrets
 
 imagePullSecrets:
  - name: docker-credentials 
