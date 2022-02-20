@@ -50,9 +50,10 @@ spec:
             {{- end }}
             {{- with $job.envFrom }}
             envFrom:
-{{ toYaml . | indent 12 }}
-            {{- end }}
-            {{- if $job.command }}
+            - configMapRef:
+              name: {{ $job.name }}-configmap
+            - secretRef:
+              name: {{ $job.envSecretName }}
             command: {{ $job.command }}
             {{- end }}
             {{- with $job.args }}
