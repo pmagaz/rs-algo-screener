@@ -25,7 +25,6 @@ pub struct Instrument {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InstrumentRes {
     pub symbol: String,
-    pub created: String,
     pub updated: String,
     pub candle: CandleType,
     pub current_price: f64,
