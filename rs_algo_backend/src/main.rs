@@ -10,6 +10,7 @@ extern crate lazy_static;
 mod db;
 mod error;
 mod handlers;
+mod helpers;
 mod models;
 
 use db::mongo;

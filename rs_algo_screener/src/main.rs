@@ -20,11 +20,9 @@ mod patterns;
 mod screener;
 
 use dotenv::dotenv;
-use shared::http::request;
-//use shared::models::InstrumentRes;
+use helpers::http::request;
 use std::env;
 use std::{thread, time};
-
 /*
 TODO LIST
 - Add activated chart figures for channels and broadenings
