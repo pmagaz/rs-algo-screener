@@ -108,6 +108,8 @@ async fn main() -> Result<()> {
 
                     let new_data = InstrumentRes {
                         symbol: inst.symbol().to_owned(),
+                        created: Local::now().to_string(),
+                        updated: "".to_string(),
                         candle: inst.current_candle().candle_type().clone(),
                         current_price: inst.current_price(),
                         patterns: inst.patterns().clone(),
