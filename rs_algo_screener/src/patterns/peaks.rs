@@ -137,15 +137,19 @@ impl Peaks {
     ) -> Result<Vec<(usize, f64)>> {
         let prominence = max_price * min_prominence;
         let mut result: Vec<(usize, f64)> = vec![];
+
         let mut local_minima_fp = PeakFinder::new(&data);
         local_minima_fp.with_min_prominence(prominence);
-        local_minima_fp.with_min_distance(min_distance);
+        //local_minima_fp.with_min_distance(min_distance);
 
         let mut x_values: Vec<f64> = vec![];
         let mut y_values: Vec<f64> = vec![];
+
         for x in local_minima_fp.find_peaks() {
             let candle_id = x.middle_position();
+
             let price = self.close[candle_id];
+
             x_values.push(candle_id as f64);
             y_values.push(price);
             result.push((candle_id, price.abs()));

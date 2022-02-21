@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
 
     // let symbols = [
     //     Symbol {
-    //         symbol: "TGNA.US_9".to_owned(),
+    //         symbol: "FXA.US".to_owned(),
     //         category: "".to_owned(),
     //         description: "".to_owned(),
     //         currency: "".to_owned(),
@@ -79,6 +79,8 @@ async fn main() -> Result<()> {
     // ];
 
     for s in symbols {
+        //println!("[Response122222] {:?} ", s.symbol);
+
         screener
             .get_instrument_data(
                 &s.symbol,
