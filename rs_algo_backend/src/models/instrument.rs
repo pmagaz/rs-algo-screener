@@ -1,5 +1,15 @@
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InstrumentRes {
+    pub symbol: String,
+    pub updated: String,
+    pub candle: CandleType,
+    pub current_price: f64,
+    pub patterns: Patterns,
+    pub indicators: Vec<IndicatorStatus>,
+}
+
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Instrument {
     pub grant_type: String,
@@ -104,15 +114,4 @@ pub enum IndicatorStatus {
     Oversold,
     Overbought,
     Default,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InstrumentRes {
-    pub symbol: String,
-    pub created: String,
-    pub updated: String,
-    pub candle: CandleType,
-    pub current_price: f64,
-    pub patterns: Patterns,
-    pub indicators: Vec<IndicatorStatus>,
 }
