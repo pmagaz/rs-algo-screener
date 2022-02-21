@@ -4,7 +4,7 @@ jobs:
       repository: pmagaz/rs-algo-screener
       tag: latest
       imagePullPolicy: Always
-    schedule: "*/1 * * * *"
+    schedule: "0 22 * * *"
     failedJobsHistoryLimit: 1
     successfulJobsHistoryLimit: 3
     concurrencyPolicy: Replace
