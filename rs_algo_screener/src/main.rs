@@ -125,7 +125,7 @@ async fn main() -> Result<()> {
                         .await
                         .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
-                    println!("[Request] to {:?}", res);
+                    println!("[Response] status {:?}", res.status());
 
                     Ok(())
                 },

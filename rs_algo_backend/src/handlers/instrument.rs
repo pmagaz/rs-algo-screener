@@ -11,6 +11,7 @@ pub async fn instrument(
 ) -> Result<HttpResponse, CustomError> {
     let response: InstrumentRes = serde_json::from_str(&data).unwrap();
     let _insert_result = db::instrument::insert(response, &state).await.unwrap();
+    println!("[Request]");
 
     Ok(HttpResponse::Ok().body("ok"))
 }
