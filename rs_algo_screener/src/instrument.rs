@@ -1,7 +1,7 @@
 use crate::candle::{Candle, CandleType};
 use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
 use crate::helpers::date::{DateTime, Local};
-use crate::indicators::{IndicatorStatus, Indicators};
+use crate::indicators::{IndicatorReq, Indicators};
 use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
@@ -29,7 +29,7 @@ pub struct InstrumentRes {
     pub candle: CandleType,
     pub current_price: f64,
     pub patterns: Patterns,
-    pub indicators: Vec<IndicatorStatus>,
+    pub indicators: Vec<IndicatorReq>,
 }
 
 impl Instrument {

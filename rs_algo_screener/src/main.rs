@@ -5,7 +5,7 @@ use broker::xtb::*;
 use broker::Symbol;
 use helpers::date;
 use helpers::date::Local;
-use indicators::Indicator;
+use indicators::{Indicator, IndicatorReq, IndicatorType};
 use instrument::{Instrument, InstrumentRes};
 use screener::Screener;
 
@@ -38,11 +38,11 @@ async fn main() -> Result<()> {
     dotenv().ok();
     let username = &env::var("BROKER_USERNAME").unwrap();
     let password = &env::var("BROKER_PASSWORD").unwrap();
-
+    let from_date = env::var("FROM_DATE").unwrap().parse::<i64>().unwrap();
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
 
     let sleep = time::Duration::from_millis(*sleep_time);
-    let from = (Local::now() - date::Duration::days(365 * 2)).timestamp();
+    let from = (Local::now() - date::Duration::days(from_date)).timestamp();
     let time_frame = TimeFrame::D;
 
     let mut screener = Screener::<Xtb>::new().await?;
@@ -66,12 +66,62 @@ async fn main() -> Result<()> {
                         current_price: inst.current_price(),
                         patterns: inst.patterns().clone(),
                         indicators: vec![
-                            inst.indicators().macd().get_status(current_price),
-                            inst.indicators().rsi().get_status(current_price),
-                            inst.indicators().stoch().get_status(current_price),
-                            inst.indicators().ema_a().get_status(current_price),
-                            inst.indicators().ema_b().get_status(current_price),
-                            inst.indicators().ema_c().get_status(current_price),
+                            IndicatorReq::new()
+                                .indicator_type(IndicatorType::MacD)
+                                .status(inst.indicators().macd().get_status(current_price))
+                                .data_a(inst.indicators().macd().get_data_a().clone())
+                                .data_b(inst.indicators().macd().get_data_b().clone())
+                                .build()
+                                .unwrap(),
+                            IndicatorReq::new()
+                                .indicator_type(IndicatorType::Stoch)
+                                .status(inst.indicators().stoch().get_status(current_price))
+                                .data_a(inst.indicators().stoch().get_data_a().clone())
+                                .data_b(inst.indicators().stoch().get_data_b().clone())
+                                .build()
+                                .unwrap(),
+                            IndicatorReq::new()
+                                .indicator_type(IndicatorType::Rsi)
+                                .status(inst.indicators().rsi().get_status(current_price))
+                                .data_a(inst.indicators().rsi().get_data_a().clone())
+                                .data_b(inst.indicators().rsi().get_data_b().clone())
+                                .build()
+                                .unwrap(),
+                            IndicatorReq::new()
+                                .indicator_type(IndicatorType::Ema_a)
+                                .status(inst.indicators().ema_a().get_status(current_price))
+                                .data_a(inst.indicators().ema_a().get_data_a().clone())
+                                .data_b(inst.indicators().ema_a().get_data_b().clone())
+                                .build()
+                                .unwrap(),
+                            IndicatorReq::new()
+                                .indicator_type(IndicatorType::Ema_b)
+                                .status(inst.indicators().ema_b().get_status(current_price))
+                                .data_a(inst.indicators().ema_b().get_data_a().clone())
+                                .data_b(inst.indicators().ema_b().get_data_b().clone())
+                                .build()
+                                .unwrap(),
+                            IndicatorReq::new()
+                                .indicator_type(IndicatorType::Ema_c)
+                                .status(inst.indicators().ema_c().get_status(current_price))
+                                .data_a(inst.indicators().ema_c().get_data_a().clone())
+                                .data_b(inst.indicators().ema_c().get_data_b().clone())
+                                .build()
+                                .unwrap(),
+                            IndicatorReq::new()
+                                .indicator_type(IndicatorType::Ema_d)
+                                .status(inst.indicators().ema_d().get_status(current_price))
+                                .data_a(inst.indicators().ema_d().get_data_a().clone())
+                                .data_b(inst.indicators().ema_d().get_data_b().clone())
+                                .build()
+                                .unwrap(),
+                            IndicatorReq::new()
+                                .indicator_type(IndicatorType::Ema_e)
+                                .status(inst.indicators().ema_e().get_status(current_price))
+                                .data_a(inst.indicators().ema_e().get_data_a().clone())
+                                .data_b(inst.indicators().ema_e().get_data_b().clone())
+                                .build()
+                                .unwrap(),
                         ],
                     };
 

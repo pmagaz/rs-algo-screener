@@ -1,13 +1,34 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InstrumentRes {
-    pub symbol: String,
-    pub updated: String,
-    pub candle: CandleType,
-    pub current_price: f64,
-    pub patterns: Patterns,
-    pub indicators: Vec<IndicatorStatus>,
+pub enum IndicatorType {
+    MacD,
+    Stoch,
+    Rsi,
+    Ema_a,
+    Ema_b,
+    Ema_c,
+    Ema_d,
+    Ema_e,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum IndicatorStatus {
+    Bearish,
+    BearishBellowZero,
+    Bullish,
+    BullishOverZero,
+    Oversold,
+    Overbought,
+    Default,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IndicatorReq {
+    indicator_type: IndicatorType,
+    status: IndicatorStatus,
+    data_a: Vec<f64>,
+    data_b: Vec<f64>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
@@ -15,6 +36,16 @@ pub struct Instrument {
     pub grant_type: String,
     pub access_code: String,
     pub redirect_url: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct InstrumentRes {
+    pub symbol: String,
+    pub updated: String,
+    pub candle: CandleType,
+    pub current_price: f64,
+    pub patterns: Patterns,
+    pub indicators: Vec<IndicatorReq>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -94,24 +125,4 @@ pub struct Pattern {
 pub struct Patterns {
     pub local_patterns: Vec<Pattern>,
     pub extrema_patterns: Vec<Pattern>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum IndicatorType {
-    MacD,
-    Stoch,
-    Rsi,
-    Ema_a,
-    Ema_b,
-    Ema_c,
-}
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum IndicatorStatus {
-    Bearish,
-    BearishBellowZero,
-    Bullish,
-    BullishOverZero,
-    Oversold,
-    Overbought,
-    Default,
 }
