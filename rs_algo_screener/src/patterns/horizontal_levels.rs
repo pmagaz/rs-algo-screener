@@ -1,16 +1,17 @@
 use super::peaks::Peaks;
 use crate::error::Result;
 
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum HorizontalLevelType {
     Resistance,
     Support,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HorizontalLevel {
     price: f64,
     min_value: f64,
@@ -26,7 +27,7 @@ impl HorizontalLevel {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HorizontalLevels {
     horizontal_levels: HashMap<usize, HorizontalLevel>,
 }

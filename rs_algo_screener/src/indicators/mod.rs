@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use std::marker::Sized;
 
+/*
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum IndicatorType {
     MacD,
@@ -91,7 +92,7 @@ impl IndicatorReqBuilder {
         self
     }
 }
-
+*/
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum IndicatorStatus {
     Bearish,
@@ -103,7 +104,7 @@ pub enum IndicatorStatus {
     Default,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Indicators {
     pub macd: Macd,
     pub stoch: Stoch,

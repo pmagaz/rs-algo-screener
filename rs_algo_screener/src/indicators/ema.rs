@@ -2,10 +2,11 @@ use super::Indicator;
 use super::IndicatorStatus;
 use crate::error::Result;
 
+use serde::{Deserialize, Serialize};
 use ta::indicators::ExponentialMovingAverage;
 use ta::Next;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Ema {
     ema: ExponentialMovingAverage,
     data_a: Vec<f64>,

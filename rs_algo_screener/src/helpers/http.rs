@@ -2,7 +2,7 @@ use reqwest::{Client, Error, Response};
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-pub async fn request<T>(url: &str, data: T) -> Result<Response, Error>
+pub async fn request<T>(url: &str, data: &T) -> Result<Response, Error>
 where
     for<'de> T: Serialize + Deserialize<'de> + Debug,
 {

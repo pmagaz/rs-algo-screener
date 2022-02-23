@@ -2,11 +2,9 @@ use crate::error::Result;
 use error::RsAlgoErrorKind;
 
 use broker::xtb::*;
-use broker::Symbol;
 use helpers::date;
 use helpers::date::Local;
-use indicators::{Indicator, IndicatorReq, IndicatorType};
-use instrument::{Instrument, InstrumentRes};
+use instrument::Instrument;
 use screener::Screener;
 
 mod backend;
@@ -55,81 +53,16 @@ async fn main() -> Result<()> {
                 &s.symbol,
                 time_frame.value(),
                 from,
-                |inst: Instrument| async move {
+                |instrument: Instrument| async move {
+                    println!("[INSTRUMENT]  {:?}", &instrument.symbol());
+
                     let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
 
-                    let current_price = inst.current_price();
-                    let new_data = InstrumentRes {
-                        symbol: inst.symbol().to_owned(),
-                        updated: "".to_string(),
-                        candle: inst.current_candle().candle_type().clone(),
-                        current_price: inst.current_price(),
-                        patterns: inst.patterns().clone(),
-                        indicators: vec![
-                            IndicatorReq::new()
-                                .indicator_type(IndicatorType::MacD)
-                                .status(inst.indicators().macd().get_status(current_price))
-                                .data_a(inst.indicators().macd().get_data_a().clone())
-                                .data_b(inst.indicators().macd().get_data_b().clone())
-                                .build()
-                                .unwrap(),
-                            IndicatorReq::new()
-                                .indicator_type(IndicatorType::Stoch)
-                                .status(inst.indicators().stoch().get_status(current_price))
-                                .data_a(inst.indicators().stoch().get_data_a().clone())
-                                .data_b(inst.indicators().stoch().get_data_b().clone())
-                                .build()
-                                .unwrap(),
-                            IndicatorReq::new()
-                                .indicator_type(IndicatorType::Rsi)
-                                .status(inst.indicators().rsi().get_status(current_price))
-                                .data_a(inst.indicators().rsi().get_data_a().clone())
-                                .data_b(inst.indicators().rsi().get_data_b().clone())
-                                .build()
-                                .unwrap(),
-                            IndicatorReq::new()
-                                .indicator_type(IndicatorType::Ema_a)
-                                .status(inst.indicators().ema_a().get_status(current_price))
-                                .data_a(inst.indicators().ema_a().get_data_a().clone())
-                                .data_b(inst.indicators().ema_a().get_data_b().clone())
-                                .build()
-                                .unwrap(),
-                            IndicatorReq::new()
-                                .indicator_type(IndicatorType::Ema_b)
-                                .status(inst.indicators().ema_b().get_status(current_price))
-                                .data_a(inst.indicators().ema_b().get_data_a().clone())
-                                .data_b(inst.indicators().ema_b().get_data_b().clone())
-                                .build()
-                                .unwrap(),
-                            IndicatorReq::new()
-                                .indicator_type(IndicatorType::Ema_c)
-                                .status(inst.indicators().ema_c().get_status(current_price))
-                                .data_a(inst.indicators().ema_c().get_data_a().clone())
-                                .data_b(inst.indicators().ema_c().get_data_b().clone())
-                                .build()
-                                .unwrap(),
-                            IndicatorReq::new()
-                                .indicator_type(IndicatorType::Ema_d)
-                                .status(inst.indicators().ema_d().get_status(current_price))
-                                .data_a(inst.indicators().ema_d().get_data_a().clone())
-                                .data_b(inst.indicators().ema_d().get_data_b().clone())
-                                .build()
-                                .unwrap(),
-                            IndicatorReq::new()
-                                .indicator_type(IndicatorType::Ema_e)
-                                .status(inst.indicators().ema_e().get_status(current_price))
-                                .data_a(inst.indicators().ema_e().get_data_a().clone())
-                                .data_b(inst.indicators().ema_e().get_data_b().clone())
-                                .build()
-                                .unwrap(),
-                        ],
-                    };
-
-                    let res = request::<InstrumentRes>(&endpoint, new_data)
+                    let res = request::<Instrument>(&endpoint, &instrument)
                         .await
                         .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
-                    println!("[Response] status {:?}", res.status());
+                    println!("[Response] {:?}", res);
 
                     Ok(())
                 },

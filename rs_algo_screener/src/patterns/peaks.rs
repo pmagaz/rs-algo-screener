@@ -2,10 +2,10 @@ use crate::error::Result;
 use crate::helpers::regression::kernel_regression;
 
 use find_peaks::PeakFinder;
-use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
 use std::env;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Peaks {
     pub highs: Vec<f64>,
     pub close: Vec<f64>,

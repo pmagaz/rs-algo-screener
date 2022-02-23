@@ -4,10 +4,12 @@ use crate::error::Result;
 
 use ta::indicators::SlowStochastic;
 
+use serde::{Deserialize, Serialize};
 use ta::indicators::ExponentialMovingAverage;
 use ta::Next;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+
 pub struct Stoch {
     stoch: SlowStochastic,
     ema: ExponentialMovingAverage,
