@@ -46,6 +46,7 @@ async fn main() -> Result<()> {
                 db: mongodb.clone(),
                 db_name: db_name.to_owned(),
             })
+            .app_data(web::PayloadConfig::new(1000000))
             .wrap(Logger::default())
             .route("/", web::get().to(index))
             .service(web::scope("/api").route("/instruments", web::post().to(instrument)))
