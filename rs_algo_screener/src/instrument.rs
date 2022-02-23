@@ -14,6 +14,7 @@ pub struct Instrument {
     symbol: String,
     data: Vec<Candle>,
     current_price: f64,
+    current_candle: CandleType,
     min_price: f64,
     max_price: f64,
     peaks: Peaks,
@@ -89,6 +90,7 @@ impl Instrument {
                 if self.min_price == -100. {
                     self.min_price = low;
                 }
+
                 if low < self.min_price {
                     self.min_price = low;
                 }
@@ -157,6 +159,9 @@ impl Instrument {
             .calculate_horizontal_lows(&self.current_price, &self.peaks)
             .unwrap();
         self.data = parsed;
+
+        self.current_candle = self.current_candle().candle_type().clone();
+
         Ok(())
     }
 }
@@ -184,14 +189,15 @@ impl InstrumentBuilder {
         if let Some(symbol) = self.symbol {
             Ok(Instrument {
                 symbol,
+                current_price: 0.,
+                current_candle: CandleType::Default,
+                min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
+                max_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
                 data: vec![],
                 peaks: Peaks::new(),
                 horizontal_levels: HorizontalLevels::new(),
                 patterns: Patterns::new(),
                 indicators: Indicators::new().unwrap(),
-                current_price: 0.,
-                min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
-                max_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
             })
         } else {
             Err(RsAlgoError {

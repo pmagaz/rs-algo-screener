@@ -11,7 +11,7 @@ use mongodb::results::InsertOneResult;
 pub async fn insert(
     mut doc: Instrument,
     state: &web::Data<AppState>,
-) -> Result<InsertOneResult, Error> {
+) -> Result<Option<Instrument>, Error> {
     let db_name = &state.db_name;
 
     let collection = &state
@@ -29,15 +29,14 @@ pub async fn insert(
     //     )
     //     .await
 
-    //doc.updated = Local::now().to_string();
-    collection.insert_one(doc, None).await
-    // collection
-    //     .find_one_and_replace(
-    //         doc! { "symbol": doc.symbol.clone() },
-    //         doc,
-    //         FindOneAndReplaceOptions::builder()
-    //             .upsert(Some(true))
-    //             .build(),
-    //     )
-    //     .await
+    doc.updated = Local::now().to_string();
+    collection
+        .find_one_and_replace(
+            doc! { "symbol": doc.symbol.clone() },
+            doc,
+            FindOneAndReplaceOptions::builder()
+                .upsert(Some(true))
+                .build(),
+        )
+        .await
 }

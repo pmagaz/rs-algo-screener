@@ -10,12 +10,13 @@ use ta::indicators::SlowStochastic;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Instrument {
     pub symbol: String,
-    #[serde(skip_deserializing)]
-    pub updated: String,
-    data: Vec<Candle>,
     current_price: f64,
     min_price: f64,
     max_price: f64,
+    current_candle: CandleType,
+    #[serde(skip_deserializing)]
+    pub updated: String,
+    data: Vec<Candle>,
     peaks: Peaks,
     //horizontal_levels: HorizontalLevels,
     patterns: Patterns,
