@@ -128,6 +128,7 @@ impl Instrument {
             })
             .collect();
 
+        //FIXME [INSTRUMENT]  "RIDE.US"
         self.set_current_price(parsed.last().unwrap().close());
         self.peaks.calculate_peaks(&self.max_price).unwrap();
 
