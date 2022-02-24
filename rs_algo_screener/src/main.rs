@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
                         .await
                         .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
-                    println!("[Response] {:?}", res.status());
+                    println!("[Response] {:?} at {:?}", res.status(), Local::now());
 
                     Ok(())
                 },

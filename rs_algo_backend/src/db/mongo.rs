@@ -9,7 +9,7 @@ pub async fn connect() -> Result<Client, CustomError> {
     let db_name = &env::var("BACKEND_DATABASE").expect("BACKEND_DATABASE not found");
 
     let db_uri = [
-        "mongodb+srv://",
+        "mongodb://",
         db_user,
         ":",
         db_password,
