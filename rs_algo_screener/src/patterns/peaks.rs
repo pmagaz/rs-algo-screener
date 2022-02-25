@@ -1,4 +1,5 @@
 use crate::error::Result;
+use crate::helpers::maxima_minima::maxima_minima;
 use crate::helpers::regression::kernel_regression;
 
 use find_peaks::PeakFinder;
@@ -76,10 +77,10 @@ impl Peaks {
             .unwrap()
             .parse::<f64>()
             .unwrap();
-        let local_distance = env::var("PROMINENCE_MIN_DISTANCE")
-            .unwrap()
-            .parse::<usize>()
-            .unwrap();
+        // let local_distance = env::var("PROMINENCE_MIN_DISTANCE")
+        //     .unwrap()
+        //     .parse::<usize>()
+        //     .unwrap();
         let mut kernel_bandwidth = env::var("KERNEL_BANDWIDTH")
             .unwrap()
             .parse::<f64>()
@@ -109,52 +110,47 @@ impl Peaks {
 
         let minima_smooth: Vec<f64> = smooth_close.iter().map(|x| -x).collect();
 
-        self.local_maxima =
-            self.maxima_minima(&smooth_close, local_prominence, local_distance, max_price)?;
+        self.local_maxima = maxima_minima(&smooth_close, &self.close, local_prominence, max_price)?;
 
         self.local_minima =
-            self.maxima_minima(&minima_smooth, local_prominence, local_distance, max_price)?;
+            maxima_minima(&minima_smooth, &self.close, local_prominence, max_price)?;
 
         self.extrema_maxima =
-            self.maxima_minima(&smooth_close, extrema_prominence, local_distance, max_price)?;
+            maxima_minima(&smooth_close, &self.close, extrema_prominence, max_price)?;
 
-        self.extrema_minima = self.maxima_minima(
-            &minima_smooth,
-            extrema_prominence,
-            local_distance,
-            max_price,
-        )?;
+        self.extrema_minima =
+            maxima_minima(&minima_smooth, &self.close, extrema_prominence, max_price)?;
 
         Ok(())
     }
 
-    fn maxima_minima(
-        &self,
-        data: &Vec<f64>,
-        min_prominence: f64,
-        min_distance: usize,
-        max_price: &f64,
-    ) -> Result<Vec<(usize, f64)>> {
-        let prominence = max_price * min_prominence;
-        let mut result: Vec<(usize, f64)> = vec![];
+    // fn maxima_minima(
+    //     &self,
+    //     data: &Vec<f64>,
+    //     min_prominence: f64,
+    //     min_distance: usize,
+    //     max_price: &f64,
+    // ) -> Result<Vec<(usize, f64)>> {
+    //     let prominence = max_price * min_prominence;
+    //     let mut result: Vec<(usize, f64)> = vec![];
 
-        let mut local_minima_fp = PeakFinder::new(&data);
-        local_minima_fp.with_min_prominence(prominence);
-        //local_minima_fp.with_min_distance(min_distance);
+    //     let peaks = PeakFinder::new(&data)
+    //         .with_min_prominence(prominence)
+    //         //.with_min_distance(min_distance);
+    //         .find_peaks();
 
-        let mut x_values: Vec<f64> = vec![];
-        let mut y_values: Vec<f64> = vec![];
+    //     let mut x_values: Vec<f64> = vec![];
+    //     let mut y_values: Vec<f64> = vec![];
 
-        for x in local_minima_fp.find_peaks() {
-            let candle_id = x.middle_position();
+    //     for peak in peaks {
+    //         let candle_id = peak.middle_position();
+    //         let price = self.close[candle_id];
 
-            let price = self.close[candle_id];
+    //         x_values.push(candle_id as f64);
+    //         y_values.push(price);
+    //         result.push((candle_id, price.abs()));
+    //     }
 
-            x_values.push(candle_id as f64);
-            y_values.push(price);
-            result.push((candle_id, price.abs()));
-        }
-
-        Ok(result)
-    }
+    //     Ok(result)
+    // }
 }

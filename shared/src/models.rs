@@ -80,15 +80,6 @@ pub struct Patterns {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum IndicatorType {
-    MacD,
-    Stoch,
-    Rsi,
-    Ema_a,
-    Ema_b,
-    Ema_c,
-}
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum IndicatorStatus {
     Bearish,
     BearishBellowZero,

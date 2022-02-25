@@ -2,6 +2,7 @@ use crate::candle::{Candle, CandleType};
 use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
 use crate::helpers::date::{DateTime, Local};
 use crate::indicators::Indicators;
+use crate::patterns::divergences::Divergences;
 use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
@@ -22,6 +23,7 @@ pub struct Instrument {
     horizontal_levels: HorizontalLevels,
     patterns: Patterns,
     indicators: Indicators,
+    divergences: Divergences,
 }
 
 impl Instrument {
@@ -46,9 +48,9 @@ impl Instrument {
         self.current_price
     }
 
-    pub fn current_price(&self) -> f64 {
-        self.current_price
-    }
+    // pub fn current_price(&self) -> f64 {
+    //     self.current_price
+    // }
 
     pub fn current_candle(&self) -> &Candle {
         let num_candles = &self.data().len() - 1;
@@ -161,6 +163,8 @@ impl Instrument {
             .unwrap();
         self.data = parsed;
 
+        self.divergences.calculate(&self.patterns, &self.indicators);
+
         self.current_candle = self.current_candle().candle_type().clone();
 
         Ok(())
@@ -199,6 +203,7 @@ impl InstrumentBuilder {
                 horizontal_levels: HorizontalLevels::new(),
                 patterns: Patterns::new(),
                 indicators: Indicators::new().unwrap(),
+                divergences: Divergences::new().unwrap(),
             })
         } else {
             Err(RsAlgoError {

@@ -1,5 +1,6 @@
 pub mod broadening;
 pub mod channel;
+pub mod divergences;
 pub mod double;
 pub mod highs_lows;
 pub mod horizontal_levels;

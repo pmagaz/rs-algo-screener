@@ -1,9 +1,10 @@
-type Point = (usize, f64);
-pub type DataPoints = Vec<Point>;
 use crate::patterns::*;
 
 use serde::{Deserialize, Serialize};
 use std::env;
+
+type Point = (usize, f64);
+pub type DataPoints = Vec<Point>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PatternType {
@@ -129,7 +130,6 @@ impl Patterns {
             while no_pattern {
                 match iter.next() {
                     Some(window) => {
-                        //TODO Detect activated charts for channel, broadening, etc with poly
                         let data_points = window.to_vec();
                         if triangle::is_ascendant_top(&data_points) {
                             self.set_pattern(

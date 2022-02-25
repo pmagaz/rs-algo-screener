@@ -3,7 +3,7 @@ pub mod macd;
 pub mod rsi;
 pub mod stoch;
 
-use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
+use crate::error::Result;
 use crate::indicators::ema::Ema;
 use crate::indicators::macd::Macd;
 use crate::indicators::rsi::Rsi;
@@ -13,86 +13,6 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use std::marker::Sized;
 
-/*
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum IndicatorType {
-    MacD,
-    Stoch,
-    Rsi,
-    Ema_a,
-    Ema_b,
-    Ema_c,
-    Ema_d,
-    Ema_e,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IndicatorReq {
-    indicator_type: IndicatorType,
-    status: IndicatorStatus,
-    data_a: Vec<f64>,
-    data_b: Vec<f64>,
-}
-
-impl IndicatorReq {
-    pub fn new() -> IndicatorReqBuilder {
-        IndicatorReqBuilder::new()
-    }
-}
-
-pub struct IndicatorReqBuilder {
-    indicator_type: Option<IndicatorType>,
-    status: Option<IndicatorStatus>,
-    data_a: Option<Vec<f64>>,
-    data_b: Option<Vec<f64>>,
-}
-
-impl IndicatorReqBuilder {
-    pub fn new() -> Self {
-        Self {
-            indicator_type: None,
-            status: None,
-            data_a: None,
-            data_b: None,
-        }
-    }
-
-    pub fn build(self) -> Result<IndicatorReq> {
-        if let (Some(indicator_type), Some(status), Some(data_a), Some(data_b)) =
-            (self.indicator_type, self.status, self.data_a, self.data_b)
-        {
-            Ok(IndicatorReq {
-                indicator_type,
-                status,
-                data_a,
-                data_b,
-            })
-        } else {
-            Err(RsAlgoError {
-                err: RsAlgoErrorKind::InvalidCandle,
-            })
-        }
-    }
-
-    pub fn indicator_type(mut self, val: IndicatorType) -> Self {
-        self.indicator_type = Some(val);
-        self
-    }
-
-    pub fn status(mut self, val: IndicatorStatus) -> Self {
-        self.status = Some(val);
-        self
-    }
-    pub fn data_a(mut self, val: Vec<f64>) -> Self {
-        self.data_a = Some(val);
-        self
-    }
-    pub fn data_b(mut self, val: Vec<f64>) -> Self {
-        self.data_b = Some(val);
-        self
-    }
-}
-*/
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum IndicatorStatus {
     Bearish,
@@ -102,6 +22,13 @@ pub enum IndicatorStatus {
     Oversold,
     Overbought,
     Default,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum IndicatorType {
+    Macd,
+    Stoch,
+    Rsi,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
