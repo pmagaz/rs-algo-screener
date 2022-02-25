@@ -54,6 +54,7 @@ pub struct Pattern {
     pub pattern_type: PatternType,
     pub pattern_size: PatternSize,
     pub data_points: DataPoints,
+    pub distance: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -134,6 +135,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 triangle::ascendant_top_status(&data_points, current_price),
                             );
                             //no_pattern = false;
@@ -141,6 +143,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 triangle::ascendant_bottom_status(&data_points, current_price),
                             );
                             //no_pattern = false;
@@ -148,6 +151,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 triangle::descendant_top_status(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -155,6 +159,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 triangle::descendant_bottom_status(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -162,6 +167,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 PatternType::TriangleSymmetricalTop,
                             );
                             // no_pattern = false;
@@ -169,6 +175,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 PatternType::TriangleSymmetricalBottom,
                             );
                             // no_pattern = false;
@@ -176,6 +183,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 rectangle::rectangle_top_status(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -183,6 +191,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 rectangle::rectangle_bottom_status(&data_points, current_price),
                             );
                             //  no_pattern = false;
@@ -190,6 +199,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 PatternType::ChannelUpTop,
                             );
                             //no_pattern = false;
@@ -197,6 +207,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 PatternType::ChannelUpBottom,
                             );
                             // no_pattern = false;
@@ -204,6 +215,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 PatternType::ChannelDownTop,
                             );
                             //  no_pattern = false;
@@ -211,6 +223,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 PatternType::ChannelDownBottom,
                             );
                             // no_pattern = false;
@@ -218,6 +231,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 PatternType::BroadeningTop,
                             );
                             // no_pattern = false;
@@ -225,6 +239,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 PatternType::BroadeningBottom,
                             );
                             // no_pattern = false;
@@ -232,6 +247,7 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 double::top_status(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -239,36 +255,44 @@ impl Patterns {
                             self.set_pattern(
                                 &data_points,
                                 &pattern_size,
+                                self.calculate_distance(&data_points),
                                 double::bottom_status(&data_points, current_price),
                             );
                             // no_pattern = false;
                         }
                     }
                     None => {
-                        self.set_pattern(&vec![(0, 0.)], &pattern_size, PatternType::None);
+                        self.set_pattern(&vec![(0, 0.)], &pattern_size, 0., PatternType::None);
                         no_pattern = false;
                     }
                 }
             }
         } else {
-            self.set_pattern(&vec![(0, 0.)], &pattern_size, PatternType::None);
+            self.set_pattern(&vec![(0, 0.)], &pattern_size, 0., PatternType::None);
         }
+    }
+
+    fn calculate_distance(&self, data_points: &DataPoints) -> f64 {
+        (data_points[4].1 - data_points[3].1).abs()
     }
 
     fn set_pattern(
         &mut self,
         data_points: &DataPoints,
         pattern_size: &PatternSize,
+        distance: f64,
         pattern_type: PatternType,
     ) {
         match &pattern_size {
             PatternSize::Local => self.local_patterns.push(Pattern {
                 pattern_type,
+                distance,
                 pattern_size: pattern_size.clone(),
                 data_points: data_points.to_owned(),
             }),
             PatternSize::Extrema => self.extrema_patterns.push(Pattern {
                 pattern_type,
+                distance,
                 pattern_size: pattern_size.clone(),
                 data_points: data_points.to_owned(),
             }),
