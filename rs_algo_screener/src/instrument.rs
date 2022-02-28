@@ -163,7 +163,8 @@ impl Instrument {
             .unwrap();
         self.data = parsed;
 
-        self.divergences.calculate(&self.patterns, &self.indicators);
+        self.divergences
+            .calculate(&self.indicators, self.peaks.local_maxima());
 
         self.current_candle = self.current_candle().candle_type().clone();
 
