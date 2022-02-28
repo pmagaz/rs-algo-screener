@@ -7,40 +7,25 @@ type Point = (usize, f64);
 pub type DataPoints = Vec<Point>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum PatternDirection {
+    Top,
+    Bottom,
+    None,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PatternType {
+    Triangle,
+    TriangleSymmetrical,
+    TriangleDescendant,
     TriangleSymmetricalTop,
-    TriangleSymmetricalTopActivated,
-    TriangleSymmetricalBottom,
-    TriangleSymmetricalBottomActivated,
-    TriangleDescendantTop,
-    TriangleDescendantTopActivated,
-    TriangleDescendantBottom,
-    TriangleDescendantBottomActivated,
-    TriangleAscendantTop,
-    TriangleAscendantTopActivated,
-    TriangleAscendantBottom,
-    TriangleAscendantBottomActivated,
-    RectangleTop,
-    RectangleTopActivatedUp,
-    RectangleTopActivatedLow,
-    RectangleBottom,
-    RectangleBottomActivated,
-    ChannelUpTop,
-    ChannelUpTopActivated,
-    ChannelUpBottom,
-    ChannelUpBottomActivated,
-    ChannelDownTop,
-    ChannelDownTopActivated,
-    ChannelDownBottom,
-    ChannelDownBottomActivated,
-    BroadeningTop,
-    BroadeningTopActivated,
-    BroadeningBottom,
-    BroadeningBottomActivated,
-    DoubleBottom,
-    DoubleBottomActivated,
+    TriangleAscendant,
+    Rectangle,
+    ChannelUp,
+    ChannelDown,
+    Broadening,
     DoubleTop,
-    DoubleTopActivated,
+    DoubleBottom,
     None,
 }
 
@@ -55,6 +40,8 @@ pub struct Pattern {
     pub pattern_type: PatternType,
     pub pattern_size: PatternSize,
     pub data_points: DataPoints,
+    pub direction: PatternDirection,
+    pub active: bool,
     pub distance: f64,
 }
 
@@ -133,142 +120,188 @@ impl Patterns {
                         let data_points = window.to_vec();
                         if triangle::is_ascendant_top(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::TriangleAscendant,
+                                PatternDirection::Top,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                triangle::ascendant_top_status(&data_points, current_price),
+                                triangle::ascendant_top_active(&data_points, current_price),
                             );
                             //no_pattern = false;
                         } else if triangle::is_ascendant_bottom(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::TriangleAscendant,
+                                PatternDirection::Bottom,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                triangle::ascendant_bottom_status(&data_points, current_price),
+                                triangle::ascendant_bottom_active(&data_points, current_price),
                             );
                             //no_pattern = false;
                         } else if triangle::is_descendant_top(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::TriangleDescendant,
+                                PatternDirection::Top,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                triangle::descendant_top_status(&data_points, current_price),
+                                triangle::descendant_top_active(&data_points, current_price),
                             );
                             // no_pattern = false;
                         } else if triangle::is_descendant_bottom(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::TriangleDescendant,
+                                PatternDirection::Bottom,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                triangle::descendant_bottom_status(&data_points, current_price),
+                                triangle::descendant_bottom_active(&data_points, current_price),
                             );
                             // no_pattern = false;
                         } else if triangle::is_symmetrical_top(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::TriangleSymmetrical,
+                                PatternDirection::Top,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                PatternType::TriangleSymmetricalTop,
+                                false,
                             );
                             // no_pattern = false;
                         } else if triangle::is_symmetrical_bottom(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::TriangleSymmetrical,
+                                PatternDirection::Bottom,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                PatternType::TriangleSymmetricalBottom,
+                                false,
                             );
                             // no_pattern = false;
                         } else if rectangle::is_renctangle_top(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::Rectangle,
+                                PatternDirection::Top,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                rectangle::rectangle_top_status(&data_points, current_price),
+                                rectangle::rectangle_top_active(&data_points, current_price),
                             );
                             // no_pattern = false;
                         } else if rectangle::is_renctangle_bottom(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::Rectangle,
+                                PatternDirection::Bottom,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                rectangle::rectangle_bottom_status(&data_points, current_price),
+                                rectangle::rectangle_bottom_active(&data_points, current_price),
                             );
                             //  no_pattern = false;
                         } else if channel::is_ascendant_top(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::ChannelUp,
+                                PatternDirection::Top,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                PatternType::ChannelUpTop,
+                                false,
                             );
                             //no_pattern = false;
                         } else if channel::is_ascendant_bottom(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::ChannelUp,
+                                PatternDirection::Bottom,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                PatternType::ChannelUpBottom,
+                                false,
                             );
                             // no_pattern = false;
                         } else if channel::is_descendant_top(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::ChannelDown,
+                                PatternDirection::Top,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                PatternType::ChannelDownTop,
+                                false,
                             );
                             //  no_pattern = false;
                         } else if channel::is_descendant_bottom(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::ChannelDown,
+                                PatternDirection::Bottom,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                PatternType::ChannelDownBottom,
+                                false,
                             );
                             // no_pattern = false;
                         } else if broadening::is_top(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::Broadening,
+                                PatternDirection::Top,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                PatternType::BroadeningTop,
+                                false,
                             );
                             // no_pattern = false;
                         } else if broadening::is_bottom(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::Broadening,
+                                PatternDirection::Bottom,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                PatternType::BroadeningBottom,
+                                false,
                             );
                             // no_pattern = false;
                         } else if double::is_top(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::DoubleTop,
+                                PatternDirection::Top,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                double::top_status(&data_points, current_price),
+                                double::top_active(&data_points, current_price),
                             );
                             // no_pattern = false;
                         } else if double::is_bottom(&data_points) {
                             self.set_pattern(
-                                &data_points,
+                                PatternType::DoubleBottom,
+                                PatternDirection::Bottom,
                                 &pattern_size,
+                                &data_points,
                                 self.calculate_distance(&data_points),
-                                double::bottom_status(&data_points, current_price),
+                                double::top_active(&data_points, current_price),
                             );
                             // no_pattern = false;
                         }
                     }
                     None => {
-                        self.set_pattern(&vec![(0, 0.)], &pattern_size, 0., PatternType::None);
+                        self.set_pattern(
+                            PatternType::None,
+                            PatternDirection::None,
+                            &pattern_size,
+                            &vec![(0, 0.)],
+                            0.,
+                            false,
+                        );
                         no_pattern = false;
                     }
                 }
             }
         } else {
-            self.set_pattern(&vec![(0, 0.)], &pattern_size, 0., PatternType::None);
+            self.set_pattern(
+                PatternType::None,
+                PatternDirection::None,
+                &pattern_size,
+                &vec![(0, 0.)],
+                0.,
+                false,
+            );
         }
     }
 
@@ -278,21 +311,27 @@ impl Patterns {
 
     fn set_pattern(
         &mut self,
-        data_points: &DataPoints,
-        pattern_size: &PatternSize,
-        distance: f64,
         pattern_type: PatternType,
+        direction: PatternDirection,
+        pattern_size: &PatternSize,
+        data_points: &DataPoints,
+        distance: f64,
+        active: bool,
     ) {
         match &pattern_size {
             PatternSize::Local => self.local_patterns.push(Pattern {
                 pattern_type,
                 distance,
+                direction,
+                active,
                 pattern_size: pattern_size.clone(),
                 data_points: data_points.to_owned(),
             }),
             PatternSize::Extrema => self.extrema_patterns.push(Pattern {
                 pattern_type,
                 distance,
+                direction,
+                active,
                 pattern_size: pattern_size.clone(),
                 data_points: data_points.to_owned(),
             }),

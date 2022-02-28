@@ -9,11 +9,8 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
     }
 }
 
-pub fn ascendant_top_status(data: &DataPoints, current_price: &f64) -> PatternType {
-    match price_is_bigger_upper_band_top(&data, current_price) {
-        true => PatternType::TriangleAscendantTopActivated,
-        false => PatternType::TriangleAscendantTop,
-    }
+pub fn ascendant_top_active(data: &DataPoints, current_price: &f64) -> bool {
+    price_is_bigger_upper_band_top(&data, current_price)
 }
 
 pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
@@ -24,11 +21,8 @@ pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
     }
 }
 
-pub fn ascendant_bottom_status(data: &DataPoints, current_price: &f64) -> PatternType {
-    match price_is_bigger_upper_band_bottom(&data, current_price) {
-        true => PatternType::TriangleAscendantBottomActivated,
-        false => PatternType::TriangleAscendantBottom,
-    }
+pub fn ascendant_bottom_active(data: &DataPoints, current_price: &f64) -> bool {
+    price_is_bigger_upper_band_bottom(&data, current_price)
 }
 
 pub fn is_descendant_top(data: &DataPoints) -> bool {
@@ -39,11 +33,8 @@ pub fn is_descendant_top(data: &DataPoints) -> bool {
     }
 }
 
-pub fn descendant_top_status(data: &DataPoints, current_price: &f64) -> PatternType {
-    match price_is_lower_low_band_top(&data, current_price) {
-        true => PatternType::TriangleDescendantTopActivated,
-        false => PatternType::TriangleDescendantTop,
-    }
+pub fn descendant_top_active(data: &DataPoints, current_price: &f64) -> bool {
+    price_is_lower_low_band_top(&data, current_price)
 }
 
 pub fn is_descendant_bottom(data: &DataPoints) -> bool {
@@ -54,11 +45,8 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
     }
 }
 
-pub fn descendant_bottom_status(data: &DataPoints, current_price: &f64) -> PatternType {
-    match price_is_lower_low_band_bottom(&data, current_price) {
-        true => PatternType::TriangleDescendantBottomActivated,
-        false => PatternType::TriangleDescendantBottom,
-    }
+pub fn descendant_bottom_active(data: &DataPoints, current_price: &f64) -> bool {
+    price_is_lower_low_band_bottom(&data, current_price)
 }
 
 pub fn is_symmetrical_top(data: &DataPoints) -> bool {
