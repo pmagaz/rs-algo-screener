@@ -179,45 +179,30 @@ pub struct Candle {
 // }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum PatternType {
-    TriangleSymmetricalTop,
-    TriangleSymmetricalTopActivated,
-    TriangleSymmetricalBottom,
-    TriangleSymmetricalBottomActivated,
-    TriangleDescendantTop,
-    TriangleDescendantTopActivated,
-    TriangleDescendantBottom,
-    TriangleDescendantBottomActivated,
-    TriangleAscendantTop,
-    TriangleAscendantTopActivated,
-    TriangleAscendantBottom,
-    TriangleAscendantBottomActivated,
-    RectangleTop,
-    RectangleTopActivatedUp,
-    RectangleTopActivatedLow,
-    RectangleBottom,
-    RectangleBottomActivated,
-    ChannelUpTop,
-    ChannelUpTopActivated,
-    ChannelUpBottom,
-    ChannelUpBottomActivated,
-    ChannelDownTop,
-    ChannelDownTopActivated,
-    ChannelDownBottom,
-    ChannelDownBottomActivated,
-    BroadeningTop,
-    BroadeningTopActivated,
-    BroadeningBottom,
-    BroadeningBottomActivated,
-    DoubleBottom,
-    DoubleBottomActivated,
-    DoubleTop,
-    DoubleTopActivated,
+pub enum PatternDirection {
+    Top,
+    Bottom,
     None,
 }
 
 type Point = (usize, f64);
 pub type DataPoints = Vec<Point>;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum PatternType {
+    Triangle,
+    TriangleSymmetrical,
+    TriangleDescendant,
+    TriangleSymmetricalTop,
+    TriangleAscendant,
+    Rectangle,
+    ChannelUp,
+    ChannelDown,
+    Broadening,
+    DoubleTop,
+    DoubleBottom,
+    None,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PatternSize {
@@ -230,6 +215,9 @@ pub struct Pattern {
     pub pattern_type: PatternType,
     pub pattern_size: PatternSize,
     pub data_points: DataPoints,
+    pub direction: PatternDirection,
+    pub active: bool,
+    pub distance: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
