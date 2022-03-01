@@ -217,7 +217,7 @@ pub struct Pattern {
     pub data_points: DataPoints,
     pub direction: PatternDirection,
     pub active: bool,
-    pub distance: f64,
+    pub change: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

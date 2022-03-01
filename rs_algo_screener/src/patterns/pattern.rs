@@ -1,3 +1,4 @@
+use crate::helpers::comp::percentage_change;
 use crate::patterns::*;
 
 use serde::{Deserialize, Serialize};
@@ -42,7 +43,7 @@ pub struct Pattern {
     pub data_points: DataPoints,
     pub direction: PatternDirection,
     pub active: bool,
-    pub distance: f64,
+    pub change: f64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -124,7 +125,7 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 triangle::ascendant_top_active(&data_points, current_price),
                             );
                             //no_pattern = false;
@@ -134,7 +135,7 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 triangle::ascendant_bottom_active(&data_points, current_price),
                             );
                             //no_pattern = false;
@@ -144,7 +145,7 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 triangle::descendant_top_active(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -154,7 +155,7 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 triangle::descendant_bottom_active(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -164,7 +165,7 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 false,
                             );
                             // no_pattern = false;
@@ -174,7 +175,7 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 false,
                             );
                             // no_pattern = false;
@@ -184,7 +185,7 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 rectangle::rectangle_top_active(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -194,7 +195,7 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 rectangle::rectangle_bottom_active(&data_points, current_price),
                             );
                             //  no_pattern = false;
@@ -204,7 +205,7 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 false,
                             );
                             //no_pattern = false;
@@ -214,7 +215,7 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 false,
                             );
                             // no_pattern = false;
@@ -224,7 +225,7 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 false,
                             );
                             //  no_pattern = false;
@@ -234,7 +235,7 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 false,
                             );
                             // no_pattern = false;
@@ -244,7 +245,7 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 false,
                             );
                             // no_pattern = false;
@@ -254,7 +255,7 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 false,
                             );
                             // no_pattern = false;
@@ -264,7 +265,7 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 double::top_active(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -274,7 +275,7 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_distance(&data_points),
+                                self.calculate_change(&data_points),
                                 double::top_active(&data_points, current_price),
                             );
                             // no_pattern = false;
@@ -305,8 +306,8 @@ impl Patterns {
         }
     }
 
-    fn calculate_distance(&self, data_points: &DataPoints) -> f64 {
-        (data_points[4].1 - data_points[3].1).abs()
+    fn calculate_change(&self, data_points: &DataPoints) -> f64 {
+        percentage_change(data_points[4].1, data_points[3].1).abs()
     }
 
     fn set_pattern(
@@ -315,13 +316,13 @@ impl Patterns {
         direction: PatternDirection,
         pattern_size: &PatternSize,
         data_points: &DataPoints,
-        distance: f64,
+        change: f64,
         active: bool,
     ) {
         match &pattern_size {
             PatternSize::Local => self.local_patterns.push(Pattern {
                 pattern_type,
-                distance,
+                change,
                 direction,
                 active,
                 pattern_size: pattern_size.clone(),
@@ -329,7 +330,7 @@ impl Patterns {
             }),
             PatternSize::Extrema => self.extrema_patterns.push(Pattern {
                 pattern_type,
-                distance,
+                change,
                 direction,
                 active,
                 pattern_size: pattern_size.clone(),

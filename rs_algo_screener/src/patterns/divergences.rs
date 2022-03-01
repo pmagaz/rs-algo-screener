@@ -138,7 +138,7 @@ impl Divergences {
         }
     }
 
-    // fn calculate_distance(&self, data_points: &DataPoints) -> f64 {
+    // fn calculate_change(&self, data_points: &DataPoints) -> f64 {
     //     (data_points[4].1 - data_points[3].1).abs()
     // }
 
