@@ -1,50 +1,12 @@
 use crate::helpers::comp::percentage_change;
 use crate::patterns::*;
+pub use rs_algo_shared::models::*;
 
 use serde::{Deserialize, Serialize};
 use std::env;
 
 type Point = (usize, f64);
 pub type DataPoints = Vec<Point>;
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum PatternDirection {
-    Top,
-    Bottom,
-    None,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum PatternType {
-    Triangle,
-    TriangleSymmetrical,
-    TriangleDescendant,
-    TriangleSymmetricalTop,
-    TriangleAscendant,
-    Rectangle,
-    ChannelUp,
-    ChannelDown,
-    Broadening,
-    DoubleTop,
-    DoubleBottom,
-    None,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum PatternSize {
-    Local,
-    Extrema,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Pattern {
-    pub pattern_type: PatternType,
-    pub pattern_size: PatternSize,
-    pub data_points: DataPoints,
-    pub direction: PatternDirection,
-    pub active: bool,
-    pub change: f64,
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Patterns {

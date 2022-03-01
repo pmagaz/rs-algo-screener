@@ -18,8 +18,7 @@ bson = "2.1.0"
 reqwest = { version = "0.11.9", features = ["json"] }
 openssl = { version = "0.10.38", features = ["vendored"] }
 ta = {version = "0.5.0", features = ["serde"] }
-# [dependencies.shared]
-# path = "../shared"
+rs_algo_shared = { git = "https://github.com/pmagaz/rs_algo_shared", branch = "main" }
 
 [dependencies.mongodb]
 version = "2.1.0"

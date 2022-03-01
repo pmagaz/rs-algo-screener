@@ -2,7 +2,6 @@ use crate::error::Result;
 use crate::helpers::maxima_minima::maxima_minima;
 use crate::indicators::{Indicator, IndicatorType, Indicators};
 use crate::patterns::highs_lows::*;
-use crate::patterns::pattern::Patterns;
 
 //use find_peaks::PeakFinder;
 use serde::{Deserialize, Serialize};
