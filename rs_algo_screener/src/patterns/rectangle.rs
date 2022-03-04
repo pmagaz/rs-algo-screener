@@ -1,5 +1,7 @@
 use super::highs_lows::*;
-use super::pattern::{DataPoints, PatternType};
+use super::pattern::DataPoints;
+
+use crate::helpers::poly::fit;
 
 pub fn is_renctangle_top(data: &DataPoints) -> bool {
     if upper_band_is_equal_top(data) && lower_band_is_equal_top(data) {
@@ -10,6 +12,7 @@ pub fn is_renctangle_top(data: &DataPoints) -> bool {
 }
 
 pub fn rectangle_top_active(data: &DataPoints, current_price: &f64) -> bool {
+    println!("aaaaa {:?}", data);
     price_is_bigger_upper_band_top(&data, current_price)
         || price_is_lower_low_band_top(&data, current_price)
 }

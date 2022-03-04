@@ -1,10 +1,12 @@
 use crate::error::Result;
+use broker::Symbol;
 use error::RsAlgoErrorKind;
 
 use broker::xtb::*;
-use helpers::date;
-use helpers::date::Local;
 use instrument::Instrument;
+use rs_algo_shared::helpers::date;
+use rs_algo_shared::helpers::date::Local;
+use rs_algo_shared::models::TimeFrame;
 use screener::Screener;
 
 mod backend;
@@ -18,7 +20,8 @@ mod patterns;
 mod screener;
 
 use dotenv::dotenv;
-use helpers::http::request;
+use rs_algo_shared::helpers::http::request;
+
 use std::env;
 use std::{thread, time};
 /*
@@ -38,34 +41,43 @@ async fn main() -> Result<()> {
     let password = &env::var("BROKER_PASSWORD").unwrap();
     let from_date = env::var("FROM_DATE").unwrap().parse::<i64>().unwrap();
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
+    let time_frame = &env::var("TIME_FRAME").unwrap();
 
     let sleep = time::Duration::from_millis(*sleep_time);
     let from = (Local::now() - date::Duration::days(from_date)).timestamp();
-    let time_frame = TimeFrame::D;
+    println!("[TIMEFRAME]  {:?}", time_frame);
+
+    let time_frame = TimeFrame::new(time_frame);
 
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
     let symbols = screener.get_symbols().await.unwrap().symbols;
 
+    // let symbols = [Symbol {
+    //     symbol: "APLE.US_9".to_owned(),
+    //     category: "".to_owned(),
+    //     description: "".to_owned(),
+    //     currency: "".to_owned(),
+    // }];
+
     for s in symbols {
         screener
             .get_instrument_data(
                 &s.symbol,
-                time_frame.value(),
+                time_frame.clone(),
                 from,
                 |instrument: Instrument| async move {
                     println!("[INSTRUMENT]  {:?}", &instrument.symbol());
 
                     let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
-
                     let res = request::<Instrument>(&endpoint, &instrument)
                         .await
                         .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
                     println!(
-                        "[Response] stats {:?} from {:?} at {:?}",
+                        "[Response] {:?} code for {:?} at {:?}",
                         res.status(),
-                        &instrument.symbol(),
+                        &instrument.time_frame(),
                         Local::now()
                     );
 

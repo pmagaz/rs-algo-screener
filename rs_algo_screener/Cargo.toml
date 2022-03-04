@@ -24,6 +24,6 @@ reqwest = { version = "0.11.9", features = ["json"] }
 openssl = { version = "0.10.38", features = ["vendored"] }
 tungstenite = {version = "0.17.1", features = ["native-tls"]}
 
-rs_algo_shared = { git = "https://github.com/pmagaz/rs_algo_shared", branch = "main" }
+rs_algo_shared = { git = "https://github.com/pmagaz/rs_algo_shared", rev = "c3b00ea"}
 # [dependencies.shared]
 # path = "../shared"

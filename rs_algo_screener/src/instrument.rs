@@ -1,11 +1,13 @@
 use crate::candle::{Candle, CandleType};
 use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
-use crate::helpers::date::{DateTime, Local};
 use crate::indicators::Indicators;
 use crate::patterns::divergences::Divergences;
 use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
+
+use rs_algo_shared::helpers::date::{DateTime, Local};
+use rs_algo_shared::models::TimeFrameType;
 
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -13,6 +15,7 @@ use std::env;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Instrument {
     symbol: String,
+    time_frame: TimeFrameType,
     data: Vec<Candle>,
     current_price: f64,
     current_candle: CandleType,
@@ -33,6 +36,10 @@ impl Instrument {
 
     pub fn symbol(&self) -> &str {
         &self.symbol
+    }
+
+    pub fn time_frame(&self) -> &TimeFrameType {
+        &self.time_frame
     }
 
     pub fn indicators(&self) -> &Indicators {
@@ -174,15 +181,23 @@ impl Instrument {
 
 pub struct InstrumentBuilder {
     symbol: Option<String>,
+    time_frame: Option<TimeFrameType>,
     //indicators: Option<Indicators>,
 }
 
 impl InstrumentBuilder {
     pub fn new() -> InstrumentBuilder {
-        Self { symbol: None }
+        Self {
+            symbol: None,
+            time_frame: None,
+        }
     }
     pub fn symbol(mut self, val: &str) -> Self {
         self.symbol = Some(String::from(val));
+        self
+    }
+    pub fn time_frame(mut self, val: TimeFrameType) -> Self {
+        self.time_frame = Some(val);
         self
     }
 
@@ -192,9 +207,10 @@ impl InstrumentBuilder {
     // }
 
     pub fn build(self) -> Result<Instrument> {
-        if let Some(symbol) = self.symbol {
+        if let (Some(symbol), Some(time_frame)) = (self.symbol, self.time_frame) {
             Ok(Instrument {
                 symbol,
+                time_frame: time_frame,
                 current_price: 0.,
                 current_candle: CandleType::Default,
                 min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),

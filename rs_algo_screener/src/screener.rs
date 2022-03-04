@@ -3,6 +3,7 @@ use crate::broker::{Broker, Response, VEC_DOHLC};
 use crate::error::Result;
 use crate::instrument::Instrument;
 
+use rs_algo_shared::models::TimeFrameType;
 use std::env;
 use std::future::Future;
 
@@ -36,7 +37,7 @@ where
     pub async fn get_instrument_data<F, T>(
         &mut self,
         symbol: &str,
-        time_frame: usize,
+        time_frame: TimeFrameType,
         start_date: i64,
         mut callback: F,
     ) -> Result<()>
@@ -46,10 +47,14 @@ where
     {
         let res = self
             .broker
-            .get_instrument_data(symbol, time_frame, start_date)
+            .get_instrument_data(symbol, time_frame.value(), start_date)
             .await?;
 
-        let mut instrument = Instrument::new().symbol(&res.symbol).build().unwrap();
+        let mut instrument = Instrument::new()
+            .symbol(&res.symbol)
+            .time_frame(time_frame)
+            .build()
+            .unwrap();
         instrument.set_data(res.data).unwrap();
 
         let render_to_image = env::var("RENDER_TO_IMAGE")

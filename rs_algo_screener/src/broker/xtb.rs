@@ -1,32 +1,14 @@
 use super::{Broker, Response, Symbol, VEC_DOHLC};
 use crate::error::Result;
-use crate::helpers::date::parse_time;
 use crate::helpers::websocket::{Message, MessageType, WebSocket};
 
+use rs_algo_shared::helpers::date::parse_time;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::env;
 use std::fmt::Debug;
 use std::future::Future;
 
-#[derive(Debug)]
-pub enum TimeFrame {
-    H1,
-    H4,
-    D,
-    W,
-}
-
-impl TimeFrame {
-    pub fn value(&self) -> usize {
-        match *self {
-            TimeFrame::H1 => 60,
-            TimeFrame::H4 => 240,
-            TimeFrame::D => 1440,
-            TimeFrame::W => 10080,
-        }
-    }
-}
 #[derive(Debug)]
 pub struct Xtb {
     pub websocket: WebSocket,
