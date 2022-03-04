@@ -12,3 +12,4 @@ plotters/
 secrets/
 .env
 .DS_Store
+hosts
