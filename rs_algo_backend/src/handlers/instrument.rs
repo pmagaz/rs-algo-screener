@@ -4,6 +4,7 @@ use crate::models::app_state::AppState;
 use crate::models::instrument::Instrument;
 
 use actix_web::{web, HttpResponse, Responder};
+use rs_algo_shared::helpers::date::Local;
 
 pub async fn instrument(
     data: String,
@@ -14,7 +15,7 @@ pub async fn instrument(
 
     let _insert_result = db::instrument::insert(response, &state).await.unwrap();
 
-    println!("[INSERTED] {:?}", symbol);
+    println!("[INSERTED] {:?} at {:?}", symbol, Local::now());
 
     Ok(HttpResponse::Ok().body("ok"))
 }
