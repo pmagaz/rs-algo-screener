@@ -1,0 +1,7 @@
+---
+- name: Deploy RS-ALGO-SCREENER 
+  hosts: all
+  roles:
+    - git 
+    - { role : 'rs_algo_backend/roles/deploy' }
+    - { role : 'rs_algo_screener/roles/deploy' }
