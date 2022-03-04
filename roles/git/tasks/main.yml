@@ -1,0 +1,8 @@
+---
+
+- name: Clone GITHUB repo 
+  ansible.builtin.git:
+    repo: "{{ repo_url }}" 
+    dest: "{{ local_path }}"
+    clone: no
+    update: yes
