@@ -4,6 +4,10 @@
 
 Stock screener written in Rust. In this first iteration the idea is to construct just an screener that will help me to analyse the stock marked using Technical analysis. In a second iteration, this screener will be used by a bot to do algorithmic trading.
 
+## Stack
+
+The whole screener and it's backend is built in Rust and it was designed to run in Docker containers in a Kubernetes cluster, using Helm and Ansible for release deployments.
+
 ### Screener Status
 
 - [x] Image output support
