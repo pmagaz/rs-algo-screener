@@ -34,3 +34,5 @@ Stock screener written in Rust. In this first iteration the idea is to construct
 ### Examples
 
 ![PNG](./images/GOOGL.US_9.png)
+
+:)
