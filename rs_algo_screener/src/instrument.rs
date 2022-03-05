@@ -151,6 +151,7 @@ impl Instrument {
             PatternSize::Local,
             local_maxima,
             local_minima,
+            &self.peaks.close,
             &self.current_price,
         );
 
@@ -158,6 +159,7 @@ impl Instrument {
             PatternSize::Extrema,
             extrema_maxima,
             extrema_minima,
+            &self.peaks.close,
             &self.current_price,
         );
 

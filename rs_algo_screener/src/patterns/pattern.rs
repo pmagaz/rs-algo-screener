@@ -33,6 +33,7 @@ impl Patterns {
         pattern_size: PatternSize,
         maxima: &Vec<(usize, f64)>,
         minima: &Vec<(usize, f64)>,
+        close: &Vec<f64>,
         current_price: &f64,
     ) {
         let local_max_points = env::var("PATTERNS_MAX_POINTS")
@@ -150,18 +151,18 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                rectangle::rectangle_top_active(&data_points, current_price),
+                                rectangle::rectangle_top_active(&data_points, close, current_price),
                             );
                             // no_pattern = false;
                         } else if rectangle::is_renctangle_bottom(&data_points) {
-                            self.set_pattern(
-                                PatternType::Rectangle,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                rectangle::rectangle_bottom_active(&data_points, current_price),
-                            );
+                            // self.set_pattern(
+                            //     PatternType::Rectangle,
+                            //     PatternDirection::Bottom,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     rectangle::rectangle_bottom_active(&data_points, current_price),
+                            // );
                             //  no_pattern = false;
                             // } else if channel::is_ascendant_top(&data_points) {
                             //     self.set_pattern(
@@ -205,30 +206,30 @@ impl Patterns {
                             //     );
                             // no_pattern = false;
                         } else if broadening::is_top(&data_points) {
-                            self.set_pattern(
-                                PatternType::Broadening,
-                                PatternDirection::Top,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                PatternActive {
-                                    active: false,
-                                    index: 0,
-                                },
-                            );
+                            // self.set_pattern(
+                            //     PatternType::Broadening,
+                            //     PatternDirection::Top,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     PatternActive {
+                            //         active: false,
+                            //         index: 0,
+                            //     },
+                            // );
                             // no_pattern = false;
                         } else if broadening::is_bottom(&data_points) {
-                            self.set_pattern(
-                                PatternType::Broadening,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                PatternActive {
-                                    active: false,
-                                    index: 0,
-                                },
-                            );
+                            // self.set_pattern(
+                            //     PatternType::Broadening,
+                            //     PatternDirection::Bottom,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     PatternActive {
+                            //         active: false,
+                            //         index: 0,
+                            //     },
+                            // );
                             // no_pattern = false;
                         } else if double::is_top(&data_points) {
                             // self.set_pattern(
@@ -262,6 +263,8 @@ impl Patterns {
                             PatternActive {
                                 active: false,
                                 index: 0,
+                                price: 0.,
+                                break_direction: PatternDirection::None,
                             },
                         );
                         no_pattern = false;
@@ -278,6 +281,8 @@ impl Patterns {
                 PatternActive {
                     active: false,
                     index: 0,
+                    price: 0.,
+                    break_direction: PatternDirection::None,
                 },
             );
         }

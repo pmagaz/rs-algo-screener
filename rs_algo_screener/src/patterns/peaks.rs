@@ -95,23 +95,25 @@ impl Peaks {
 
         let mut candle_id = 0;
         for x in &self.close {
-            let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
-            let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
-            let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
+            if kernel_source == "highs_lows" {
+                let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
+                let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
+                smooth_highs.push(smoothed_high.abs());
+                smooth_lows.push(smoothed_low.abs());
+                self.smooth_highs.push((candle_id, smoothed_high.abs()));
+                self.smooth_lows.push((candle_id, smoothed_low.abs()));
+            } else {
+                let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
+                smooth_close.push(smoothed_close.abs());
+                self.smooth_close.push((candle_id, smoothed_close.abs()));
+            }
 
-            smooth_highs.push(smoothed_high.abs());
-            smooth_lows.push(smoothed_low.abs());
-            smooth_close.push(smoothed_close.abs());
-
-            self.smooth_highs.push((candle_id, smoothed_high.abs()));
-            self.smooth_lows.push((candle_id, smoothed_low.abs()));
-            self.smooth_close.push((candle_id, smoothed_close.abs()));
             candle_id += 1;
         }
 
         let source = match kernel_source.as_ref() {
-            "close" => (&smooth_close, &self.close, &smooth_close, &self.close),
             "highs_lows" => (&smooth_highs, &self.highs, &smooth_lows, &self.lows),
+            "close" => (&smooth_close, &self.close, &smooth_close, &self.close),
             &_ => (&smooth_close, &smooth_close, &self.close, &self.close),
         };
 

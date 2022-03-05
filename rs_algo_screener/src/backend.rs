@@ -36,9 +36,22 @@ impl Backend {
         let extrema_maxima = instrument.peaks().extrema_maxima();
         let extrema_minima = instrument.peaks().extrema_minima();
         let horizontal_levels = instrument.horizontal_levels().horizontal_levels();
-        let extrema_patterns = instrument.patterns().extrema_patterns.clone();
-        let local_patterns = instrument.patterns().local_patterns.clone();
 
+        let local_patterns = instrument.patterns().local_patterns.clone();
+        let local_pattern_breaks: Vec<usize> = instrument
+            .patterns()
+            .local_patterns
+            .iter()
+            .map(|x| x.active.index)
+            .collect();
+
+        let extrema_patterns = instrument.patterns().extrema_patterns.clone();
+        let extrema_pattern_breaks: Vec<usize> = instrument
+            .patterns()
+            .extrema_patterns
+            .iter()
+            .map(|x| x.active.index)
+            .collect();
         let stoch = instrument.indicators().stoch();
         let stoch_a = stoch.get_data_a();
         let stoch_b = stoch.get_data_b();
@@ -114,18 +127,18 @@ impl Backend {
         //             ShapeStyle::from(&RED).filled(),
         //             &|coord, _size: i32, _style| {
         //                 let new_coord = (coord.0, coord.1);
-        //                 let mut PatternName;
+        //                 let mut pattern_name;
         //                 if coord.2 == 4 {
-        //                     PatternName = Text::new(
+        //                     pattern_name = Text::new(
         //                         format!("{:?}", pattern.pattern_type),
         //                         (0, 0),
         //                         ("sans-serif", 15),
         //                     )
         //                 } else {
-        //                     PatternName = Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
+        //                     pattern_name = Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
         //                 }
 
-        //                 EmptyElement::at(new_coord) + PatternName
+        //                 EmptyElement::at(new_coord) + pattern_name
         //             },
         //         ))
         //         .unwrap();
@@ -159,23 +172,39 @@ impl Backend {
                     ShapeStyle::from(&RED).filled(),
                     &|coord, _size: i32, _style| {
                         let new_coord = (coord.0, coord.1);
-                        let mut PatternName;
+                        let mut pattern_name;
                         if coord.2 == 4 {
-                            PatternName = Text::new(
+                            pattern_name = Text::new(
                                 format!("{:?}", pattern.pattern_type),
                                 (0, 0),
                                 ("sans-serif", 15),
                             )
                         } else {
-                            PatternName = Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
+                            pattern_name =
+                                Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
                         }
 
-                        EmptyElement::at(new_coord) + PatternName
+                        EmptyElement::at(new_coord) + pattern_name
                     },
                 ))
                 .unwrap();
         }
 
+        //  for (x, pattern) in local_patterns.iter().enumerate() {
+        //     if pattern.active.id
+        //     // if local_minima.contains(&(i, candle.close())) {
+        //     //     return TriangleMarker::new(
+        //     //         (
+        //     //             candle.date(),
+        //     //             candle.high() + candle.high() / peaks_marker_distance - 10.,
+        //     //         ),
+        //     //         4,
+        //     //         BLUE.filled(),
+        //     //     );
+        //     // } else {
+        //     //     return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
+        //     // }
+        //     }
         for (x, pattern) in local_patterns.iter().enumerate() {
             chart
                 .draw_series(LineSeries::new(
@@ -185,11 +214,28 @@ impl Backend {
                         let date = data[idx].date();
                         (date, value)
                     }),
-                    (if x < 1 { &BLACK } else { &BLACK }),
+                    if x < 1 { &BLACK } else { &BLACK },
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
         }
+
+        chart
+            .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                if local_pattern_breaks.contains(&(i)) {
+                    return TriangleMarker::new(
+                        (
+                            candle.date(),
+                            candle.high() + candle.close() / peaks_marker_distance + 5.,
+                        ),
+                        -4,
+                        BLACK.filled(),
+                    );
+                } else {
+                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
+                }
+            }))
+            .unwrap();
 
         // LOCAL MAXIMA MINIMA
 
@@ -259,6 +305,23 @@ impl Backend {
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
+                }
+            }))
+            .unwrap();
+
+        chart
+            .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                if extrema_pattern_breaks.contains(&(i)) {
+                    return TriangleMarker::new(
+                        (
+                            candle.date(),
+                            candle.high() + candle.close() / peaks_marker_distance + 5.,
+                        ),
+                        -4,
+                        BLACK.filled(),
+                    );
+                } else {
+                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
                 }
             }))
             .unwrap();

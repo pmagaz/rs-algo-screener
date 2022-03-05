@@ -10,8 +10,8 @@ pub fn is_top(data: &DataPoints) -> bool {
     }
 }
 
-pub fn top_active(data: &DataPoints, current_price: &f64) -> PatternActive {
-    price_is_lower_low_band_bottom(&data, current_price)
+pub fn top_active(data: &DataPoints, close: &Vec<f64>) -> (bool, usize, f64) {
+    price_is_lower_low_band_bottom(&data, close)
 }
 
 pub fn is_bottom(data: &DataPoints) -> bool {
@@ -22,6 +22,10 @@ pub fn is_bottom(data: &DataPoints) -> bool {
     }
 }
 
-pub fn bottom_active(data: &DataPoints, current_price: &f64) -> PatternActive {
-    price_is_bigger_upper_band_top(&data, current_price)
+pub fn bottom_active(
+    data: &DataPoints,
+    close: &Vec<f64>,
+    current_price: &f64,
+) -> (bool, usize, f64) {
+    price_is_bigger_upper_band_top(&data, close)
 }
