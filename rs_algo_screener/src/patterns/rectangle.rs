@@ -10,11 +10,7 @@ pub fn is_renctangle_top(data: &DataPoints) -> bool {
     }
 }
 
-pub fn rectangle_top_active(
-    data: &DataPoints,
-    close: &Vec<f64>,
-    current_price: &f64,
-) -> PatternActive {
+pub fn rectangle_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     let (upper_result, upper_id, upper_price) = price_is_bigger_upper_band_top(&data, close);
     let (lower_result, lower_id, lower_price) = price_is_lower_low_band_top(&data, close);
 
@@ -46,10 +42,6 @@ pub fn rectangle_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternAc
     let (upper_result, upper_id, upper_price) = price_is_bigger_upper_band_bottom(&data, close);
     let (lower_result, lower_id, lower_price) = price_is_lower_low_band_bottom(&data, close);
 
-
-
-
-    
     if upper_result {
         PatternActive {
             active: true,

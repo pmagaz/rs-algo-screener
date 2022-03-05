@@ -151,18 +151,18 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                rectangle::rectangle_top_active(&data_points, close, current_price),
+                                rectangle::rectangle_top_active(&data_points, close),
                             );
                             // no_pattern = false;
                         } else if rectangle::is_renctangle_bottom(&data_points) {
-                            // self.set_pattern(
-                            //     PatternType::Rectangle,
-                            //     PatternDirection::Bottom,
-                            //     &pattern_size,
-                            //     &data_points,
-                            //     self.calculate_change(&data_points),
-                            //     rectangle::rectangle_bottom_active(&data_points, current_price),
-                            // );
+                            self.set_pattern(
+                                PatternType::Rectangle,
+                                PatternDirection::Bottom,
+                                &pattern_size,
+                                &data_points,
+                                self.calculate_change(&data_points),
+                                rectangle::rectangle_bottom_active(&data_points, close),
+                            );
                             //  no_pattern = false;
                             // } else if channel::is_ascendant_top(&data_points) {
                             //     self.set_pattern(
@@ -232,24 +232,24 @@ impl Patterns {
                             // );
                             // no_pattern = false;
                         } else if double::is_top(&data_points) {
-                            // self.set_pattern(
-                            //     PatternType::DoubleTop,
-                            //     PatternDirection::Top,
-                            //     &pattern_size,
-                            //     &data_points,
-                            //     self.calculate_change(&data_points),
-                            //     double::top_active(&data_points, current_price),
-                            // );
+                            self.set_pattern(
+                                PatternType::DoubleTop,
+                                PatternDirection::Top,
+                                &pattern_size,
+                                &data_points,
+                                self.calculate_change(&data_points),
+                                double::top_active(&data_points, close),
+                            );
                             // no_pattern = false;
                         } else if double::is_bottom(&data_points) {
-                            // self.set_pattern(
-                            //     PatternType::DoubleBottom,
-                            //     PatternDirection::Bottom,
-                            //     &pattern_size,
-                            //     &data_points,
-                            //     self.calculate_change(&data_points),
-                            //     double::top_active(&data_points, current_price),
-                            // );
+                            self.set_pattern(
+                                PatternType::DoubleBottom,
+                                PatternDirection::Bottom,
+                                &pattern_size,
+                                &data_points,
+                                self.calculate_change(&data_points),
+                                double::top_active(&data_points, close),
+                            );
                             // no_pattern = false;
                         }
                     }
