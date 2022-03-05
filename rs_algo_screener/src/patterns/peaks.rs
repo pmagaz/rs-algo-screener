@@ -2,7 +2,6 @@ use crate::error::Result;
 use crate::helpers::maxima_minima::maxima_minima;
 use crate::helpers::regression::kernel_regression;
 
-use find_peaks::PeakFinder;
 use serde::{Deserialize, Serialize};
 use std::env;
 
@@ -81,45 +80,51 @@ impl Peaks {
         //     .unwrap()
         //     .parse::<usize>()
         //     .unwrap();
-        let mut kernel_bandwidth = env::var("KERNEL_BANDWIDTH")
+        let mut kernel_bandwidth = env::var("KERNEL_REGRESSION_BANDWIDTH")
             .unwrap()
             .parse::<f64>()
             .unwrap();
 
+        let kernel_source = env::var("KERNEL_REGRESSION_SOURCE").unwrap();
+
         //local_prominence = max_price * local_prominence;
         kernel_bandwidth = max_price * kernel_bandwidth;
-        // let mut smooth_highs: Vec<f64> = vec![];
-        // let mut smooth_lows: Vec<f64> = vec![];
+        let mut smooth_highs: Vec<f64> = vec![];
+        let mut smooth_lows: Vec<f64> = vec![];
         let mut smooth_close: Vec<f64> = vec![];
 
         let mut candle_id = 0;
         for x in &self.close {
-            // let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
-            // let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
+            let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
+            let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
             let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
 
-            // smooth_highs.push(smoothed_high.abs());
-            // smooth_lows.push(smoothed_low.abs());
+            smooth_highs.push(smoothed_high.abs());
+            smooth_lows.push(smoothed_low.abs());
             smooth_close.push(smoothed_close.abs());
 
-            // self.smooth_highs.push((candle_id, smoothed_high.abs()));
-            // self.smooth_lows.push((candle_id, smoothed_low.abs()));
+            self.smooth_highs.push((candle_id, smoothed_high.abs()));
+            self.smooth_lows.push((candle_id, smoothed_low.abs()));
             self.smooth_close.push((candle_id, smoothed_close.abs()));
             candle_id += 1;
         }
 
-        let minima_smooth: Vec<f64> = smooth_close.iter().map(|x| -x).collect();
+        let source = match kernel_source.as_ref() {
+            "close" => (&smooth_close, &self.close, &smooth_close, &self.close),
+            "highs_lows" => (&smooth_highs, &self.highs, &smooth_lows, &self.lows),
+            &_ => (&smooth_close, &smooth_close, &self.close, &self.close),
+        };
 
-        self.local_maxima = maxima_minima(&smooth_close, &self.close, local_prominence, max_price)?;
+        let minima_smooth: Vec<f64> = source.2.iter().map(|x| -x).collect();
 
-        self.local_minima =
-            maxima_minima(&minima_smooth, &self.close, local_prominence, max_price)?;
+        self.local_maxima = maxima_minima(source.0, source.1, local_prominence, max_price)?;
 
-        self.extrema_maxima =
-            maxima_minima(&smooth_close, &self.close, extrema_prominence, max_price)?;
+        self.local_minima = maxima_minima(&minima_smooth, source.3, local_prominence, max_price)?;
+
+        self.extrema_maxima = maxima_minima(source.0, source.2, extrema_prominence, max_price)?;
 
         self.extrema_minima =
-            maxima_minima(&minima_smooth, &self.close, extrema_prominence, max_price)?;
+            maxima_minima(&minima_smooth, source.3, extrema_prominence, max_price)?;
 
         Ok(())
     }

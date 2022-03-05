@@ -1,5 +1,7 @@
 use crate::helpers::comp::percentage_change;
 use crate::patterns::*;
+
+use rs_algo_shared::helpers::date::{DateTime, Local};
 pub use rs_algo_shared::models::*;
 
 use serde::{Deserialize, Serialize};
@@ -82,67 +84,66 @@ impl Patterns {
                     Some(window) => {
                         let data_points = window.to_vec();
                         if triangle::is_ascendant_top(&data_points) {
-                            self.set_pattern(
-                                PatternType::TriangleAscendant,
-                                PatternDirection::Top,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                triangle::ascendant_top_active(&data_points, current_price),
-                            );
+                            // self.set_pattern(
+                            //     PatternType::TriangleAscendant,
+                            //     PatternDirection::Top,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     triangle::ascendant_top_active(&data_points, current_price),
+                            // );
                             //no_pattern = false;
                         } else if triangle::is_ascendant_bottom(&data_points) {
-                            self.set_pattern(
-                                PatternType::TriangleAscendant,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                triangle::ascendant_bottom_active(&data_points, current_price),
-                            );
-                            //no_pattern = false;
+                            // self.set_pattern(
+                            //     PatternType::TriangleAscendant,
+                            //     PatternDirection::Bottom,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     triangle::ascendant_bottom_active(&data_points, current_price),
+                            // );
+                            // //no_pattern = false;
                         } else if triangle::is_descendant_top(&data_points) {
-                            self.set_pattern(
-                                PatternType::TriangleDescendant,
-                                PatternDirection::Top,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                triangle::descendant_top_active(&data_points, current_price),
-                            );
+                            // self.set_pattern(
+                            //     PatternType::TriangleDescendant,
+                            //     PatternDirection::Top,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     triangle::descendant_top_active(&data_points, current_price),
+                            // );
                             // no_pattern = false;
                         } else if triangle::is_descendant_bottom(&data_points) {
-                            self.set_pattern(
-                                PatternType::TriangleDescendant,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                triangle::descendant_bottom_active(&data_points, current_price),
-                            );
+                            // self.set_pattern(
+                            //     PatternType::TriangleDescendant,
+                            //     PatternDirection::Bottom,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     triangle::descendant_bottom_active(&data_points, current_price),
+                            // );
                             // no_pattern = false;
                         } else if triangle::is_symmetrical_top(&data_points) {
-                            self.set_pattern(
-                                PatternType::TriangleSymmetrical,
-                                PatternDirection::Top,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                false,
-                            );
+                            // self.set_pattern(
+                            //     PatternType::TriangleSymmetrical,
+                            //     PatternDirection::Top,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     false,
+                            // );
                             // no_pattern = false;
                         } else if triangle::is_symmetrical_bottom(&data_points) {
-                            self.set_pattern(
-                                PatternType::TriangleSymmetrical,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                false,
-                            );
+                            // self.set_pattern(
+                            //     PatternType::TriangleSymmetrical,
+                            //     PatternDirection::Bottom,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     false,
+                            // );
                             // no_pattern = false;
                         } else if rectangle::is_renctangle_top(&data_points) {
-                            println!("1111111 {:?}", pattern_size);
                             self.set_pattern(
                                 PatternType::Rectangle,
                                 PatternDirection::Top,
@@ -210,7 +211,10 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                false,
+                                PatternActive {
+                                    active: false,
+                                    index: 0,
+                                },
                             );
                             // no_pattern = false;
                         } else if broadening::is_bottom(&data_points) {
@@ -220,28 +224,31 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                false,
+                                PatternActive {
+                                    active: false,
+                                    index: 0,
+                                },
                             );
                             // no_pattern = false;
                         } else if double::is_top(&data_points) {
-                            self.set_pattern(
-                                PatternType::DoubleTop,
-                                PatternDirection::Top,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                double::top_active(&data_points, current_price),
-                            );
+                            // self.set_pattern(
+                            //     PatternType::DoubleTop,
+                            //     PatternDirection::Top,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     double::top_active(&data_points, current_price),
+                            // );
                             // no_pattern = false;
                         } else if double::is_bottom(&data_points) {
-                            self.set_pattern(
-                                PatternType::DoubleBottom,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                &data_points,
-                                self.calculate_change(&data_points),
-                                double::top_active(&data_points, current_price),
-                            );
+                            // self.set_pattern(
+                            //     PatternType::DoubleBottom,
+                            //     PatternDirection::Bottom,
+                            //     &pattern_size,
+                            //     &data_points,
+                            //     self.calculate_change(&data_points),
+                            //     double::top_active(&data_points, current_price),
+                            // );
                             // no_pattern = false;
                         }
                     }
@@ -252,7 +259,10 @@ impl Patterns {
                             &pattern_size,
                             &vec![(0, 0.)],
                             0.,
-                            false,
+                            PatternActive {
+                                active: false,
+                                index: 0,
+                            },
                         );
                         no_pattern = false;
                     }
@@ -265,7 +275,10 @@ impl Patterns {
                 &pattern_size,
                 &vec![(0, 0.)],
                 0.,
-                false,
+                PatternActive {
+                    active: false,
+                    index: 0,
+                },
             );
         }
     }
@@ -281,7 +294,7 @@ impl Patterns {
         pattern_size: &PatternSize,
         data_points: &DataPoints,
         change: f64,
-        active: bool,
+        active: PatternActive,
     ) {
         match &pattern_size {
             PatternSize::Local => self.local_patterns.push(Pattern {

@@ -9,7 +9,7 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
     }
 }
 
-pub fn ascendant_top_active(data: &DataPoints, current_price: &f64) -> bool {
+pub fn ascendant_top_active(data: &DataPoints, current_price: &f64) -> PatternActive {
     price_is_bigger_upper_band_top(&data, current_price)
 }
 
@@ -21,7 +21,7 @@ pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
     }
 }
 
-pub fn ascendant_bottom_active(data: &DataPoints, current_price: &f64) -> bool {
+pub fn ascendant_bottom_active(data: &DataPoints, current_price: &f64) -> PatternActive {
     price_is_bigger_upper_band_bottom(&data, current_price)
 }
 
@@ -33,7 +33,7 @@ pub fn is_descendant_top(data: &DataPoints) -> bool {
     }
 }
 
-pub fn descendant_top_active(data: &DataPoints, current_price: &f64) -> bool {
+pub fn descendant_top_active(data: &DataPoints, current_price: &f64) -> PatternActive {
     price_is_lower_low_band_top(&data, current_price)
 }
 
@@ -45,7 +45,7 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
     }
 }
 
-pub fn descendant_bottom_active(data: &DataPoints, current_price: &f64) -> bool {
+pub fn descendant_bottom_active(data: &DataPoints, current_price: &f64) -> PatternActive {
     price_is_lower_low_band_bottom(&data, current_price)
 }
 

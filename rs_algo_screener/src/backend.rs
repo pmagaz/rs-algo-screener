@@ -36,8 +36,8 @@ impl Backend {
         let extrema_maxima = instrument.peaks().extrema_maxima();
         let extrema_minima = instrument.peaks().extrema_minima();
         let horizontal_levels = instrument.horizontal_levels().horizontal_levels();
-        let patterns = instrument.patterns().extrema_patterns.clone();
-        //let upper_channel = instrument.patterns().upper_channel();
+        let extrema_patterns = instrument.patterns().extrema_patterns.clone();
+        let local_patterns = instrument.patterns().local_patterns.clone();
 
         let stoch = instrument.indicators().stoch();
         let stoch_a = stoch.get_data_a();
@@ -101,7 +101,52 @@ impl Backend {
             }))
             .unwrap();
 
-        for (x, pattern) in patterns.iter().enumerate() {
+        // for (x, pattern) in extrema_patterns.iter().enumerate() {
+        //     chart
+        //         .draw_series(PointSeries::of_element(
+        //             (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
+        //                 let idx = highs.0;
+        //                 let value = highs.1;
+        //                 let date = data[idx].date();
+        //                 (date, value, i)
+        //             }),
+        //             0,
+        //             ShapeStyle::from(&RED).filled(),
+        //             &|coord, _size: i32, _style| {
+        //                 let new_coord = (coord.0, coord.1);
+        //                 let mut PatternName;
+        //                 if coord.2 == 4 {
+        //                     PatternName = Text::new(
+        //                         format!("{:?}", pattern.pattern_type),
+        //                         (0, 0),
+        //                         ("sans-serif", 15),
+        //                     )
+        //                 } else {
+        //                     PatternName = Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
+        //                 }
+
+        //                 EmptyElement::at(new_coord) + PatternName
+        //             },
+        //         ))
+        //         .unwrap();
+        // }
+
+        // for (x, pattern) in extrema_patterns.iter().enumerate() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
+        //                 let idx = highs.0;
+        //                 let value = highs.1;
+        //                 let date = data[idx].date();
+        //                 (date, value)
+        //             }),
+        //             (if x < 1 { &BLACK } else { &BLACK }),
+        //         ))
+        //         .unwrap()
+        //         .label(format!("{:?}", pattern.pattern_type));
+        // }
+
+        for (x, pattern) in local_patterns.iter().enumerate() {
             chart
                 .draw_series(PointSeries::of_element(
                     (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
@@ -129,6 +174,21 @@ impl Backend {
                     },
                 ))
                 .unwrap();
+        }
+
+        for (x, pattern) in local_patterns.iter().enumerate() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
+                        let idx = highs.0;
+                        let value = highs.1;
+                        let date = data[idx].date();
+                        (date, value)
+                    }),
+                    (if x < 1 { &BLACK } else { &BLACK }),
+                ))
+                .unwrap()
+                .label(format!("{:?}", pattern.pattern_type));
         }
 
         // LOCAL MAXIMA MINIMA
@@ -249,21 +309,6 @@ impl Backend {
                     &TRANSPARENT,
                 ))
                 .unwrap();
-        }
-
-        for (x, pattern) in patterns.iter().enumerate() {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
-                        let idx = highs.0;
-                        let value = highs.1;
-                        let date = data[idx].date();
-                        (date, value)
-                    }),
-                    (if x < 1 { &BLACK } else { &BLACK }),
-                ))
-                .unwrap()
-                .label(format!("{:?}", pattern.pattern_type));
         }
 
         // for x in local_maxima.iter() {
