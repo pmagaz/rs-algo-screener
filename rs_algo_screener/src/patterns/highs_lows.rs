@@ -1,10 +1,11 @@
 use super::pattern::DataPoints;
 use crate::helpers::comp::*;
 use crate::helpers::poly::fit;
-pub use rs_algo_shared::models::PatternActive;
+
+use rs_algo_shared::models::PatternActive;
 
 pub fn is_higher_highs_top(data: &DataPoints) -> bool {
-    if data[4].1 < data[2].1 && data[2].1 < data[0].1 {
+    if data[2].1 > data[0].1 && data[4].1 > data[2].1 {
         true
     } else {
         false
@@ -12,49 +13,6 @@ pub fn is_higher_highs_top(data: &DataPoints) -> bool {
 }
 
 pub fn is_higher_highs_bottom(data: &DataPoints) -> bool {
-    if data[3].1 < data[1].1 && data[3].1 > data[2].1 {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_lower_highs_top(data: &DataPoints) -> bool {
-    if data[4].1 > data[2].1 && data[2].1 > data[0].1 {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_higher_lows_top(data: &DataPoints) -> bool {
-    if data[3].1 < data[1].1 && data[1].1 < data[0].1 {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_lower_lows_top(data: &DataPoints) -> bool {
-    if data[3].1 > data[1].1 && data[2].1 > data[1].1 {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_higher_lows_bottom(data: &DataPoints) -> bool {
-    if data[4].1 < data[2].1 && data[2].1 < data[0].1
-    // FIXME improve degree of increment
-    //&& increase_equally((data[2].1, data[4].1), (data[0].1, data[2].1))
-    {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_lower_highs_bottom(data: &DataPoints) -> bool {
     if data[3].1 > data[1].1 {
         true
     } else {
@@ -62,8 +20,48 @@ pub fn is_lower_highs_bottom(data: &DataPoints) -> bool {
     }
 }
 
+pub fn is_higher_lows_top(data: &DataPoints) -> bool {
+    if data[0].1 < data[2].1 && data[2].1 < data[4].1 {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_higher_lows_bottom(data: &DataPoints) -> bool {
+    if data[3].1 > data[1].1 {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_lower_highs_top(data: &DataPoints) -> bool {
+    if data[2].1 < data[0].1 && data[4].1 < data[2].1 {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_lower_highs_bottom(data: &DataPoints) -> bool {
+    if data[3].1 < data[1].1 {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_lower_lows_top(data: &DataPoints) -> bool {
+    if data[3].1 < data[1].1 {
+        true
+    } else {
+        false
+    }
+}
+
 pub fn is_lower_lows_bottom(data: &DataPoints) -> bool {
-    if data[4].1 > data[2].1 && data[2].1 > data[0].1 {
+    if data[0].1 > data[2].1 && data[2].1 > data[4].1 {
         true
     } else {
         false
@@ -143,7 +141,7 @@ pub fn search_price_break(band: Vec<(usize, f64)>, close: &Vec<f64>) -> (bool, u
 
     //FIXME DESTRUCTURE CLOSE FROM INDEX
     let mut id = keys[0];
-    while true {
+    while id < close.len() {
         let price = &close[id];
         for (_x, slope) in &poly_degree {
             if price > slope {

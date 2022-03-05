@@ -2,7 +2,8 @@ use super::highs_lows::*;
 use super::pattern::DataPoints;
 use crate::helpers::comp::*;
 
-pub use rs_algo_shared::models::*;
+use rs_algo_shared::models::*;
+
 pub fn is_top(data: &DataPoints) -> bool {
     if is_equal(data[3].1, data[1].1) && data[4].1 < data[3].1 && data[2].1 < data[1].1 {
         true
@@ -12,12 +13,12 @@ pub fn is_top(data: &DataPoints) -> bool {
 }
 
 pub fn top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
-    let (upper_result, upper_id, upper_price) = price_is_lower_low_band_bottom(&data, close);
-    if upper_result {
+    let (top_result, top_id, top_price) = price_is_lower_low_band_bottom(&data, close);
+    if top_result {
         PatternActive {
             active: true,
-            index: upper_id,
-            price: upper_price,
+            index: top_id,
+            price: top_price,
             break_direction: PatternDirection::Top,
         }
     } else {
@@ -39,12 +40,12 @@ pub fn is_bottom(data: &DataPoints) -> bool {
 }
 
 pub fn bottom_active(data: &DataPoints, close: &Vec<f64>, current_price: &f64) -> PatternActive {
-    let (lower_result, lower_id, lower_price) = price_is_bigger_upper_band_top(&data, close);
-    if lower_result {
+    let (bottom_result, bottom_id, bottom_price) = price_is_bigger_upper_band_top(&data, close);
+    if bottom_result {
         PatternActive {
             active: true,
-            index: lower_id,
-            price: lower_price,
+            index: bottom_id,
+            price: bottom_price,
             break_direction: PatternDirection::Bottom,
         }
     } else {

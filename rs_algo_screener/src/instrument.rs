@@ -152,7 +152,6 @@ impl Instrument {
             local_maxima,
             local_minima,
             &self.peaks.close,
-            &self.current_price,
         );
 
         self.patterns.detect_pattern(
@@ -160,7 +159,6 @@ impl Instrument {
             extrema_maxima,
             extrema_minima,
             &self.peaks.close,
-            &self.current_price,
         );
 
         self.horizontal_levels

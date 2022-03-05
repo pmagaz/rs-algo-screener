@@ -1,6 +1,7 @@
 use super::highs_lows::*;
 use super::pattern::DataPoints;
-pub use rs_algo_shared::models::*;
+
+use rs_algo_shared::models::*;
 
 pub fn is_renctangle_top(data: &DataPoints) -> bool {
     if upper_band_is_equal_top(data) && lower_band_is_equal_top(data) {
@@ -11,21 +12,21 @@ pub fn is_renctangle_top(data: &DataPoints) -> bool {
 }
 
 pub fn rectangle_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
-    let (upper_result, upper_id, upper_price) = price_is_bigger_upper_band_top(&data, close);
-    let (lower_result, lower_id, lower_price) = price_is_lower_low_band_top(&data, close);
+    let (top_result, top_id, top_price) = price_is_bigger_upper_band_bottom(&data, close);
+    let (bottom_result, bottom_id, bottom_price) = price_is_lower_low_band_bottom(&data, close);
 
-    if upper_result {
+    if top_result {
         PatternActive {
             active: true,
-            index: upper_id,
-            price: upper_price,
+            index: top_id,
+            price: top_price,
             break_direction: PatternDirection::Top,
         }
-    } else if lower_result {
+    } else if bottom_result {
         PatternActive {
             active: true,
-            index: lower_id,
-            price: lower_price,
+            index: bottom_id,
+            price: bottom_price,
             break_direction: PatternDirection::Bottom,
         }
     } else {
@@ -39,21 +40,21 @@ pub fn rectangle_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActiv
 }
 
 pub fn rectangle_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
-    let (upper_result, upper_id, upper_price) = price_is_bigger_upper_band_bottom(&data, close);
-    let (lower_result, lower_id, lower_price) = price_is_lower_low_band_bottom(&data, close);
+    let (top_result, top_id, top_price) = price_is_bigger_upper_band_bottom(&data, close);
+    let (bottom_result, bottom_id, bottom_price) = price_is_lower_low_band_bottom(&data, close);
 
-    if upper_result {
+    if top_result {
         PatternActive {
             active: true,
-            index: upper_id,
-            price: upper_price,
+            index: top_id,
+            price: top_price,
             break_direction: PatternDirection::Top,
         }
-    } else if lower_result {
+    } else if bottom_result {
         PatternActive {
             active: true,
-            index: lower_id,
-            price: lower_price,
+            index: bottom_id,
+            price: bottom_price,
             break_direction: PatternDirection::Bottom,
         }
     } else {
