@@ -14,6 +14,7 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
 
 pub fn ascendant_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     pattern_active_result(
+        &data,
         price_is_higher_upper_band_top(&data, close),
         price_is_lower_low_band_top(&data, close),
     )
@@ -21,6 +22,7 @@ pub fn ascendant_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActiv
 
 pub fn ascendant_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     pattern_active_result(
+        &data,
         price_is_higher_upper_band_bottom(&data, close),
         price_is_lower_low_band_bottom(&data, close),
     )
@@ -28,6 +30,7 @@ pub fn ascendant_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternAc
 
 pub fn descendant_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     pattern_active_result(
+        &data,
         price_is_higher_upper_band_top(&data, close),
         price_is_lower_low_band_top(&data, close),
     )
@@ -35,6 +38,7 @@ pub fn descendant_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActi
 
 pub fn descendant_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     pattern_active_result(
+        &data,
         price_is_higher_upper_band_bottom(&data, close),
         price_is_lower_low_band_bottom(&data, close),
     )
@@ -42,6 +46,7 @@ pub fn descendant_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternA
 
 pub fn symetrical_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     pattern_active_result(
+        &data,
         price_is_higher_upper_band_top(&data, close),
         price_is_lower_low_band_top(&data, close),
     )
@@ -49,6 +54,7 @@ pub fn symetrical_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActi
 
 pub fn symetrical_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     pattern_active_result(
+        &data,
         price_is_higher_upper_band_bottom(&data, close),
         price_is_lower_low_band_bottom(&data, close),
     )

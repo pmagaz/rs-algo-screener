@@ -38,6 +38,7 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
 
 pub fn channel_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     pattern_active_result(
+        &data,
         price_is_higher_upper_band_top(&data, close),
         price_is_lower_low_band_top(&data, close),
     )
@@ -45,6 +46,7 @@ pub fn channel_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive 
 
 pub fn channel_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
     pattern_active_result(
+        &data,
         price_is_higher_upper_band_bottom(&data, close),
         price_is_lower_low_band_bottom(&data, close),
     )

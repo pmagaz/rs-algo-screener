@@ -1,5 +1,6 @@
 use crate::helpers::comp::percentage_change;
 use crate::patterns::*;
+use crate::prices::calculate_price_change;
 
 pub use rs_algo_shared::models::*;
 
@@ -251,6 +252,9 @@ impl Patterns {
                             0.,
                             PatternActive {
                                 active: false,
+                                completed: true,
+                                target: 0.,
+                                change: 0.,
                                 index: 0,
                                 price: 0.,
                                 break_direction: PatternDirection::None,
@@ -269,6 +273,9 @@ impl Patterns {
                 0.,
                 PatternActive {
                     active: false,
+                    completed: true,
+                    target: 0.,
+                    change: 0.,
                     index: 0,
                     price: 0.,
                     break_direction: PatternDirection::None,
@@ -368,28 +375,43 @@ impl Patterns {
     // }
 }
 
-pub fn pattern_active_result(top: (bool, usize, f64), bottom: (bool, usize, f64)) -> PatternActive {
+pub fn pattern_active_result(
+    data: &DataPoints,
+    top: (bool, usize, f64),
+    bottom: (bool, usize, f64),
+) -> PatternActive {
     let (top_result, top_id, top_price) = top;
     let (bottom_result, bottom_id, bottom_price) = bottom;
+    let price_change = calculate_price_change(&data);
+    let price_target = 0.;
     if top_result {
         PatternActive {
             active: true,
+            completed: false,
             index: top_id,
             price: top_price,
+            change: price_change,
+            target: price_target,
             break_direction: PatternDirection::Top,
         }
     } else if bottom_result {
         PatternActive {
             active: true,
+            completed: false,
             index: bottom_id,
             price: bottom_price,
+            change: price_change,
+            target: price_target,
             break_direction: PatternDirection::Bottom,
         }
     } else {
         PatternActive {
             active: false,
+            completed: false,
             index: 0,
             price: 0.,
+            change: 0.,
+            target: 0.,
             break_direction: PatternDirection::None,
         }
     }

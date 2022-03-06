@@ -1,5 +1,5 @@
+use crate::helpers::comp::percentage_change;
 use crate::helpers::poly::fit;
-
 use rs_algo_shared::models::*;
 
 pub fn price_is_higher_upper_band_top(data: &DataPoints, close: &Vec<f64>) -> (bool, usize, f64) {
@@ -27,6 +27,10 @@ pub fn price_is_lower_low_band_bottom(data: &DataPoints, close: &Vec<f64>) -> (b
     let band = vec![data[0], data[2], data[4]];
     let top_break = |price: f64, slope: f64| price < slope;
     search_price_break(band, close, &top_break)
+}
+
+pub fn calculate_price_change(data_points: &DataPoints) -> f64 {
+    percentage_change(data_points[4].1, data_points[3].1).abs()
 }
 
 pub fn search_price_break(
