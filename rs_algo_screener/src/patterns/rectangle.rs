@@ -1,5 +1,6 @@
 use super::highs_lows::*;
 use super::pattern::DataPoints;
+use crate::prices::*;
 
 use rs_algo_shared::models::*;
 
@@ -12,8 +13,8 @@ pub fn is_renctangle_top(data: &DataPoints) -> bool {
 }
 
 pub fn rectangle_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
-    let (top_result, top_id, top_price) = price_is_bigger_upper_band_bottom(&data, close);
-    let (bottom_result, bottom_id, bottom_price) = price_is_lower_low_band_bottom(&data, close);
+    let (top_result, top_id, top_price) = price_is_higher_upper_band_top(&data, close);
+    let (bottom_result, bottom_id, bottom_price) = price_is_lower_low_band_top(&data, close);
 
     if top_result {
         PatternActive {
@@ -40,7 +41,7 @@ pub fn rectangle_top_active(data: &DataPoints, close: &Vec<f64>) -> PatternActiv
 }
 
 pub fn rectangle_bottom_active(data: &DataPoints, close: &Vec<f64>) -> PatternActive {
-    let (top_result, top_id, top_price) = price_is_bigger_upper_band_bottom(&data, close);
+    let (top_result, top_id, top_price) = price_is_higher_upper_band_bottom(&data, close);
     let (bottom_result, bottom_id, bottom_price) = price_is_lower_low_band_bottom(&data, close);
 
     if top_result {

@@ -17,6 +17,7 @@ mod helpers;
 mod indicators;
 mod instrument;
 mod patterns;
+mod prices;
 mod screener;
 
 use dotenv::dotenv;

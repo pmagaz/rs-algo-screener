@@ -8,6 +8,7 @@ use std::env;
 
 type Point = (usize, f64);
 pub type DataPoints = Vec<Point>;
+pub type PatternActiveResult = (bool, usize, f64);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Patterns {
@@ -89,7 +90,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                triangle::ascendant_active(&data_points, close),
+                                triangle::ascendant_top_active(&data_points, close),
                             );
                             //no_pattern = false;
                         } else if triangle::is_ascendant_bottom(&data_points) {
@@ -99,7 +100,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                triangle::ascendant_active(&data_points, close),
+                                triangle::ascendant_bottom_active(&data_points, close),
                             );
                             // //no_pattern = false;
                         } else if triangle::is_descendant_top(&data_points) {
@@ -109,7 +110,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                triangle::descendant_active(&data_points, close),
+                                triangle::descendant_top_active(&data_points, close),
                             );
                             // no_pattern = false;
                         } else if triangle::is_descendant_bottom(&data_points) {
@@ -119,7 +120,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                triangle::descendant_active(&data_points, close),
+                                triangle::descendant_bottom_active(&data_points, close),
                             );
                             // no_pattern = false;
                         } else if triangle::is_symmetrical_top(&data_points) {
@@ -129,7 +130,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                triangle::symetrical_active(&data_points, close),
+                                triangle::symetrical_top_active(&data_points, close),
                             );
                             // no_pattern = false;
                         } else if triangle::is_symmetrical_bottom(&data_points) {
@@ -139,7 +140,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                triangle::symetrical_active(&data_points, close),
+                                triangle::symetrical_bottom_active(&data_points, close),
                             );
                             // no_pattern = false;
                         } else if rectangle::is_renctangle_top(&data_points) {
@@ -169,7 +170,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                channel::channel_active(&data_points, close),
+                                channel::channel_top_active(&data_points, close),
                             );
                         //     //no_pattern = false;
                         } else if channel::is_ascendant_bottom(&data_points) {
@@ -179,7 +180,26 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                channel::channel_active(&data_points, close),
+                                channel::channel_bottom_active(&data_points, close),
+                            );
+                        } else if channel::is_descendant_top(&data_points) {
+                            self.set_pattern(
+                                PatternType::ChannelDown,
+                                PatternDirection::Top,
+                                &pattern_size,
+                                &data_points,
+                                self.calculate_change(&data_points),
+                                channel::channel_top_active(&data_points, close),
+                            );
+                        //     //no_pattern = false;
+                        } else if channel::is_descendant_bottom(&data_points) {
+                            self.set_pattern(
+                                PatternType::ChannelDown,
+                                PatternDirection::Bottom,
+                                &pattern_size,
+                                &data_points,
+                                self.calculate_change(&data_points),
+                                channel::channel_bottom_active(&data_points, close),
                             );
                         } else if broadening::is_top(&data_points) {
                             self.set_pattern(
@@ -188,7 +208,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                broadening::broadening_active(&data_points, close),
+                                broadening::broadening_top_active(&data_points, close),
                             );
                             // no_pattern = false;
                         } else if broadening::is_bottom(&data_points) {
@@ -198,7 +218,7 @@ impl Patterns {
                                 &pattern_size,
                                 &data_points,
                                 self.calculate_change(&data_points),
-                                broadening::broadening_active(&data_points, close),
+                                broadening::broadening_top_active(&data_points, close),
                             );
                             // no_pattern = false;
                         } else if double::is_top(&data_points) {
@@ -220,28 +240,6 @@ impl Patterns {
                                 self.calculate_change(&data_points),
                                 double::top_active(&data_points, close),
                             );
-                            // no_pattern = false;
-
-                            // } else if channel::is_descendant_top(&data_points) {
-                            //     self.set_pattern(
-                            //         PatternType::ChannelDown,
-                            //         PatternDirection::Top,
-                            //         &pattern_size,
-                            //         &data_points,
-                            //         self.calculate_change(&data_points),
-                            //         false,
-                            //     );
-                            //     //  no_pattern = false;
-                            // } else if channel::is_descendant_bottom(&data_points) {
-                            //     self.set_pattern(
-                            //         PatternType::ChannelDown,
-                            //         PatternDirection::Bottom,
-                            //         &pattern_size,
-                            //         &data_points,
-                            //         self.calculate_change(&data_points),
-                            //         false,
-                            //     );
-                            // no_pattern = false;
                         }
                     }
                     None => {
@@ -368,6 +366,33 @@ impl Patterns {
     // pub fn is_upper_channel(&mut self, peaks: &Peaks) -> &UpperChannel {
     //     self.upper_channel.scan(peaks)
     // }
+}
+
+pub fn pattern_active_result(top: (bool, usize, f64), bottom: (bool, usize, f64)) -> PatternActive {
+    let (top_result, top_id, top_price) = top;
+    let (bottom_result, bottom_id, bottom_price) = bottom;
+    if top_result {
+        PatternActive {
+            active: true,
+            index: top_id,
+            price: top_price,
+            break_direction: PatternDirection::Top,
+        }
+    } else if bottom_result {
+        PatternActive {
+            active: true,
+            index: bottom_id,
+            price: bottom_price,
+            break_direction: PatternDirection::Bottom,
+        }
+    } else {
+        PatternActive {
+            active: false,
+            index: 0,
+            price: 0.,
+            break_direction: PatternDirection::None,
+        }
+    }
 }
 
 // impl<T> Default for Pattern<T> {

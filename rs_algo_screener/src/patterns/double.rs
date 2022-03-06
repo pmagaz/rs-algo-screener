@@ -1,6 +1,5 @@
-use super::highs_lows::*;
-use super::pattern::DataPoints;
 use crate::helpers::comp::*;
+use crate::prices::*;
 
 use rs_algo_shared::models::*;
 
@@ -40,7 +39,7 @@ pub fn is_bottom(data: &DataPoints) -> bool {
 }
 
 pub fn bottom_active(data: &DataPoints, close: &Vec<f64>, current_price: &f64) -> PatternActive {
-    let (bottom_result, bottom_id, bottom_price) = price_is_bigger_upper_band_top(&data, close);
+    let (bottom_result, bottom_id, bottom_price) = price_is_higher_upper_band_top(&data, close);
     if bottom_result {
         PatternActive {
             active: true,
