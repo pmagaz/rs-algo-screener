@@ -4,16 +4,16 @@ jobs:
       repository: pmagaz/rs-algo-screener
       tag: latest
       imagePullPolicy: Always
-    schedule: "40 16 * * *"
+    schedule: "52 16 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
     restartPolicy: Never
     activeDeadlineSeconds: 360000
     envSecretName: rs-algo-screener-secrets
-    resources:
-      requests:
-        cpu: 250m
-      limits:
-        cpu: 400m
+    # resources:
+    #   requests:
+    #     cpu: 250m
+    #   limits:
+    #     cpu: 400m
     
