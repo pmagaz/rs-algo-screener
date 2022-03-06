@@ -1,6 +1,6 @@
 use crate::error::Result;
-use broker::Symbol;
 use error::RsAlgoErrorKind;
+use std::time::Instant;
 
 use broker::xtb::*;
 use instrument::Instrument;
@@ -46,7 +46,6 @@ async fn main() -> Result<()> {
 
     let sleep = time::Duration::from_millis(*sleep_time);
     let from = (Local::now() - date::Duration::days(from_date)).timestamp();
-    println!("[TIMEFRAME]  {:?}", time_frame);
 
     let time_frame = TimeFrame::new(time_frame);
 
@@ -62,24 +61,32 @@ async fn main() -> Result<()> {
     // }];
 
     for s in symbols {
+        let now = Instant::now();
         screener
             .get_instrument_data(
                 &s.symbol,
                 time_frame.clone(),
                 from,
                 |instrument: Instrument| async move {
-                    println!("[INSTRUMENT]  {:?}", &instrument.symbol());
+                    println!(
+                        "[INSTRUMENT] {:?} processed in {:?}",
+                        &instrument.symbol(),
+                        now.elapsed()
+                    );
 
                     let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
+                    let now = Instant::now();
+
                     let res = request::<Instrument>(&endpoint, &instrument)
                         .await
                         .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
                     println!(
-                        "[Response] {:?} code for {:?} at {:?}",
+                        "[RESPONSE] {:?} status {:?} at {:?} in {:?}",
+                        &instrument.symbol(),
                         res.status(),
-                        &instrument.time_frame(),
-                        Local::now()
+                        Local::now(),
+                        now.elapsed()
                     );
 
                     Ok(())

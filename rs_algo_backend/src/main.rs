@@ -1,6 +1,7 @@
 use actix_web::dev::Service;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
+use std::time::Instant;
 
 use std::io::Result;
 
