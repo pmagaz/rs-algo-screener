@@ -1,7 +1,7 @@
 #!/bin/sh
 
 PS3='Please enter your choice: '
-options=("build & deploy all" "deploy all" "build & deploy rs-algo-backend" "build & deploy rs-algo-screener" "Quit")
+options=("deploy all" "build & deploy all" "build & deploy rs-algo-backend" "build & deploy rs-algo-screener" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
