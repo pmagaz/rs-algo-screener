@@ -11,9 +11,9 @@ jobs:
     restartPolicy: Never
     activeDeadlineSeconds: 360000
     envSecretName: rs-algo-screener-secrets
-    # resources:
-    #   requests:
-    #     cpu: 250m
-    #   limits:
-    #     cpu: 400m
+    resources:
+      requests:
+        cpu: 250m
+      limits:
+        memory: 1024Mi
     
