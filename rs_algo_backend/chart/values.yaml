@@ -52,7 +52,9 @@ ingress:
               number: 80 
   tls: []
 
-resources: {}
+resources:
+  requests:
+    cpu: 250m
   #requests:
   #  cpu: 600m
   #memory: 128Mi
