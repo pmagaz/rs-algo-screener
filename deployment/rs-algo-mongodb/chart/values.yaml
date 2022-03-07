@@ -44,6 +44,8 @@ resources:
     ephemeral-storage: 3Gi
     memory: 3Gi
 
+ingress: {}
+
 autoscaling:
   enabled: false
   minReplicas: 1
