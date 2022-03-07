@@ -2,7 +2,6 @@ use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
 use rs_algo_shared::helpers::date::{DateTime, Local};
 pub type OHLCV = (f64, f64, f64, f64);
 pub type DOHLCV = (DateTime<Local>, f64, f64, f64, f64, f64);
-use chrono::serde::ts_seconds::serialize as to_ts;
 
 use serde::{Deserialize, Serialize};
 

@@ -5,9 +5,6 @@ use std::time::Instant;
 
 use std::io::Result;
 
-#[macro_use]
-extern crate lazy_static;
-
 mod db;
 mod error;
 mod handlers;

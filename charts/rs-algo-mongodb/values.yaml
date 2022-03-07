@@ -38,29 +38,6 @@ service:
     labels:
       app: rs-algo-mongodb
 
-ingress:
-  enabled: false
-  annotations:
-    kubernetes.io/ingress.class: nginx
-  hosts:
-    - host: cluster.local
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: rs-algo-backend 
-            port:
-              number: 80 
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: rs-algo-backend 
-            port:
-              number: 80 
-  tls: []
-
 resources:
   requests:
   limits:
