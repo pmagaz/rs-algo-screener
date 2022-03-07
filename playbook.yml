@@ -3,5 +3,7 @@
   hosts: all
   roles:
     - git 
+    - { role : 'deployment/rs-algo-mongodb/roles/deploy' }
+    - { role : 'rs_algo_backend/roles/deploy' }
     - { role : 'rs_algo_backend/roles/deploy' }
     - { role : 'rs_algo_screener/roles/deploy' }

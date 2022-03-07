@@ -1,8 +1,0 @@
-apiVersion: v2
-name: rs-algo-mongodb
-description: MongoDb storage 
-type: application
-version: 0.1.3
-appVersion: "1.16.0"
-maintainers:
-  - name: pablomagaz
