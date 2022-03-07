@@ -1,0 +1,58 @@
+replicaCount: 1
+
+image:
+  repository: arm64v8/mongo
+  pullPolicy: "IfNotPresent" 
+  tag: "4.4.12"
+
+volumeMounts:
+- name: data
+  mountPath: /data/db
+
+volumes:
+- name: data
+  emptyDir:
+      medium: Memory
+
+envSecretName: rs-algo-screener-secrets
+
+imagePullSecrets:
+ - name: docker-credentials 
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+service:
+  type: LoadBalancer 
+  port: 27017 
+  targetPort: 27017 
+  metadata:
+    name: rs-algo-mongodb
+    labels:
+      app: rs-algo-mongodb
+
+resources:
+  requests:
+  limits:
+    ephemeral-storage: 3Gi
+    memory: 3Gi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 25
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
