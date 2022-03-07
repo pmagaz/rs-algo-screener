@@ -41,8 +41,8 @@ service:
 resources:
   requests:
   limits:
-    ephemeral-storage: 1Gi
-    memory: 1Gi
+    ephemeral-storage: 3Gi
+    memory: 3Gi
 
 autoscaling:
   enabled: false
