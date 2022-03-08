@@ -1,0 +1,77 @@
+replicaCount: 1
+
+image:
+  repository: pmagaz/rs-algo-backend 
+  pullPolicy: Always 
+  tag: "latest"
+
+envSecretName: rs-algo-screener-secrets
+
+imagePullSecrets:
+ - name: docker-credentials 
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+  metadata:
+    name: rs-algo-backend
+    labels:
+      app: rs-algo-backend
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: cluster.local
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rs-algo-backend 
+            port:
+              number: 80 
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: rs-algo-backend 
+            port:
+              number: 80 
+  tls: []
+
+resources:
+  #requests:
+  #  cpu: 1000m
+  #requests:
+  #  cpu: 600m
+  #memory: 128Mi
+  limits:
+   # cpu: 100m
+    memory: 256Mi
+
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 25
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
