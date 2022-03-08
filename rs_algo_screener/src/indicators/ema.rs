@@ -1,7 +1,7 @@
 use super::Indicator;
-use super::IndicatorStatus;
 use crate::error::Result;
 
+use rs_algo_shared::models::*;
 use serde::{Deserialize, Serialize};
 use ta::indicators::ExponentialMovingAverage;
 use ta::Next;
