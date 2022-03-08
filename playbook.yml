@@ -3,6 +3,6 @@
   hosts: all
   roles:
     - { role : 'deployment/git/roles' }
-    #- { role : 'deployment/mongodb/roles/deploy' }
+    - { role : 'deployment/mongodb/roles/deploy' }
     - { role : 'rs_algo_backend/deployment/roles/deploy' }
     - { role : 'rs_algo_screener/deployment/roles/deploy' }
