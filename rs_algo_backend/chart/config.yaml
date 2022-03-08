@@ -1,5 +1,0 @@
-BACKEND_PORT: "8000"
-BACKEND_NAME: "Rust Algo Backend"
-BACKEND_DATABASE: "screener-db"
-BACKEND_DATABASE_COLLECTION: "instruments"
-BACKEND_MONGO_DB_URI: "@rs-algo-mongodb:27017/screener-db?authSource=admin&readPreference=primary&retryWrites=true&directConnection=true&ssl=false"

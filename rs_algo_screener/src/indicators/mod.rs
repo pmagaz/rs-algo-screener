@@ -14,24 +14,6 @@ use std::env;
 use std::marker::Sized;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum IndicatorStatus {
-    Bearish,
-    BearishBellowZero,
-    Bullish,
-    BullishOverZero,
-    Oversold,
-    Overbought,
-    Default,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum IndicatorType {
-    Macd,
-    Stoch,
-    Rsi,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Indicators {
     pub macd: Macd,
     pub stoch: Stoch,

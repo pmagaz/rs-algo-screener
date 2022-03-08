@@ -1,28 +1,11 @@
 use crate::error::Result;
 use crate::helpers::maxima_minima::maxima_minima;
-use crate::indicators::{Indicator, IndicatorType, Indicators};
+use crate::indicators::{Indicator, Indicators};
 use crate::patterns::highs_lows::*;
-
+pub use rs_algo_shared::models::*;
 //use find_peaks::PeakFinder;
 use serde::{Deserialize, Serialize};
 use std::env;
-
-type Point = (usize, f64);
-pub type DataPoints = Vec<Point>;
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum DivergenceType {
-    Bullish,
-    Bearish,
-    None,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Divergence {
-    data: DataPoints,
-    indicator: IndicatorType,
-    divergence_type: DivergenceType,
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Divergences {
