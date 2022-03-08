@@ -2,7 +2,7 @@
 - name: Deploy RS-ALGO-SCREENER 
   hosts: all
   roles:
-    - { role : 'deployment/roles/git' }
-    #- { role : 'deployment/rs-algo-mongodb/roles/deploy' }
+    - { role : 'deployment/git/roles' }
+    #- { role : 'deployment/mongodb/roles/deploy' }
     - { role : 'rs_algo_backend/deployment/roles/deploy' }
     - { role : 'rs_algo_screener/deployment/roles/deploy' }

@@ -34,9 +34,9 @@ service:
   port: 27017 
   targetPort: 27017 
   metadata:
-    name: rs-algo-mongodb
+    name: mongodb
     labels:
-      app: rs-algo-mongodb
+      app: mongodb
 
 resources:
   requests:

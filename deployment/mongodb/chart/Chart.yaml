@@ -1,5 +1,5 @@
 apiVersion: v2
-name: rs-algo-mongodb
+name: mongodb
 description: MongoDb storage 
 type: application
 version: 0.1.3

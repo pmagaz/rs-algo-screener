@@ -1,3 +1,0 @@
-release_name: rs-algo-mongodb
-local_path: /home/dev/rs-algo-screener
-chart_path: deployment/rs-algo-mongodb/chart
