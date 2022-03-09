@@ -14,17 +14,16 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactInstrume
     let collection = state
         .db
         .database(&state.db_name)
-        .collection::<CompactInstrument>(collection);
+        .collection::<CompactInstrument>("instruments");
 
     let filter = doc! {"current_candle": "Karakasa"};
     let find_options = FindOptions::builder().build();
-    let mut cursor = collection.await.find(filter, find_options).await.unwrap();
+    let mut cursor = collection.find(filter, find_options).await.unwrap();
 
     let mut docs: Vec<CompactInstrument> = vec![];
     while let Some(result) = cursor.next().await {
         match result {
             Ok(doc) => {
-                println!("[GET] {:?}", &doc);
                 docs.push(doc);
             }
             _ => {
