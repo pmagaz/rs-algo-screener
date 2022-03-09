@@ -1,6 +1,7 @@
+use super::helpers::get_collection;
 use crate::helpers::date::Local;
 use crate::models::app_state::AppState;
-use crate::models::instrument::Instrument;
+use crate::models::instrument::{CompactInstrument, Instrument};
 
 use actix_web::web;
 use bson::{doc, Bson};
@@ -8,25 +9,18 @@ use futures::stream::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOptions};
 use mongodb::results::InsertOneResult;
-use mongodb::Collection;
 
-pub async fn get_collection(
-    state: &web::Data<AppState>,
-    collection: &str,
-) -> Collection<Instrument> {
-    state
+pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactInstrument>, Error> {
+    let collection = state
         .db
         .database(&state.db_name)
-        .collection::<Instrument>(collection)
-}
+        .collection::<CompactInstrument>(collection);
 
-pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
-    let collection = get_collection(state, "instruments");
     let filter = doc! {"current_candle": "Karakasa"};
     let find_options = FindOptions::builder().build();
     let mut cursor = collection.await.find(filter, find_options).await.unwrap();
 
-    let mut docs: Vec<Instrument> = vec![];
+    let mut docs: Vec<CompactInstrument> = vec![];
     while let Some(result) = cursor.next().await {
         match result {
             Ok(doc) => {

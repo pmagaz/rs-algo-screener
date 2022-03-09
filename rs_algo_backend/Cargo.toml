@@ -7,6 +7,7 @@ edition = "2021"
 [dependencies]
 actix-web = "4.0.1"
 actix-http = "3.0.0"
+anyhow = "1.0.54"
 serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.79"
 serde_qs ="0.9.1"
@@ -19,7 +20,7 @@ futures = "0.3.21"
 reqwest = { version = "0.11.9", features = ["json"] }
 openssl = { version = "0.10.38", features = ["vendored"] }
 ta = {version = "0.5.0", features = ["serde"] }
-rs_algo_shared = { git = "https://github.com/pmagaz/rs_algo_shared", rev = "81d07d7"}
+rs_algo_shared = { git = "https://github.com/pmagaz/rs_algo_shared", rev = "154bb95"}
 
 [dependencies.mongodb]
 version = "2.1.0"

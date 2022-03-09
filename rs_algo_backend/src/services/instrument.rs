@@ -1,13 +1,13 @@
 use crate::db;
-use crate::error::CustomError;
+use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
 use crate::models::instrument::Instrument;
 use std::time::Instant;
 
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{web, HttpResponse};
 use rs_algo_shared::helpers::date::Local;
 
-pub async fn get(state: web::Data<AppState>) -> Result<HttpResponse, CustomError> {
+pub async fn get(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
     println!("[GET] {:?} {:?}", Local::now(), now.elapsed());
 
@@ -18,7 +18,7 @@ pub async fn get(state: web::Data<AppState>) -> Result<HttpResponse, CustomError
     Ok(HttpResponse::Ok().json(instruments))
 }
 
-pub async fn post(data: String, state: web::Data<AppState>) -> Result<HttpResponse, CustomError> {
+pub async fn post(data: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
     let response: Instrument = serde_json::from_str(&data).unwrap();
     let symbol = response.symbol.clone();

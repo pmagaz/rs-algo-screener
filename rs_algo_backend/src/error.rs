@@ -2,6 +2,8 @@ use actix_web::{error::ResponseError, http::StatusCode, HttpResponse};
 use serde::Serialize;
 use thiserror::Error;
 
+pub type Result<T> = ::anyhow::Result<T, RsAlgoError>;
+
 #[derive(Serialize)]
 struct ErrorResponse {
     code: u16,
@@ -10,7 +12,7 @@ struct ErrorResponse {
 }
 
 #[derive(Error, Debug)]
-pub enum CustomError {
+pub enum RsAlgoError {
     #[error("Requested user was not found")]
     NotFound,
     #[error("You ared forbidden to access this resource.")]
@@ -25,7 +27,7 @@ pub enum CustomError {
     InvalidToken,
 }
 
-impl CustomError {
+impl RsAlgoError {
     pub fn name(&self) -> String {
         match self {
             Self::NotFound => "NotFound".to_string(),
@@ -38,7 +40,7 @@ impl CustomError {
     }
 }
 
-impl ResponseError for CustomError {
+impl ResponseError for RsAlgoError {
     fn status_code(&self) -> StatusCode {
         match *self {
             Self::NotFound => StatusCode::NOT_FOUND,
@@ -61,10 +63,10 @@ impl ResponseError for CustomError {
     }
 }
 
-pub fn map_io_error(e: std::io::Error) -> CustomError {
+pub fn map_io_error(e: std::io::Error) -> RsAlgoError {
     match e.kind() {
-        std::io::ErrorKind::NotFound => CustomError::NotFound,
-        std::io::ErrorKind::PermissionDenied => CustomError::Forbidden,
-        _ => CustomError::Unknown,
+        std::io::ErrorKind::NotFound => RsAlgoError::NotFound,
+        std::io::ErrorKind::PermissionDenied => RsAlgoError::Forbidden,
+        _ => RsAlgoError::Unknown,
     }
 }

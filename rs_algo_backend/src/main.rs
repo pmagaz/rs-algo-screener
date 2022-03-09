@@ -1,6 +1,5 @@
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
-use std::time::Instant;
 
 use std::io::Result;
 
@@ -11,7 +10,7 @@ mod models;
 mod services;
 
 use db::mongo;
-use error::CustomError;
+use error::RsAlgoError;
 use models::app_state::AppState;
 use services::index::index;
 use services::instrument;
@@ -27,7 +26,7 @@ async fn main() -> Result<()> {
 
     let mongodb: mongodb::Client = mongo::connect()
         .await
-        .map_err(|_e| CustomError::NoDbConnection)
+        .map_err(|_e| RsAlgoError::NoDbConnection)
         .unwrap();
 
     println!(

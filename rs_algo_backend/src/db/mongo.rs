@@ -1,9 +1,9 @@
 use mongodb::{bson::doc, options::ClientOptions, Client};
 use std::env;
 
-use crate::error::CustomError;
+use crate::error::RsAlgoError;
 
-pub async fn connect() -> Result<Client, CustomError> {
+pub async fn connect() -> Result<Client, RsAlgoError> {
     let db_user = &env::var("DB_USERNAME").expect("DB_USERNAME not found");
     let db_password = &env::var("DB_PASSWORD").expect("DB_PASSWORD not found");
     let db_name = &env::var("BACKEND_DATABASE").expect("BACKEND_DATABASE not found");
