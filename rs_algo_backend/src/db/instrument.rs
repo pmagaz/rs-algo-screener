@@ -23,8 +23,8 @@ pub async fn get_collection(
 pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
     let collection = get_collection(state, "instruments");
     let filter = doc! {"current_candle": "Karakasa"};
-    let find_options = FindOptions::builder().sort(filter).build();
-    let mut cursor = collection.await.find(None, None).await.unwrap();
+    let find_options = FindOptions::builder().build();
+    let mut cursor = collection.await.find(filter, find_options).await.unwrap();
 
     let mut docs: Vec<Instrument> = vec![];
     while let Some(result) = cursor.next().await {
