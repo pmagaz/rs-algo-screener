@@ -1,4 +1,3 @@
-use actix_web::dev::Service;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
 use std::time::Instant;
@@ -7,15 +6,15 @@ use std::io::Result;
 
 mod db;
 mod error;
-mod handlers;
 mod helpers;
 mod models;
+mod services;
 
 use db::mongo;
 use error::CustomError;
-use handlers::index::index;
-use handlers::instrument::instrument;
 use models::app_state::AppState;
+use services::index::index;
+use services::instrument;
 use std::env;
 
 #[actix_web::main]
@@ -47,7 +46,11 @@ async fn main() -> Result<()> {
             .app_data(web::PayloadConfig::new(10000000))
             .wrap(Logger::default())
             .route("/", web::get().to(index))
-            .service(web::scope("/api").route("/instruments", web::post().to(instrument)))
+            .service(
+                web::scope("/api")
+                    .route("/instruments", web::get().to(instrument::get))
+                    .route("/instruments", web::post().to(instrument::post)),
+            )
     })
     .bind(["0.0.0.0:", &port].concat())
     .expect("Can't launch server")

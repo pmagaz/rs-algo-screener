@@ -3,10 +3,43 @@ use crate::models::app_state::AppState;
 use crate::models::instrument::Instrument;
 
 use actix_web::web;
-use mongodb::bson::doc;
+use bson::{doc, Bson};
+use futures::stream::StreamExt;
 use mongodb::error::Error;
-use mongodb::options::FindOneAndReplaceOptions;
+use mongodb::options::{FindOneAndReplaceOptions, FindOptions};
 use mongodb::results::InsertOneResult;
+use mongodb::Collection;
+
+pub async fn get_collection(
+    state: &web::Data<AppState>,
+    collection: &str,
+) -> Collection<Instrument> {
+    state
+        .db
+        .database(&state.db_name)
+        .collection::<Instrument>(collection)
+}
+
+pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
+    let collection = get_collection(state, "instruments");
+    let filter = doc! {"current_candle": "Karakasa"};
+    let find_options = FindOptions::builder().sort(filter).build();
+    let mut cursor = collection.await.find(None, None).await.unwrap();
+
+    let mut docs: Vec<Instrument> = vec![];
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(doc) => {
+                println!("[GET] {:?}", &doc);
+                docs.push(doc);
+            }
+            _ => {
+                //return HttpResponse::InternalServerError().finish();
+            }
+        }
+    }
+    Ok(docs)
+}
 
 pub async fn insert(
     mut doc: Instrument,
@@ -14,10 +47,7 @@ pub async fn insert(
 ) -> Result<Option<Instrument>, Error> {
     let db_name = &state.db_name;
 
-    let collection = &state
-        .db
-        .database(db_name)
-        .collection::<Instrument>("instruments");
+    let collection = get_collection(state, "instruments").await;
 
     // collection
     //     .find_one_and_update(

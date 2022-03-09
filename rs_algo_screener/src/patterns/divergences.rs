@@ -46,7 +46,7 @@ impl Divergences {
         maxima: &Vec<(usize, f64)>,
         minima: &Vec<(usize, f64)>,
         indicator_type: &IndicatorType,
-        current_price: &f64,
+        max_value: &f64,
     ) {
         let local_max_points = env::var("PATTERNS_MAX_POINTS")
             .unwrap()

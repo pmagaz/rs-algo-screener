@@ -81,6 +81,10 @@ impl Instrument {
     pub fn horizontal_levels(&self) -> &HorizontalLevels {
         &self.horizontal_levels
     }
+
+    pub fn divergences(&self) -> &Divergences {
+        &self.divergences
+    }
     pub fn set_data(
         &mut self,
         data: Vec<(DateTime<Local>, f64, f64, f64, f64, f64)>,

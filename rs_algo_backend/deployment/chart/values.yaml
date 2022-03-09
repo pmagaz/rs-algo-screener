@@ -53,13 +53,10 @@ ingress:
   tls: []
 
 resources:
-  #requests:
-  #  cpu: 1000m
-  #requests:
-  #  cpu: 600m
-  #memory: 128Mi
+  requests:
+    cpu: 1000m
   limits:
-   # cpu: 100m
+    cpu: 1000m
     memory: 256Mi
 
 
