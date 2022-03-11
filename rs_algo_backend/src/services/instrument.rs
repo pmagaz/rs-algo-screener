@@ -11,11 +11,11 @@ pub async fn get(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError
     let now = Instant::now();
     println!("[GET] {:?} {:?}", Local::now(), now.elapsed());
 
-    let instruments = db::instrument::find_all(&state).await.unwrap();
+    let compact_instruments = db::instrument::find_all(&state).await.unwrap();
 
     println!("[GET] {:?} {:?}", Local::now(), now.elapsed());
 
-    Ok(HttpResponse::Ok().json(instruments))
+    Ok(HttpResponse::Ok().json(compact_instruments))
 }
 
 pub async fn post(data: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {

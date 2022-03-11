@@ -1,7 +1,9 @@
-use super::helpers::get_collection;
+use super::helpers::{compact_instrument, get_collection};
 use crate::helpers::date::Local;
 use crate::models::app_state::AppState;
-use crate::models::instrument::{CompactInstrument, Instrument};
+use crate::models::instrument::{
+    CompactIndicator, CompactIndicators, CompactInstrument, Instrument, Patterns,
+};
 
 use actix_web::web;
 use bson::{doc, Bson};
@@ -10,13 +12,9 @@ use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOptions};
 use mongodb::results::InsertOneResult;
 
-pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactInstrument>, Error> {
-    let collection = state
-        .db
-        .database(&state.db_name)
-        .collection::<CompactInstrument>("instruments");
-
-    let filter = doc! {"current_candle": "Karakasa"};
+pub async fn find_all<'a>(state: &web::Data<AppState>) -> Result<Vec<CompactInstrument>, Error> {
+    let collection = get_collection(state, "instruments").await;
+    let filter = doc! {"current_candle": "Doji"};
     let find_options = FindOptions::builder().build();
     let mut cursor = collection.find(filter, find_options).await.unwrap();
 
@@ -24,11 +22,9 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactInstrume
     while let Some(result) = cursor.next().await {
         match result {
             Ok(doc) => {
-                docs.push(doc);
+                docs.push(compact_instrument(doc).unwrap());
             }
-            _ => {
-                //return HttpResponse::InternalServerError().finish();
-            }
+            _ => {}
         }
     }
     Ok(docs)
@@ -40,7 +36,7 @@ pub async fn insert(
 ) -> Result<Option<Instrument>, Error> {
     let db_name = &state.db_name;
 
-    let collection = get_collection(state, "instruments").await;
+    let collection = get_collection::<Instrument>(state, "instruments").await;
 
     // collection
     //     .find_one_and_update(
