@@ -30,6 +30,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
     let len = doc.indicators.macd.data_a.len();
     let doc = CompactInstrument {
         symbol: doc.symbol,
+        updated: doc.updated,
         time_frame: doc.time_frame,
         current_price: doc.current_price,
         current_candle: doc.current_candle,

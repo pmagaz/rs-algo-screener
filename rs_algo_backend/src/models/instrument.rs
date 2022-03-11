@@ -27,8 +27,8 @@ pub struct CompactInstrument {
     pub time_frame: TimeFrameType,
     pub current_price: f64,
     pub current_candle: CandleType,
-    // #[serde(skip_deserializing)]
-    // updated: String,
+    #[serde(skip_deserializing)]
+    pub updated: String,
     pub patterns: Patterns,
     pub indicators: CompactIndicators,
     pub divergences: Divergences,
