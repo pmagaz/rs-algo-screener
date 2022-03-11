@@ -27,7 +27,6 @@ pub struct CompactInstrument {
     pub time_frame: TimeFrameType,
     pub current_price: f64,
     pub current_candle: CandleType,
-    #[serde(skip_deserializing)]
     pub updated: String,
     pub patterns: Patterns,
     pub indicators: CompactIndicators,
@@ -39,15 +38,11 @@ pub struct Instrument {
     pub symbol: String,
     pub time_frame: TimeFrameType,
     pub current_price: f64,
-    #[serde(skip_deserializing)]
     min_price: f64,
-    #[serde(skip_deserializing)]
     max_price: f64,
     pub current_candle: CandleType,
     pub updated: String,
-    #[serde(skip_deserializing)]
     data: Vec<Candle>,
-    #[serde(skip_deserializing)]
     peaks: Peaks,
     pub patterns: Patterns,
     pub indicators: Indicators,
