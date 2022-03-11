@@ -41,6 +41,7 @@ pub struct Instrument {
     min_price: f64,
     max_price: f64,
     pub current_candle: CandleType,
+    #[serde(skip_deserializing)]
     pub updated: String,
     data: Vec<Candle>,
     peaks: Peaks,
