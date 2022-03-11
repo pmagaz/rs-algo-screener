@@ -24,6 +24,4 @@ rs_algo_shared = { git = "https://github.com/pmagaz/rs_algo_shared", rev = "ce88
 
 [dependencies.mongodb]
 version = "2.1.0"
-default-features = false
-features = ["async-std-runtime"]
 
