@@ -29,6 +29,15 @@ pub async fn post(data: String, state: web::Data<AppState>) -> Result<HttpRespon
             .await
             .unwrap();
 
+    println!(
+        "[INSERTED COMPACT] {:?} at {:?} in {:?}",
+        symbol,
+        Local::now(),
+        now.elapsed()
+    );
+
+    let now = Instant::now();
+
     let _insert_result = db::instrument::insert(instrument, &state).await.unwrap();
 
     println!(
