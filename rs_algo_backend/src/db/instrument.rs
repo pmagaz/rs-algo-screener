@@ -17,7 +17,7 @@ pub async fn find_by_params(
     state: &web::Data<AppState>,
     params: String,
 ) -> Result<Vec<CompactInstrument>, Error> {
-    let collection_name = &env::var("BACKEND_DATABASE_COLLECTION").unwrap();
+    let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
 
     println!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
@@ -40,7 +40,7 @@ pub async fn insert(
     mut doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = &env::var("BACKEND_DATABASE_COLLECTION").unwrap();
+    let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
     doc.updated = Local::now().to_string();
@@ -59,7 +59,7 @@ pub async fn insert_long(
     mut doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = &env::var("BACKEND_DATABASE_COLLECTION").unwrap();
+    let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
     // collection
     //     .find_one_and_update(
