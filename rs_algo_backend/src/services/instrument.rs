@@ -20,10 +20,10 @@ pub async fn get(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError
 }
 
 pub async fn post(data: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
-    let now = Instant::now();
     let instrument: Instrument = serde_json::from_str(&data).unwrap();
     let symbol = instrument.symbol.clone();
 
+    let now = Instant::now();
     let _insert_compact =
         db::instrument::insert_compact(compact_instrument(instrument.clone()).unwrap(), &state)
             .await

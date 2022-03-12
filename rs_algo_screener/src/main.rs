@@ -38,6 +38,7 @@ TODO LIST
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
+    let start = Instant::now();
     let username = &env::var("BROKER_USERNAME").unwrap();
     let password = &env::var("BROKER_PASSWORD").unwrap();
     let from_date = env::var("FROM_DATE").unwrap().parse::<i64>().unwrap();
