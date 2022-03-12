@@ -97,7 +97,7 @@ async fn main() -> Result<()> {
         thread::sleep(sleep);
     }
 
-    println!("[Finished] at {:?}", Local::now());
+    println!("[Finished] at {:?}  in {:?}", Local::now(), start.elapsed());
 
     Ok(())
 }

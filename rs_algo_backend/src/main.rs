@@ -52,7 +52,7 @@ async fn main() -> Result<()> {
             )
     })
     .bind(["0.0.0.0:", &port].concat())
-    .expect("Can't launch server")
+    .expect("[Error] Can't launch server!")
     .run()
     .await
 }
