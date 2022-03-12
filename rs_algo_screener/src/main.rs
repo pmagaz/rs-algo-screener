@@ -21,7 +21,7 @@ mod prices;
 mod screener;
 
 use dotenv::dotenv;
-use rs_algo_shared::helpers::http::request;
+use rs_algo_shared::helpers::http::{request, HttpMethod};
 
 use std::env;
 use std::{thread, time};
@@ -78,7 +78,7 @@ async fn main() -> Result<()> {
                     let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
                     let now = Instant::now();
 
-                    let res = request::<Instrument>(&endpoint, &instrument)
+                    let res = request::<Instrument>(&endpoint, &instrument, HttpMethod::Put)
                         .await
                         .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 

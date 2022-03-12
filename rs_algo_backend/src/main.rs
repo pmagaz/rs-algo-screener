@@ -47,8 +47,8 @@ async fn main() -> Result<()> {
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")
-                    .route("/instruments", web::get().to(instrument::get))
-                    .route("/instruments", web::post().to(instrument::post)),
+                    .route("/instruments", web::post().to(instrument::post))
+                    .route("/instruments", web::put().to(instrument::put)),
             )
     })
     .bind(["0.0.0.0:", &port].concat())

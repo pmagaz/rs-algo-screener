@@ -8,19 +8,21 @@ use std::time::Instant;
 use actix_web::{web, HttpResponse};
 use rs_algo_shared::helpers::date::Local;
 
-pub async fn get(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+pub async fn post(params: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
-    println!("[GET] {:?} {:?}", Local::now(), now.elapsed());
+    let compact_instruments = db::instrument::find_by_params(&state, params)
+        .await
+        .unwrap();
 
-    let compact_instruments = db::instrument::find_all(&state).await.unwrap();
-
-    println!("[GET] {:?} {:?}", Local::now(), now.elapsed());
+    println!("[POST] {:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(compact_instruments))
 }
 
-pub async fn post(data: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
-    let instrument: Instrument = serde_json::from_str(&data).unwrap();
+pub async fn put(
+    instrument: web::Json<Instrument>,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
     let symbol = instrument.symbol.clone();
 
     let now = Instant::now();
