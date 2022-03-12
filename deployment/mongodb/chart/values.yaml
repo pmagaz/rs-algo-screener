@@ -40,9 +40,9 @@ service:
 
 resources:
   requests:
-     cpu: 1500m
+     cpu: 1300m
   limits:
-    cpu: 1700m
+    cpu: 1500m
     ephemeral-storage: 3Gi
     memory: 3Gi
 
