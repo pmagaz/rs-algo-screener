@@ -27,12 +27,12 @@ pub async fn put(
 
     let now = Instant::now();
     let _insert_compact =
-        db::instrument::insert_compact(compact_instrument(instrument.clone()).unwrap(), &state)
+        db::instrument::insert(compact_instrument(instrument.clone()).unwrap(), &state)
             .await
             .unwrap();
 
     println!(
-        "[INSERTED COMPACT] {:?} at {:?} in {:?}",
+        "[INSTRUMENT INSERTED] {:?} at {:?} in {:?}",
         symbol,
         Local::now(),
         now.elapsed()

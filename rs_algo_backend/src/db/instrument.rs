@@ -37,12 +37,11 @@ pub async fn find_by_params(
 }
 
 pub async fn insert(
-    mut doc: Instrument,
+    mut doc: CompactInstrument,
     state: &web::Data<AppState>,
-) -> Result<Option<Instrument>, Error> {
-    let db_name = &state.db_name;
-
-    let collection = get_collection::<Instrument>(state, "instruments").await;
+) -> Result<Option<CompactInstrument>, Error> {
+    let collection_name = &env::var("BACKEND_DATABASE_COLLECTION").unwrap();
+    let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
     doc.updated = Local::now().to_string();
     collection
@@ -56,12 +55,12 @@ pub async fn insert(
         .await
 }
 
-pub async fn insert_compact(
+pub async fn insert_long(
     mut doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection = get_collection::<CompactInstrument>(state, "compact_instruments").await;
-
+    let collection_name = &env::var("BACKEND_DATABASE_COLLECTION").unwrap();
+    let collection = get_collection::<CompactInstrument>(state, collection_name).await;
     // collection
     //     .find_one_and_update(
     //         doc! { "symbol": doc.symbol },
