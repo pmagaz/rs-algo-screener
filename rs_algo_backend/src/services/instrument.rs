@@ -36,16 +36,16 @@ pub async fn post(data: String, state: web::Data<AppState>) -> Result<HttpRespon
         now.elapsed()
     );
 
-    let now = Instant::now();
+    // let now = Instant::now();
 
-    let _insert_result = db::instrument::insert(instrument, &state).await.unwrap();
+    // let _insert_result = db::instrument::insert(instrument, &state).await.unwrap();
 
-    println!(
-        "[INSERTED] {:?} at {:?} in {:?}",
-        symbol,
-        Local::now(),
-        now.elapsed()
-    );
+    // println!(
+    //     "[INSERTED] {:?} at {:?} in {:?}",
+    //     symbol,
+    //     Local::now(),
+    //     now.elapsed()
+    // );
 
     Ok(HttpResponse::Ok().json("ok"))
 }
