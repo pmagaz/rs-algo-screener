@@ -110,6 +110,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 .divergences
                 .into_iter()
                 .enumerate()
+                .filter(|(key, _inst)| key < &3)
                 .map(|(key, inst)| CompactDivergence {
                     indicator: inst.indicator,
                     divergence_type: inst.divergence_type,
