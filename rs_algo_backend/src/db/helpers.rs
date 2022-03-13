@@ -1,7 +1,8 @@
 use crate::error::Result;
 use crate::models::app_state::AppState;
 use crate::models::instrument::{
-    CompactIndicator, CompactIndicators, CompactInstrument, Instrument, Patterns,
+    CompactDivergence, CompactDivergences, CompactIndicator, CompactIndicators, CompactInstrument,
+    Instrument, Patterns,
 };
 use actix_web::web;
 use mongodb::bson::{doc, document::Document, oid::ObjectId, Bson};
@@ -102,7 +103,19 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 .map(|(key, inst)| inst)
                 .collect(),
         },
-        divergences: doc.divergences,
+        //divergences: doc.divergences,
+        divergences: CompactDivergences {
+            divergences: doc
+                .divergences
+                .divergences
+                .into_iter()
+                .enumerate()
+                .map(|(key, inst)| CompactDivergence {
+                    indicator: inst.indicator,
+                    divergence_type: inst.divergence_type,
+                })
+                .collect(),
+        },
     };
     Ok(doc)
 }

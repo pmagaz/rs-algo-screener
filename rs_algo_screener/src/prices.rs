@@ -32,6 +32,10 @@ pub fn price_is_lower_low_band_bottom(data: &DataPoints, close: &Vec<f64>) -> (b
 pub fn calculate_price_change(data_points: &DataPoints) -> f64 {
     percentage_change(data_points[4].1, data_points[3].1).abs()
 }
+//FIXME
+pub fn calculate_price_target(data_points: &DataPoints) -> f64 {
+    percentage_change(data_points[4].1, data_points[3].1).abs()
+}
 
 pub fn search_price_break(
     band: Vec<(usize, f64)>,

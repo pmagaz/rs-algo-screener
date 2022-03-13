@@ -9,7 +9,7 @@ pub fn maxima_minima(
     max_value: &f64,
 ) -> Result<Vec<(usize, f64)>> {
     let prominence = max_value * min_prominence;
-    let min_distance = env::var("MARKERS_DISTANCE")
+    let min_distance = env::var("PROMINENCE_MIN_DISTANCE")
         .unwrap()
         .parse::<usize>()
         .unwrap();

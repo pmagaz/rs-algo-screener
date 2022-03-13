@@ -1,7 +1,8 @@
 use crate::helpers::comp::percentage_change;
 use crate::patterns::*;
-use crate::prices::calculate_price_change;
+use crate::prices::{calculate_price_change, calculate_price_target};
 
+use rs_algo_shared::helpers::date::Local;
 pub use rs_algo_shared::models::*;
 
 use serde::{Deserialize, Serialize};
@@ -253,6 +254,8 @@ impl Patterns {
                             PatternActive {
                                 active: false,
                                 completed: true,
+                                date: Local::now(),
+                                timestamp: Local::now().timestamp(),
                                 target: 0.,
                                 change: 0.,
                                 index: 0,
@@ -274,6 +277,8 @@ impl Patterns {
                 PatternActive {
                     active: false,
                     completed: true,
+                    date: Local::now(),
+                    timestamp: Local::now().timestamp(),
                     target: 0.,
                     change: 0.,
                     index: 0,
@@ -377,19 +382,21 @@ impl Patterns {
 
 pub fn pattern_active_result(
     data: &DataPoints,
-    top: (bool, usize, f64),
-    bottom: (bool, usize, f64),
+    top: PatternActiveResult,
+    bottom: PatternActiveResult,
 ) -> PatternActive {
     let (top_result, top_id, top_price) = top;
     let (bottom_result, bottom_id, bottom_price) = bottom;
     let price_change = calculate_price_change(&data);
-    let price_target = 0.;
+    let price_target = calculate_price_target(&data);
     if top_result {
         PatternActive {
             active: true,
             completed: false,
             index: top_id,
             price: top_price,
+            date: Local::now(),
+            timestamp: Local::now().timestamp(),
             change: price_change,
             target: price_target,
             break_direction: PatternDirection::Top,
@@ -399,6 +406,8 @@ pub fn pattern_active_result(
             active: true,
             completed: false,
             index: bottom_id,
+            date: Local::now(),
+            timestamp: Local::now().timestamp(),
             price: bottom_price,
             change: price_change,
             target: price_target,
@@ -409,6 +418,8 @@ pub fn pattern_active_result(
             active: false,
             completed: false,
             index: 0,
+            date: Local::now(),
+            timestamp: Local::now().timestamp(),
             price: 0.,
             change: 0.,
             target: 0.,
