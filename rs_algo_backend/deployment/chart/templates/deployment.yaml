@@ -16,7 +16,6 @@ spec:
       {{- with .Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
-        timestamp: {{ now | quote }}
       {{- end }}
       labels:
         {{- include "rs-algo-backend.selectorLabels" . | nindent 8 }}

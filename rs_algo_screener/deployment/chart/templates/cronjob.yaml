@@ -17,8 +17,6 @@ spec:
     spec:
       template:
         metadata:
-          annotations:
-            timestamp: {{ now | quote }}
           labels:
             app: {{ $release_name }}
             cron: {{ $job.name }}
