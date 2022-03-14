@@ -1,10 +1,10 @@
 jobs:
-  - name: scanner
+  - name: rs-algo-screener
     image:
       repository: pmagaz/rs-algo-screener
       tag: latest
       imagePullPolicy: Always
-    schedule: "27 19 * * *"
+    schedule: "30 19 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
