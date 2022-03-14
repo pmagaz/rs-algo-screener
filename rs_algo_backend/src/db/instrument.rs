@@ -36,14 +36,13 @@ pub async fn find_by_params(
     Ok(docs)
 }
 
-pub async fn insert(
+pub async fn insert_compact(
     mut doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &env::var("DATABASE_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
-    doc.updated = Local::now().to_string();
     collection
         .find_one_and_replace(
             doc! { "symbol": doc.symbol.clone() },
@@ -55,23 +54,13 @@ pub async fn insert(
         .await
 }
 
-pub async fn insert_long(
-    mut doc: CompactInstrument,
+pub async fn insert(
+    doc: &Instrument,
     state: &web::Data<AppState>,
-) -> Result<Option<CompactInstrument>, Error> {
+) -> Result<Option<Instrument>, Error> {
     let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
-    let collection = get_collection::<CompactInstrument>(state, collection_name).await;
-    // collection
-    //     .find_one_and_update(
-    //         doc! { "symbol": doc.symbol },
-    //         UpdateModifications::Document(doc! { "updated": Local::now().to_string() }),
-    //         FindOneAndUpdateOptions::builder()
-    //             .upsert(Some(true))
-    //             .build(),
-    //     )
-    //     .await
+    let collection = get_collection::<Instrument>(state, collection_name).await;
 
-    doc.updated = Local::now().to_string();
     collection
         .find_one_and_replace(
             doc! { "symbol": doc.symbol.clone() },

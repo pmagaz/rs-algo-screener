@@ -20,16 +20,16 @@ pub async fn post(params: String, state: web::Data<AppState>) -> Result<HttpResp
 }
 
 pub async fn put(
-    instrument: web::Json<Instrument>,
+    instrument: String,
+    //instrument: web::Json<Instrument>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
-    let symbol = instrument.symbol.clone();
-
+    let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let now = Instant::now();
-    let _insert_compact =
-        db::instrument::insert(compact_instrument(instrument.clone()).unwrap(), &state)
-            .await
-            .unwrap();
+    let symbol = instrument.symbol.clone();
+    instrument.updated = Local::now().to_string();
+
+    let _insert_result = db::instrument::insert(&instrument, &state).await.unwrap();
 
     println!(
         "[INSTRUMENT INSERTED] {:?} at {:?} in {:?}",
@@ -38,16 +38,18 @@ pub async fn put(
         now.elapsed()
     );
 
-    // let now = Instant::now();
+    let _insert_compact =
+        db::instrument::insert_compact(compact_instrument(instrument).unwrap(), &state)
+            .await
+            .unwrap();
 
-    // let _insert_result = db::instrument::insert(instrument, &state).await.unwrap();
-
-    // println!(
-    //     "[INSERTED] {:?} at {:?} in {:?}",
-    //     symbol,
-    //     Local::now(),
-    //     now.elapsed()
-    // );
+    println!(
+        "[COMPACT INSTRUMENT INSERTED] {:?} at {:?} in {:?}",
+        symbol,
+        Local::now(),
+        now.elapsed()
+    );
+    let now = Instant::now();
 
     Ok(HttpResponse::Ok().json("ok"))
 }
