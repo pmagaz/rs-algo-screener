@@ -62,40 +62,48 @@ async fn main() -> Result<()> {
     //     currency: "".to_owned(),
     // }];
 
+    let ignore_list: Vec<String> = env::var("SYMBOL_IGNORE_LIST")
+        .unwrap()
+        .split('@')
+        .map(|x| x.to_owned())
+        .collect();
+
     for s in symbols {
         let now = Instant::now();
-        screener
-            .get_instrument_data(
-                &s.symbol,
-                time_frame.clone(),
-                from,
-                |instrument: Instrument| async move {
-                    println!(
-                        "[INSTRUMENT] {:?} processed in {:?}",
-                        &instrument.symbol(),
-                        now.elapsed()
-                    );
+        if !ignore_list.contains(&s.symbol) {
+            screener
+                .get_instrument_data(
+                    &s.symbol,
+                    time_frame.clone(),
+                    from,
+                    |instrument: Instrument| async move {
+                        println!(
+                            "[INSTRUMENT] {:?} processed in {:?}",
+                            &instrument.symbol(),
+                            now.elapsed()
+                        );
 
-                    let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
-                    let now = Instant::now();
+                        let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
+                        let now = Instant::now();
 
-                    let res = request::<Instrument>(&endpoint, &instrument, HttpMethod::Put)
-                        .await
-                        .map_err(|_e| RsAlgoErrorKind::RequestError)?;
+                        let res = request::<Instrument>(&endpoint, &instrument, HttpMethod::Put)
+                            .await
+                            .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
-                    println!(
-                        "[RESPONSE] {:?} status {:?} at {:?} in {:?}",
-                        &instrument.symbol(),
-                        res.status(),
-                        Local::now(),
-                        now.elapsed()
-                    );
+                        println!(
+                            "[RESPONSE] {:?} status {:?} at {:?} in {:?}",
+                            &instrument.symbol(),
+                            res.status(),
+                            Local::now(),
+                            now.elapsed()
+                        );
 
-                    Ok(())
-                },
-            )
-            .await?;
-        thread::sleep(sleep);
+                        Ok(())
+                    },
+                )
+                .await?;
+            thread::sleep(sleep);
+        }
     }
 
     println!("[Finished] at {:?}  in {:?}", Local::now(), start.elapsed());
