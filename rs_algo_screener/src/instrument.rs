@@ -142,6 +142,7 @@ impl Instrument {
             .collect();
 
         //FIXME [INSTRUMENT]  "RIDE.US"
+        let parsed_len = parsed.len();
         self.set_current_price(parsed.last().unwrap().close());
         self.peaks.calculate_peaks(&self.max_price).unwrap();
 
