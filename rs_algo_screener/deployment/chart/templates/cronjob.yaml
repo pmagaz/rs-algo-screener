@@ -19,7 +19,7 @@ spec:
         metadata:
           annotations:
             timestamp: {{ now | quote }}
-            checksum/configmap: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
+            #checksum/configmap: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
           labels:
             app: {{ $release_name }}
             cron: {{ $job.name }}
