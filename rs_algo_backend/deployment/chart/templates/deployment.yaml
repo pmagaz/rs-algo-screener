@@ -17,7 +17,6 @@ spec:
       annotations:
         {{- toYaml . | nindent 8 }}
         timestamp: {{ now | quote }}
-        #checksum/configmap: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
       {{- end }}
       labels:
         {{- include "rs-algo-backend.selectorLabels" . | nindent 8 }}
