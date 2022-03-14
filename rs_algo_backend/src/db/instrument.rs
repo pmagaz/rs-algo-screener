@@ -40,7 +40,7 @@ pub async fn insert(
     mut doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = &env::var("DATABASE_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
+    let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
     collection
@@ -58,7 +58,7 @@ pub async fn insert_detail(
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &env::var("DATABASE_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
     let collection = get_collection::<Instrument>(state, collection_name).await;
 
     collection
