@@ -15,10 +15,7 @@ serviceAccount:
   annotations: {}
   name: ""
 
-podAnnotations:
-  metadata:
-      annotations:
-          timestamp: {{ now | quote }}
+podAnnotations: {}
 
 podSecurityContext:
   fsGroup: 1000
