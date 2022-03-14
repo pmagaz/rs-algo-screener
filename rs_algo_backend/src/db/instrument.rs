@@ -36,11 +36,11 @@ pub async fn find_by_params(
     Ok(docs)
 }
 
-pub async fn insert_compact(
+pub async fn insert(
     mut doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = &env::var("DATABASE_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
+    let collection_name = &env::var("DATABASE_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
     collection
@@ -54,7 +54,7 @@ pub async fn insert_compact(
         .await
 }
 
-pub async fn insert(
+pub async fn insert_detail(
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {

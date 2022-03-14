@@ -9,18 +9,18 @@ use actix_web::{web, HttpResponse};
 use rs_algo_shared::helpers::date::Local;
 use std::env;
 
-pub async fn post(params: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+pub async fn find(params: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
-    let compact_instruments = db::instrument::find_by_params(&state, params)
+    let instruments = db::instrument::find_by_params(&state, params)
         .await
         .unwrap();
 
-    println!("[POST] {:?} {:?}", Local::now(), now.elapsed());
+    println!("[FIND] {:?} {:?}", Local::now(), now.elapsed());
 
-    Ok(HttpResponse::Ok().json(compact_instruments))
+    Ok(HttpResponse::Ok().json(instruments))
 }
 
-pub async fn put(
+pub async fn upsert(
     instrument: String,
     //instrument: web::Json<Instrument>,
     state: web::Data<AppState>,
@@ -29,6 +29,26 @@ pub async fn put(
     let symbol = instrument.symbol.clone();
     instrument.updated = Local::now().to_string();
 
+    let insert_instruments_detail = env::var("INSERT_INSTRUMENTS_DETAIL")
+        .unwrap()
+        .parse::<bool>()
+        .unwrap();
+
+    if insert_instruments_detail {
+        let now = Instant::now();
+
+        let _insert_result = db::instrument::insert_detail(&instrument, &state)
+            .await
+            .unwrap();
+
+        println!(
+            "[INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
+            symbol,
+            Local::now(),
+            now.elapsed()
+        );
+    }
+
     let insert_instruments = env::var("INSERT_INSTRUMENTS")
         .unwrap()
         .parse::<bool>()
@@ -36,31 +56,13 @@ pub async fn put(
 
     if insert_instruments {
         let now = Instant::now();
-
-        let _insert_result = db::instrument::insert(&instrument, &state).await.unwrap();
-
-        println!(
-            "[INSTRUMENT INSERTED] {:?} at {:?} in {:?}",
-            symbol,
-            Local::now(),
-            now.elapsed()
-        );
-    }
-
-    let insert_compact_instruments = env::var("INSERT_COMPACT_INSTRUMENTS")
-        .unwrap()
-        .parse::<bool>()
-        .unwrap();
-
-    if insert_compact_instruments {
-        let now = Instant::now();
         let _insert_compact =
-            db::instrument::insert_compact(compact_instrument(instrument).unwrap(), &state)
+            db::instrument::insert(compact_instrument(instrument).unwrap(), &state)
                 .await
                 .unwrap();
 
         println!(
-            "[COMPACT INSTRUMENT INSERTED] {:?} at {:?} in {:?}",
+            "[INSTRUMENT DETAIL UPSERTED] {:?} at {:?} in {:?}",
             symbol,
             Local::now(),
             now.elapsed()
