@@ -89,7 +89,7 @@ impl Instrument {
         &mut self,
         data: Vec<(DateTime<Local>, f64, f64, f64, f64, f64)>,
     ) -> Result<()> {
-        let parsed: Vec<Candle> = data
+        let candles: Vec<Candle> = data
             .iter()
             .enumerate()
             .map(|(id, x)| {
@@ -141,44 +141,44 @@ impl Instrument {
             })
             .collect();
 
-        //FIXME [INSTRUMENT]  "RIDE.US"
-        self.set_current_price(parsed.last().unwrap().close());
+        if candles.len() > 0 {
+            self.set_current_price(candles.last().unwrap().close());
 
-        self.peaks.calculate_peaks(&self.max_price).unwrap();
-        let local_maxima = self.peaks.local_maxima();
-        let local_minima = self.peaks.local_minima();
+            self.peaks.calculate_peaks(&self.max_price).unwrap();
+            let local_maxima = self.peaks.local_maxima();
+            let local_minima = self.peaks.local_minima();
 
-        let extrema_maxima = self.peaks.extrema_maxima();
-        let extrema_minima = self.peaks.extrema_minima();
+            let extrema_maxima = self.peaks.extrema_maxima();
+            let extrema_minima = self.peaks.extrema_minima();
 
-        self.patterns.detect_pattern(
-            PatternSize::Local,
-            local_maxima,
-            local_minima,
-            &self.peaks.close,
-        );
+            self.patterns.detect_pattern(
+                PatternSize::Local,
+                local_maxima,
+                local_minima,
+                &self.peaks.close,
+            );
 
-        self.patterns.detect_pattern(
-            PatternSize::Extrema,
-            extrema_maxima,
-            extrema_minima,
-            &self.peaks.close,
-        );
+            self.patterns.detect_pattern(
+                PatternSize::Extrema,
+                extrema_maxima,
+                extrema_minima,
+                &self.peaks.close,
+            );
 
-        self.horizontal_levels
-            .calculate_horizontal_highs(&self.current_price, &self.peaks)
-            .unwrap();
+            self.horizontal_levels
+                .calculate_horizontal_highs(&self.current_price, &self.peaks)
+                .unwrap();
 
-        self.horizontal_levels
-            .calculate_horizontal_lows(&self.current_price, &self.peaks)
-            .unwrap();
-        self.data = parsed;
+            self.horizontal_levels
+                .calculate_horizontal_lows(&self.current_price, &self.peaks)
+                .unwrap();
+            self.data = candles;
 
-        self.divergences
-            .calculate(&self.indicators, self.peaks.local_maxima());
+            self.divergences
+                .calculate(&self.indicators, self.peaks.local_maxima());
 
-        self.current_candle = self.current_candle().candle_type().clone();
-
+            self.current_candle = self.current_candle().candle_type().clone();
+        }
         Ok(())
     }
 }
