@@ -13,7 +13,6 @@ WORKDIR ./$APP_NAME
 COPY Cargo.toml ./
 RUN cargo build --release
 RUN rm src/*.rs
-COPY ./DejaVuSans.ttf ./
 
 ADD . ./
 RUN rm ./target/$TARGET/release/deps/$APP_NAME*
@@ -27,9 +26,7 @@ ARG TARGET
 ARG APP_DIR=/usr/src/$APP_NAME
 EXPOSE 8000
 ENV TZ=CET \
-  APP_USER=appuser \
-  LANG=en_GB.UTF-8 \
-  LD_LIBRARY_PATH=/usr/lib
+  APP_USER=appuser 
 
 RUN addgroup -S $APP_USER \
   && adduser -S -g $APP_USER $APP_USER
@@ -38,12 +35,10 @@ RUN apk update \
   && apk add tzdata \
   && rm -rf /var/cache/apk/*
 
+COPY ./DejaVuSans.ttf ./
 RUN mkdir -p /usr/share/fonts/truetype/
 RUN install -m644 DejaVuSans.ttf /usr/share/fonts/truetype/
-
-# RUN ln -s /usr/lib/libfontconfig.so.1 /usr/lib/libfontconfig.so && \
-#   ln -s /lib/libuuid.so.1 /usr/lib/libuuid.so.1 && \
-#   ln -s /lib/libc.musl-aarch64.so.1 /usr/lib/libc.musl-aarch64.so.1
+ENV FONTCONFIG_PATH=/etc/fonts
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
 
