@@ -14,6 +14,9 @@ impl Backend {
     pub fn render(&self, instrument: &Instrument) -> Result<()> {
         let to_date = instrument.data.last().unwrap().date;
         let from_date = instrument.data.first().unwrap().date;
+
+        let font = env::var("PLOTTER_FONT").unwrap();
+
         let peaks_marker_distance = env::var("MARKERS_DISTANCE")
             .unwrap()
             .parse::<f64>()
@@ -76,7 +79,7 @@ impl Backend {
             .x_label_area_size(40)
             .y_label_area_size(40)
             .margin(5)
-            .caption(&instrument.symbol, ("sans-serif", 14.0).into_font())
+            .caption(&instrument.symbol, (font.as_ref(), 14.0).into_font())
             .build_cartesian_2d(from_date..to_date, min_price..max_price)
             .unwrap();
 
@@ -131,10 +134,10 @@ impl Backend {
         //                     pattern_name = Text::new(
         //                         format!("{:?}", pattern.pattern_type),
         //                         (0, 0),
-        //                         ("sans-serif", 15),
+        //                         (font.as_ref(), 15),
         //                     )
         //                 } else {
-        //                     pattern_name = Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
+        //                     pattern_name = Text::new(format!("{:?}", ""), (0, 15), (font.as_ref(), 0))
         //                 }
 
         //                 EmptyElement::at(new_coord) + pattern_name
@@ -176,11 +179,11 @@ impl Backend {
                             pattern_name = Text::new(
                                 format!("{:?}", pattern.pattern_type),
                                 (0, 0),
-                                ("sans-serif", 15),
+                                (font.as_ref(), 15),
                             )
                         } else {
                             pattern_name =
-                                Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
+                                Text::new(format!("{:?}", ""), (0, 15), (font.as_ref(), 0))
                         }
 
                         EmptyElement::at(new_coord) + pattern_name
@@ -558,7 +561,7 @@ impl Backend {
             .x_label_area_size(40)
             .y_label_area_size(40)
             //.margin(2)
-            //.caption("RSI", ("sans-serif", 8.0).into_font())
+            //.caption("RSI", (font.as_ref(), 8.0).into_font())
             .build_cartesian_2d(from_date..to_date, -0f64..100f64)
             .unwrap();
 
@@ -604,7 +607,7 @@ impl Backend {
             .x_label_area_size(40)
             .y_label_area_size(40)
             // .margin(2)
-            //.caption("MACD", ("sans-serif", 8.0).into_font())
+            //.caption("MACD", (font.as_ref(), 8.0).into_font())
             .build_cartesian_2d(from_date..to_date, -0f64..100f64)
             .unwrap();
         //stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
@@ -630,7 +633,7 @@ impl Backend {
             .x_label_area_size(40)
             .y_label_area_size(40)
             //.margin(2)
-            //.caption("STOCH", ("sans-serif", 8.0).into_font())
+            //.caption("STOCH", (font.as_ref(), 8.0).into_font())
             .build_cartesian_2d(from_date..to_date, -10f64..10f64)
             .unwrap();
         // stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
