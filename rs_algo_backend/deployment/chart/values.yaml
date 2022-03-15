@@ -5,10 +5,19 @@ image:
   pullPolicy: Always 
   tag: "latest"
 
-envSecretName: rs-algo-screener-secrets
-
 imagePullSecrets:
  - name: docker-credentials 
+
+volumeMounts:
+- name: data
+  mountPath: /data/
+
+volumes:
+- name: data
+  emptyDir:
+      medium: Memory
+
+envSecretName: rs-algo-screener-secrets
 
 serviceAccount:
   create: true
@@ -58,6 +67,7 @@ resources:
     cpu: 1800m
   limits:
     cpu: 2000m
+    ephemeral-storage: 256Mi 
     memory: 256Mi
 
 

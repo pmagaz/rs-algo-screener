@@ -5,6 +5,9 @@ image:
   pullPolicy: "IfNotPresent" 
   tag: "4.4.12"
 
+imagePullSecrets:
+ - name: docker-credentials 
+
 volumeMounts:
 - name: data
   mountPath: /data/db
@@ -15,9 +18,6 @@ volumes:
       medium: Memory
 
 envSecretName: rs-algo-screener-secrets
-
-imagePullSecrets:
- - name: docker-credentials 
 
 serviceAccount:
   create: true

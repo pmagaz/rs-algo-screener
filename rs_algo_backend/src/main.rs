@@ -3,6 +3,7 @@ use dotenv::dotenv;
 
 use std::io::Result;
 
+mod backend;
 mod db;
 mod error;
 mod helpers;
@@ -47,6 +48,7 @@ async fn main() -> Result<()> {
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")
+                    .route("/instruments", web::get().to(instrument::render))
                     .route("/instruments", web::post().to(instrument::find))
                     .route("/instruments", web::put().to(instrument::upsert)),
             )

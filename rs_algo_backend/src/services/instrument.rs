@@ -1,13 +1,43 @@
+use crate::backend::Backend;
 use crate::db;
 use crate::db::helpers::{compact_instrument, get_collection};
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::models::instrument::Instrument;
+use crate::models::Instrument;
 use std::time::Instant;
 
 use actix_web::{web, HttpResponse};
 use rs_algo_shared::helpers::date::Local;
+use serde::{Deserialize, Serialize};
 use std::env;
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+pub struct SymbolQuery {
+    pub symbol: String,
+}
+
+pub async fn render(
+    query: web::Query<SymbolQuery>,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+
+    let instrument = db::instrument::find_by_symbol(&query.symbol, &state)
+        .await
+        .unwrap()
+        .unwrap();
+    let backend = Backend::new();
+    let _output = backend.render(&instrument);
+
+    println!(
+        "[RENDER] {:?} {:?} {:?}",
+        instrument.symbol,
+        Local::now(),
+        now.elapsed()
+    );
+
+    Ok(HttpResponse::Ok().json(instrument))
+}
 
 pub async fn find(params: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();

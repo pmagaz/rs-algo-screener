@@ -10,20 +10,38 @@ use actix_web::web;
 use bson::{doc, Document};
 use futures::stream::StreamExt;
 use mongodb::error::Error;
-use mongodb::options::{FindOneAndReplaceOptions, FindOptions};
+use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
 use std::env;
+
+pub async fn find_by_symbol(
+    symbol: &str,
+    state: &web::Data<AppState>,
+) -> Result<Option<Instrument>, Error> {
+    let collection_name = &env::var("DB_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
+    let collection = get_collection::<Instrument>(state, collection_name).await;
+
+    let instrument = collection
+        .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
+        .await
+        .unwrap();
+
+    Ok(instrument)
+}
 
 pub async fn find_by_params(
     state: &web::Data<AppState>,
     params: String,
 ) -> Result<Vec<CompactInstrument>, Error> {
-    let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
 
     println!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
     let filter: Document = serde_json::from_str(&params).unwrap();
-    let find_options = FindOptions::builder().build();
-    let mut cursor = collection.find(filter, find_options).await.unwrap();
+    let mut cursor = collection
+        .find(filter, FindOptions::builder().build())
+        .await
+        .unwrap();
+
     let mut docs: Vec<CompactInstrument> = vec![];
     while let Some(result) = cursor.next().await {
         match result {
@@ -40,7 +58,7 @@ pub async fn insert(
     mut doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = &env::var("DATABASE_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
     collection
@@ -58,7 +76,7 @@ pub async fn insert_detail(
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = &env::var("DATABASE_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
     let collection = get_collection::<Instrument>(state, collection_name).await;
 
     collection
