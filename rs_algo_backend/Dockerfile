@@ -40,10 +40,10 @@ RUN apk update \
   && rm -rf /var/cache/apk/*
 
 RUN ln -s /usr/lib/libfontconfig.so.1 /usr/lib/libfontconfig.so && \
-  #ln -s /lib/libuuid.so.1 /usr/lib/libuuid.so.1 && \
-  #ln -s /lib/libc.musl-aarch64.so.1 /usr/lib/libc.musl-aarch64.so.1
+  ln -s /lib/libuuid.so.1 /usr/lib/libuuid.so.1 && \
+  ln -s /lib/libc.musl-aarch64.so.1 /usr/lib/libc.musl-aarch64.so.1
 
-  COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
+COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
 
 RUN chown -R $APP_USER:$APP_USER ${APP_DIR}
 
