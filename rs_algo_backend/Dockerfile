@@ -33,6 +33,7 @@ RUN addgroup -S $APP_USER \
 
 RUN apk update \
   && apk add --no-cache tzdata\
+  && apk fontconfig ttf-dejavu\ 
   && rm -rf /var/cache/apk/*
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
