@@ -13,7 +13,7 @@ WORKDIR ./$APP_NAME
 COPY Cargo.toml ./
 RUN cargo build --release
 RUN rm src/*.rs
-COPY ./dejavu-sans.ttf ./
+COPY ./DejaVuSans.ttf ./
 
 ADD . ./
 RUN rm ./target/$TARGET/release/deps/$APP_NAME*
