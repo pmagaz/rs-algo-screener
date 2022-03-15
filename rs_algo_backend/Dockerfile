@@ -13,6 +13,7 @@ WORKDIR ./$APP_NAME
 COPY Cargo.toml ./
 RUN cargo build --release
 RUN rm src/*.rs
+COPY ./dejavu-sans.ttf ./
 
 ADD . ./
 RUN rm ./target/$TARGET/release/deps/$APP_NAME*
@@ -35,13 +36,14 @@ RUN addgroup -S $APP_USER \
 
 RUN apk update \
   && apk add tzdata \
-  && apk add fontconfig \
-  && apk add ttf-dejavu \ 
   && rm -rf /var/cache/apk/*
 
-RUN ln -s /usr/lib/libfontconfig.so.1 /usr/lib/libfontconfig.so && \
-  ln -s /lib/libuuid.so.1 /usr/lib/libuuid.so.1 && \
-  ln -s /lib/libc.musl-aarch64.so.1 /usr/lib/libc.musl-aarch64.so.1
+RUN mkdir -p /usr/share/fonts/truetype/
+RUN install -m644 DejaVuSans.ttf /usr/share/fonts/truetype/
+
+# RUN ln -s /usr/lib/libfontconfig.so.1 /usr/lib/libfontconfig.so && \
+#   ln -s /lib/libuuid.so.1 /usr/lib/libuuid.so.1 && \
+#   ln -s /lib/libc.musl-aarch64.so.1 /usr/lib/libc.musl-aarch64.so.1
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
 
