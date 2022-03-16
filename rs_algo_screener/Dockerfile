@@ -26,7 +26,7 @@ ARG TARGET
 ARG APP_DIR=/usr/src/$APP_NAME
 #EXPOSE 8000
 ENV TZ=Etc/UTC \
-  APP_USER=appuser
+  APP_USER=dev
 
 RUN addgroup -S $APP_USER \
   && adduser -S -g $APP_USER $APP_USER

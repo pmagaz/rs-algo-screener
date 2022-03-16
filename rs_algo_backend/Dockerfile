@@ -41,18 +41,20 @@ RUN addgroup -S $APP_USER \
   && adduser -S -g $APP_USER $APP_USER \
   && echo '%wheel ALL=(ALL) ALL' >> \
   /etc/sudoers.d/wheel \
-  && adduser $APP_USER wheel \
-  && chown -R $APP_USER:$APP_USER ${APP_DIR}
+  && adduser $APP_USER wheel
 
 #FONT
 ENV FONTCONFIG_PATH=/etc/fonts
-# COPY ./DejaVuSans.ttf ./
-# RUN mkdir -p /usr/share/fonts/truetype/
-# RUN install -m644 DejaVuSans.ttf /usr/share/fonts/truetype/
+COPY ./OpenSans/OpenSans-Light.ttf ./
+RUN mkdir -p /usr/share/fonts/truetype/
+RUN install -m644 OpenSans-Light.ttf /usr/share/fonts/truetype/
 COPY ./fonts.conf ./
 RUN sudo mv fonts.conf /etc/fonts/
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
+
+RUN chown -R $APP_USER:$APP_USER ${APP_DIR}
+
 
 USER $APP_USER
 WORKDIR ${APP_DIR}
