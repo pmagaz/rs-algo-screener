@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../rs_algo_shared"
+		}
+	],
+	"settings": {}
+}
