@@ -49,12 +49,14 @@ COPY ./OpenSans/OpenSans-Light.ttf ./
 RUN mkdir -p /usr/share/fonts/truetype/
 RUN install -m644 OpenSans-Light.ttf /usr/share/fonts/truetype/
 COPY ./fonts.conf ./
+COPY fonts.conf /usr/share/fontconfig/conf.avail/99-webfont-mapping.conf
 RUN sudo mv fonts.conf /etc/fonts/
+RUN sudo ln -s /usr/share/fontconfig/conf.avail/99-webfont-mapping.conf /etc/fonts/conf.d/99-webfont-mapping.conf 
+RUN fc-cache -fv
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
 
 RUN chown -R $APP_USER:$APP_USER ${APP_DIR}
-
 
 USER $APP_USER
 WORKDIR ${APP_DIR}
