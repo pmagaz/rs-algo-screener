@@ -31,8 +31,9 @@ ENV TZ=CET \
 
 #DEPENDENCIES
 RUN apk update \
-  && apk add fontconfig ttf-dejavu && \
+  && apk add fontconfig \
   && apk add su-exec sudo\
+  && apk add ttf-opensans \
   && rm -rf /var/cache/apk/*
 
 #USER
@@ -40,27 +41,18 @@ RUN addgroup -S $APP_USER \
   && adduser -S -g $APP_USER $APP_USER \
   && echo '%wheel ALL=(ALL) ALL' >> \
   /etc/sudoers.d/wheel \
-  && adduser $APP_USER wheel
+  && adduser $APP_USER wheel \
+  && chown -R $APP_USER:$APP_USER ${APP_DIR}
 
 #FONT
 ENV FONTCONFIG_PATH=/etc/fonts
-COPY ./DejaVuSans.ttf ./
-RUN mkdir -p /usr/share/fonts/truetype/
-RUN install -m644 DejaVu Sans.ttf /usr/share/fonts/truetype/
+# COPY ./DejaVuSans.ttf ./
+# RUN mkdir -p /usr/share/fonts/truetype/
+# RUN install -m644 DejaVuSans.ttf /usr/share/fonts/truetype/
 COPY ./fonts.conf ./
 RUN sudo mv fonts.conf /etc/fonts/
-# RUN sed -i '/<description/d' /etc/fonts/conf.d/*.conf
-# RUN sed -i '/its\:/d' /etc/fonts/conf.d/*.conf
-# RUN sudo mv /etc/fonts/ /etc/fonts.bak 
-# RUN find /usr/share/fonts -type f -exec sudo chmod 644 {} ;
-# RUN find ~/.fonts -type f -exec sudo chmod 644 {} ;
-# RUN sudo mv /etc/fonts.bak/ /etc/fonts
-# RUN sudo fc-cache -r -v 
-
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
-
-RUN chown -R $APP_USER:$APP_USER ${APP_DIR}
 
 USER $APP_USER
 WORKDIR ${APP_DIR}
