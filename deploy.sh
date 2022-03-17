@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 PS3='Please enter your choice: '
 options=("deploy all" "build & deploy all" "build & deploy rs-algo-backend" "build & deploy rs-algo-screener" "Quit")
 select opt in "${options[@]}"
