@@ -40,7 +40,6 @@ spec:
               name: {{ .Release.Name }}-configmap
           - secretRef:
               name: {{ .Values.envSecretName }} 
-            #name: {{ .Release.Name }}-secrets
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }} 
@@ -55,6 +54,10 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.volumes}}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
