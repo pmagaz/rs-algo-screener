@@ -28,6 +28,7 @@ impl Backend {
             ".png",
         ]
         .concat();
+        println!("BACKEND PATH {}", output_file);
         let min_price = instrument.min_price;
         let max_price = instrument.max_price;
 
@@ -39,7 +40,6 @@ impl Backend {
         // let horizontal_levels = instrument.horizontal_levels.horizontal_levels;
 
         let local_patterns = &instrument.patterns.local_patterns;
-        println!("1111111 local_patterns {:?}", local_patterns);
         let local_pattern_breaks: Vec<usize> = instrument
             .patterns
             .local_patterns

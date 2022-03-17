@@ -10,7 +10,7 @@ imagePullSecrets:
 
 volumeMounts:
 - name: data
-  mountPath: /data/
+  mountPath: /data/plotters/
 
 volumes:
 - name: data

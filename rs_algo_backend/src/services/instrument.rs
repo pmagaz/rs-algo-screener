@@ -62,6 +62,9 @@ pub async fn render(
     image_path.push(image_folder);
     image_path.push(symbol);
     image_path.push(".png");
+
+    println!("[PATH] {:?}", image_path.to_str());
+
     let file = fs::NamedFile::open(image_path).unwrap();
 
     println!(
