@@ -7,6 +7,7 @@ edition = "2021"
 [dependencies]
 actix-web = "4.0.1"
 actix-http = "3.0.2"
+actix-files = "0.6.0"
 anyhow = "1.0.56"
 thiserror = "1.0.30"
 serde = { version = "1.0.136", features = ["derive"] }
