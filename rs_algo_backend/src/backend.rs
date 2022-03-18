@@ -645,7 +645,7 @@ impl Backend {
             ))
             .unwrap();
 
-        stoch_pannel
+        macd_pannel
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
