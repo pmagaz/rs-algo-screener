@@ -10,7 +10,7 @@ jobs:
     concurrencyPolicy: Forbid
     restartPolicy: Never
     activeDeadlineSeconds: 360000
-    envSecretName: rs-algo-scanner-secrets
+    envSecretName: rs-algo-screener-secrets
     resources:
       requests:
         cpu: 800m
