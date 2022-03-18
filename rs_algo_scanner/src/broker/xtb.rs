@@ -80,7 +80,7 @@ impl Broker for Xtb {
             arguments: LoginParams {
                 userId: String::from(username),
                 password: String::from(password),
-                appName: String::from("rs-algo-screener"),
+                appName: String::from("rs-algo-scanner"),
             },
         })
         .await?;

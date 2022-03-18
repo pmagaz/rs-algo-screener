@@ -60,8 +60,7 @@ pub async fn render(
     let image_folder = &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap();
     let mut image_path = PathBuf::new();
     image_path.push(image_folder);
-    image_path.push(symbol);
-    image_path.push(".png");
+    image_path.push([symbol, ".png"].concat());
 
     println!("[PATH] {:?}", image_path.to_str());
 

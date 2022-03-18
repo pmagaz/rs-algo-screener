@@ -1,5 +1,5 @@
 apiVersion: v2
-name: rs-algo-screener
+name: rs-algo-scanner
 description: Rust Algorithmic Screener
 type: application
 version: 0.1.3

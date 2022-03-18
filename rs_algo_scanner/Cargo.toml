@@ -1,5 +1,5 @@
 [package]
-name = "rs_algo_screener"
+name = "rs_algo_scanner"
 version = "0.1.0"
 authors = ["pmagaz <magazpablo@gmail.com>"]
 edition = "2021"

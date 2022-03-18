@@ -1,4 +1,4 @@
-# rs-algo-screener
+# rs-algo-scanner
 
 ## Rust algorithmic stock screener
 

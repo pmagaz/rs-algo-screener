@@ -1,5 +1,5 @@
 # GLOBAL VARS
-ARG APP_NAME=rs_algo_screener
+ARG APP_NAME=rs_algo_scanner
 ARG TARGET=aarch64-unknown-linux-musl
 # BUILDER
 FROM messense/rust-musl-cross:aarch64-musl as builder
@@ -41,4 +41,4 @@ RUN chown -R $APP_USER:$APP_USER ${APP_DIR}
 
 USER $APP_USER
 WORKDIR ${APP_DIR}
-CMD ["./rs_algo_screener"]
+CMD ["./rs_algo_scanner"]

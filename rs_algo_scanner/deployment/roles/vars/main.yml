@@ -1,4 +1,4 @@
-package_name: rs_algo_backend
-release_name: rs-algo-backend
+package_name: rs_algo_scanner
+release_name: rs-algo-scanner
 local_path: /home/dev/rs-algo-scanner
 chart_path: deployment/chart

@@ -17,7 +17,7 @@ volumes:
   emptyDir:
       medium: Memory
 
-envSecretName: rs-algo-screener-secrets
+envSecretName: rs-algo-scanner-secrets
 
 serviceAccount:
   create: true

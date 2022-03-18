@@ -1,7 +1,7 @@
 jobs:
-  - name: rs-algo-screener
+  - name: rs-algo-scanner
     image:
-      repository: pmagaz/rs-algo-screener
+      repository: pmagaz/rs-algo-scanner
       tag: latest
       imagePullPolicy: Always
     schedule: "50 19 * * *"
@@ -10,7 +10,7 @@ jobs:
     concurrencyPolicy: Forbid
     restartPolicy: Never
     activeDeadlineSeconds: 360000
-    envSecretName: rs-algo-screener-secrets
+    envSecretName: rs-algo-scanner-secrets
     resources:
       requests:
         cpu: 800m

@@ -1,13 +1,13 @@
 #!/bin/sh
 set -e
 PS3='Please enter your choice: '
-options=("deploy all" "build & deploy all" "build & deploy rs-algo-backend" "build & deploy rs-algo-screener" "Quit")
+options=("deploy all" "build & deploy all" "build & deploy rs-algo-backend" "build & deploy rs-algo-scanner" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
         "build & deploy all")
             echo "Deploying: $opt";
-            docker login ; docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; docker build -t pmagaz/rs-algo-screener:latest rs_algo_screener ; docker push pmagaz/rs-algo-screener:latest ; ansible-playbook playbook.yml  
+            docker login ; docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; ansible-playbook playbook.yml  
             break
             ;;
         "deploy all")
@@ -20,9 +20,9 @@ do
             docker login ;  docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; ansible-playbook playbook.yml 
             break
             ;;
-        "build & deploy rs-algo-screener")
+        "build & deploy rs-algo-scanner")
             echo "Deploying: $opt";
-            docker login ; docker build -t pmagaz/rs-algo-screener:latest rs_algo_screener ; docker push pmagaz/rs-algo-screener:latest ; ansible-playbook playbook.yml 
+            docker login ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; ansible-playbook playbook.yml 
             break
             ;;
         "Quit")

@@ -70,8 +70,7 @@ impl Backend {
 
         let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
         let (upper, lower) = root.split_vertically((75).percent());
-        let (lower_2, lower_1) = lower.split_vertically((70).percent());
-        let (indicator_1, indicator_2) = lower_2.split_vertically((50).percent());
+        let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
         root.fill(&WHITE).unwrap();
 
@@ -99,7 +98,7 @@ impl Backend {
                 };
 
                 let (bullish, bearish) = match candle.candle_type {
-                    CandleType::Engulfing => (BLUE.filled(), BLUE.filled()),
+                    CandleType::Engulfing => candle_color,
                     _ => candle_color,
                 };
 
@@ -557,13 +556,13 @@ impl Backend {
             }))
             .unwrap();
 
-        let mut rsi_pannel = ChartBuilder::on(&lower_1)
-            .x_label_area_size(40)
-            .y_label_area_size(40)
-            //.margin(2)
-            //.caption("RSI", (font.as_ref(), 8.0).into_font())
-            .build_cartesian_2d(from_date..to_date, -0f64..100f64)
-            .unwrap();
+        // let mut rsi_pannel = ChartBuilder::on(&lower_1)
+        //     .x_label_area_size(40)
+        //     .y_label_area_size(40)
+        //     //.margin(2)
+        //     //.caption("RSI", (font.as_ref(), 8.0).into_font())
+        //     .build_cartesian_2d(from_date..to_date, -0f64..100f64)
+        //     .unwrap();
 
         // INDICATORS
 
@@ -594,14 +593,14 @@ impl Backend {
             ))
             .unwrap();
 
-        rsi_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, rsi[id])),
-                &RED,
-            ))
-            .unwrap();
+        // rsi_pannel
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date, rsi[id])),
+        //         &RED,
+        //     ))
+        //     .unwrap();
 
         let mut stoch_pannel = ChartBuilder::on(&indicator_1)
             .x_label_area_size(40)
@@ -629,15 +628,15 @@ impl Backend {
             ))
             .unwrap();
 
-        let mut stoch_pannel = ChartBuilder::on(&indicator_2)
+        let min = macd_a.iter().map(|x| *x as usize).min().unwrap() as f64;
+        let max = macd_a.iter().map(|x| *x as usize).max().unwrap() as f64;
+        let mut macd_pannel = ChartBuilder::on(&indicator_2)
             .x_label_area_size(40)
             .y_label_area_size(40)
-            //.margin(2)
-            //.caption("STOCH", (font.as_ref(), 8.0).into_font())
-            .build_cartesian_2d(from_date..to_date, -10f64..10f64)
+            .build_cartesian_2d(from_date..to_date, min..max)
             .unwrap();
-        // stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
-        stoch_pannel
+
+        macd_pannel
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
@@ -655,7 +654,7 @@ impl Backend {
             ))
             .unwrap();
 
-        root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");
+        root.present().expect("[BACKEND] Error. Can't save file!");
         println!("[BACKEND] File saved in {}", output_file);
         Ok(())
     }

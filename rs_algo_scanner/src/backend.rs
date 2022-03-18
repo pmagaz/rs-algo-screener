@@ -68,8 +68,7 @@ impl Backend {
 
         let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
         let (upper, lower) = root.split_vertically((75).percent());
-        let (lower_2, lower_1) = lower.split_vertically((70).percent());
-        let (indicator_1, indicator_2) = lower_2.split_vertically((50).percent());
+        let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
         root.fill(&WHITE).unwrap();
 
@@ -555,13 +554,13 @@ impl Backend {
             }))
             .unwrap();
 
-        let mut rsi_pannel = ChartBuilder::on(&lower_1)
-            .x_label_area_size(40)
-            .y_label_area_size(40)
-            //.margin(2)
-            //.caption("RSI", ("sans-serif", 8.0).into_font())
-            .build_cartesian_2d(from_date..to_date, -0f64..100f64)
-            .unwrap();
+        // let mut rsi_pannel = ChartBuilder::on(&lower_1)
+        //     .x_label_area_size(40)
+        //     .y_label_area_size(40)
+        //     //.margin(2)
+        //     //.caption("RSI", ("sans-serif", 8.0).into_font())
+        //     .build_cartesian_2d(from_date..to_date, -0f64..100f64)
+        //     .unwrap();
 
         // INDICATORS
 
@@ -592,20 +591,20 @@ impl Backend {
             ))
             .unwrap();
 
-        rsi_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), rsi[id])),
-                &RED,
-            ))
-            .unwrap();
+        // rsi_pannel
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date(), rsi[id])),
+        //         &RED,
+        //     ))
+        //     .unwrap();
 
         let mut stoch_pannel = ChartBuilder::on(&indicator_1)
             .x_label_area_size(40)
             .y_label_area_size(40)
             // .margin(2)
-            //.caption("MACD", ("sans-serif", 8.0).into_font())
+            .caption("MACD", ("sans-serif", 8.0).into_font())
             .build_cartesian_2d(from_date..to_date, -0f64..100f64)
             .unwrap();
         //stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
@@ -627,15 +626,13 @@ impl Backend {
             ))
             .unwrap();
 
-        let mut stoch_pannel = ChartBuilder::on(&indicator_2)
+        let mut macd_pannel = ChartBuilder::on(&indicator_2)
             .x_label_area_size(40)
             .y_label_area_size(40)
-            //.margin(2)
-            //.caption("STOCH", ("sans-serif", 8.0).into_font())
-            .build_cartesian_2d(from_date..to_date, -10f64..10f64)
+            .build_cartesian_2d(from_date..to_date, -1f64..1f64)
             .unwrap();
-        // stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
-        stoch_pannel
+
+        macd_pannel
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
@@ -644,7 +641,7 @@ impl Backend {
             ))
             .unwrap();
 
-        stoch_pannel
+        macd_pannel
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
