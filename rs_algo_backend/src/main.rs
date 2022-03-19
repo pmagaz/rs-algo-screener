@@ -39,7 +39,7 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .wrap(Cors::default())
+            .wrap(Cors::permissive())
             .data(AppState {
                 app_name: String::from(&app_name),
                 db: mongodb.clone(),
