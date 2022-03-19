@@ -1,34 +1,14 @@
-use yew::html::Scope;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-// mod components;
-// mod content;
-// mod generator;
+mod components;
 mod pages;
+mod routes;
 
-use pages::home::Home;
-// use pages::{
-//     author::Author, author_list::AuthorList, home::Home, page_not_found::PageNotFound, post::Post,
-//     post_list::PostList,
-// };
-
-#[derive(Routable, PartialEq, Clone, Debug)]
-pub enum Route {
-    // #[at("/posts/:id")]
-    // Post { id: u64 },
-    // #[at("/posts")]
-    // Posts,
-    // #[at("/authors/:id")]
-    // Author { id: u64 },
-    // #[at("/authors")]
-    // Authors,
-    #[at("/")]
-    Home,
-    // #[not_found]
-    // #[at("/404")]
-    // NotFound,
-}
+use components::footer::Footer;
+use components::header::Header;
+use pages::api;
+use routes::{switch, Route};
 
 pub enum Msg {
     ToggleNavbar,
@@ -42,6 +22,8 @@ impl Component for App {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
+        log::info!("Some info");
+
         Self {
             navbar_active: false,
         }
@@ -50,6 +32,7 @@ impl Component for App {
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::ToggleNavbar => {
+                log::info!("Some info");
                 self.navbar_active = !self.navbar_active;
                 true
             }
@@ -59,71 +42,12 @@ impl Component for App {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <BrowserRouter>
-                { self.view_nav(ctx.link()) }
-
+                <Header />
                 <main>
-
                     <Switch<Route> render={Switch::render(switch)} />
                 </main>
-                <footer class="footer">
-                    <div class="content has-text-centered">
-                        { "Powered by " }
-                        <a href="https://yew.rs">{ "Yew" }</a>
-                        { " using " }
-                        <a href="https://bulma.io">{ "Bulma" }</a>
-                        { " and images from " }
-                        <a href="https://unsplash.com">{ "Unsplash" }</a>
-                    </div>
-                </footer>
+                <Footer />
             </BrowserRouter>
-        }
-    }
-}
-impl App {
-    fn view_nav(&self, link: &Scope<Self>) -> Html {
-        let Self { navbar_active, .. } = *self;
-
-        let active_class = if !navbar_active { "is-active" } else { "" };
-
-        html! {
-            <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
-                <div class="navbar-brand">
-                    <h1 class="navbar-item is-size-3">{ "RS-ALGO-SCREENER" }</h1>
-
-
-                    <button class={classes!("navbar-burger", "burger", active_class)}
-                        aria-label="menu" aria-expanded="false"
-                        onclick={link.callback(|_| Msg::ToggleNavbar)}
-                    >
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                        <span aria-hidden="true"></span>
-                    </button>
-                </div>
-                <div class={classes!("navbar-menu", active_class)}>
-                    <div class="navbar-start">
-                        <Link<Route> classes={classes!("navbar-item")} to={Route::Home}>
-                            { "Home" }
-                        </Link<Route>>
-                        <div class="navbar-item has-dropdown is-hoverable">
-                            <div class="navbar-link">
-                                { "More" }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-        }
-    }
-}
-
-fn switch(routes: &Route) -> Html {
-    match routes.clone() {
-        // Route::Post { id } => {
-        //     html! { <Post seed={id} /> }
-        // }
-        Route::Home => {
-            html! { <Home /> }
         }
     }
 }

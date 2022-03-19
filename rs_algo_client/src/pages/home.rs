@@ -1,12 +1,32 @@
+use super::api;
 use yew::prelude::*;
-
 pub struct Home;
+
+pub enum Msg {
+    ToggleNavbar,
+}
+
 impl Component for Home {
-    type Message = ();
+    type Message = Msg;
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
+        //api::get_instruments().await.unwrap();
         Self
+    }
+
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::ToggleNavbar => {
+                log::info!("Some info");
+
+                //self.navbar_active = !self.navbar_active;
+                let query = r#"{"symbol":"patterns.local_patterns": { "$elemMatch" : { "active.active": false} }}"#;
+                //let json = serde_json::from_str(query).unwrap();
+                let res = api::get_instruments(query);
+                true
+            }
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
