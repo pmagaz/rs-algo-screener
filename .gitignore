@@ -11,6 +11,7 @@ Cargo.lock
 plotters/
 secrets/
 dist/
+**/dist/
 .env
 .DS_Store
 hosts
