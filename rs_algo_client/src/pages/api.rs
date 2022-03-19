@@ -1,7 +1,6 @@
 use dotenv::dotenv;
 use reqwest::{Client, Error, Response};
 use rs_algo_shared::error::{Result, RsAlgoError};
-use rs_algo_shared::helpers::http::{request, HttpMethod};
 //use rs_algo_shared::models::*;
 use serde::{Deserialize, Serialize};
 use std::env;
