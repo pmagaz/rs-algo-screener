@@ -39,6 +39,7 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Cors::default())
             .data(AppState {
                 app_name: String::from(&app_name),
                 db: mongodb.clone(),
@@ -46,7 +47,6 @@ async fn main() -> Result<()> {
             })
             .app_data(web::PayloadConfig::new(10000000))
             .wrap(Logger::default())
-            .wrap(Cors::default().allowed_origin("*"))
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")
