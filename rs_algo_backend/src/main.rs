@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
 
@@ -45,6 +46,7 @@ async fn main() -> Result<()> {
             })
             .app_data(web::PayloadConfig::new(10000000))
             .wrap(Logger::default())
+            .wrap(Cors::default().allowed_origin("*"))
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")
