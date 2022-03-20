@@ -40,12 +40,7 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .wrap(
-                Cors::default()
-                    .allowed_origin("http://localhost:8080")
-                    .allowed_methods(vec!["GET", "POST"])
-                    .allowed_header(header::CONTENT_TYPE),
-            )
+            .wrap(Cors::permissive())
             .data(AppState {
                 app_name: String::from(&app_name),
                 db: mongodb.clone(),
