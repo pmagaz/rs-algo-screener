@@ -7,7 +7,7 @@ do
     case $opt in
         "build & deploy all")
             echo "Deploying: $opt";
-            docker login ; docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; ansible-playbook playbook.yml  
+            docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; ansible-playbook playbook.yml  
             break
             ;;
         "deploy all")
@@ -17,12 +17,12 @@ do
             ;;
         "build & deploy rs-algo-backend")
             echo "Deploying: $opt";
-            docker login ;  docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; ansible-playbook playbook.yml 
+            docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; ansible-playbook playbook.yml 
             break
             ;;
         "build & deploy rs-algo-scanner")
             echo "Deploying: $opt";
-            docker login ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; ansible-playbook playbook.yml 
+            docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; ansible-playbook playbook.yml 
             break
             ;;
         "Quit")
