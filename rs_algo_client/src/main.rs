@@ -1,3 +1,4 @@
+use dotenv::dotenv;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -22,22 +23,22 @@ impl Component for App {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        log::info!("Some info");
+        log::info!("[CLIENT] Loading app...");
 
         Self {
             navbar_active: false,
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            Msg::ToggleNavbar => {
-                log::info!("Some info");
-                self.navbar_active = !self.navbar_active;
-                true
-            }
-        }
-    }
+    // fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    //     match msg {
+    //         Msg::ToggleNavbar => {
+    //             log::info!("[CLIENT] Loading app...");
+    //             self.navbar_active = !self.navbar_active;
+    //             true
+    //         }
+    //     }
+    // }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
@@ -53,6 +54,7 @@ impl Component for App {
 }
 
 fn main() {
+    dotenv().ok();
     wasm_logger::init(wasm_logger::Config::new(log::Level::Trace));
     yew::start_app::<App>();
 }

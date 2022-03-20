@@ -1,96 +1,120 @@
 use super::api;
-use yew::prelude::*;
-pub struct Home;
+use dotenv::dotenv;
 
-pub enum Msg {
-    ToggleNavbar,
-}
+use rs_algo_shared::models::CompactInstrument;
+use std::env;
+use web_sys::{window, Url};
+use yew::utils;
+use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Html, Properties};
+#[function_component(Home)]
+pub fn home() -> Html {
+    dotenv().ok();
 
-impl Component for Home {
-    type Message = Msg;
-    type Properties = ();
-
-    fn create(_ctx: &Context<Self>) -> Self {
-        //api::get_instruments().await.unwrap();
-        Self
+    let instruments = use_state(|| vec![]);
+    {
+        //let is_loading = props.is_loading.clone();
+        let instruments = instruments.clone();
+        use_effect_with_deps(
+            move |_| {
+                log::info!("[CLIENT] API call...");
+                wasm_bindgen_futures::spawn_local(async move {
+                    let data = r#"{"current_candle": "Karakasa"}"#;
+                    // let query = r#"{"symbol":"patterns.local_patterns": { "$elemMatch" : { "active.active": false} }}"#;
+                    let res = api::get_instruments(data.to_owned()).await.unwrap();
+                    let fetched_instruments: Vec<CompactInstrument> = res.json().await.unwrap();
+                    instruments.set(fetched_instruments);
+                });
+                || ()
+            },
+            (),
+        );
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            Msg::ToggleNavbar => {
-                log::info!("Some info");
+    //let selected_instrument = use_state(|| None);
+    let on_instrument_click = {
+        //  let selected_instrument = selected_instrument.clone();
+        Callback::from(move |instrument: CompactInstrument| {
+            log::info!("[CLIENT] Instrument selected {:}", instrument.symbol);
+            let url = Url::new(
+                &[
+                    "http://192.168.1.10/api/instruments?symbol=",
+                    &instrument.symbol,
+                ]
+                .concat(),
+            )
+            .unwrap();
+            log::info!("[CLIENT] API call... {:?}", url);
+            let location = window().unwrap().location().assign(
+                &[
+                    "http://192.168.1.10/api/instruments?symbol=",
+                    &instrument.symbol,
+                ]
+                .concat(),
+            );
+        })
+    };
 
-                //self.navbar_active = !self.navbar_active;
-                let query = r#"{"symbol":"patterns.local_patterns": { "$elemMatch" : { "active.active": false} }}"#;
-                //let json = serde_json::from_str(query).unwrap();
-                let res = api::get_instruments(query);
-                true
-            }
-        }
-    }
-
-    fn view(&self, _ctx: &Context<Self>) -> Html {
-        html! {
-            <div class="tile is-ancestor is-vertical">
-                <div class="tile is-child hero">
-                    <div class="hero-body container pb-0">
-                        <h1 class="title is-1">{ "Welcome..." }</h1>
-                        <h2 class="subtitle">{ "...to the best yew content" }</h2>
-                    </div>
-                </div>
-
-                <div class="tile is-child">
-                    <figure class="image is-3by1">
-                        <img alt="A random image for the input term 'yew'." src="https://source.unsplash.com/random/1200x400/?yew" />
-                    </figure>
-                </div>
-
-                <div class="tile is-parent container">
-                    { self.view_info_tiles() }
+    html! {
+        <div class="tile is-ancestor is-vertical">
+            <div class="tile is-child hero">
+                <div class="hero-body container pb-0">
+                    <h1 class="title is-1">{ "Instruments" }</h1>
                 </div>
             </div>
-        }
+
+           <div class="container ">
+                <div class="notification is-fluid">
+            <table class="table">
+                <thead>
+                    <tr>
+                    <th><abbr>{ "Symbol" }</abbr></th>
+                    <th><abbr>{ "Price" }</abbr></th>
+                    <th><abbr>{ "Candle" }</abbr></th>
+                    <th><abbr>{ "Updated" }</abbr></th>
+                    </tr>
+                </thead>
+                 <tbody>
+                          <InstrumentsList instruments={(*instruments).clone()} on_click={on_instrument_click.clone()} />
+                </tbody>
+            </table>
+            </div>
+            </div>
+        </div>
     }
 }
-impl Home {
-    fn view_info_tiles(&self) -> Html {
-        html! {
-            <>
-                <div class="tile is-parent">
-                    <div class="tile is-child box">
-                        <p class="title">{ "What are yews?" }</p>
-                        <p class="subtitle">{ "Everything you need to know!" }</p>
 
-                        <div class="content">
-                            {r#"
-                            A yew is a small to medium-sized evergreen tree, growing 10 to 20 metres tall, with a trunk up to 2 metres in diameter.
-                            The bark is thin, scaly brown, coming off in small flakes aligned with the stem.
-                            The leaves are flat, dark green, 1 to 4 centimetres long and 2 to 3 millimetres broad, arranged spirally on the stem,
-                            but with the leaf bases twisted to align the leaves in two flat rows either side of the stem,
-                            except on erect leading shoots where the spiral arrangement is more obvious.
-                            The leaves are poisonous.
-                            "#}
-                        </div>
-                    </div>
-                </div>
+#[derive(Clone, Properties, PartialEq)]
+struct InstrumentsProps {
+    instruments: Vec<CompactInstrument>,
+    on_click: Callback<CompactInstrument>,
+}
 
-                <div class="tile is-parent">
-                    <div class="tile is-child box">
-                        <p class="title">{ "Who are we?" }</p>
+#[function_component(InstrumentsList)]
+fn instrument_list(
+    InstrumentsProps {
+        instruments,
+        on_click,
+    }: &InstrumentsProps,
+) -> Html {
+    let on_click = on_click.clone();
 
-                        <div class="content">
-                            { "We're a small team of just 2" }
-                            <sup>{ 64 }</sup>
-                            { " members working tirelessly to bring you the low-effort yew content we all desperately crave." }
-                            <br />
-                            {r#"
-                                We put a ton of effort into fact-checking our posts.
-                                Some say they read like a Wikipedia article - what a compliment!
-                            "#}
-                        </div>
-                    </div>
-                </div>
-            </>
-        }
-    }
+    instruments
+        .iter()
+        .map(|instrument| {
+            let on_instrument_select = {
+                let on_click = on_click.clone();
+                let instrument = instrument.clone();
+                Callback::from(move |_| on_click.emit(instrument.clone()))
+            };
+
+            html! {
+                <tr onclick={on_instrument_select}>
+                    <td> {format!("{}", instrument.symbol)}</td>
+                    <td> {format!("{}", instrument.current_price)}</td>
+                    <td> {format!("{:?}", instrument.current_candle)}</td>
+                    <td> {format!("{}", instrument.updated)}</td>
+                </tr>
+            }
+        })
+        .collect()
 }
