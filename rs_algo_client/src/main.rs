@@ -1,4 +1,3 @@
-use dotenv::dotenv;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -8,37 +7,19 @@ mod routes;
 
 use components::footer::Footer;
 use components::header::Header;
-use pages::api;
 use routes::{switch, Route};
 
-pub enum Msg {
-    ToggleNavbar,
-}
+pub enum Msg {}
 
-pub struct App {
-    navbar_active: bool,
-}
+pub struct App {}
 impl Component for App {
     type Message = Msg;
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
         log::info!("[CLIENT] Loading app...");
-
-        Self {
-            navbar_active: false,
-        }
+        Self {}
     }
-
-    // fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-    //     match msg {
-    //         Msg::ToggleNavbar => {
-    //             log::info!("[CLIENT] Loading app...");
-    //             self.navbar_active = !self.navbar_active;
-    //             true
-    //         }
-    //     }
-    // }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
@@ -54,7 +35,6 @@ impl Component for App {
 }
 
 fn main() {
-    dotenv().ok();
     wasm_logger::init(wasm_logger::Config::new(log::Level::Trace));
     yew::start_app::<App>();
 }

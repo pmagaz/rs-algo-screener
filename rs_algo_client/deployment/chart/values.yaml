@@ -1,21 +1,12 @@
 replicaCount: 1
 
 image:
-  repository: pmagaz/rs-algo-backend 
+  repository: pmagaz/rs-algo-client 
   pullPolicy: Always 
   tag: "latest"
 
 imagePullSecrets:
  - name: docker-credentials 
-
-volumeMounts:
-- name: data
-  mountPath: /data/plotters/
-
-volumes:
-- name: data
-  emptyDir:
-      medium: Memory
 
 envSecretName: rs-algo-screener-secrets
 
@@ -34,9 +25,9 @@ service:
   port: 80
   targetPort: 8000
   metadata:
-    name: rs-algo-backend
+    name: rs-algo-client
     labels:
-      app: rs-algo-backend
+      app: rs-algo-client
 
 ingress:
   enabled: true
@@ -49,25 +40,17 @@ ingress:
         pathType: Prefix
         backend:
           service:
-            name: rs-algo-backend 
-            port:
-              number: 80 
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: rs-algo-backend 
+            name: rs-algo-client 
             port:
               number: 80 
   tls: []
 
 resources:
   requests:
-    cpu: 1800m
+    #cpu: 1800m
   limits:
-    cpu: 2000m
-    ephemeral-storage: 256Mi 
-    memory: 256Mi
+    cpu: 200m
+    memory: 124Mi
 
 
 autoscaling:

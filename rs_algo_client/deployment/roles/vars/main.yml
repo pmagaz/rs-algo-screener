@@ -1,0 +1,4 @@
+package_name: rs_algo_client
+release_name: rs-algo-client
+local_path: /home/dev/rs-algo-screener
+chart_path: deployment/chart

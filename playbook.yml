@@ -6,3 +6,4 @@
     - { role: "deployment/mongodb/roles/" }
     - { role: "rs_algo_backend/deployment/roles/" }
     - { role: "rs_algo_scanner/deployment/roles/" }
+    - { role: "rs_algo_client/deployment/roles/" }
