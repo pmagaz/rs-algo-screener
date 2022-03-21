@@ -1,2 +1,3 @@
-pub mod api;
+mod api;
+mod components;
 pub mod page;
