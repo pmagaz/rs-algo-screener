@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 PS3='Please enter your choice: '
-options=("deploy all" "build & deploy all" "build & deploy rs-algo-backend" "build & deploy rs-algo-scanner" "Quit")
+options=("deploy all" "build & deploy all" "build & deploy rs-algo-backend" "build & deploy rs-algo-scanner" "build & deploy rs-algo-client" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -23,6 +23,11 @@ do
         "build & deploy rs-algo-scanner")
             echo "Deploying: $opt";
             docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; ansible-playbook playbook.yml 
+            break
+            ;;
+        "build & deploy rs-algo-client")
+            echo "Deploying: $opt";
+            docker build -t pmagaz/rs-algo-client:latest rs_algo_client ; docker push pmagaz/rs-algo-client:latest ; ansible-playbook playbook.yml 
             break
             ;;
         "Quit")
