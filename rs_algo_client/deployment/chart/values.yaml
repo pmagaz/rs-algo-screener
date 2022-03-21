@@ -49,8 +49,8 @@ resources:
   requests:
     #cpu: 1800m
   limits:
-    cpu: 200m
-    memory: 124Mi
+    cpu: 100m
+    memory: 32Mi
 
 
 autoscaling:
