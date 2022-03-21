@@ -1,15 +1,20 @@
 use super::api;
 
 use round::round;
-use rs_algo_shared::models::CompactInstrument;
-use wasm_bindgen::JsCast;
-use web_sys::{window, Element, HtmlElement, HtmlInputElement, MouseEvent};
+use rs_algo_shared::models::{CompactInstrument, PatternType};
+use wasm_bindgen::prelude::*;
+use web_sys::{window, Document, Element, HtmlElement, HtmlInputElement, MouseEvent, Window};
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = get_query_value)]
+    fn get_query_value() -> String;
+}
 
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Html, Properties};
 #[function_component(Home)]
 pub fn home() -> Html {
     let url = "http://192.168.1.10/api/instruments";
-    //let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     {
         //let is_loading = props.is_loading.clone();
@@ -19,9 +24,8 @@ pub fn home() -> Html {
             move |_| {
                 log::info!("[CLIENT] API call...");
                 wasm_bindgen_futures::spawn_local(async move {
-                    let data = r#"{"current_candle": "Karakasa"}"#;
-                    // let query = r#"{"symbol":"patterns.local_patterns": { "$elemMatch" : { "active.active": false} }}"#;
-                    instruments.set(api::get_instruments(url, data.to_owned()).await.unwrap());
+                    let query = get_query_value();
+                    instruments.set(api::get_instruments(url, query).await.unwrap());
                 });
                 || ()
             },
@@ -36,28 +40,9 @@ pub fn home() -> Html {
             Callback::from(move |event: MouseEvent| {
                 let instruments = instruments.clone();
                 wasm_bindgen_futures::spawn_local(async move {
-                    let value = window()
-                        .unwrap()
-                        .document()
-                        .unwrap()
-                        .get_element_by_id("query_box")
-                        .unwrap()
-                        .dyn_into::<web_sys::HtmlInputElement>()
-                        .unwrap()
-                        .value();
-                    // .dyn_into::<web_sys::HtmlInputElement>()
-                    // .unwrap()
-                    // .inner_text();
-                    // .dyn_into::<HtmlInputElement>()
-                    // .unwrap()
-                    // .value();
-                    //.inner_html();
-                    // .text_content();
-                    // .inner_html();
-                    //.dyn_into::<HtmlInputElement>()
-                    let data = r#"{"current_candle": "Karakasa"}"#;
-                    log::info!("[CLIENT] query {:?}", value);
-                    instruments.set(api::get_instruments(url, data.to_owned()).await.unwrap());
+                    let query = get_query_value();
+                    log::info!("[CLIENT] query {:?}", query);
+                    instruments.set(api::get_instruments(url, query).await.unwrap());
                 });
             })
         }
@@ -76,11 +61,8 @@ pub fn home() -> Html {
                 <div class="field">
                     <label class="label">{ "query" }</label>
                     <div class="control">
-                        <form name="form">
-                            <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value="hola"></textarea>
+                            <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value="{\"current_candle\": \"Karakasa\"}"></textarea>
                             <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
-                        </form>
-
                     </div>
                     </div>
                 </div>
@@ -130,18 +112,30 @@ fn instrument_list(
     instruments
         .iter()
         .map(|instrument| {
-            let on_instrument_select = {
-                //let on_click = on_click.clone();
-                let instrument = instrument.clone();
-                //Callback::from(move |_| on_click.emit(instrument.clone()))
+            // let on_instrument_select = {
+            //     //let on_click = on_click.clone();
+            //     let instrument = instrument.clone();
+            //     //Callback::from(move |_| on_click.emit(instrument.clone()))
+            // };
+
+            let local_pattern = instrument.patterns.local_patterns.get(0); 
+            let pattern_type = match local_pattern {
+                Some(val) => val.pattern_type.clone(),
+                None   => PatternType::None,
             };
+            
+            let pattern_change = match local_pattern {
+                Some(val) => round(val.active.change, 2),
+                None   => 0.,
+            };
+
             html! {
                 <tr>
                     <td> <a href={format!("{}{}", base_url, instrument.symbol)}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td> {format!("{:?}", instrument.current_candle)}</td>
-                    <td> {format!("{:?}", instrument.patterns.local_patterns[0].pattern_type)}</td>
-                    <td> {format!("{:?}%", instrument.patterns.local_patterns[0].active.change.ceil())}</td>
+                    <td> {format!("{:?}", pattern_type)}</td>
+                    <td> {format!("{:?}%", pattern_change)}</td>
                     <td> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 2), round(instrument.indicators.macd.current_b, 2))}</td>
                     <td> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 2), round(instrument.indicators.stoch.current_b, 2))}</td>
                     <td> {format!("{}", instrument.updated)}</td>
