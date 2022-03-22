@@ -4,6 +4,7 @@ use crate::db::helpers::{compact_instrument, get_collection};
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
 use crate::models::Instrument;
+pub use rs_algo_shared::models::*;
 use std::time::Instant;
 
 use actix_files as fs;
@@ -99,7 +100,7 @@ pub async fn upsert(
 ) -> Result<HttpResponse, RsAlgoError> {
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
-    instrument.updated = Local::now().to_string();
+    //instrument.date = bson::DateTime::from_chrono(Local::now());
 
     let insert_instruments_detail = env::var("INSERT_INSTRUMENTS_DETAIL")
         .unwrap()

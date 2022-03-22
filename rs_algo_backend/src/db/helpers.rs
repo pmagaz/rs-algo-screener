@@ -21,7 +21,7 @@ pub async fn get_collection<T>(state: &web::Data<AppState>, collection: &str) ->
 //         time_frame: doc.get_str("time_frame").unwrap().to_owned(),
 //         current_price: doc.get_f64("current_price").unwrap(),
 //         current_candle: doc.get_str("current_candle").unwrap().to_owned(),
-//         //updated: doc.get_datetime(key)
+//         //date: doc.get_datetime(key)
 //     };
 
 //     Ok(instrument)
@@ -31,8 +31,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
     let len = doc.indicators.macd.data_a.len();
     let doc = CompactInstrument {
         symbol: doc.symbol,
-        updated: doc.updated,
-        updated2: doc.updated2,
+        date: doc.date,
         time_frame: doc.time_frame,
         current_price: doc.current_price,
         current_candle: doc.current_candle,

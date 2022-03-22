@@ -62,7 +62,8 @@ pub fn home() -> Html {
                 <div class="field">
                     <label class="label">{ "query" }</label>
                     <div class="control">
-         <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value="{\"current_candle\": \"Karakasa\", \"patterns.local_patterns\": { \"$elemMatch\" : { \"active.date2\": { \"$lt\" : new Date(ISODate().getTime() - 1000 * 86400 * 2) }} }}"></textarea>                            <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
+                        <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value="{\"current_candle\": \"Karakasa\"}"></textarea>
+                        <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
                     </div>
                     </div>
                 </div>

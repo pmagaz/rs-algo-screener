@@ -7,7 +7,7 @@ use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
 
 use rs_algo_shared::helpers::date::{DateTime, Local};
-use rs_algo_shared::models::TimeFrameType;
+use rs_algo_shared::models::{BsonDateTime, TimeFrameType};
 
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -19,6 +19,7 @@ pub struct Instrument {
     data: Vec<Candle>,
     current_price: f64,
     current_candle: CandleType,
+    date: BsonDateTime,
     min_price: f64,
     max_price: f64,
     peaks: Peaks,
@@ -216,6 +217,7 @@ impl InstrumentBuilder {
                 symbol,
                 time_frame: time_frame,
                 current_price: 0.,
+                date: BsonDateTime::from_chrono(Local::now()),
                 current_candle: CandleType::Default,
                 min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
                 max_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),

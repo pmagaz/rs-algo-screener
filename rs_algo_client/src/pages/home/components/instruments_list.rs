@@ -47,7 +47,7 @@ pub fn instrument_list(
                     <td> {format!("{:?}%", pattern_change)}</td>
                     <td> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 2), round(instrument.indicators.macd.current_b, 2))}</td>
                     <td> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 2), round(instrument.indicators.stoch.current_b, 2))}</td>
-                    <td> {format!("{}", instrument.updated)}</td>
+                    <td> {format!("{:?}", instrument.date)}</td>
                 </tr>
             }
         })
