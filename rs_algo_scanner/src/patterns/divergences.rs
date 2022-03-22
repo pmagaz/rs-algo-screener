@@ -3,7 +3,6 @@ use crate::helpers::maxima_minima::maxima_minima;
 use crate::indicators::{Indicator, Indicators};
 use crate::patterns::highs_lows::*;
 pub use rs_algo_shared::models::*;
-//use find_peaks::PeakFinder;
 use serde::{Deserialize, Serialize};
 use std::env;
 
@@ -41,6 +40,7 @@ impl Divergences {
         }
     }
 
+    //FIXME Improve this (just that)
     pub fn detect_pattern(
         &mut self,
         maxima: &Vec<(usize, f64)>,

@@ -1,9 +1,6 @@
 use super::helpers::get_collection;
 use crate::models::app_state::AppState;
-use crate::models::instrument::{
-    CompactIndicator, CompactIndicators, CompactInstrument, CompactInstrument2, Instrument,
-    Patterns,
-};
+use crate::models::instrument::{CompactInstrument, Instrument};
 
 use actix_web::web;
 use bson::{doc, Document};
@@ -54,7 +51,7 @@ pub async fn find_by_params(
 }
 
 pub async fn insert(
-    mut doc: CompactInstrument,
+    doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
@@ -88,32 +85,3 @@ pub async fn insert_detail(
         )
         .await
 }
-
-/*fn doc_to_instrument(doc: &Document) -> CompactInstrument2 {
-    CompactInstrument2 {
-        symbol: doc.get_str("symbol").unwrap().to_string(),
-        time_frame: doc.get_str("time_frame").unwrap().to_string(),
-        current_price: doc.get_f64("current_price").unwrap(),
-        current_candle: doc.get_str("current_candle").unwrap().to_string(),
-        updated: doc.get_str("current_candle").unwrap().to_string(),
-        patterns: doc.get_array("patterns").unwrap(),
-    }
-}
-
-pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactInstrument>, Error> {
-    let collection = get_collection(state, "compact_instruments").await;
-    let filter = doc! {"current_candle": "Doji"};
-    let find_options = FindOptions::builder().build();
-    let mut cursor = collection.find(None, find_options).await.unwrap();
-    let mut docs: Vec<CompactInstrument> = vec![];
-    while let Some(result) = cursor.next().await {
-        match result {
-            Ok(doc) => {
-                docs.push(doc);
-            }
-            _ => {}
-        }
-    }
-    Ok(docs)
-}
- */

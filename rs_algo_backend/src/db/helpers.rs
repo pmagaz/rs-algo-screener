@@ -32,6 +32,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
     let doc = CompactInstrument {
         symbol: doc.symbol,
         updated: doc.updated,
+        updated2: doc.updated2,
         time_frame: doc.time_frame,
         current_price: doc.current_price,
         current_candle: doc.current_candle,

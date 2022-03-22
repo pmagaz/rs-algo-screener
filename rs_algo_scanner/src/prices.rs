@@ -29,6 +29,20 @@ pub fn price_is_lower_low_band_bottom(data: &DataPoints, close: &Vec<f64>) -> (b
     search_price_break(band, close, &top_break)
 }
 
+pub fn price_is_higher_peak(peak: (usize, f64), close: &Vec<f64>) -> (bool, usize, f64) {
+    let mut band = vec![];
+    band.push(peak);
+    let top_break = |price: f64, slope: f64| price > slope;
+    search_price_break(band, close, &top_break)
+}
+
+pub fn price_is_lower_peak(peak: (usize, f64), close: &Vec<f64>) -> (bool, usize, f64) {
+    let mut band = vec![];
+    band.push(peak);
+    let top_break = |price: f64, slope: f64| price < slope;
+    search_price_break(band, close, &top_break)
+}
+
 pub fn calculate_price_change(data_points: &DataPoints) -> f64 {
     percentage_change(data_points[4].1, data_points[3].1).abs()
 }
@@ -42,6 +56,7 @@ pub fn search_price_break(
     close: &Vec<f64>,
     comparator: &dyn Fn(f64, f64) -> bool,
 ) -> (bool, usize, f64) {
+    //FIXME improve price break calculation
     let ids: Vec<f64> = band.iter().map(|(x, _y)| *x as f64).collect();
     let keys: Vec<usize> = band.iter().map(|(x, _y)| *x).collect();
     let prices: Vec<f64> = band.iter().map(|(_x, y)| *y).collect();
