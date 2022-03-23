@@ -1,10 +1,10 @@
 jobs:
-  - name: scan
+  - name: scan-daily
     image:
       repository: pmagaz/rs-algo-scanner
       tag: latest
       imagePullPolicy: Always
-    schedule: "10 11 * * *"
+    schedule: "25 11 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
