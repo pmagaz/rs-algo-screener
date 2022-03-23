@@ -57,8 +57,8 @@ pub fn instrument_list(
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td> {format!("{:?}", instrument.current_candle)}</td>
                     <td> {format!("{:?}", pattern_type)}</td>
-                    <td> {format!("{:?}%", pattern_change)}</td>
                     <td> {format!("{:?}", break_direction)}</td>
+                    <td> {format!("{:?}%", pattern_change)}</td>
                     <td> {format!("{:?}/{:?}/{:?}", pattern_date.day(), pattern_date.month(), pattern_date.year())}</td>
                     <td> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 2), round(instrument.indicators.macd.current_b, 2))}</td>
                     <td> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 2), round(instrument.indicators.stoch.current_b, 2))}</td>
