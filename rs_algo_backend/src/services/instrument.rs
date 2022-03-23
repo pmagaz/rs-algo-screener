@@ -98,9 +98,8 @@ pub async fn upsert(
     //instrument: web::Json<Instrument>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
-    let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
+    let instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
-    //instrument.date = bson::DateTime::from_chrono(Local::now());
 
     let insert_instruments_detail = env::var("INSERT_INSTRUMENTS_DETAIL")
         .unwrap()

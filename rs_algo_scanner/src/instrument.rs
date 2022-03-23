@@ -7,7 +7,7 @@ use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
 
 use rs_algo_shared::helpers::date::{DateTime, Local};
-use rs_algo_shared::models::{BsonDateTime, TimeFrameType};
+use rs_algo_shared::models::{DbDateTime, TimeFrameType};
 
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -19,7 +19,7 @@ pub struct Instrument {
     data: Vec<Candle>,
     current_price: f64,
     current_candle: CandleType,
-    date: BsonDateTime,
+    date: DbDateTime,
     min_price: f64,
     max_price: f64,
     peaks: Peaks,
@@ -152,18 +152,14 @@ impl Instrument {
             let extrema_maxima = self.peaks.extrema_maxima();
             let extrema_minima = self.peaks.extrema_minima();
 
-            self.patterns.detect_pattern(
-                PatternSize::Local,
-                local_maxima,
-                local_minima,
-                &self.peaks.close,
-            );
+            self.patterns
+                .detect_pattern(PatternSize::Local, local_maxima, local_minima, &candles);
 
             self.patterns.detect_pattern(
                 PatternSize::Extrema,
                 extrema_maxima,
                 extrema_minima,
-                &self.peaks.close,
+                &candles,
             );
 
             self.horizontal_levels
@@ -217,7 +213,7 @@ impl InstrumentBuilder {
                 symbol,
                 time_frame: time_frame,
                 current_price: 0.,
-                date: BsonDateTime::from_chrono(Local::now()),
+                date: DbDateTime::from_chrono(Local::now()),
                 current_candle: CandleType::Default,
                 min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
                 max_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),

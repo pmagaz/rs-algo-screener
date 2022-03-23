@@ -1,5 +1,5 @@
 jobs:
-  - name: rs-algo-scanner
+  - name: scan
     image:
       repository: pmagaz/rs-algo-scanner
       tag: latest
