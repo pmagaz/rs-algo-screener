@@ -15,7 +15,7 @@ extern "C" {
 
 #[function_component(Home)]
 pub fn home() -> Html {
-    let url = "http://localhost:8000/api/instruments";
+    let url = "http://192.168.1.10/api/instruments";
     let instruments = use_state(|| vec![]);
     {
         //let is_loading = props.is_loading.clone();
@@ -49,8 +49,6 @@ pub fn home() -> Html {
         }
     };
 
-    //let default_query = "{\"current_candle\": \"Karakasa\", \"$or\": [{ \"patterns.local_patterns\": {\"$elemMatch\" : {\"active.date\": { \"$lt\" : \"new Date(ISODate().getTime() - 1000 * 86400 * 5)\" }}}}]}";
-    //let default_query = "{\"current_candle\": \"Karakasa\"}";
     let default_query = "";
 
     html! {
