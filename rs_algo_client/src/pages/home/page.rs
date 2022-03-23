@@ -15,7 +15,7 @@ extern "C" {
 
 #[function_component(Home)]
 pub fn home() -> Html {
-    let url = "http://192.168.1.10/api/instruments";
+    let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     {
         //let is_loading = props.is_loading.clone();
@@ -49,6 +49,10 @@ pub fn home() -> Html {
         }
     };
 
+    //let default_query = "{\"current_candle\": \"Karakasa\", \"$or\": [{ \"patterns.local_patterns\": {\"$elemMatch\" : {\"active.date\": { \"$lt\" : \"new Date(ISODate().getTime() - 1000 * 86400 * 5)\" }}}}]}";
+    //let default_query = "{\"current_candle\": \"Karakasa\"}";
+    let default_query = "";
+
     html! {
         <div class="tile is-ancestor is-vertical">
             <div class="tile is-child hero">
@@ -62,13 +66,12 @@ pub fn home() -> Html {
                 <div class="field">
                     <label class="label">{ "query" }</label>
                     <div class="control">
-                        <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value="{\"current_candle\": \"Karakasa\"}"></textarea>
+                        <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value={format!("{}", default_query)}></textarea>
                         <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
                     </div>
                     </div>
                 </div>
             </div>
-
            <div class="container ">
                 <div class="notification is-fluid">
             <table class="table">
@@ -78,9 +81,12 @@ pub fn home() -> Html {
                     <th><abbr>{ "Price" }</abbr></th>
                     <th><abbr>{ "Candle" }</abbr></th>
                     <th><abbr>{ "Pattern" }</abbr></th>
-                    <th><abbr>{ "P. Target" }</abbr></th>
+                    <th><abbr>{ "Target" }</abbr></th>
+                    <th><abbr>{ "Direction" }</abbr></th>
+                    <th><abbr>{ "Activated" }</abbr></th>
                     <th><abbr>{ "MacD" }</abbr></th>
                     <th><abbr>{ "Stoch" }</abbr></th>
+                    <th><abbr>{ "Rsi" }</abbr></th>
                     <th><abbr>{ "Updated" }</abbr></th>
                     </tr>
                 </thead>

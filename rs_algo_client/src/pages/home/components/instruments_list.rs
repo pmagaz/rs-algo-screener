@@ -1,5 +1,6 @@
 use round::round;
-use rs_algo_shared::models::{CompactInstrument, PatternType};
+use rs_algo_shared::helpers::date::{Local, DateTime,Datelike};
+use rs_algo_shared::models::{CompactInstrument, PatternType, PatternDirection};
 use yew::{function_component, html, Properties};
 
 #[derive(Clone, Properties, PartialEq)]
@@ -32,11 +33,23 @@ pub fn instrument_list(
                 Some(val) => val.pattern_type.clone(),
                 None   => PatternType::None,
             };
+
+            let break_direction = match local_pattern {
+                Some(val) => val.active.break_direction.clone(),
+                None   => PatternDirection::None,
+            };
+
+            let pattern_date = match local_pattern {
+                Some(val) => val.active.date.to_chrono(),
+                None   => DateTime::from(Local::now())
+            };
             
             let pattern_change = match local_pattern {
                 Some(val) => round(val.active.change, 2),
                 None   => 0.,
             };
+
+            let date = instrument.date.to_chrono();
 
             html! {
                 <tr>
@@ -45,9 +58,12 @@ pub fn instrument_list(
                     <td> {format!("{:?}", instrument.current_candle)}</td>
                     <td> {format!("{:?}", pattern_type)}</td>
                     <td> {format!("{:?}%", pattern_change)}</td>
+                    <td> {format!("{:?}", break_direction)}</td>
+                    <td> {format!("{:?}/{:?}/{:?}", pattern_date.day(), pattern_date.month(), pattern_date.year())}</td>
                     <td> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 2), round(instrument.indicators.macd.current_b, 2))}</td>
                     <td> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 2), round(instrument.indicators.stoch.current_b, 2))}</td>
-                    <td> {format!("{:?}", instrument.date)}</td>
+                    <td> {format!("{:?}", round(instrument.indicators.rsi.current_a, 2))}</td>
+                    <td> {format!("{:?}", date)}</td>
                 </tr>
             }
         })

@@ -17,4 +17,4 @@ anyhow = "1.0.56"
 round = "0.1.2"
 reqwest = { version = "0.11.9", features = ["json"] }
 uuid = { version = "0.8.2", features = ["wasm-bindgen"] }
-rs_algo_shared = { git = "https://github.com/pmagaz/rs_algo_shared", rev = "bb1fb8b"}
+rs_algo_shared = { git = "https://github.com/pmagaz/rs_algo_shared", rev = "0590b59"}

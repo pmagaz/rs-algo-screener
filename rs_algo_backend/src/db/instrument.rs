@@ -2,8 +2,12 @@ use super::helpers::get_collection;
 use crate::models::app_state::AppState;
 use crate::models::instrument::{CompactInstrument, Instrument};
 
+use rs_algo_shared::helpers::date::Local;
+use rs_algo_shared::models::*;
+
 use actix_web::web;
 use bson::{doc, Document};
+use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
@@ -32,9 +36,17 @@ pub async fn find_by_params(
 
     println!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
-    let filter: Document = serde_json::from_str(&params).unwrap();
+
+    let default_query = doc! {"current_candle": "Karakasa",
+        "$or": [{ "patterns.local_patterns": {"$elemMatch" : {"active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }}}}]
+    };
+    let query = match params.as_ref() {
+        "" => default_query,
+        _ => serde_json::from_str(&params).unwrap(),
+    };
+
     let mut cursor = collection
-        .find(filter, FindOptions::builder().build())
+        .find(query, FindOptions::builder().build())
         .await
         .unwrap();
 
