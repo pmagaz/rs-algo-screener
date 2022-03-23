@@ -43,14 +43,14 @@ spec:
           containers:
           - image: "{{ $job.image.repository }}:{{ $job.image.tag }}"
             imagePullPolicy: {{ $job.image.imagePullPolicy }}
-            name: {{ $job.name }}
+            name: {{ $release_name }}
             {{- with $job.env }}
             env:
 {{ toYaml . | indent 12 }}
             {{- end }}
             envFrom:
             - configMapRef:
-                name: {{ $job.name }}-configmap
+                name: {{ $release_name }}-configmap
             - secretRef:
                 name: {{ $job.envSecretName }}
             command: {{ $job.command }}
