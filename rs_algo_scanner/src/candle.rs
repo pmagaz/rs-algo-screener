@@ -235,6 +235,7 @@ impl CandleBuilder {
     }
 
     fn is_bullish_gap(&self) -> bool {
+        //FIXMW
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (prev_open, prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
@@ -242,6 +243,7 @@ impl CandleBuilder {
     }
 
     fn is_bearish_gap(&self) -> bool {
+        //FIXME
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);

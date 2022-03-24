@@ -49,6 +49,7 @@ pub fn home() -> Html {
         }
     };
 
+    //FIXME persist last query (url)
     let default_query = "";
 
     html! {
