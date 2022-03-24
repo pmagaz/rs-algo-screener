@@ -69,7 +69,7 @@ impl Backend {
         let ema_c = &instrument.indicators.ema_c.data_a;
 
         let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
-        let (upper, lower) = root.split_vertically((75).percent());
+        let (upper, lower) = root.split_vertically((80).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
         root.fill(&WHITE).unwrap();
