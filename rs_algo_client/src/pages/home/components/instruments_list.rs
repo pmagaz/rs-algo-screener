@@ -28,7 +28,7 @@ pub fn instrument_list(
             //     //Callback::from(move |_| on_click.emit(instrument.clone()))
             // };
 
-            let patterns = instrument.patterns.extrema_patterns.get(0); 
+            let patterns = instrument.patterns.local_patterns.get(0); 
             let pattern_type = match patterns {
                 Some(val) => val.pattern_type.clone(),
                 None   => PatternType::None,

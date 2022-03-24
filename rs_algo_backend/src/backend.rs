@@ -55,7 +55,7 @@ impl Backend {
             .map(|x| x.active.index)
             .collect();
 
-        let patterns = extrema_patterns;
+        let patterns = local_patterns;
         let stoch = &instrument.indicators.stoch;
         let stoch_a = &stoch.data_a;
         let stoch_b = &stoch.data_b;
@@ -225,7 +225,7 @@ impl Backend {
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_pattern_breaks.contains(&(i)) {
+                if local_pattern_breaks.contains(&(i)) {
                     return TriangleMarker::new(
                         (
                             candle.date,
