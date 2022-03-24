@@ -160,7 +160,7 @@ impl Backend {
         //         .label(format!("{:?}", pattern.pattern_type));
         // }
 
-        for (x, pattern) in local_patterns.iter().enumerate() {
+        for (x, pattern) in extrema_patterns.iter().enumerate() {
             chart
                 .draw_series(PointSeries::of_element(
                     (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
