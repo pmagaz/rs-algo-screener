@@ -225,7 +225,7 @@ impl Backend {
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_pattern_breaks.contains(&(i)) {
+                if extrema_pattern_breaks.contains(&(i)) {
                     return TriangleMarker::new(
                         (
                             candle.date,
