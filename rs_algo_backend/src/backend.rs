@@ -54,6 +54,8 @@ impl Backend {
             .iter()
             .map(|x| x.active.index)
             .collect();
+
+        let patterns = extrema_patterns;
         let stoch = &instrument.indicators.stoch;
         let stoch_a = &stoch.data_a;
         let stoch_b = &stoch.data_b;
@@ -160,7 +162,7 @@ impl Backend {
         //         .label(format!("{:?}", pattern.pattern_type));
         // }
 
-        for (x, pattern) in extrema_patterns.iter().enumerate() {
+        for (x, pattern) in patterns.iter().enumerate() {
             chart
                 .draw_series(PointSeries::of_element(
                     (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
@@ -206,7 +208,7 @@ impl Backend {
         //     //     return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
         //     // }
         //     }
-        for (x, pattern) in local_patterns.iter().enumerate() {
+        for (x, pattern) in patterns.iter().enumerate() {
             chart
                 .draw_series(LineSeries::new(
                     (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
