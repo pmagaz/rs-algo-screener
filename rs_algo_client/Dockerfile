@@ -8,7 +8,7 @@ ARG TARGET
 
 #RUN rustup toolchain install nightly
 #RUN rustup target add $TARGET
-#RUN USER=root cargo +nightly install trunk --locked
+#RUN USER=root cargo install trunk --locked
 WORKDIR ./$APP_NAME
 #RUN trunk build 
 COPY dist ./
