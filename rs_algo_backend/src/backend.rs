@@ -221,9 +221,9 @@ impl Backend {
                         (date, value)
                     }),
                     if x < 1 {
-                        BLACK.mix(0.4)
+                        BLACK.mix(0.3)
                     } else {
-                        BLACK.mix(0.4)
+                        BLACK.mix(0.3)
                     },
                 ))
                 .unwrap()
