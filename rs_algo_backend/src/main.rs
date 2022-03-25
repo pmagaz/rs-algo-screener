@@ -4,11 +4,11 @@ use dotenv::dotenv;
 
 use std::io::Result;
 
-mod backend;
 mod db;
 mod error;
 mod helpers;
 mod models;
+mod render_image;
 mod services;
 
 use db::mongo;

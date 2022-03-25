@@ -69,38 +69,4 @@ where
         tokio::spawn(callback(instrument));
         Ok(())
     }
-
-    //     pub async fn listen(&mut self) -> Result<()>
-    // // where
-    //     //     F: Send + FnMut(bool) -> T,
-    //     //     T: Future<Output = Result<()>> + Send + 'static,
-    //     {
-    //         let handler = |res: Response<VEC_DOHLC>| {
-    //             match &res.msg_type {
-    //                 MessageType::Login => {
-    //                     println!("[Login] Ok");
-    //                 }
-    //                 MessageType::GetInstrumentPrice => {
-    //                     println!("[Data Prices] Ok {}", &res.symbol);
-    //                     //res.data.reverse();
-    //                     let mut instrument = Instrument::new().symbol(&res.symbol).build().unwrap();
-    //                     instrument.set_data(res.data).unwrap();
-    //                     println!("[Backend] rendering...");
-
-    //                     self.backend.render(&instrument).unwrap();
-    //                 }
-    //                 MessageType::Other => {
-    //                     println!("33333");
-    //                 }
-    //             };
-    //             //CONTINUE HERE. TO return a handler or something
-    //             //tokio::spawn(callback(&mut self.broker.operator));
-    //             //  callback(true);
-    //             //tokio::spawn(async move { callback(true) });
-    //             future::ok::<(), RsAlgoError>(())
-    //         };
-
-    //         self.broker.listen(handler).await;
-    //         Ok(())
-    //     }
 }

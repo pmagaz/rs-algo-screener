@@ -1,15 +1,13 @@
-use crate::backend::Backend;
 use crate::db;
 use crate::db::helpers::{compact_instrument, get_collection};
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
 use crate::models::Instrument;
+use crate::render_image::Backend;
 pub use rs_algo_shared::models::*;
 use std::time::Instant;
 
 use actix_files as fs;
-use actix_web::http::header::{ContentDisposition, DispositionType};
-use actix_web::{get, App, Error, HttpRequest, HttpServer};
 use actix_web::{web, HttpResponse};
 use rs_algo_shared::helpers::date::Local;
 use serde::{Deserialize, Serialize};
@@ -95,11 +93,16 @@ pub async fn find(params: String, state: web::Data<AppState>) -> Result<HttpResp
 
 pub async fn upsert(
     instrument: String,
-    //instrument: web::Json<Instrument>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
-    let instrument: Instrument = serde_json::from_str(&instrument).unwrap();
+    let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
+
+    //FOR XTB
+    if symbol.contains("_") {
+        let symbol_str: Vec<&str> = symbol.split('_').collect();
+        instrument.symbol = symbol_str[0].to_owned();
+    }
 
     let insert_instruments_detail = env::var("INSERT_INSTRUMENTS_DETAIL")
         .unwrap()
