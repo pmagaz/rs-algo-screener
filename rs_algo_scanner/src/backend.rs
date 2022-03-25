@@ -67,7 +67,7 @@ impl Backend {
         let ema_c = instrument.indicators().ema_c().get_data_a();
 
         let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
-        let (upper, lower) = root.split_vertically((75).percent());
+        let (upper, lower) = root.split_vertically((80).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
         root.fill(&WHITE).unwrap();
@@ -176,11 +176,11 @@ impl Backend {
                             pattern_name = Text::new(
                                 format!("{:?}", pattern.pattern_type),
                                 (0, 0),
-                                ("sans-serif", 15),
+                                ("sans-serif", 12),
                             )
                         } else {
                             pattern_name =
-                                Text::new(format!("{:?}", ""), (0, 15), ("sans-serif", 0))
+                                Text::new(format!("{:?}", ""), (0, 12), ("sans-serif", 0))
                         }
 
                         EmptyElement::at(new_coord) + pattern_name
@@ -211,9 +211,15 @@ impl Backend {
                         let idx = highs.0;
                         let value = highs.1;
                         let date = data[idx].date();
+                        let color = &BLACK.clone();
+
                         (date, value)
                     }),
-                    if x < 1 { &BLACK } else { &BLACK },
+                    if x < 1 {
+                        BLACK.mix(0.4)
+                    } else {
+                        BLACK.mix(0.4)
+                    },
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
@@ -228,7 +234,7 @@ impl Backend {
                             candle.high() + candle.close() / peaks_marker_distance + 5.,
                         ),
                         -4,
-                        BLACK.filled(),
+                        BLACK.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
@@ -247,7 +253,7 @@ impl Backend {
                             candle.high() + candle.close() / peaks_marker_distance + 5.,
                         ),
                         -4,
-                        BLUE.filled(),
+                        BLUE.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
@@ -264,7 +270,7 @@ impl Backend {
                             candle.high() + candle.high() / peaks_marker_distance - 10.,
                         ),
                         4,
-                        BLUE.filled(),
+                        BLUE.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
@@ -283,7 +289,7 @@ impl Backend {
                             candle.high() + candle.close() / peaks_marker_distance + 6.,
                         ),
                         -4,
-                        RED.filled(),
+                        RED.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
@@ -300,7 +306,7 @@ impl Backend {
                             candle.high() + candle.high() / peaks_marker_distance - 11.,
                         ),
                         4,
-                        RED.filled(),
+                        RED.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
@@ -317,7 +323,7 @@ impl Backend {
                             candle.high() + candle.close() / peaks_marker_distance + 5.,
                         ),
                         -4,
-                        BLACK.filled(),
+                        BLACK.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
@@ -336,42 +342,73 @@ impl Backend {
         //                     let date = data[idx].date();
         //                     (date, value)
         //                 }),
-        //             &YELLOW,
+        //             &BLACK.mix(0.8),
         //         ))
         //         .unwrap();
         // }
 
-        // for x in instrument.peaks().smooth_lows().iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(instrument.peaks().smooth_lows().iter())
-        //                 .map(|(_k, highs)| {
-        //                     let idx = highs.0;
-        //                     let value = highs.1;
-        //                     let date = data[idx].date();
-        //                     (date, value)
-        //                 }),
-        //             &YELLOW,
-        //         ))
-        //         .unwrap();
-        // }
-
-        for x in instrument.peaks().smooth_close().iter() {
+        for x in instrument.peaks().smooth_highs().iter() {
             chart
                 .draw_series(LineSeries::new(
                     (0..)
-                        .zip(instrument.peaks().smooth_close().iter())
+                        .zip(instrument.peaks().smooth_highs().iter())
                         .map(|(_k, highs)| {
                             let idx = highs.0;
                             let value = highs.1;
                             let date = data[idx].date();
                             (date, value)
                         }),
-                    &TRANSPARENT,
+                    MAGENTA.mix(0.014),
                 ))
                 .unwrap();
         }
+
+        for x in instrument.peaks().smooth_lows().iter() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(instrument.peaks().smooth_lows().iter())
+                        .map(|(_k, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date();
+                            (date, value)
+                        }),
+                    MAGENTA.mix(0.014),
+                ))
+                .unwrap();
+        }
+
+        //     for x in instrument.peaks().smooth_lows().iter() {
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(instrument.peaks().smooth_lows().iter())
+        //             .map(|(_k, highs)| {
+        //                 let idx = highs.0;
+        //                 let value = highs.1;
+        //                 let date = data[idx].date();
+        //                 (date, value)
+        //             }),
+        //         BLACK.mix(0.018),
+        //     ))
+        //     .unwrap();
+
+        // for x in instrument.peaks().smooth_close().iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(instrument.peaks().smooth_close().iter())
+        //                 .map(|(_k, highs)| {
+        //                     let idx = highs.0;
+        //                     let value = highs.1;
+        //                     let date = data[idx].date();
+        //                     (date, value)
+        //                 }),
+        //             &TRANSPARENT,
+        //         ))
+        //         .unwrap();
+        // }
 
         // for x in local_maxima.iter() {
         //     chart
@@ -495,7 +532,7 @@ impl Backend {
                             candle.high() + candle.high() / peaks_marker_distance + 5.,
                         ),
                         -4,
-                        BLUE.filled(),
+                        BLUE.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
@@ -512,7 +549,7 @@ impl Backend {
                             candle.low() - candle.low() / peaks_marker_distance - 5.,
                         ),
                         4,
-                        BLUE.filled(),
+                        BLUE.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.low()), 0, &TRANSPARENT);
@@ -529,7 +566,7 @@ impl Backend {
                             candle.low() - candle.low() / peaks_marker_distance + 25.,
                         ),
                         -4,
-                        RED.filled(),
+                        RED.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.low()), 0, &TRANSPARENT);
@@ -546,7 +583,7 @@ impl Backend {
                             candle.low() - candle.low() / peaks_marker_distance - 25.,
                         ),
                         4,
-                        RED.filled(),
+                        RED.mix(0.4),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.low()), 0, &TRANSPARENT);
@@ -564,32 +601,32 @@ impl Backend {
 
         // INDICATORS
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), ema_a[id])),
-                &RED,
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date(), ema_a[id])),
+        //         &RED.mix(0.5),
+        //     ))
+        //     .unwrap();
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), ema_b[id])),
-                &BLUE,
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date(), ema_b[id])),
+        //         &MAGENTA.mix(0.5),
+        //     ))
+        //     .unwrap();
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), ema_c[id])),
-                &YELLOW,
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date(), ema_c[id])),
+        //         &BLUE.mix(0.5),
+        //     ))
+        //     .unwrap();
 
         // rsi_pannel
         //     .draw_series(LineSeries::new(
