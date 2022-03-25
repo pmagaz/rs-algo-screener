@@ -60,10 +60,10 @@ pub fn instrument_list(
                     <td> {format!("{:?}", break_direction)}</td>
                     <td> {format!("{}%", pattern_change)}</td>
                     <td> {format!("{}", pattern_date.format("%d/%m/%Y"))}</td>
-                    <td> {format!("{:?}/{:?}", round(instrument.indicators.macd.current_a, 2), round(instrument.indicators.macd.current_b, 2))}</td>
-                    <td> {format!("{:?}/{:?}", round(instrument.indicators.stoch.current_a, 2), round(instrument.indicators.stoch.current_b, 2))}</td>
+                    <td> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 2), round(instrument.indicators.macd.current_b, 2))}</td>
+                    <td> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 2), round(instrument.indicators.stoch.current_b, 2))}</td>
                     <td> {format!("{:?}", round(instrument.indicators.rsi.current_a, 2))}</td>
-                    <td> {format!("{}", date.format("%r"))}</td>
+                    <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }
         })

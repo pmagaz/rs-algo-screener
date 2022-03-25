@@ -12,6 +12,8 @@ pub fn loading(props: &Props) -> Html {
     html! {
         if *loading {
           <progress class="progress is-small is-primary" max="100">{ "Loading..."} </progress>
+        } else {
+          <div style="height: 36px;"></div>
         }
     }
 }

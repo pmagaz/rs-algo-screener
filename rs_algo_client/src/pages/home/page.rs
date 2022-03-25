@@ -92,7 +92,7 @@ pub fn home() -> Html {
                     <th><abbr>{ "MacD" }</abbr></th>
                     <th><abbr>{ "Stoch" }</abbr></th>
                     <th><abbr>{ "Rsi" }</abbr></th>
-                    <th><abbr>{ "Updated" }</abbr></th>
+                    <th><abbr>{ "Time" }</abbr></th>
                     </tr>
                 </thead>
                  <tbody>
