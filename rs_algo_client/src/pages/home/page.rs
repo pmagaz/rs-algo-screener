@@ -2,12 +2,12 @@ use super::api;
 use crate::components::loading::Loading;
 use crate::pages::home::components::instruments_list::InstrumentsList;
 
+use crate::components::plotter::Plotter;
 use round::round;
 use rs_algo_shared::models::CompactInstrument;
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
@@ -20,10 +20,10 @@ pub fn home() -> Html {
     let instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_query = use_state(|| String::from(""));
+    let use_url = use_state(|| String::from(""));
 
     {
         let instruments = instruments.clone();
-        let use_query = use_query.clone();
         let use_loading = use_loading.clone();
 
         use_effect_with_deps(
@@ -60,6 +60,15 @@ pub fn home() -> Html {
         })
     };
 
+    let on_symbol_click = {
+        let use_url = use_url.clone();
+        Callback::from(move |url: String| {
+            log::info!("[CLIENT] Selecting {}", &url);
+            let use_url = use_url.clone();
+            use_url.set(url);
+        })
+    };
+
     html! {
         <div class="tile is-ancestor is-vertical">
             <div class="hero-body container pb-0">
@@ -77,6 +86,7 @@ pub fn home() -> Html {
                     </div>
                 </div>
             </div>
+            //<Plotter url={*use_url}/>
            <div class="container">
                 <div class="notification is-fluid">
             <table class="table is-bordered">
@@ -96,7 +106,7 @@ pub fn home() -> Html {
                     </tr>
                 </thead>
                  <tbody>
-                          <InstrumentsList instruments={(*instruments).clone()} />
+                          <InstrumentsList on_symbol_click={ on_symbol_click } instruments={(*instruments).clone()} />
                 </tbody>
             </table>
             </div>

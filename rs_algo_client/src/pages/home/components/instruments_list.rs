@@ -1,32 +1,42 @@
 use round::round;
 use rs_algo_shared::helpers::date::{Local, DateTime,Datelike};
 use rs_algo_shared::models::{CompactInstrument, PatternType, PatternDirection};
-use yew::{function_component, html, Properties};
+use yew::{function_component, html, Callback, use_state, Properties};
+use wasm_bindgen::prelude::*;
+use web_sys::MouseEvent;
+
+use crate::components::plotter::Plotter;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_name = get_query_value)]
+    fn open_modal(modal: &str);
+    fn close_modal(modal: &str);
+}
 
 #[derive(Clone, Properties, PartialEq)]
-pub struct InstrumentsProps {
+pub struct Props {
     pub instruments: Vec<CompactInstrument>,
-    //on_click: Callback<CompactInstrument>,
+    pub on_symbol_click: Callback<String>,
 }
 
 #[function_component(InstrumentsList)]
-pub fn instrument_list(
-    InstrumentsProps {
-        instruments,
-        // on_click,
-    }: &InstrumentsProps,
+pub fn instrument_list(props: &Props
 ) -> Html {
-    //let on_click = on_click.clone();
+        let Props { instruments, on_symbol_click } = props;
     let base_url = "http://192.168.1.10/api/instruments?symbol=";
+    let use_url = use_state(|| String::from(""));
 
     instruments
         .iter()
         .map(|instrument| {
-            // let on_instrument_select = {
-            //     //let on_click = on_click.clone();
-            //     let instrument = instrument.clone();
-            //     //Callback::from(move |_| on_click.emit(instrument.clone()))
-            // };
+            let on_instrument_select = {
+                let on_symbol_click = on_symbol_click.clone();
+                let instrument = instrument.clone();
+                let url = [base_url,&instrument.symbol].concat();
+                Callback::from(move |_| on_symbol_click.emit(url.clone()))
+            };
+            
 
             let patterns = instrument.patterns.local_patterns.get(0); 
             let pattern_type = match patterns {
@@ -53,7 +63,8 @@ pub fn instrument_list(
 
             html! {
                 <tr>
-                    <td> <a href={format!("{}{}", base_url, instrument.symbol)}>{format!("{}", instrument.symbol)}</a></td>
+                    <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
+                    //<td> <a href={format!("{}{}", base_url, instrument.symbol)}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td> {format!("{:?}", instrument.current_candle)}</td>
                     <td> {format!("{:?}", pattern_type)}</td>

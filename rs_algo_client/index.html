@@ -12,6 +12,13 @@
     function get_query_value(){
       return document.getElementById("query_box").value;
     }
+     function open_modal($el) {
+        $el.classList.add('is-active');
+      }
+
+      function close_modal($el) {
+        $el.classList.remove('is-active');
+      }
   </script>
 </head>
 
