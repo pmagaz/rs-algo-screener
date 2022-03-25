@@ -102,8 +102,8 @@ impl Backend {
                 let (bullish, bearish) = match candle.candle_type {
                     CandleType::Karakasa => (BLUE.filled(), BLUE.filled()),
                     CandleType::BearishKarakasa => (BLUE.filled(), BLUE.filled()),
-                    CandleType::BullishGap => (BLUE.filled(), BLUE.filled()),
-                    CandleType::BearishGap => (BLUE.filled(), BLUE.filled()),
+                    // CandleType::BullishGap => (BLUE.filled(), BLUE.filled()),
+                    // CandleType::BearishGap => (BLUE.filled(), BLUE.filled()),
                     _ => candle_color,
                 };
 
@@ -575,32 +575,32 @@ impl Backend {
 
         // INDICATORS EMAS
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, ema_a[id])),
-                &RED.mix(0.5),
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date, ema_a[id])),
+        //         &RED.mix(0.5),
+        //     ))
+        //     .unwrap();
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, ema_b[id])),
-                &MAGENTA.mix(0.5),
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date, ema_b[id])),
+        //         &MAGENTA.mix(0.5),
+        //     ))
+        //     .unwrap();
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, ema_c[id])),
-                &BLUE.mix(0.5),
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date, ema_c[id])),
+        //         &BLUE.mix(0.5),
+        //     ))
+        //     .unwrap();
 
         // rsi_pannel
         //     .draw_series(LineSeries::new(
