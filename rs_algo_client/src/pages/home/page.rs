@@ -1,11 +1,12 @@
 use super::api;
+use crate::components::loading::Loading;
 use crate::pages::home::components::instruments_list::InstrumentsList;
 
 use round::round;
-use rs_algo_shared::models::{CompactInstrument, PatternType};
+use rs_algo_shared::models::CompactInstrument;
 use wasm_bindgen::prelude::*;
-use web_sys::{window, Document, Element, HtmlElement, HtmlInputElement, MouseEvent, Window};
-use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Html, Properties};
+use web_sys::MouseEvent;
+use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
 
 #[wasm_bindgen]
 extern "C" {
@@ -17,16 +18,22 @@ extern "C" {
 pub fn home() -> Html {
     let url = "http://192.168.1.10/api/instruments";
     let instruments = use_state(|| vec![]);
-    {
-        //let is_loading = props.is_loading.clone();
+    let use_loading = use_state(|| true);
+    let use_query = use_state(|| String::from(""));
 
+    {
         let instruments = instruments.clone();
+        let use_query = use_query.clone();
+        let use_loading = use_loading.clone();
+
         use_effect_with_deps(
             move |_| {
                 log::info!("[CLIENT] API call...");
+                let use_loading = use_loading.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let query = get_query_value();
                     instruments.set(api::get_instruments(url, query).await.unwrap());
+                    use_loading.set(false);
                 });
                 || ()
             },
@@ -34,47 +41,46 @@ pub fn home() -> Html {
         );
     }
 
-    //let selected_instrument = use_state(|| None);
     let on_query_send = {
-        {
-            let instruments = instruments.clone();
-            Callback::from(move |event: MouseEvent| {
-                let instruments = instruments.clone();
-                wasm_bindgen_futures::spawn_local(async move {
-                    let query = get_query_value();
-                    log::info!("[CLIENT] query {:?}", query);
-                    instruments.set(api::get_instruments(url, query).await.unwrap());
-                });
-            })
-        }
-    };
+        let instruments = instruments.clone();
+        let use_query = use_query.clone();
+        let use_loading = use_loading.clone();
 
-    //FIXME persist last query (url)
-    let default_query = "";
+        Callback::from(move |event: MouseEvent| {
+            let instruments = instruments.clone();
+            let use_query = use_query.clone();
+            let use_loading = use_loading.clone();
+            let query = get_query_value();
+            use_query.set(query.clone());
+            use_loading.set(true);
+            wasm_bindgen_futures::spawn_local(async move {
+                instruments.set(api::get_instruments(url, query).await.unwrap());
+                use_loading.set(false);
+            });
+        })
+    };
 
     html! {
         <div class="tile is-ancestor is-vertical">
-            <div class="tile is-child hero">
-                <div class="hero-body container pb-0">
-                    <h1 class="title is-1">{ "Instruments" }</h1>
-                </div>
+            <div class="hero-body container pb-0">
+                <h2 class="title is-1">{ "Instruments" }</h2>
             </div>
-
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
                 <div class="field">
-                    <label class="label">{ "query" }</label>
+                     <Loading loading={ *use_loading} />
+                    <label class="label">{ "Query" }</label>
                     <div class="control">
-                        <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value={format!("{}", default_query)}></textarea>
+                        <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value={ {format!("{}", *use_query)}}></textarea>
                         <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
                     </div>
                     </div>
                 </div>
             </div>
-           <div class="container ">
+           <div class="container">
                 <div class="notification is-fluid">
-            <table class="table">
-                <thead>
+            <table class="table is-bordered">
+                <thead class="has-background-grey-lighter">
                     <tr>
                     <th><abbr>{ "Symbol" }</abbr></th>
                     <th><abbr>{ "Price" }</abbr></th>

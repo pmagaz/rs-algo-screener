@@ -3,25 +3,6 @@ use std::rc::Rc;
 use yew::{classes, function_component, html, html::Scope, Html, Properties};
 use yew_router::prelude::*;
 
-#[derive(Clone, Debug, PartialEq, Properties)]
-pub struct Props {
-    pub seed: u32,
-}
-
-// #[derive(PartialEq, Debug)]
-// pub struct Footer {}
-
-// impl Reducible for Footer {
-//     type Action = u32;
-
-//     fn reduce(self: Rc<Self>, action: u32) -> Rc<Self> {
-//         Self {
-//             inner: Author::generate_from_seed(action),
-//         }
-//         .into()
-//     }
-// }
-
 #[function_component(Header)]
 pub fn header() -> Html {
     //let Self { navbar_active, .. } = *self;
