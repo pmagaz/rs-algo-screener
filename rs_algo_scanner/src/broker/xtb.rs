@@ -253,14 +253,12 @@ impl Xtb {
                 _ => panic!("Description parse error"),
             };
 
-            if symbol.contains(".US") {
-                result.push(Symbol {
-                    symbol,
-                    currency,
-                    category,
-                    description,
-                });
-            }
+            result.push(Symbol {
+                symbol,
+                currency,
+                category,
+                description,
+            });
         }
         Ok(result)
     }
