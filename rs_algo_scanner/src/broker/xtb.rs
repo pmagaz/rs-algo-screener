@@ -253,9 +253,11 @@ impl Xtb {
                 _ => panic!("Description parse error"),
             };
 
-            if symbol.contains(".US") {
+            let symbol: Vec<&str> = symbol.split('_').collect();
+
+            if symbol[0].contains(".US") {
                 result.push(Symbol {
-                    symbol,
+                    symbol: symbol[0].to_owned(),
                     currency,
                     category,
                     description,
