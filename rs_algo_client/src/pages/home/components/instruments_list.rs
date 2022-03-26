@@ -14,6 +14,13 @@ extern "C" {
     fn close_modal(modal: &str);
 }
 
+pub enum IndicatorStatus {
+    Bullish,
+    Bearish,
+    Neutral
+}
+
+
 #[derive(Clone, Properties, PartialEq)]
 pub struct Props {
     pub instruments: Vec<CompactInstrument>,
@@ -27,6 +34,17 @@ pub fn instrument_list(props: &Props
     let base_url = "http://192.168.1.10/api/instruments?symbol=";
     let use_url = use_state(|| String::from(""));
 
+      
+                 fn get_status_class<'a>(status: IndicatorStatus) -> &'a str {
+                     let class = match status {
+                         IndicatorStatus::Bullish => "has-background-success-light", 
+                         IndicatorStatus::Neutral => "has-background-warning-light", 
+                         IndicatorStatus::Bearish => "has-background-danger-light", 
+                     };
+                     class
+
+                 }
+
     instruments
         .iter()
         .map(|instrument| {
@@ -34,6 +52,7 @@ pub fn instrument_list(props: &Props
                 let on_symbol_click = on_symbol_click.clone();
                 let instrument = instrument.clone();
                 let url = [base_url,&instrument.symbol].concat();
+                open_modal("modal");
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
             };
             
@@ -59,6 +78,31 @@ pub fn instrument_list(props: &Props
                 None   => 0.,
             };
 
+            //FIXME move this to server???? strategies?
+            let macd = instrument.indicators.macd.clone();
+            let macd_status: IndicatorStatus= match macd {
+                _x if macd.current_a > 0. && macd.current_a > macd.current_b=>IndicatorStatus::Bullish,
+                _x if macd.current_a > macd.current_b && macd.current_a < 0.=> IndicatorStatus::Neutral,
+                _x if macd.current_a < macd.current_b => IndicatorStatus::Bearish,
+                _ => IndicatorStatus::Neutral,
+            };
+
+            let stoch = instrument.indicators.stoch.clone();
+            let stoch_status: IndicatorStatus= match stoch {
+                _x if stoch.current_a < 30. && stoch.current_a > stoch.current_b =>IndicatorStatus::Bullish,
+                _x if stoch.current_a < 45. && stoch.current_a < stoch.current_b => IndicatorStatus::Neutral,
+                _x if stoch.current_a > 60. || stoch.current_a < stoch.current_b => IndicatorStatus::Bearish,
+                _ => IndicatorStatus::Neutral,
+            };
+
+                let rsi = instrument.indicators.rsi.clone();
+                let rsi_status: IndicatorStatus= match rsi {
+                    _x if rsi.current_a > 60. =>IndicatorStatus::Bearish,
+                    _x if rsi.current_a > 40. && rsi.current_a < 60. => IndicatorStatus::Neutral,
+                    _x if rsi.current_a < 30. => IndicatorStatus::Bullish,
+                    _ => IndicatorStatus::Neutral,
+                };
+
             let date = instrument.date.to_chrono();
 
             html! {
@@ -71,9 +115,9 @@ pub fn instrument_list(props: &Props
                     <td> {format!("{:?}", break_direction)}</td>
                     <td> {format!("{}%", pattern_change)}</td>
                     <td> {format!("{}", pattern_date.format("%d/%m/%Y"))}</td>
-                    <td> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 2), round(instrument.indicators.macd.current_b, 2))}</td>
-                    <td> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 2), round(instrument.indicators.stoch.current_b, 2))}</td>
-                    <td> {format!("{:?}", round(instrument.indicators.rsi.current_a, 2))}</td>
+                    <td class={get_status_class(macd_status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 2), round(instrument.indicators.macd.current_b, 2))}</td>
+                    <td class={get_status_class(stoch_status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 2), round(instrument.indicators.stoch.current_b, 2))}</td>
+                    <td class={get_status_class(rsi_status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 2))}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }

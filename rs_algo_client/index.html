@@ -7,18 +7,36 @@
 
   <title>Yew • Router</title>
   <base data-trunk-public-url />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css" />
+
+  <style>
+    .modal-content { width: 1024px;}
+  </style>
   <script language="JavaScript">
-    function get_query_value(){
-      return document.getElementById("query_box").value;
-    }
-     function open_modal($el) {
-        $el.classList.add('is-active');
+    const get_query_value = () => document.getElementById("query_box").value;
+
+     const open_modal = () => {
+        console.log("open modal");
+        const $target = document.getElementById("modal");
+        $target.classList.add('is-active');
       }
 
-      function close_modal($el) {
-        $el.classList.remove('is-active');
-      }
+      const close_modal = () => {
+          console.log("close modal");
+          const $target = document.getElementById("modal");
+          $target.classList.remove('is-active');
+        }
+
+      const setListeners = () => {
+      let elem = document.getElementById('modal-background');
+      elem.addEventListener('click', () => close_modal());
+
+      document.addEventListener('keydown', (event) => {
+        const e = event || window.event;
+        if (e.keyCode === 27) closeAllModals();
+      });
+    }
+    setTimeout(setListeners, 800);
   </script>
 </head>
 

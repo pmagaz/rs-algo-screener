@@ -12,6 +12,8 @@ use yew::{function_component, html, use_effect_with_deps, use_state, Callback, P
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
     fn get_query_value() -> String;
+    fn open_modal();
+
 }
 
 #[function_component(Home)]
@@ -46,7 +48,7 @@ pub fn home() -> Html {
         let use_query = use_query.clone();
         let use_loading = use_loading.clone();
 
-        Callback::from(move |event: MouseEvent| {
+        Callback::from(move |_e: MouseEvent| {
             let instruments = instruments.clone();
             let use_query = use_query.clone();
             let use_loading = use_loading.clone();
@@ -66,27 +68,25 @@ pub fn home() -> Html {
             log::info!("[CLIENT] Selecting {}", &url);
             let use_url = use_url.clone();
             use_url.set(url);
+            open_modal();
         })
     };
 
     html! {
         <div class="tile is-ancestor is-vertical">
-            <div class="hero-body container pb-0">
-                <h2 class="title is-1">{ "Instruments" }</h2>
-            </div>
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
                 <div class="field">
                      <Loading loading={ *use_loading} />
                     <label class="label">{ "Query" }</label>
                     <div class="control">
-                        <textarea id="query_box" class="textarea is-primary" placeholder="Textarea" cols="50" value={ {format!("{}", *use_query)}}></textarea>
+                        <textarea id="query_box" class="textarea is-link" placeholder="Textarea" cols="50" value={ {format!("{}", *use_query)}}></textarea>
                         <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
                     </div>
                     </div>
                 </div>
             </div>
-            //<Plotter url={*use_url}/>
+            <Plotter url={(*use_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid">
             <table class="table is-bordered">

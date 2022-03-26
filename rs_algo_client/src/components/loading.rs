@@ -11,7 +11,7 @@ pub fn loading(props: &Props) -> Html {
     log::info!("[CLIENT] props {:?}", &props);
     html! {
         if *loading {
-          <progress class="progress is-small is-primary" max="100">{ "Loading..."} </progress>
+          <progress class="progress is-small is-link" max="100">{ "Loading..."} </progress>
         } else {
           <div style="height: 36px;"></div>
         }

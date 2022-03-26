@@ -1,5 +1,4 @@
 use yew::{function_component, html, Html, Properties};
-
 #[derive(Clone, Debug, PartialEq, Properties)]
 pub struct Props {
     pub url: String,
@@ -11,17 +10,12 @@ pub fn plotter(props: &Props) -> Html {
     log::info!("[CLIENT] Plotter {:?}", &props);
     html! {
 
-    <div id="modal" class="modal">
-      <div class="modal-background"></div>
-
+      <div class="modal" id="modal">
+      <div class="modal-background" id="modal-background"></div>
       <div class="modal-content">
-        <div class="box">
-              <img src={format!("{}", url)} />
-        </div>
+          <img src={format!("{}", url)} width="1024" height="768"/>
       </div>
-
       <button class="modal-close is-large" aria-label="close"></button>
     </div>
-
         }
 }

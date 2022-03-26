@@ -9,7 +9,7 @@ pub fn footer() -> Html {
         <footer class="footer">
             <div class="content has-text-centered">
                 { "Powered by " }
-                <a href="https://yew.rs">{ "Yew" }</a>
+                <a href="https://yew.rs">{ "Rust" }</a>
             </div>
         </footer>
     }
