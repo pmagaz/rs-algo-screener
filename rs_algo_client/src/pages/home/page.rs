@@ -89,6 +89,7 @@ pub fn home() -> Html {
             <Plotter url={(*use_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid">
+                { "Results:" } { &instruments.len()}
             <table class="table is-bordered">
                 <thead class="has-background-grey-lighter">
                     <tr>

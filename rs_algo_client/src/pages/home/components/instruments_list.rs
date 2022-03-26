@@ -80,8 +80,8 @@ pub fn instrument_list(props: &Props
             let macd = instrument.indicators.macd.clone();
             let macd_status: IndicatorStatus= match macd {
                 _x if macd.current_a > macd.current_b && macd.current_a > 0. =>IndicatorStatus::Bullish,
-                _x if macd.current_a < macd.current_b => IndicatorStatus::Bearish,
                 _x if macd.current_a > macd.current_b && macd.current_a < 0. => IndicatorStatus::Neutral,
+                _x if macd.current_a < macd.current_b => IndicatorStatus::Bearish,
                 _ => IndicatorStatus::Neutral,
             };
 
