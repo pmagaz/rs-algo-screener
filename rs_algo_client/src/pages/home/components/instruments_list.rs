@@ -81,25 +81,25 @@ pub fn instrument_list(props: &Props
             //FIXME move this to server???? strategies?
             let macd = instrument.indicators.macd.clone();
             let macd_status: IndicatorStatus= match macd {
-                _x if macd.current_a > 0. && macd.current_a > macd.current_b=>IndicatorStatus::Bullish,
-                _x if macd.current_a > macd.current_b && macd.current_a < 0.=> IndicatorStatus::Neutral,
+                _x if macd.current_a > macd.current_b && macd.current_a > 0. =>IndicatorStatus::Bullish,
                 _x if macd.current_a < macd.current_b => IndicatorStatus::Bearish,
+                _x if macd.current_a > macd.current_b && macd.current_a < 0. => IndicatorStatus::Neutral,
                 _ => IndicatorStatus::Neutral,
             };
 
             let stoch = instrument.indicators.stoch.clone();
             let stoch_status: IndicatorStatus= match stoch {
-                _x if stoch.current_a < 30. && stoch.current_a > stoch.current_b =>IndicatorStatus::Bullish,
-                _x if stoch.current_a < 45. && stoch.current_a < stoch.current_b => IndicatorStatus::Neutral,
-                _x if stoch.current_a > 60. || stoch.current_a < stoch.current_b => IndicatorStatus::Bearish,
+                _x if stoch.current_a > stoch.current_b && stoch.current_a < 30. =>IndicatorStatus::Bullish,
+                _x if stoch.current_a < stoch.current_b => IndicatorStatus::Bearish,
+                _x if stoch.current_a > stoch.current_b  && stoch.current_a > 40. => IndicatorStatus::Neutral,
                 _ => IndicatorStatus::Neutral,
             };
 
                 let rsi = instrument.indicators.rsi.clone();
                 let rsi_status: IndicatorStatus= match rsi {
+                    _x if rsi.current_a < 30. => IndicatorStatus::Bullish,
                     _x if rsi.current_a > 60. =>IndicatorStatus::Bearish,
                     _x if rsi.current_a > 40. && rsi.current_a < 60. => IndicatorStatus::Neutral,
-                    _x if rsi.current_a < 30. => IndicatorStatus::Bullish,
                     _ => IndicatorStatus::Neutral,
                 };
 
