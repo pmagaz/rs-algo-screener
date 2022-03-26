@@ -39,10 +39,11 @@ pub async fn find_by_params(
 
     let default_query = doc! {
         "$or": [
-            {"current_candle":"Karakasa", "indicators.rsi.current_a":  {"$lt": 30 }, "indicators.stoch.current_a":  {"$lt": 30 }},
-            {"current_candle":"BearishGap", "indicators.rsi.current_a":  {"$lt": 30 }, "indicators.stoch.current_a":  {"$lt": 30 }},
-            {"patterns.local_patterns": {"$elemMatch" : {"active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(3)) }}}, "indicators.stoch.current_a":  {"$gt": "indicators.stoch.current_b" }},
-            {"indicators.rsi.current_a":  {"$lt": 30 }, "indicators.stoch.current_a":  {"$lt": 30 }, },
+            {"current_candle":"Karakasa", "indicators.rsi.current_a":  {"$lt": 30 }},
+            {"current_candle":"BearishGap", "indicators.rsi.current_a":  {"$lt": 30 }},
+            {"indicators.stoch.current_a":  {"$gt": "indicators.stoch.current_b" }, "indicators.stoch.prev_a":  {"$lte": "indicators.stoch.prev_b" }} ,
+            {"patterns.local_patterns": {"$elemMatch" : {"active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }}}, "indicators.stoch.current_a":  {"$gt": "indicators.stoch.current_b" }, "indicators.stoch.prev_a":  {"$lte": "indicators.stoch.prev_b" }},
+            {"indicators.rsi.current_a":  {"$lt": 25 } },
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT ","STELLAR"] } }
         ]
     };
