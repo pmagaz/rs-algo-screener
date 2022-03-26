@@ -42,7 +42,7 @@ pub async fn find_by_params(
             {"$and": [
                 { "$or": [{"current_candle":"Karakasa"},{"current_candle":"BearishGap"}, {"current_candle":"BullishCrows"}]},
                 {"$expr": {"$gt": ["$indicators.rsi.current_a","$indicators.rsi.current_b"]}},
-                {"indicators.rsi.current_a":  {"$lt": 40 }}
+                {"indicators.rsi.current_a":  {"$lt": 30 }}
             ]},
             {"$and": [
                 {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.current_b"]}},
@@ -50,6 +50,7 @@ pub async fn find_by_params(
             ]},
               {"$and": [
                 {"patterns.local_patterns": {"$elemMatch" : {"active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }}}},
+                {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.current_b"]}},
                 {"$expr": {"$lte": ["$indicators.stoch.prev_a","$indicators.stoch.prev_b"]}}
             ]},
             {"indicators.rsi.current_a":  {"$lt": 25 } },

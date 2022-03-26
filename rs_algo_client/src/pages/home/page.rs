@@ -101,8 +101,8 @@ pub fn home() -> Html {
                     <th><abbr>{ "Activated" }</abbr></th>
                     <th><abbr>{ "Stoch" }</abbr></th>
                     <th><abbr>{ "MacD" }</abbr></th>
-                    <th><abbr>{ "Emas" }</abbr></th>
                     <th><abbr>{ "Rsi" }</abbr></th>
+                    <th><abbr>{ "Emas" }</abbr></th>
                     <th><abbr>{ "Updated" }</abbr></th>
                     </tr>
                 </thead>

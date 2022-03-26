@@ -5,8 +5,6 @@ use yew::{function_component, html, Callback, use_state, Properties};
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
 
-use crate::components::plotter::Plotter;
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
@@ -127,8 +125,8 @@ pub fn instrument_list(props: &Props
                     <td> {format!("{}", pattern_date.format("%d/%m/%Y"))}</td>
                     <td class={get_status_class(stoch_status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 2))}</td>
                     <td class={get_status_class(macd_status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 2))}</td>
-                    <td class={get_status_class(ema_status)}> {format!("{:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 2))}</td>
                     <td class={get_status_class(rsi_status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
+                    <td class={get_status_class(ema_status)}> {format!("{:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 2))}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }
