@@ -29,6 +29,7 @@ pub async fn get_collection<T>(state: &web::Data<AppState>, collection: &str) ->
 
 pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
     let len = doc.indicators.macd.data_a.len();
+
     let doc = CompactInstrument {
         symbol: doc.symbol,
         date: doc.date,
@@ -39,49 +40,37 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
             macd: CompactIndicator {
                 current_a: *doc.indicators.macd.data_a.last().unwrap(),
                 current_b: *doc.indicators.macd.data_b.last().unwrap(),
-                prev_a: *doc.indicators.macd.data_a.get(len - 1).unwrap(),
-                prev_b: *doc.indicators.macd.data_b.get(len - 1).unwrap(),
+                prev_a: *doc.indicators.macd.data_a.get(len - 2).unwrap(),
+                prev_b: *doc.indicators.macd.data_b.get(len - 2).unwrap(),
             },
             rsi: CompactIndicator {
                 current_a: *doc.indicators.rsi.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.rsi.data_a.get(len - 1).unwrap(),
+                prev_a: *doc.indicators.rsi.data_a.get(len - 2).unwrap(),
                 prev_b: 0.,
             },
             stoch: CompactIndicator {
                 current_a: *doc.indicators.stoch.data_a.last().unwrap(),
                 current_b: *doc.indicators.stoch.data_b.last().unwrap(),
-                prev_a: *doc.indicators.stoch.data_a.get(len - 1).unwrap(),
-                prev_b: *doc.indicators.stoch.data_b.get(len - 1).unwrap(),
+                prev_a: *doc.indicators.stoch.data_a.get(len - 2).unwrap(),
+                prev_b: *doc.indicators.stoch.data_b.get(len - 2).unwrap(),
             },
             ema_a: CompactIndicator {
                 current_a: *doc.indicators.ema_a.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_a.data_a.get(len - 1).unwrap(),
+                prev_a: *doc.indicators.ema_a.data_a.get(len - 2).unwrap(),
                 prev_b: 0.,
             },
             ema_b: CompactIndicator {
                 current_a: *doc.indicators.ema_b.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_b.data_a.get(len - 1).unwrap(),
+                prev_a: *doc.indicators.ema_b.data_a.get(len - 2).unwrap(),
                 prev_b: 0.,
             },
             ema_c: CompactIndicator {
                 current_a: *doc.indicators.ema_c.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_c.data_a.get(len - 1).unwrap(),
-                prev_b: 0.,
-            },
-            ema_d: CompactIndicator {
-                current_a: *doc.indicators.ema_d.data_a.last().unwrap(),
-                current_b: 0.,
-                prev_a: *doc.indicators.ema_d.data_a.get(len - 1).unwrap(),
-                prev_b: 0.,
-            },
-            ema_e: CompactIndicator {
-                current_a: *doc.indicators.ema_e.data_a.last().unwrap(),
-                current_b: 0.,
-                prev_a: *doc.indicators.ema_e.data_a.get(len - 1).unwrap(),
+                prev_a: *doc.indicators.ema_c.data_a.get(len - 2).unwrap(),
                 prev_b: 0.,
             },
         },

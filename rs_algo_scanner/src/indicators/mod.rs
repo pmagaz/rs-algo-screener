@@ -22,8 +22,6 @@ pub struct Indicators {
     pub ema_a: Ema,
     pub ema_b: Ema,
     pub ema_c: Ema,
-    pub ema_d: Ema,
-    pub ema_e: Ema,
 }
 
 impl Indicators {
@@ -31,8 +29,6 @@ impl Indicators {
         let ema_a = &env::var("EMA_A").unwrap().parse::<usize>().unwrap();
         let ema_b = &env::var("EMA_B").unwrap().parse::<usize>().unwrap();
         let ema_c = &env::var("EMA_C").unwrap().parse::<usize>().unwrap();
-        let ema_d = &env::var("EMA_D").unwrap().parse::<usize>().unwrap();
-        let ema_e = &env::var("EMA_E").unwrap().parse::<usize>().unwrap();
 
         Ok(Self {
             macd: Macd::new().unwrap(),
@@ -41,8 +37,6 @@ impl Indicators {
             ema_a: Ema::new_ema(*ema_a).unwrap(),
             ema_b: Ema::new_ema(*ema_b).unwrap(),
             ema_c: Ema::new_ema(*ema_c).unwrap(),
-            ema_d: Ema::new_ema(*ema_d).unwrap(),
-            ema_e: Ema::new_ema(*ema_e).unwrap(),
         })
     }
 
@@ -70,14 +64,6 @@ impl Indicators {
         &self.ema_c
     }
 
-    pub fn ema_d(&self) -> &Ema {
-        &self.ema_d
-    }
-
-    pub fn ema_e(&self) -> &Ema {
-        &self.ema_e
-    }
-
     pub fn calculate_indicators(&mut self, close: f64) -> Result<()> {
         self.macd.next(close).unwrap();
         self.stoch.next(close).unwrap();
@@ -85,8 +71,6 @@ impl Indicators {
         self.ema_a.next(close).unwrap();
         self.ema_b.next(close).unwrap();
         self.ema_c.next(close).unwrap();
-        self.ema_d.next(close).unwrap();
-        self.ema_e.next(close).unwrap();
         Ok(())
     }
 }
