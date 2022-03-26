@@ -37,8 +37,14 @@ pub async fn find_by_params(
     println!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
-    let default_query = doc! {"current_candle": "Karakasa",
-        "$or": [{ "patterns.local_patterns": {"$elemMatch" : {"active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }}}}]
+    let default_query = doc! {
+        "$or": [
+            {"current_candle":"Karakasa", "indicators.rsi.current_a":  {"$lt": 30 }, "indicators.stoch.current_a":  {"$lt": 30 }},
+            {"current_candle":"BearishGap", "indicators.rsi.current_a":  {"$lt": 30 }, "indicators.stoch.current_a":  {"$lt": 30 }},
+            {"patterns.local_patterns": {"$elemMatch" : {"active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(3)) }}}, "indicators.stoch.current_a":  {"$gt": "indicators.stoch.current_b" }},
+            {"indicators.rsi.current_a":  {"$lt": 30 }, "indicators.stoch.current_a":  {"$lt": 30 }, },
+            { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT ","STELLAR"] } }
+        ]
     };
     let query = match params.as_ref() {
         "" => default_query,
