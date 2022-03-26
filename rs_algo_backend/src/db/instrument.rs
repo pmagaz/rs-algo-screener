@@ -37,23 +37,35 @@ pub async fn find_by_params(
     println!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
+    //MOVE TO Backend
     let default_query = doc! {
         "$or": [
             {"$and": [
-                { "$or": [{"current_candle":"Karakasa"},{"current_candle":"BearishGap"}, {"current_candle":"BullishCrows"}]},
-                {"$expr": {"$gt": ["$indicators.rsi.current_a","$indicators.rsi.current_b"]}},
-                {"indicators.rsi.current_a":  {"$lt": 30 }}
+                { "$or": [{"current_candle":"Karakasa"},{"current_candle":"BullishGap"}, {"current_candle":"BullishCrows"}]},
+                {"indicators.rsi.current_a":  {"$lte": 30 }},
             ]},
+            //STOCH
             {"$and": [
+                {"indicators.rsi.current_a":  {"$lte": 30 } },
+                {"indicators.stoch.current_a":  {"$lt": 30 }},
                 {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.current_b"]}},
+                {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.prev_a"]}},
                 {"$expr": {"$lte": ["$indicators.stoch.prev_a","$indicators.stoch.prev_b"]}}
             ]},
+            // MACD
+            {"$and": [
+                {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.current_b"]}},
+                {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.stoch.prev_a"]}},
+                {"$expr": {"$lte": ["$indicators.macd.prev_a","$indicators.macd.prev_b"]}}
+            ]},
+            // RSI
               {"$and": [
-                {"patterns.local_patterns": {"$elemMatch" : {"active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }}}},
+                {"patterns.local_patterns": {"$elemMatch" : {"active.target":{"$gte": 15 }, "active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(3)) }}}},
                 {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.current_b"]}},
+                {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.prev_a"]}},
                 {"$expr": {"$lte": ["$indicators.stoch.prev_a","$indicators.stoch.prev_b"]}}
             ]},
-            {"indicators.rsi.current_a":  {"$lt": 25 } },
+
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT ","STELLAR"] } }
         ]
     };
