@@ -3,7 +3,7 @@ use crate::models::app_state::AppState;
 use crate::models::instrument::{CompactInstrument, Instrument};
 use crate::strategies::Strategy;
 
-use crate::strategies::stoch::Stoch;
+use crate::strategies::general::General;
 use actix_web::web;
 use bson::{doc, Document};
 use chrono::Duration;
@@ -32,7 +32,7 @@ pub async fn find_by_symbol(
 pub async fn find_by_params(
     state: &web::Data<AppState>,
     params: String,
-    strategy: Stoch,
+    strategy: General,
 ) -> Result<Vec<CompactInstrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
 

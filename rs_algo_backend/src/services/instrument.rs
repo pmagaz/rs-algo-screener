@@ -4,7 +4,7 @@ use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
 use crate::models::Instrument;
 use crate::render_image::Backend;
-use crate::strategies::stoch::Stoch;
+use crate::strategies::general::General;
 use crate::strategies::Strategy;
 
 pub use rs_algo_shared::models::*;
@@ -80,7 +80,7 @@ pub async fn render(
 
 pub async fn find(params: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
-    let strategy = Stoch::new().unwrap();
+    let strategy = General::new().unwrap();
     let instruments = db::instrument::find_by_params(&state, params, strategy)
         .await
         .unwrap();

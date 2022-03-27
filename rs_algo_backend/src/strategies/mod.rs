@@ -1,4 +1,4 @@
-pub mod stoch;
+pub mod general;
 use async_trait::async_trait;
 use mongodb::Cursor;
 use rs_algo_shared::error::Result;
