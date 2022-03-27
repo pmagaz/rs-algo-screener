@@ -7,17 +7,17 @@ do
     case $opt in
         "build & deploy all")
             echo "Deploying: $opt";
-            docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; docker build -t pmagaz/rs-algo-client:latest rs_algo_client ; docker push pmagaz/rs-algo-client:latest ; ansible-playbook playbook.yml  
+            docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend  ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ;  docker build -t pmagaz/rs-algo-client:latest rs_algo_client ; docker push pmagaz/rs-algo-backend:latest ; docker push pmagaz/rs-algo-scanner:latest ; docker push pmagaz/rs-algo-client:latest ; ansible-playbook playbook.yml  
+            break
+            ;;
+        "build all")
+            echo "Deploying: $opt";
+            docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend  ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ;  docker build -t pmagaz/rs-algo-client:latest rs_algo_client ; docker push pmagaz/rs-algo-backend:latest ; docker push pmagaz/rs-algo-scanner:latest ; docker push pmagaz/rs-algo-client:latest ;
             break
             ;;
         "deploy all")
             echo "Deploying: $opt";
             ansible-playbook playbook.yml
-            break
-            ;;
-        "build all")
-            echo "Deploying: $opt";
-            docker build -t pmagaz/rs-algo-backend:latest rs_algo_backend ; docker push pmagaz/rs-algo-backend:latest ; docker build -t pmagaz/rs-algo-scanner:latest rs_algo_scanner ; docker push pmagaz/rs-algo-scanner:latest ; docker build -t pmagaz/rs-algo-client:latest rs_algo_client ; docker push pmagaz/rs-algo-client:latest ; 
             break
             ;;
         "build & deploy rs-algo-backend")
