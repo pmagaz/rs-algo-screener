@@ -27,7 +27,7 @@ pub fn instrument_list(props: &Props
     let use_url = use_state(|| String::from(""));
 
       
-                 fn get_status_class<'a>(status: Status) -> &'a str {
+                 fn get_status_class<'a>(status: &Status) -> &'a str {
                      let class = match status {
                          Status::Default => "", 
                          //Status::Neutral => "", 
@@ -94,14 +94,14 @@ pub fn instrument_list(props: &Props
                     //<td> <a href={format!("{}{}", base_url, instrument.symbol)}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td> {format!("{:?}", instrument.current_candle)}</td>
-                    <td> {format!("{:?}", pattern_type)}</td>
-                    <td> {format!("{:?}", break_direction)}</td>
-                    <td class={get_status_class(pattern_status.clone())}> {format!("{}%", pattern_change)}</td>
-                    <td class={get_status_class(pattern_status)}> {format!("{}", pattern_date.format("%d/%m/%Y"))}</td>
-                    <td class={get_status_class(stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 2))}</td>
-                    <td class={get_status_class(macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 2))}</td>
-                    <td class={get_status_class(rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    <td class={get_status_class(ema_a.status)}> {format!("{:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 2))}</td>
+                    <td class={get_status_class(&pattern_status)}> {format!("{:?}", pattern_type)}</td>
+                    <td class={get_status_class(&pattern_status)}>{format!("{:?}", break_direction)}</td>
+                    <td class={get_status_class(&pattern_status)}> {format!("{}%", pattern_change)}</td>
+                    <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_date.format("%d/%m/%Y"))}</td>
+                    <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 2))}</td>
+                    <td class={get_status_class(&macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 2))}</td>
+                    <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
+                    <td class={get_status_class(&ema_a.status)}> {format!("{:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 2))}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }
