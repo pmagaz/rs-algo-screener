@@ -138,8 +138,7 @@ impl Stoch {
                     instrument.indicators.rsi.status = rsi_status.clone();
                     //if pattern_status != Status::Default &&
                     if pattern_status != Status::Neutral
-                        && stoch_status != Status::Bearish
-                        && macd_status != Status::Bearish
+                        || (stoch_status != Status::Bearish && macd_status != Status::Bearish)
                     {
                         docs.push(instrument);
                     }
