@@ -31,7 +31,7 @@ pub fn instrument_list(props: &Props
                      let class = match status {
                          Status::Default => "", 
                          //Status::Neutral => "", 
-                         Status::Bullish => "has-background-success-light", 
+                         Status::Bullish => "has-background-primary-light", 
                          Status::Bearish => "has-background-danger-light", 
                          Status::Neutral => "has-background-warning-light", 
                      };
