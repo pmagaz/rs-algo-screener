@@ -256,6 +256,7 @@ impl Patterns {
                             PatternActive {
                                 active: false,
                                 completed: true,
+                                status: Status::Default,
                                 date: DbDateTime::from_chrono(Local::now()),
                                 target: 0.,
                                 change: 0.,
@@ -279,6 +280,7 @@ impl Patterns {
                     active: false,
                     completed: true,
                     date: DbDateTime::from_chrono(Local::now()),
+                    status: Status::Default,
                     target: 0.,
                     change: 0.,
                     index: 0,
@@ -338,6 +340,7 @@ pub fn pattern_active_result(
         PatternActive {
             active: true,
             completed: false,
+            status: Status::Default,
             index: top_id,
             price: top_price,
             date: top_date,
@@ -349,6 +352,7 @@ pub fn pattern_active_result(
         PatternActive {
             active: true,
             completed: false,
+            status: Status::Default,
             index: bottom_id,
             date: bottom_date,
             price: bottom_price,
@@ -360,6 +364,7 @@ pub fn pattern_active_result(
         PatternActive {
             active: false,
             completed: false,
+            status: Status::Default,
             index: 0,
             date: DbDateTime::from_chrono(Local::now()),
             price: 0.,

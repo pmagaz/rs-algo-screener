@@ -1,5 +1,5 @@
 use std::env;
-
+//FIXME move to shared
 pub fn percentage_change(x: f64, y: f64) -> f64 {
     let max = x.max(y);
     let min = y.min(x);

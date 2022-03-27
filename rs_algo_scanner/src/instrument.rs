@@ -100,7 +100,6 @@ impl Instrument {
                 let low = x.3;
                 let close = x.4;
                 let volume = x.4;
-
                 if self.min_price == -100. {
                     self.min_price = low;
                 }

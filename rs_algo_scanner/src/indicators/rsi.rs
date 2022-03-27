@@ -1,5 +1,5 @@
 use super::Indicator;
-use super::IndicatorStatus;
+use super::Status;
 use crate::error::Result;
 
 use serde::{Deserialize, Serialize};
@@ -38,17 +38,6 @@ impl Indicator for Rsi {
     fn get_current_b(&self) -> &f64 {
         let max = self.data_a.len() - 1;
         &self.data_a[max]
-    }
-
-    fn get_status(&self, _current_price: f64) -> IndicatorStatus {
-        let a = self.get_current_a();
-        let b = self.get_current_b();
-        let status = match (a, b) {
-            _x if a > &60. => IndicatorStatus::Overbought,
-            _x if a < &10. => IndicatorStatus::Oversold,
-            _ => IndicatorStatus::Default,
-        };
-        status
     }
 
     fn next(&mut self, value: f64) -> Result<()> {

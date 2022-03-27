@@ -1,4 +1,6 @@
 use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
+use crate::helpers::comp::percentage_change;
+
 use rs_algo_shared::helpers::date::{DateTime, Local};
 pub type OHLCV = (f64, f64, f64, f64);
 pub type DOHLCV = (DateTime<Local>, f64, f64, f64, f64, f64);
@@ -239,7 +241,8 @@ impl CandleBuilder {
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (prev_open, prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
-        (open > &(prev_high / 1.01) && open > &(prev_close / 1.01))
+        let percentage_diff = percentage_change(*open, *prev_high);
+        percentage_diff > 1.5
     }
 
     fn is_bearish_gap(&self) -> bool {
@@ -247,7 +250,8 @@ impl CandleBuilder {
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);
-        open < &(prev_low / 1.01) && open < &(prev_close / 1.01)
+        let percentage_diff = percentage_change(*open, *prev_low);
+        percentage_diff > 1.5
     }
 
     fn is_bullish_crows(&self) -> bool {

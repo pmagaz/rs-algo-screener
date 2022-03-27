@@ -49,16 +49,6 @@ impl Indicator for Ema {
         &self.data_b[max]
     }
 
-    fn get_status(&self, current_price: f64) -> IndicatorStatus {
-        let a = self.get_current_a();
-        let status = match a {
-            _x if a > &current_price => IndicatorStatus::Bullish,
-            _x if a < &current_price => IndicatorStatus::Bearish,
-            _ => IndicatorStatus::Default,
-        };
-        status
-    }
-
     fn next(&mut self, value: f64) -> Result<()> {
         let a = self.ema.next(value);
         self.data_a.push(a);

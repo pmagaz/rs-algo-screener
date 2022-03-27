@@ -1,7 +1,8 @@
 use super::Indicator;
-use super::IndicatorStatus;
+use super::Status;
 use crate::error::Result;
 
+use ta::indicators::FastStochastic;
 use ta::indicators::SlowStochastic;
 
 use serde::{Deserialize, Serialize};
@@ -43,19 +44,6 @@ impl Indicator for Stoch {
     fn get_current_b(&self) -> &f64 {
         let max = self.data_b.len() - 1;
         &self.data_b[max]
-    }
-
-    fn get_status(&self, _current_price: f64) -> IndicatorStatus {
-        let a = self.get_current_a();
-        let b = self.get_current_b();
-        let status = match (a, b) {
-            _x if a > b => IndicatorStatus::Bullish,
-            _x if a < b => IndicatorStatus::Bearish,
-            _x if a > b && a > &70. && b > &70. => IndicatorStatus::Overbought,
-            _x if a < b && a < &20. && b < &20. => IndicatorStatus::Oversold,
-            _ => IndicatorStatus::Default,
-        };
-        status
     }
 
     fn next(&mut self, value: f64) -> Result<()> {

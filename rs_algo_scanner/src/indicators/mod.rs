@@ -84,5 +84,5 @@ pub trait Indicator {
     fn get_current_a(&self) -> &f64;
     fn get_current_b(&self) -> &f64;
     fn get_data_b(&self) -> &Vec<f64>;
-    fn get_status(&self, current_price: f64) -> IndicatorStatus;
+    //fn get_status(&self, current_price: f64) -> Status;
 }

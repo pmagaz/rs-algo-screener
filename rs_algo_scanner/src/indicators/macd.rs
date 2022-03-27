@@ -43,19 +43,6 @@ impl Indicator for Macd {
         &self.data_b[max]
     }
 
-    fn get_status(&self, _current_price: f64) -> IndicatorStatus {
-        let a = self.get_current_a();
-        let b = self.get_current_b();
-        let status = match (a, b) {
-            _x if a > b => IndicatorStatus::Bullish,
-            _x if a < b => IndicatorStatus::Bearish,
-            _x if a > b && a > &0. && b > &0. => IndicatorStatus::BullishOverZero,
-            _x if a < b && a < &0. && b < &0. => IndicatorStatus::BearishBellowZero,
-            _ => IndicatorStatus::Default,
-        };
-        status
-    }
-
     fn next(&mut self, value: f64) -> Result<()> {
         let a = self.ema12.next(value) - self.ema26.next(value);
         let b = self.ema9.next(a);
