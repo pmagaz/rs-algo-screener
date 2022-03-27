@@ -3,7 +3,6 @@ use crate::components::loading::Loading;
 use crate::pages::home::components::instruments_list::InstrumentsList;
 
 use crate::components::plotter::Plotter;
-use round::round;
 use rs_algo_shared::models::CompactInstrument;
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
