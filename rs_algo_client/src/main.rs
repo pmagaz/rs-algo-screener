@@ -1,6 +1,6 @@
+use dotenv::dotenv;
 use yew::prelude::*;
 use yew_router::prelude::*;
-
 mod components;
 mod pages;
 mod routes;
@@ -8,6 +8,7 @@ mod routes;
 use components::footer::Footer;
 use components::header::Header;
 use routes::{switch, Route};
+use std::env;
 
 pub enum Msg {}
 
@@ -35,6 +36,10 @@ impl Component for App {
 }
 
 fn main() {
+    dotenv().ok();
+    //let port = env::var("RENDER_TO_IMAGE").expect("RENDER_TO_IMAGE not found");
+    // log::info!("[aaaaaaa] Loading app... {}", port);
+
     wasm_logger::init(wasm_logger::Config::new(log::Level::Trace));
     yew::start_app::<App>();
 }

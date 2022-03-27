@@ -1,6 +1,6 @@
 use round::round;
 use rs_algo_shared::helpers::date::{Local, DateTime,Datelike};
-use rs_algo_shared::models::{CompactInstrument, PatternType, PatternDirection};
+use rs_algo_shared::models::{CompactInstrument, PatternType, PatternDirection, Status};
 use yew::{function_component, html, Callback, use_state, Properties};
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
@@ -10,12 +10,6 @@ extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
     fn open_modal(modal: &str);
     fn close_modal(modal: &str);
-}
-
-pub enum IndicatorStatus {
-    Bullish,
-    Bearish,
-    Neutral
 }
 
 
@@ -33,11 +27,13 @@ pub fn instrument_list(props: &Props
     let use_url = use_state(|| String::from(""));
 
       
-                 fn get_status_class<'a>(status: IndicatorStatus) -> &'a str {
+                 fn get_status_class<'a>(status: Status) -> &'a str {
                      let class = match status {
-                         IndicatorStatus::Bullish => "has-background-success-light", 
-                         IndicatorStatus::Neutral => "has-background-warning-light", 
-                         IndicatorStatus::Bearish => "has-background-danger-light", 
+                         Status::Default => "", 
+                         //Status::Neutral => "", 
+                         Status::Bullish => "has-background-success-light", 
+                         Status::Bearish => "has-background-danger-light", 
+                         Status::Neutral => "has-background-warning-light", 
                      };
                      class
 
@@ -56,14 +52,21 @@ pub fn instrument_list(props: &Props
             
 
             let patterns = instrument.patterns.local_patterns.get(0); 
+
+
+            let break_direction = match patterns {
+                Some(val) => val.active.break_direction.clone(),
+                None   => PatternDirection::None,
+            };
+            
             let pattern_type = match patterns {
                 Some(val) => val.pattern_type.clone(),
                 None   => PatternType::None,
             };
 
-            let break_direction = match patterns {
-                Some(val) => val.active.break_direction.clone(),
-                None   => PatternDirection::None,
+            let pattern_status = match patterns {
+                Some(val) => val.active.status.clone(),
+                None   => Status::Default,
             };
 
             let pattern_date = match patterns {
@@ -76,40 +79,12 @@ pub fn instrument_list(props: &Props
                 None   => 0.,
             };
 
-            //FIXME move this to server???? strategies?
             let macd = instrument.indicators.macd.clone();
-            let macd_status: IndicatorStatus= match macd {
-                _x if macd.current_a > macd.current_b && macd.current_a > 0. =>IndicatorStatus::Bullish,
-                _x if macd.current_a > macd.current_b && macd.current_a < 0. => IndicatorStatus::Neutral,
-                _x if macd.current_a < macd.current_b => IndicatorStatus::Bearish,
-                _ => IndicatorStatus::Neutral,
-            };
-
             let stoch = instrument.indicators.stoch.clone();
-            let stoch_status: IndicatorStatus= match stoch {
-                _x if stoch.current_a > stoch.current_b && stoch.current_a > 20. && stoch.current_a < 30. =>IndicatorStatus::Bullish,
-                _x if stoch.current_a < stoch.current_b => IndicatorStatus::Bearish,
-                _x if stoch.current_a > stoch.current_b  && stoch.current_a > 40. => IndicatorStatus::Neutral,
-                _ => IndicatorStatus::Neutral,
-            };
-
             let rsi = instrument.indicators.rsi.clone();
-            let rsi_status: IndicatorStatus= match rsi {
-                _x if rsi.current_a < 30. => IndicatorStatus::Bullish,
-                _x if rsi.current_a > 60. =>IndicatorStatus::Bearish,
-                _x if rsi.current_a > 40. && rsi.current_a < 60. => IndicatorStatus::Neutral,
-                _ => IndicatorStatus::Neutral,
-            };
-
             let ema_a = instrument.indicators.ema_a.clone(); //50
             let ema_b = instrument.indicators.ema_b.clone(); //21
             let ema_c = instrument.indicators.ema_c.clone(); //9
-            let ema_status: IndicatorStatus= match ema_a {
-                _x if ema_c.current_a > ema_b.current_a && ema_b.current_a > ema_a.current_a  => IndicatorStatus::Bullish,
-                _x if ema_c.current_a < ema_b.current_a && ema_b.current_a > ema_a.current_a  => IndicatorStatus::Bearish,
-                _x if ema_c.current_a < ema_b.current_a && ema_b.current_a > ema_a.current_a  => IndicatorStatus::Neutral,
-                _ => IndicatorStatus::Neutral,
-            };
 
             let date = instrument.date.to_chrono();
 
@@ -122,11 +97,11 @@ pub fn instrument_list(props: &Props
                     <td> {format!("{:?}", pattern_type)}</td>
                     <td> {format!("{:?}", break_direction)}</td>
                     <td> {format!("{}%", pattern_change)}</td>
-                    <td> {format!("{}", pattern_date.format("%d/%m/%Y"))}</td>
-                    <td class={get_status_class(stoch_status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 2))}</td>
-                    <td class={get_status_class(macd_status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 2))}</td>
-                    <td class={get_status_class(rsi_status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    <td class={get_status_class(ema_status)}> {format!("{:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 2))}</td>
+                    <td class={get_status_class(pattern_status)}> {format!("{}", pattern_date.format("%d/%m/%Y"))}</td>
+                    <td class={get_status_class(stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 2))}</td>
+                    <td class={get_status_class(macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 2))}</td>
+                    <td class={get_status_class(rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
+                    <td class={get_status_class(ema_a.status)}> {format!("{:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 2))}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }

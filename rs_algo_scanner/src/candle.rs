@@ -242,7 +242,7 @@ impl CandleBuilder {
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (prev_open, prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
         let percentage_diff = percentage_change(*open, *prev_high);
-        percentage_diff > 1.5
+        percentage_diff > 2. && close > open
     }
 
     fn is_bearish_gap(&self) -> bool {
@@ -251,7 +251,7 @@ impl CandleBuilder {
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);
         let percentage_diff = percentage_change(*open, *prev_low);
-        percentage_diff > 1.5
+        percentage_diff > 2. && close < open
     }
 
     fn is_bullish_crows(&self) -> bool {
