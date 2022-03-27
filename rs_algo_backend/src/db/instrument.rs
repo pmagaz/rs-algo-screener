@@ -3,15 +3,15 @@ use crate::models::app_state::AppState;
 use crate::models::instrument::{CompactInstrument, Instrument};
 use crate::strategies::Strategy;
 
-use rs_algo_shared::helpers::date::Local;
-use rs_algo_shared::models::*;
-
+use crate::strategies::stoch::Stoch;
 use actix_web::web;
 use bson::{doc, Document};
 use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
+use rs_algo_shared::helpers::date::Local;
+use rs_algo_shared::models::*;
 use std::env;
 
 pub async fn find_by_symbol(
@@ -32,7 +32,7 @@ pub async fn find_by_symbol(
 pub async fn find_by_params(
     state: &web::Data<AppState>,
     params: String,
-    strategy: impl Strategy,
+    strategy: Stoch,
 ) -> Result<Vec<CompactInstrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
 
@@ -49,15 +49,7 @@ pub async fn find_by_params(
         .await
         .unwrap();
 
-    let mut docs: Vec<CompactInstrument> = vec![];
-    while let Some(result) = cursor.next().await {
-        match result {
-            Ok(doc) => {
-                docs.push(doc);
-            }
-            _ => {}
-        }
-    }
+    let docs = strategy.format_instrument(cursor).await;
     Ok(docs)
 }
 
