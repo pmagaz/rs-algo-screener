@@ -25,6 +25,8 @@ impl General {
              "$or": [
                 {"$and": [
                  {"current_candle": "Karakasa"},
+                {"indicators.stoch.current_a":  {"$lt": stoch_bottom }}
+
                ]},
                 {"$and": [
                  {"current_candle": "BullishGap"},
