@@ -79,7 +79,7 @@ impl Stoch {
                     let ema_b = instrument.indicators.ema_b.clone(); //21
                     let ema_c = instrument.indicators.ema_c.clone(); //9
 
-                    let _local_pattern = match instrument.patterns.local_patterns.get(0) {
+                    let pattern_status = match instrument.patterns.local_patterns.get(0) {
                         Some(val) => {
                             if val.active.date
                                 > DbDateTime::from_chrono(Local::now() - Duration::days(5))
@@ -96,11 +96,12 @@ impl Stoch {
                                     }
                                 }
                             }
+                            instrument.patterns.local_patterns[0].active.status.clone()
                         }
-                        None => {}
+                        None => Status::Default,
                     };
 
-                    instrument.indicators.stoch.status = match stoch {
+                    let stoch_status = match stoch {
                         _x if stoch.current_a > stoch.current_b
                             && stoch.current_a > 20.
                             && stoch.current_a < 30. =>
@@ -114,7 +115,7 @@ impl Stoch {
                         _ => Status::Neutral,
                     };
 
-                    instrument.indicators.macd.status = match macd {
+                    let macd_status = match macd {
                         _x if macd.current_a > macd.current_b && macd.current_a > 0. => {
                             Status::Bullish
                         }
@@ -125,14 +126,23 @@ impl Stoch {
                         _ => Status::Neutral,
                     };
 
-                    instrument.indicators.rsi.status = match rsi {
+                    let rsi_status = match rsi {
                         _x if rsi.current_a < 30. => Status::Bullish,
                         _x if rsi.current_a > 60. => Status::Bearish,
                         _x if rsi.current_a > 40. && rsi.current_a < 60. => Status::Neutral,
                         _ => Status::Neutral,
                     };
 
-                    docs.push(instrument);
+                    instrument.indicators.stoch.status = stoch_status.clone();
+                    instrument.indicators.macd.status = macd_status.clone();
+                    instrument.indicators.rsi.status = rsi_status.clone();
+                    //if pattern_status != Status::Default &&
+                    if pattern_status != Status::Neutral
+                        && stoch_status != Status::Bearish
+                        && macd_status != Status::Bearish
+                    {
+                        docs.push(instrument);
+                    }
                 }
                 _ => {}
             }
