@@ -50,6 +50,7 @@ impl Stoch {
                  "direction":"Top",
                  "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
                 }}},
+                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR"] } }
                 //{"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.current_b"]}},
                 // {"indicators.macd.current_a":  {"$gt": 0 }},
                 // {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.prev_a"]}},
