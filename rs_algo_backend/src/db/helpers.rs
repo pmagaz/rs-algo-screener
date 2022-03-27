@@ -2,10 +2,9 @@ use crate::error::Result;
 use crate::models::app_state::AppState;
 use crate::models::instrument::{
     CompactDivergence, CompactDivergences, CompactIndicator, CompactIndicators, CompactInstrument,
-    Instrument, Patterns,
+    IndicatorStatus, Instrument, Patterns,
 };
 use actix_web::web;
-use mongodb::bson::{doc, document::Document, oid::ObjectId, Bson};
 use mongodb::Collection;
 
 pub async fn get_collection<T>(state: &web::Data<AppState>, collection: &str) -> Collection<T> {
@@ -42,36 +41,42 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 current_b: *doc.indicators.macd.data_b.last().unwrap(),
                 prev_a: *doc.indicators.macd.data_a.get(len - 2).unwrap(),
                 prev_b: *doc.indicators.macd.data_b.get(len - 2).unwrap(),
+                status: IndicatorStatus::Default,
             },
             rsi: CompactIndicator {
                 current_a: *doc.indicators.rsi.data_a.last().unwrap(),
                 current_b: 0.,
                 prev_a: *doc.indicators.rsi.data_a.get(len - 2).unwrap(),
                 prev_b: 0.,
+                status: IndicatorStatus::Default,
             },
             stoch: CompactIndicator {
                 current_a: *doc.indicators.stoch.data_a.last().unwrap(),
                 current_b: *doc.indicators.stoch.data_b.last().unwrap(),
                 prev_a: *doc.indicators.stoch.data_a.get(len - 2).unwrap(),
                 prev_b: *doc.indicators.stoch.data_b.get(len - 2).unwrap(),
+                status: IndicatorStatus::Default,
             },
             ema_a: CompactIndicator {
                 current_a: *doc.indicators.ema_a.data_a.last().unwrap(),
                 current_b: 0.,
                 prev_a: *doc.indicators.ema_a.data_a.get(len - 2).unwrap(),
                 prev_b: 0.,
+                status: IndicatorStatus::Default,
             },
             ema_b: CompactIndicator {
                 current_a: *doc.indicators.ema_b.data_a.last().unwrap(),
                 current_b: 0.,
                 prev_a: *doc.indicators.ema_b.data_a.get(len - 2).unwrap(),
                 prev_b: 0.,
+                status: IndicatorStatus::Default,
             },
             ema_c: CompactIndicator {
                 current_a: *doc.indicators.ema_c.data_a.last().unwrap(),
                 current_b: 0.,
                 prev_a: *doc.indicators.ema_c.data_a.get(len - 2).unwrap(),
                 prev_b: 0.,
+                status: IndicatorStatus::Default,
             },
         },
         patterns: Patterns {

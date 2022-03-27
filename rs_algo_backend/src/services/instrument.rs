@@ -4,6 +4,9 @@ use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
 use crate::models::Instrument;
 use crate::render_image::Backend;
+use crate::strategies::stoch::Stoch;
+use crate::strategies::Strategy;
+
 pub use rs_algo_shared::models::*;
 use std::time::Instant;
 
@@ -72,17 +75,13 @@ pub async fn render(
         now.elapsed()
     );
 
-    Ok(
-        file.use_last_modified(true), // .set_content_disposition(ContentDisposition {
-                                      //     disposition: DispositionType::Attachment,
-                                      //     parameters: vec![],
-                                      // })
-    )
+    Ok(file.use_last_modified(true))
 }
 
 pub async fn find(params: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
-    let instruments = db::instrument::find_by_params(&state, params)
+    let strategy = Stoch::new().unwrap();
+    let instruments = db::instrument::find_by_params(&state, params, strategy)
         .await
         .unwrap();
 

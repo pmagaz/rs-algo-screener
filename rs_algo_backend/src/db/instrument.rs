@@ -1,6 +1,7 @@
 use super::helpers::get_collection;
 use crate::models::app_state::AppState;
 use crate::models::instrument::{CompactInstrument, Instrument};
+use crate::strategies::Strategy;
 
 use rs_algo_shared::helpers::date::Local;
 use rs_algo_shared::models::*;
@@ -31,46 +32,15 @@ pub async fn find_by_symbol(
 pub async fn find_by_params(
     state: &web::Data<AppState>,
     params: String,
+    strategy: impl Strategy,
 ) -> Result<Vec<CompactInstrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
 
     println!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<CompactInstrument>(state, collection_name).await;
 
-    //MOVE TO Backend
-    let default_query = doc! {
-        "$or": [
-            {"$and": [
-                { "$or": [{"current_candle":"Karakasa"},{"current_candle":"BullishGap"}, {"current_candle":"BullishCrows"}]},
-                {"indicators.rsi.current_a":  {"$lte": 30 }},
-            ]},
-            //STOCH
-            {"$and": [
-                {"indicators.rsi.current_a":  {"$lte": 30 } },
-                {"indicators.stoch.current_a":  {"$lt": 30 }},
-                {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.current_b"]}},
-                {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.prev_a"]}},
-                {"$expr": {"$lte": ["$indicators.stoch.prev_a","$indicators.stoch.prev_b"]}}
-            ]},
-            // MACD
-            {"$and": [
-                {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.current_b"]}},
-                {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.stoch.prev_a"]}},
-                {"$expr": {"$lte": ["$indicators.macd.prev_a","$indicators.macd.prev_b"]}}
-            ]},
-            // RSI
-              {"$and": [
-                {"patterns.local_patterns": {"$elemMatch" : {"active.target":{"$gte": 15 }, "active.date": { "$lt" : DbDateTime::from_chrono(Local::now() - Duration::days(3)) }}}},
-                {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.current_b"]}},
-                {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.prev_a"]}},
-                {"$expr": {"$lte": ["$indicators.stoch.prev_a","$indicators.stoch.prev_b"]}}
-            ]},
-
-            { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT ","STELLAR"] } }
-        ]
-    };
     let query = match params.as_ref() {
-        "" => default_query,
+        "" => strategy.query().to_owned(),
         _ => serde_json::from_str(&params).unwrap(),
     };
 

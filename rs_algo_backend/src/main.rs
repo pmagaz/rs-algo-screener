@@ -10,6 +10,7 @@ mod helpers;
 mod models;
 mod render_image;
 mod services;
+mod strategies;
 
 use db::mongo;
 use error::RsAlgoError;
