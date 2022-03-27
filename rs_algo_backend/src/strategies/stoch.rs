@@ -48,7 +48,7 @@ impl Stoch {
                  {"patterns.local_patterns": {"$elemMatch" : {
                  "active.target":{"$gte": MINIMUM_PATTERN_TARGET },
                  "direction":"Top",
-                 "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
+                 "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(7)) }
                 }}},
             ]},
                 { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR"] } }
@@ -133,6 +133,8 @@ impl Stoch {
                     instrument.indicators.stoch.status = stoch_status.clone();
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
+
+                    //FIXME or ?
                     if pattern_status != Status::Neutral
                         && (stoch_status != Status::Bearish && macd_status != Status::Bearish)
                     {
