@@ -50,12 +50,8 @@ impl Stoch {
                  "direction":"Top",
                  "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
                 }}},
-                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR"] } }
-                //{"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.current_b"]}},
-                // {"indicators.macd.current_a":  {"$gt": 0 }},
-                // {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.prev_a"]}},
-                // {"$expr": {"$lte": ["$indicators.stoch.prev_a","$indicators.stoch.prev_b"]}}
             ]},
+                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR"] } }
             ]},
             //  format: |ins: CompactInstrument| ins,
         })
@@ -82,7 +78,7 @@ impl Stoch {
                     let pattern_status = match instrument.patterns.local_patterns.get(0) {
                         Some(val) => {
                             if val.active.date
-                                > DbDateTime::from_chrono(Local::now() - Duration::days(5))
+                                > DbDateTime::from_chrono(Local::now() - Duration::days(7))
                             {
                                 let inst = instrument.patterns.local_patterns.get(0);
                                 match inst {
@@ -109,6 +105,7 @@ impl Stoch {
                             Status::Bullish
                         }
                         _x if stoch.current_a < stoch.current_b => Status::Bearish,
+                        _x if stoch.current_a > 70. => Status::Bearish,
                         _x if stoch.current_a > stoch.current_b && stoch.current_a > 40. => {
                             Status::Neutral
                         }
@@ -136,9 +133,8 @@ impl Stoch {
                     instrument.indicators.stoch.status = stoch_status.clone();
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
-                    //if pattern_status != Status::Default &&
                     if pattern_status != Status::Neutral
-                        || (stoch_status != Status::Bearish && macd_status != Status::Bearish)
+                        && (stoch_status != Status::Bearish && macd_status != Status::Bearish)
                     {
                         docs.push(instrument);
                     }
