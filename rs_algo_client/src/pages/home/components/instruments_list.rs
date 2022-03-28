@@ -83,8 +83,8 @@ pub fn instrument_list(props: &Props
 
             let candle_status = match instrument.current_candle {
                 CandleType::Karakasa => Status::Bullish,
-                CandleType::BullishGap => Status::Bearish,
-                CandleType::BearishKarakasa => Status::Bullish,
+                CandleType::BullishGap => Status::Bullish,
+                CandleType::BearishKarakasa => Status::Bearish,
                 CandleType::BearishGap => Status::Bearish,
                 _ => Status::Default,
             };
