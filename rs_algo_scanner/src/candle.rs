@@ -240,18 +240,19 @@ impl CandleBuilder {
         //FIXMW
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
-        let (prev_open, prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
+        let (_prev_open, prev_high, _prev_low, _prev_close) = &self.get_previous_ohlc(0);
         let percentage_diff = percentage_change(*open, *prev_high);
-        open > prev_close && percentage_diff > 2. && close > open
+        println!("11111 {} {}", open, prev_high);
+        open > prev_high && percentage_diff > 2. && close > prev_high
     }
 
     fn is_bearish_gap(&self) -> bool {
         //FIXME
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
-        let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);
+        let (_a, _prev_high, prev_low, _prev_close) = &self.get_previous_ohlc(0);
         let percentage_diff = percentage_change(*open, *prev_low);
-        open < prev_close && percentage_diff > 2. && close < open
+        open < prev_low && percentage_diff > 2. && close < prev_low
     }
 
     fn is_bullish_crows(&self) -> bool {
