@@ -102,8 +102,7 @@ impl Backend {
                 let (bullish, bearish) = match candle.candle_type {
                     CandleType::Karakasa => (BLUE.filled(), BLUE.filled()),
                     CandleType::BearishKarakasa => (BLUE.filled(), BLUE.filled()),
-                    // CandleType::BullishGap => (BLUE.filled(), BLUE.filled()),
-                    // CandleType::BearishGap => (BLUE.filled(), BLUE.filled()),
+                    CandleType::BullishGap => (BLUE.filled(), BLUE.filled()),
                     _ => candle_color,
                 };
 

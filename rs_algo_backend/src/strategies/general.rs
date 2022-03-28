@@ -25,7 +25,8 @@ impl General {
              "$or": [
                 {"$and": [
                  {"current_candle": "Karakasa"},
-                {"indicators.stoch.current_a":  {"$lt": stoch_bottom }}
+                 {"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
+                 {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.current_b"]}},
 
                ]},
                 {"$and": [
@@ -52,7 +53,7 @@ impl General {
                  "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(7)) }
                 }}},
             ]},
-                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR"] } }
+                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } }
             ]},
             //  format: |ins: CompactInstrument| ins,
         })

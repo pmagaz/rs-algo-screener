@@ -1,6 +1,6 @@
 use round::round;
 use rs_algo_shared::helpers::date::{Local, DateTime,Datelike};
-use rs_algo_shared::models::{CompactInstrument, PatternType, PatternDirection, Status};
+use rs_algo_shared::models::*;
 use yew::{function_component, html, Callback, use_state, Properties};
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
@@ -36,8 +36,19 @@ pub fn instrument_list(props: &Props
                          Status::Neutral => "has-background-warning-light", 
                      };
                      class
-
                  }
+
+                // CONTINUE HERE 
+                //  fn get_candle_class<'a>(candle: &CandleType) -> &'a str {
+                //      let class = match candle {
+                //          candle::Primary => "", 
+                //          //Status::Neutral => "", 
+                //          Status::Bullish => "has-background-primary-light", 
+                //          Status::Bearish => "has-background-danger-light", 
+                //          Status::Neutral => "has-background-warning-light", 
+                //      };
+                //      class
+                //  }
 
     instruments
         .iter()
@@ -69,6 +80,16 @@ pub fn instrument_list(props: &Props
                 None   => Status::Default,
             };
 
+
+            let candle_status = match instrument.current_candle {
+                CandleType::Karakasa => Status::Bullish,
+                CandleType::BullishGap => Status::Bearish,
+                CandleType::BearishKarakasa => Status::Bullish,
+                CandleType::BearishGap => Status::Bearish,
+                _ => Status::Default,
+            };
+
+
             let pattern_date = match patterns {
                 Some(val) => val.active.date.to_chrono(),
                 None   => DateTime::from(Local::now())
@@ -93,7 +114,7 @@ pub fn instrument_list(props: &Props
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
                     //<td> <a href={format!("{}{}", base_url, instrument.symbol)}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
-                    <td> {format!("{:?}", instrument.current_candle)}</td>
+                    <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{:?}", pattern_type)}</td>
                     <td class={get_status_class(&pattern_status)}>{format!("{:?}", break_direction)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{}%", pattern_change)}</td>
