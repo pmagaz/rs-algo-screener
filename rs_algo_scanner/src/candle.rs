@@ -17,7 +17,9 @@ pub enum CandleType {
     BearishMarubozu,
     Harami,
     BearishHarami,
+    BearishStar,
     Engulfing,
+    BullishStart,
     BearishEngulfing,
     HangingMan,
     BullishCrows,
@@ -167,6 +169,34 @@ impl CandleBuilder {
             && ((high - open) / (0.001 + high - low) > 0.6)
     }
 
+    fn is_bullish_star(&self) -> bool {
+        // ((O2>C2)AND((O2-C2)/(.001+H2-L2)>.6)AND(C2>O1) AND(O1>C1)AND((H1-L1)>(3*(C1-O1))) AND(C>O)AND(O>O1))
+        let (open, high, low, close) = &self.get_current_ohlc();
+        let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);
+        let (prev_open1, prev_high1, prev_low1, prev_close1) = &self.get_previous_ohlc(1);
+        (prev_open1 > prev_close1)
+            && ((prev_open1 - prev_close1) / (0.001 + prev_high1 - prev_low1) > 0.6)
+            && (prev_close1 > prev_open)
+            && (prev_open > prev_close)
+            && ((prev_high - prev_low) > (3. * (prev_close - prev_open)))
+            && (close > open)
+            && (open > prev_open)
+    }
+
+    fn is_bearish_star(&self) -> bool {
+        // ((O2>C2)AND((O2-C2)/(.001+H2-L2)>.6)AND(C2>O1) AND(O1>C1)AND((H1-L1)>(3*(C1-O1))) AND(C>O)AND(O>O1))
+        let (open, high, low, close) = &self.get_current_ohlc();
+        let (prev_open, prev_high, prev_low, prev_close) = &self.get_previous_ohlc(0);
+        let (prev_open1, prev_high1, prev_low1, prev_close1) = &self.get_previous_ohlc(1);
+        (prev_open1 > prev_close1)
+            && ((prev_open1 - prev_close1) / (0.001 + prev_high1 - prev_low1) > 0.6)
+            && (prev_close1 < prev_open)
+            && (prev_open > prev_close)
+            && ((prev_high - prev_low) > (3. * (prev_close - prev_open)))
+            && (close > open)
+            && (open < prev_open)
+    }
+
     fn is_marubozu(&self) -> bool {
         //O = L AND H = C.
         let (open, high, low, close) = &self.get_current_ohlc();
@@ -237,7 +267,6 @@ impl CandleBuilder {
     }
 
     fn is_bullish_gap(&self) -> bool {
-        //FIXMW
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (_prev_open, prev_high, _prev_low, _prev_close) = &self.get_previous_ohlc(0);
@@ -294,28 +323,32 @@ impl CandleBuilder {
     }
 
     fn identify_candle_type(&self) -> CandleType {
-        if self.is_doji() {
-            CandleType::Doji
+        if self.is_bullish_gap() {
+            CandleType::BullishGap
         } else if self.is_karakasa() {
             CandleType::Karakasa
-        } else if self.is_bearish_karakasa() {
-            CandleType::BearishKarakasa
-        } else if self.is_hanging_man() {
-            CandleType::HangingMan
-        } else if self.is_bullish_gap() {
-            CandleType::BullishGap
-        } else if self.is_bearish_gap() {
-            CandleType::BearishGap
+        } else if self.is_bullish_star() {
+            CandleType::BullishStart
         } else if self.is_bullish_crows() {
             CandleType::BullishCrows
-        } else if self.is_bearish_crows() {
-            CandleType::BearishCrows
         } else if self.is_marubozu() {
             CandleType::Marubozu
-        } else if self.is_bearish_marubozu() {
-            CandleType::BearishMarubozu
         } else if self.is_engulfing() {
             CandleType::Engulfing
+        } else if self.is_doji() {
+            CandleType::Doji
+        } else if self.is_bearish_karakasa() {
+            CandleType::BearishKarakasa
+        } else if self.is_bearish_star() {
+            CandleType::BearishStar
+        } else if self.is_hanging_man() {
+            CandleType::HangingMan
+        } else if self.is_bearish_gap() {
+            CandleType::BearishGap
+        } else if self.is_bearish_crows() {
+            CandleType::BearishCrows
+        } else if self.is_bearish_marubozu() {
+            CandleType::BearishMarubozu
         } else if self.is_bearish_engulfing() {
             CandleType::BearishEngulfing
         } else if self.is_harami() {
