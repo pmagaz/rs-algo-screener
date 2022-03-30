@@ -1,6 +1,6 @@
 use round::round;
-use rs_algo_shared::helpers::date::{Local, DateTime,Datelike};
 use rs_algo_shared::models::*;
+use rs_algo_shared::helpers::date::{Local, DateTime,Datelike, Duration};
 use yew::{function_component, html, Callback, use_state, Properties};
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
@@ -75,11 +75,7 @@ pub fn instrument_list(props: &Props
                 None   => PatternType::None,
             };
 
-            let pattern_status = match patterns {
-                Some(val) => val.active.status.clone(),
-                None   => Status::Default,
-            };
-
+        
 
             let candle_status = match instrument.current_candle {
                 CandleType::Karakasa => Status::Bullish,
@@ -100,6 +96,13 @@ pub fn instrument_list(props: &Props
                 None   => 0.,
             };
 
+            let pattern_status = match patterns {
+                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(5)) => Status::Bullish,
+                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(10)) => Status::Neutral,
+                 _  => Status::Default,
+            };
+
+
             let macd = instrument.indicators.macd.clone();
             let stoch = instrument.indicators.stoch.clone();
             let rsi = instrument.indicators.rsi.clone();
@@ -109,16 +112,20 @@ pub fn instrument_list(props: &Props
 
             let date = instrument.date.to_chrono();
 
+             let pattern_info: (String, String, String, String) = match pattern_date {
+                    _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(7)) => (pattern_type.to_string(), break_direction.to_string(), pattern_change.to_string(), pattern_date.format("%d/%m/%Y").to_string()),
+                    _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+            };
+
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
-                    //<td> <a href={format!("{}{}", base_url, instrument.symbol)}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
-                    <td class={get_status_class(&pattern_status)}> {format!("{:?}", pattern_type)}</td>
-                    <td class={get_status_class(&pattern_status)}>{format!("{:?}", break_direction)}</td>
-                    <td class={get_status_class(&pattern_status)}> {format!("{}%", pattern_change)}</td>
-                    <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_date.format("%d/%m/%Y"))}</td>
+                    <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.0)}</td>
+                    //<td class={get_status_class(&pattern_status)}>{format!("{}", pattern_info.1)}</td>
+                    <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.2)}</td>
+                    <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.3)}</td>
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 2))}</td>
                     <td class={get_status_class(&macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 2))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>

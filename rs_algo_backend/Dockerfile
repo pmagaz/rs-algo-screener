@@ -26,16 +26,16 @@ ARG TARGET
 #ENV
 ARG APP_DIR=/usr/src/$APP_NAME
 EXPOSE 8000
-ENV TZ=CET \
-  APP_USER=dev 
+ENV APP_USER=dev 
 
 #DEPENDENCIES
 RUN apk update \
   && apk add --no-cache tzdata \
-  && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime \
-  && apk add fontconfig \
-  && apk add ttf-opensans \
-  && apk add su-exec sudo \
+  && apk add --no-cache openntpd \
+  && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
+  && apk add --no-cache fontconfig \
+  && apk add --no-cache ttf-opensans \
+  && apk add --no-cache su-exec sudo \
   && rm -rf /var/cache/apk/*
 
 #USER

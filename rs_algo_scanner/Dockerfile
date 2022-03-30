@@ -25,15 +25,15 @@ ARG TARGET
 
 ARG APP_DIR=/usr/src/$APP_NAME
 #EXPOSE 8000
-ENV TZ=Etc/UTC \
-  APP_USER=dev
+ENV APP_USER=dev
 
 RUN addgroup -S $APP_USER \
   && adduser -S -g $APP_USER $APP_USER
 
 RUN apk update \
   && apk add --no-cache tzdata \
-  && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime \
+  && apk add --no-cache openntpd \
+  && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
   && rm -rf /var/cache/apk/*
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME

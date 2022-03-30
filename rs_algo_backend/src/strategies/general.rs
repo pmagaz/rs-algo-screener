@@ -50,6 +50,7 @@ impl General {
                 {"$and": [
                  {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
+                    "active.pattern_type":{"$ne": "None" },
                     "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
                 }}},
             ]},
