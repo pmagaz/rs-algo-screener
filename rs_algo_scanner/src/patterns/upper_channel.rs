@@ -91,7 +91,6 @@ impl UpperChannel {
 
     /*
     pub fn scan_bands(&mut self, data: &Vec<(usize, f64)>) -> Band {
-      println!("111111, {:?}", data);
       let mut result: Vec<Vec<(usize, f64)>> = vec![vec![]];
       let number_peaks = env::var("CHANNEL_PEAKS").unwrap().parse::<usize>().unwrap();
       let data = data;
@@ -109,7 +108,6 @@ impl UpperChannel {
             let max_poly = polyfit(&x_max_values, &y_max_values, 1).unwrap();
             let max_slope = max_poly[0];
             let max_intercept = max_poly[1];
-            //println!("11111, {:?}, {:?}", data[key].1, max_slope);
           }
           n += 1;
           if n == number_peaks {

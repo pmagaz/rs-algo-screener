@@ -19,7 +19,7 @@ pub enum CandleType {
     BearishHarami,
     BearishStar,
     Engulfing,
-    BullishStart,
+    MorningStart,
     BearishEngulfing,
     HangingMan,
     BullishCrows,
@@ -271,7 +271,6 @@ impl CandleBuilder {
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (_prev_open, prev_high, _prev_low, _prev_close) = &self.get_previous_ohlc(0);
         let percentage_diff = percentage_change(*open, *prev_high);
-        println!("11111 {} {}", open, prev_high);
         open > prev_high && percentage_diff > 2. && close > prev_high
     }
 
@@ -328,7 +327,7 @@ impl CandleBuilder {
         } else if self.is_karakasa() {
             CandleType::Karakasa
         } else if self.is_bullish_star() {
-            CandleType::BullishStart
+            CandleType::MorningStart
         } else if self.is_bullish_crows() {
             CandleType::BullishCrows
         } else if self.is_marubozu() {

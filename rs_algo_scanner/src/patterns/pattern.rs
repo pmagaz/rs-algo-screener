@@ -335,6 +335,7 @@ pub fn pattern_active_result(
     let (top_result, top_id, top_price, top_date) = top;
     let (bottom_result, bottom_id, bottom_price, bottom_date) = bottom;
     let price_change = calculate_price_change(&data);
+    //FIXME
     let price_target = calculate_price_target(&data);
     if top_result {
         PatternActive {
