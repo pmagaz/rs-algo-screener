@@ -43,7 +43,6 @@ resources:
   requests: {}
   limits:
     cpu: 200m
-    storage: 1Gi
 
 ingress: {}
 
