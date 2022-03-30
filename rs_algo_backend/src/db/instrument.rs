@@ -6,7 +6,6 @@ use crate::strategies::Strategy;
 use crate::strategies::general::General;
 use actix_web::web;
 use bson::{doc, Document};
-use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
@@ -44,7 +43,7 @@ pub async fn find_by_params(
         _ => serde_json::from_str(&params).unwrap(),
     };
 
-    let mut cursor = collection
+    let cursor = collection
         .find(query, FindOptions::builder().build())
         .await
         .unwrap();

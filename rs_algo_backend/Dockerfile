@@ -31,6 +31,8 @@ ENV TZ=CET \
 
 #DEPENDENCIES
 RUN apk update \
+  && apk add --no-cache tzdata \
+  && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime \
   && apk add fontconfig \
   && apk add ttf-opensans \
   && apk add su-exec sudo \

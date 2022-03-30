@@ -26,12 +26,13 @@ impl General {
                 {"$and": [
                  {"current_candle": "Karakasa"},
                  {"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
-                 {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.current_b"]}},
-
+               ]},
+                {"$and": [
+                 {"current_candle": "MorningStar"},
+                 {"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
                ]},
                 {"$and": [
                  {"current_candle": "BullishGap"},
-                 //{"indicators.stoch.current_a":  {"$lt": stoch_bottom }}
                ]},
               {
                "$and": [
@@ -48,9 +49,8 @@ impl General {
                ]},
                 {"$and": [
                  {"patterns.local_patterns": {"$elemMatch" : {
-                 "active.target":{"$gte": minimum_pattern_target },
-                 "direction":"Top",
-                 "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(7)) }
+                    "active.target":{"$gte": minimum_pattern_target },
+                    "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
                 }}},
             ]},
                 { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } }
@@ -140,7 +140,7 @@ impl General {
                     if instrument.current_candle == CandleType::Karakasa
                         || instrument.current_candle == CandleType::BullishGap
                         || pattern_status != Status::Neutral
-                            && (stoch_status != Status::Bearish && macd_status != Status::Bearish)
+                        || (stoch_status != Status::Bearish && macd_status != Status::Bearish)
                     {
                         docs.push(instrument);
                     }
