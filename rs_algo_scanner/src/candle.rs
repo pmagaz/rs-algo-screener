@@ -19,7 +19,7 @@ pub enum CandleType {
     BearishHarami,
     BearishStar,
     Engulfing,
-    MorningStart,
+    MorningStar,
     BearishEngulfing,
     HangingMan,
     BullishCrows,
@@ -327,7 +327,7 @@ impl CandleBuilder {
         } else if self.is_karakasa() {
             CandleType::Karakasa
         } else if self.is_bullish_star() {
-            CandleType::MorningStart
+            CandleType::MorningStar
         } else if self.is_bullish_crows() {
             CandleType::BullishCrows
         } else if self.is_marubozu() {
