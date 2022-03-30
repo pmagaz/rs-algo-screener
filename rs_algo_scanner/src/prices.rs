@@ -64,21 +64,22 @@ pub fn search_price_break(
     candles: &Vec<Candle>,
     comparator: &dyn Fn(f64, f64) -> bool,
 ) -> PriceBreak {
-    //FIXME improve price break calculation
     let keys: Vec<usize> = band.iter().map(|(x, _y)| *x).collect();
     let mut id = keys[0];
-    let break_point = calculate_next_point(band);
-    while id < candles.len() {
-        let price = &candles[id].close();
-        if comparator(*price, break_point) {
-            return (
-                true,
-                id,
-                *price,
-                DbDateTime::from_chrono(candles[id].date()),
-            );
+    if band.len() > 1 {
+        let break_point = calculate_next_point(band);
+        while id < candles.len() {
+            let price = &candles[id].close();
+            if comparator(*price, break_point) {
+                return (
+                    true,
+                    id,
+                    *price,
+                    DbDateTime::from_chrono(candles[id].date()),
+                );
+            }
+            id += 1;
         }
-        id += 1;
     }
 
     return (false, 0, 0., DbDateTime::from_chrono(Local::now()));
