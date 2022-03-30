@@ -1,0 +1,3 @@
+release_name: docker-registry
+local_path: /home/dev/rs-algo-screener
+chart_path: deployment/docker-registry/chart

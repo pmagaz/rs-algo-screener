@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repository: registry 
+  pullPolicy: "IfNotPresent" 
+  tag: "latest"
+
+imagePullSecrets:
+ - name: docker-credentials 
+
+volumeMounts:
+- name: data
+  mountPath: /data/registry
+
+volumes:
+- name: data
+  hostPath:
+    path: /data/registry
+    type: Directory
+
+envSecretName: rs-algo-screener-secrets
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+service:
+  type: LoadBalancer 
+  port: 5000 
+  targetPort: 5000 
+  metadata:
+    name: docker-registry
+    labels:
+      app: docker-registry
+
+resources:
+  requests: {}
+  limits:
+    cpu: 200m
+    persistent-storage: 512m
+
+ingress: {}
+
+autoscaling: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
