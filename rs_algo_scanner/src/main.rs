@@ -55,32 +55,32 @@ async fn main() -> Result<()> {
     screener.login(username, password).await?;
     let symbols = screener.get_symbols().await.unwrap().symbols;
 
-    // let symbols = [
-    //     Symbol {
-    //         symbol: "AIMC.US_4".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "HUBS.US_4".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "JD.US_4".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "SWN.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    // ];
+    let symbols = [
+        Symbol {
+            symbol: "SE1.US_4".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        // Symbol {
+        //     symbol: "T10G.UK".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "NEL.NO_4".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "SWN.US_9".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+    ];
 
     let ignore_list: Vec<String> = env::var("SYMBOL_IGNORE_LIST")
         .unwrap()

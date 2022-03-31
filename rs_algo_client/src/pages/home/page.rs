@@ -17,7 +17,7 @@ extern "C" {
 
 #[function_component(Home)]
 pub fn home() -> Html {
-    let url = "http://192.168.1.10/api/instruments";
+    let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_query = use_state(|| String::from(""));
@@ -79,7 +79,7 @@ pub fn home() -> Html {
                      <Loading loading={ *use_loading} />
                     <label class="label">{ "Query" }</label>
                     <div class="control">
-                        <textarea id="query_box" class="textarea is-link" placeholder="Textarea" cols="50" value={ {format!("{}", *use_query)}}></textarea>
+                        <textarea id="query_box" class="textarea is-link" placeholder="Textarea" cols="60" rows="2" value={ {format!("{}", *use_query)}}></textarea>
                         <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
                     </div>
                     </div>

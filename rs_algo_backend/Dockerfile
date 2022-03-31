@@ -31,7 +31,6 @@ ENV APP_USER=dev
 #DEPENDENCIES
 RUN apk update \
   && apk add --no-cache tzdata \
-  && apk add --no-cache openntpd \
   && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
   && apk add --no-cache fontconfig \
   && apk add --no-cache ttf-opensans \

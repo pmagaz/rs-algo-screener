@@ -32,7 +32,6 @@ RUN addgroup -S $APP_USER \
 
 RUN apk update \
   && apk add --no-cache tzdata \
-  && apk add --no-cache openntpd \
   && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
   && rm -rf /var/cache/apk/*
 

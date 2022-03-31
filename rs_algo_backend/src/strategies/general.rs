@@ -50,7 +50,7 @@ impl General {
                 {"$and": [
                  {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
-                    "active.pattern_type":{"$ne": "None" },
+                    "active.pattern_type":{"$nin": ["None"] },
                     "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
                 }}},
             ]},
@@ -74,14 +74,14 @@ impl General {
                     let stoch = instrument.indicators.stoch.clone();
                     let macd = instrument.indicators.stoch.clone();
                     let rsi = instrument.indicators.rsi.clone();
-                    let ema_a = instrument.indicators.ema_a.clone(); //50
+                    let ema_a = instrument.indicators.ema_a.clone(); //9
                     let ema_b = instrument.indicators.ema_b.clone(); //21
-                    let ema_c = instrument.indicators.ema_c.clone(); //9
+                    let ema_c = instrument.indicators.ema_c.clone(); //55
 
                     let pattern_status = match instrument.patterns.local_patterns.get(0) {
                         Some(val) => {
                             if val.active.date
-                                > DbDateTime::from_chrono(Local::now() - Duration::days(7))
+                                > DbDateTime::from_chrono(Local::now() - Duration::days(5))
                             {
                                 let inst = instrument.patterns.local_patterns.get(0);
                                 match inst {
@@ -133,6 +133,20 @@ impl General {
                         _ => Status::Neutral,
                     };
 
+                    let ema_status = match ema_a {
+                        _x if ema_a.current_a > ema_b.current_a
+                            && ema_b.current_a > ema_c.current_a =>
+                        {
+                            Status::Bullish
+                        }
+                        _x if ema_c.current_a < ema_b.current_a
+                            && ema_b.current_a < ema_c.current_a =>
+                        {
+                            Status::Bearish
+                        }
+                        _ => Status::Neutral,
+                    };
+
                     instrument.indicators.stoch.status = stoch_status.clone();
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
@@ -153,7 +167,7 @@ impl General {
     }
 
     pub fn query(&self) -> &Document {
-        println!("[STRATEGY] Stoch ");
+        println!("[STRATEGY] General ");
         &self.query
     }
 }

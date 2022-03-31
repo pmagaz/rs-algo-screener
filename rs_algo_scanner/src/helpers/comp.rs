@@ -26,7 +26,7 @@ pub fn is_equal_distance(a: (f64, f64), b: (f64, f64)) -> bool {
     let move_b = (b.0 - b.1).abs();
     let percentage_move_b = (move_b / b.1) * 100.;
 
-    let threshold = env::var("EQUAL_PERCENTAGE_THRESHOLD")
+    let threshold = env::var("EQUAL_DISTANCE_THRESHOLD")
         .unwrap()
         .parse::<f64>()
         .unwrap();

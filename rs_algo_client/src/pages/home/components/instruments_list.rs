@@ -1,4 +1,4 @@
-use round::round;
+use round::{round};
 use rs_algo_shared::models::*;
 use rs_algo_shared::helpers::date::{Local, DateTime,Datelike, Duration};
 use yew::{function_component, html, Callback, use_state, Properties};
@@ -90,11 +90,11 @@ pub fn instrument_list(props: &Props
 
             let pattern_date = match patterns {
                 Some(val) => val.active.date.to_chrono(),
-                None   => DateTime::from(Local::now())
+                None   => DateTime::from(Local::now() - Duration::days(1000))
             };
             
             let pattern_change = match patterns {
-                Some(val) => round(val.active.change, 2),
+                Some(val) => round(val.active.change,0),
                 None   => 0.,
             };
 
@@ -108,14 +108,28 @@ pub fn instrument_list(props: &Props
             let macd = instrument.indicators.macd.clone();
             let stoch = instrument.indicators.stoch.clone();
             let rsi = instrument.indicators.rsi.clone();
-            let ema_a = instrument.indicators.ema_a.clone(); //50
+            let ema_a = instrument.indicators.ema_a.clone(); //9
             let ema_b = instrument.indicators.ema_b.clone(); //21
-            let ema_c = instrument.indicators.ema_c.clone(); //9
+            let ema_c = instrument.indicators.ema_c.clone(); //50
+
+            let ema_status = match ema_a {
+                _x if ema_a.current_a > ema_b.current_a
+                    && ema_b.current_a > ema_c.current_a =>
+                {
+                    Status::Bullish
+                }
+                _x if ema_c.current_a < ema_b.current_a
+                    && ema_b.current_a < ema_c.current_a =>
+                {
+                    Status::Bearish
+                }
+                _ => Status::Neutral,
+            };
 
             let date = instrument.date.to_chrono();
 
              let pattern_info: (String, String, String, String) = match pattern_date {
-                    _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(7)) => (pattern_type.to_string(), break_direction.to_string(), pattern_change.to_string(), pattern_date.format("%d/%m/%Y").to_string()),
+                    _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(7)) => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), pattern_date.format("%d/%m/%Y").to_string()),
                     _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
@@ -128,10 +142,10 @@ pub fn instrument_list(props: &Props
                     //<td class={get_status_class(&pattern_status)}>{format!("{}", pattern_info.1)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.2)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.3)}</td>
-                    <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 2))}</td>
-                    <td class={get_status_class(&macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 2))}</td>
+                    <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
+                    <td class={get_status_class(&macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    <td class={get_status_class(&ema_a.status)}> {format!("{:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 2))}</td>
+                    <td class={get_status_class(&ema_status)}> {format!("{:?} / {:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 1), round(instrument.indicators.ema_c.current_a, 1))}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }
