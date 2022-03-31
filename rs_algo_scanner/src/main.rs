@@ -57,7 +57,7 @@ async fn main() -> Result<()> {
 
     // let symbols = [
     //     Symbol {
-    //         symbol: "SE1.US_4".to_owned(),
+    //         symbol: "TTD.US_4".to_owned(),
     //         category: "".to_owned(),
     //         description: "".to_owned(),
     //         currency: "".to_owned(),
@@ -100,7 +100,7 @@ async fn main() -> Result<()> {
                     |instrument: Instrument| async move {
                         println!(
                             "[INSTRUMENT] {:?} processed in {:?}",
-                            &instrument.symbol(),
+                            &instrument.date(),
                             now.elapsed()
                         );
 
@@ -113,7 +113,7 @@ async fn main() -> Result<()> {
 
                         println!(
                             "[RESPONSE] {:?} status {:?} at {:?} in {:?}",
-                            &instrument.symbol(),
+                            &instrument.horizontal_levels(),
                             res.status(),
                             Local::now(),
                             now.elapsed()

@@ -1,5 +1,5 @@
 use super::pattern::DataPoints;
-use crate::helpers::comp::*;
+use rs_algo_shared::helpers::comp::*;
 
 pub fn is_higher_highs_top(data: &DataPoints) -> bool {
     if data[4].1 < data[2].1

@@ -1,11 +1,8 @@
 use crate::error::Result;
 use crate::models::app_state::AppState;
-use crate::models::instrument::{
-    CompactDivergence, CompactDivergences, CompactIndicator, CompactIndicators, CompactInstrument,
-    Instrument, Patterns, Status,
-};
 use actix_web::web;
 use mongodb::Collection;
+use rs_algo_shared::models::*;
 
 pub async fn get_collection<T>(state: &web::Data<AppState>, collection: &str) -> Collection<T> {
     state
@@ -97,6 +94,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 .map(|(key, inst)| inst)
                 .collect(),
         },
+        horizontal_levels: doc.horizontal_levels,
         //divergences: doc.divergences,
         divergences: CompactDivergences {
             divergences: doc

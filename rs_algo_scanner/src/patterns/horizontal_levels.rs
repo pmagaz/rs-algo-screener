@@ -1,5 +1,6 @@
 use super::peaks::Peaks;
 use crate::error::Result;
+use rs_algo_shared::helpers::comp::is_same_band;
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -14,8 +15,7 @@ pub enum HorizontalLevelType {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HorizontalLevel {
     price: f64,
-    min_value: f64,
-    max_value: f64,
+    occurrences: usize,
     level_type: HorizontalLevelType,
 }
 impl HorizontalLevel {
@@ -29,87 +29,85 @@ impl HorizontalLevel {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HorizontalLevels {
-    horizontal_levels: HashMap<usize, HorizontalLevel>,
+    highs: Vec<HorizontalLevel>,
+    lows: Vec<HorizontalLevel>,
 }
 
 impl HorizontalLevels {
     pub fn new() -> HorizontalLevels {
         Self {
-            horizontal_levels: HashMap::new(),
+            highs: vec![],
+            lows: vec![],
         }
     }
 
-    pub fn horizontal_levels(&self) -> &HashMap<usize, HorizontalLevel> {
-        &self.horizontal_levels
+    pub fn highs(&self) -> &Vec<HorizontalLevel> {
+        &self.highs
     }
 
-    pub fn calculate_horizontal_levels(
+    pub fn lows(&self) -> &Vec<HorizontalLevel> {
+        &self.lows
+    }
+
+    pub fn calculate_bands(
         &mut self,
         current_price: &f64,
         data: &Vec<(usize, f64)>,
         peak_type: &Vec<f64>,
-    ) -> Result<&HashMap<usize, HorizontalLevel>> {
-        //TODO: Improve upper_channelion. It has to count occurrences and return a band
-        //with min and max. Refactor two loops.
-        let threshold = env::var("HORIZONTAL_LEVELS_THRESHOLD")
+    ) -> Result<Vec<HorizontalLevel>> {
+        let mut hash: HashMap<String, HorizontalLevel> = HashMap::new();
+
+        let min_ocurrences = env::var("MIN_HORIZONTAL_LEVELS_OCCURENCES")
             .unwrap()
-            .parse::<f64>()
+            .parse::<usize>()
             .unwrap();
 
-        for (peak_index, peak_price) in data {
+        for (_peak_index, peak_price) in data {
             let price = peak_price.abs();
-            for (compare_index, _compare_price) in data {
-                let last = peak_type[*compare_index].abs();
-                let max = price.max(last);
-                let min = last.min(price);
-                let increase = max - min;
-                let percentage_increase = (increase / price) * 100.;
-                if percentage_increase > 0.
-                    && percentage_increase < threshold
-                    && peak_index != compare_index
-                    && !self.horizontal_levels.contains_key(&peak_index)
-                {
-                    let min_value = price + percentage_increase;
-                    let max_value = price - percentage_increase;
-
+            for (_compare_index, compare_price) in data {
+                if is_same_band(price, *compare_price) {
+                    let mut occurrences = 1;
+                    if hash.contains_key(&price.to_string()) {
+                        occurrences += 1;
+                    }
                     let level_type = match price {
                         _x if &price >= &current_price => HorizontalLevelType::Resistance,
                         _x if &price <= &current_price => HorizontalLevelType::Support,
                         _ => HorizontalLevelType::Support,
                     };
 
-                    self.horizontal_levels.insert(
-                        *peak_index,
+                    hash.insert(
+                        price.to_string(),
                         HorizontalLevel {
                             price,
-                            min_value,
-                            max_value,
+                            occurrences,
                             level_type,
                         },
                     );
                 }
             }
         }
-        Ok(&self.horizontal_levels)
+
+        let result: Vec<HorizontalLevel> = hash
+            .into_iter()
+            .filter(|(_k, level)| level.occurrences >= min_ocurrences)
+            .map(|(_k, v)| v)
+            .collect();
+
+        Ok(result)
     }
 
-    pub fn calculate_horizontal_highs(
-        &mut self,
-        current_price: &f64,
-        peaks: &Peaks,
-    ) -> Result<&HashMap<usize, HorizontalLevel>> {
-        Ok(&self
-            .calculate_horizontal_levels(current_price, peaks.extrema_maxima(), peaks.highs())
-            .unwrap())
+    pub fn calculate_horizontal_highs(&mut self, current_price: &f64, peaks: &Peaks) -> Result<()> {
+        self.highs = self
+            .calculate_bands(current_price, peaks.local_maxima(), peaks.highs())
+            .unwrap();
+        Ok(())
     }
 
-    pub fn calculate_horizontal_lows(
-        &mut self,
-        current_price: &f64,
-        peaks: &Peaks,
-    ) -> Result<&HashMap<usize, HorizontalLevel>> {
-        Ok(&self
-            .calculate_horizontal_levels(current_price, peaks.extrema_minima(), peaks.lows())
-            .unwrap())
+    pub fn calculate_horizontal_lows(&mut self, current_price: &f64, peaks: &Peaks) -> Result<()> {
+        self.lows = self
+            .calculate_bands(current_price, peaks.local_maxima(), peaks.lows())
+            .unwrap();
+        Ok(())
     }
 }

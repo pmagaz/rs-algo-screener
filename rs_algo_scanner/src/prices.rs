@@ -1,6 +1,6 @@
 use crate::candle::Candle;
-use crate::helpers::comp::percentage_change;
 use crate::helpers::poly::fit;
+use rs_algo_shared::helpers::comp::percentage_change;
 
 use rs_algo_shared::helpers::date::Local;
 use rs_algo_shared::models::{DataPoints, DbDateTime};

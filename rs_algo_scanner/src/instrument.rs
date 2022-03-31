@@ -6,7 +6,7 @@ use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
 
-use rs_algo_shared::helpers::date::{DateTime, Local};
+use rs_algo_shared::helpers::date::{DateTime, Duration, Local};
 use rs_algo_shared::models::{DbDateTime, TimeFrameType};
 
 use serde::{Deserialize, Serialize};
@@ -23,7 +23,6 @@ pub struct Instrument {
     min_price: f64,
     max_price: f64,
     peaks: Peaks,
-    #[serde(skip_serializing)]
     horizontal_levels: HorizontalLevels,
     patterns: Patterns,
     indicators: Indicators,
@@ -54,6 +53,10 @@ impl Instrument {
     pub fn set_current_price(&mut self, current_price: f64) -> f64 {
         self.current_price = current_price;
         self.current_price
+    }
+
+    pub fn date(&self) -> &DbDateTime {
+        &self.date
     }
 
     // pub fn current_price(&self) -> f64 {
@@ -168,6 +171,7 @@ impl Instrument {
             self.horizontal_levels
                 .calculate_horizontal_lows(&self.current_price, &self.peaks)
                 .unwrap();
+
             self.data = candles;
 
             self.divergences
@@ -201,18 +205,13 @@ impl InstrumentBuilder {
         self
     }
 
-    // pub fn indicators(mut self, indicators: Indicators) -> Self {
-    //   self.indicators = Some(indicators);
-    //   self
-    // }
-
     pub fn build(self) -> Result<Instrument> {
         if let (Some(symbol), Some(time_frame)) = (self.symbol, self.time_frame) {
             Ok(Instrument {
                 symbol,
                 time_frame: time_frame,
                 current_price: 0.,
-                date: DbDateTime::from_chrono(Local::now()),
+                date: DbDateTime::from_chrono(Local::now() + Duration::hours(2)), //FIXME
                 current_candle: CandleType::Default,
                 min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
                 max_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),

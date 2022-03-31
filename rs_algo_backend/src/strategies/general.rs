@@ -54,6 +54,11 @@ impl General {
                     "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
                 }}},
             ]},
+                {"$and": [
+                 {"horizontal_levels.highs": {"$elemMatch" : {
+                    "occurrences":{"$gte": 2 },
+                }}},
+            ]},
                 { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } }
             ]},
             //  format: |ins: CompactInstrument| ins,

@@ -1,7 +1,7 @@
 use super::pattern::pattern_active_result;
 use crate::candle::Candle;
-use crate::helpers::comp::*;
 use crate::prices::*;
+use rs_algo_shared::helpers::comp::*;
 
 use rs_algo_shared::models::*;
 

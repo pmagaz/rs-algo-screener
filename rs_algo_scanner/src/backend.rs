@@ -35,7 +35,7 @@ impl Backend {
         let local_minima = instrument.peaks().local_minima();
         let extrema_maxima = instrument.peaks().extrema_maxima();
         let extrema_minima = instrument.peaks().extrema_minima();
-        let horizontal_levels = instrument.horizontal_levels().horizontal_levels();
+        let horizontal_levels = instrument.horizontal_levels();
 
         let local_patterns = instrument.patterns().local_patterns.clone();
         let local_pattern_breaks: Vec<usize> = instrument

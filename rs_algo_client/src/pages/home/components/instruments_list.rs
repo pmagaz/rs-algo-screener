@@ -133,15 +133,26 @@ pub fn instrument_list(props: &Props
                     _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
+            let horizontal_levels =  instrument.horizontal_levels.highs.len();
+
+            //FIXME
+            let h_levels_status = match instrument.horizontal_levels.highs.len() {
+                _x if horizontal_levels > 1 =>
+                {
+                    Status::Bullish
+                }
+                _ => Status::Default,
+            };
+
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.0)}</td>
-                    //<td class={get_status_class(&pattern_status)}>{format!("{}", pattern_info.1)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.2)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.3)}</td>
+                    <td class={get_status_class(&h_levels_status)}>{format!("{}", horizontal_levels)}</td>
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     <td class={get_status_class(&macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>

@@ -1,7 +1,7 @@
 use crate::candle::Candle;
-use crate::helpers::comp::percentage_change;
 use crate::patterns::*;
 use crate::prices::{calculate_price_change, calculate_price_target};
+use rs_algo_shared::helpers::comp::percentage_change;
 use rs_algo_shared::helpers::date::Local;
 pub use rs_algo_shared::models::*;
 

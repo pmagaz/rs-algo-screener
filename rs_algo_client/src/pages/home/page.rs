@@ -96,9 +96,9 @@ pub fn home() -> Html {
                     <th><abbr>{ "Price" }</abbr></th>
                     <th><abbr>{ "Candle" }</abbr></th>
                     <th><abbr>{ "Pattern" }</abbr></th>
-                    //<th><abbr>{ "Direction" }</abbr></th>
                     <th><abbr>{ "Target" }</abbr></th>
                     <th><abbr>{ "Activated" }</abbr></th>
+                    <th><abbr>{ "H Levels" }</abbr></th>
                     <th><abbr>{ "Stoch" }</abbr></th>
                     <th><abbr>{ "MacD" }</abbr></th>
                     <th><abbr>{ "Rsi" }</abbr></th>
