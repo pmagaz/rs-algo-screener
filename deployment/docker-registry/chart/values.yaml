@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: pmagaz/docker-registry
-  pullPolicy: "IfNotPresent" 
+  pullPolicy: "Always" 
   tag: "latest"
 
 imagePullSecrets:
