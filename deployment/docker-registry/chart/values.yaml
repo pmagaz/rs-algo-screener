@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: docker-registry
+  repository: pmagaz/docker-registry
   pullPolicy: "IfNotPresent" 
   tag: "latest"
 
