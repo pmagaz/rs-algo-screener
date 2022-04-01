@@ -175,9 +175,9 @@ impl General {
                         || (instrument.current_candle == CandleType::BullishGap
                             && ema_status != Status::Bearish)
                         || pattern_status != Status::Neutral
-                        || (stoch_status != Status::Bearish
-                            && macd_status != Status::Bearish
-                            && ema_status != Status::Bearish)
+                            && (stoch_status != Status::Bearish
+                                && macd_status != Status::Bearish
+                                && ema_status != Status::Bearish)
                     {
                         docs.push(instrument);
                     }
