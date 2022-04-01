@@ -1,5 +1,10 @@
-#IMAGE 
-FROM arm64v8/registry:latest
-COPY daemon.json /etc/docker/
-EXPOSE 5000
-CMD ["docker run -d -p 5000:5000 --restart always --name registry arm64v8/registry:2"]
+#IMAGE
+FROM alpine:latest
+
+RUN apk update \
+  && apk add docker-registry
+
+ADD ./config.yml /etc/docker-registry/config.yml
+
+EXPOSE 6000
+CMD ["/usr/bin/docker-registry", "serve", "/etc/docker-registry/config.yml"]

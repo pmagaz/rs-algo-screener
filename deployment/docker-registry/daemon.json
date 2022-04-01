@@ -1,3 +1,0 @@
-{
-  "insecure-registries" : ["cluster.local.com:5000","192.168.1.10:5000"]
-}

@@ -32,8 +32,8 @@ podSecurityContext:
 
 service:
   type: LoadBalancer 
-  port: 5000 
-  targetPort: 5000 
+  port: 6000 
+  targetPort: 6000 
   metadata:
     name: docker-registry
     labels:
