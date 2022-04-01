@@ -31,11 +31,11 @@ impl General {
              "$or": [
                 {"$and": [
                  {"current_candle": "Karakasa"},
-                 {"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
+                 //{"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
                ]},
                 {"$and": [
                  {"current_candle": "MorningStar"},
-                 {"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
+                 //{"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
                ]},
                 {"$and": [
                  {"current_candle": "BullishGap"},
@@ -171,12 +171,11 @@ impl General {
                     instrument.indicators.rsi.status = rsi_status.clone();
 
                     //FIXME or ?
-                    if instrument.current_candle == CandleType::Karakasa
-                        || instrument.current_candle == CandleType::BullishGap
-                        || pattern_status != Status::Neutral
-                            // && (stoch_status != Status::Bearish
-                            //     && macd_status != Status::Bearish
-                            && ema_status != Status::Bearish
+                    if pattern_status != Status::Neutral
+                        || (ema_status != Status::Bearish
+                            && (instrument.current_candle == CandleType::Karakasa
+                                || instrument.current_candle == CandleType::BullishGap
+                                || instrument.current_candle == CandleType::MorningStar))
                     {
                         docs.push(instrument);
                     }
