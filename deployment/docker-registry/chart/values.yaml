@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: registry 
+  repository: docker-registry
   pullPolicy: "IfNotPresent" 
   tag: "latest"
 
