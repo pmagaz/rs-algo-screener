@@ -6,6 +6,7 @@ use futures::stream::StreamExt;
 use mongodb::Cursor;
 
 use rs_algo_shared::error::Result;
+use rs_algo_shared::helpers::comp::is_equal;
 use rs_algo_shared::helpers::date::Local;
 use rs_algo_shared::models::*;
 use std::env;
@@ -19,6 +20,10 @@ impl General {
     pub fn new() -> Result<General> {
         let stoch_bottom = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
         let minimum_pattern_target = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
+        let min_horizontal_level_ocurrences = env::var("MIN_HORIZONTAL_LEVELS_OCCURENCES")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
 
         Ok(Self {
             query: doc! {
@@ -55,8 +60,10 @@ impl General {
                 }}},
             ]},
                 {"$and": [
-                 {"horizontal_levels.highs": {"$elemMatch" : {
-                    "occurrences":{"$gte": 2 },
+                 {
+                    "horizontal_levels.lows": {"$elemMatch" : {
+                   // "price":{"$gte": "$current_price" },
+                    "occurrences":{"$gte": min_horizontal_level_ocurrences },
                 }}},
             ]},
                 { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } }

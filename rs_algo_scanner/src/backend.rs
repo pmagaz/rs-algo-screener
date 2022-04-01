@@ -347,37 +347,37 @@ impl Backend {
         //         .unwrap();
         // }
 
-        for x in instrument.peaks().smooth_highs().iter() {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(instrument.peaks().smooth_highs().iter())
-                        .map(|(_k, highs)| {
-                            let idx = highs.0;
-                            let value = highs.1;
-                            let date = data[idx].date();
-                            (date, value)
-                        }),
-                    MAGENTA.mix(0.014),
-                ))
-                .unwrap();
-        }
+        // for x in instrument.peaks().smooth_highs().iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(instrument.peaks().smooth_highs().iter())
+        //                 .map(|(_k, highs)| {
+        //                     let idx = highs.0;
+        //                     let value = highs.1;
+        //                     let date = data[idx].date();
+        //                     (date, value)
+        //                 }),
+        //             MAGENTA.mix(0.014),
+        //         ))
+        //         .unwrap();
+        // }
 
-        for x in instrument.peaks().smooth_lows().iter() {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(instrument.peaks().smooth_lows().iter())
-                        .map(|(_k, highs)| {
-                            let idx = highs.0;
-                            let value = highs.1;
-                            let date = data[idx].date();
-                            (date, value)
-                        }),
-                    MAGENTA.mix(0.014),
-                ))
-                .unwrap();
-        }
+        // for x in instrument.peaks().smooth_lows().iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(instrument.peaks().smooth_lows().iter())
+        //                 .map(|(_k, highs)| {
+        //                     let idx = highs.0;
+        //                     let value = highs.1;
+        //                     let date = data[idx].date();
+        //                     (date, value)
+        //                 }),
+        //             MAGENTA.mix(0.014),
+        //         ))
+        //         .unwrap();
+        // }
 
         //     for x in instrument.peaks().smooth_lows().iter() {
         // chart
@@ -601,32 +601,32 @@ impl Backend {
 
         // INDICATORS
 
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date(), ema_a[id])),
-        //         &RED.mix(0.5),
-        //     ))
-        //     .unwrap();
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date(), ema_a[id])),
+                &RED.mix(0.5),
+            ))
+            .unwrap();
 
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date(), ema_b[id])),
-        //         &MAGENTA.mix(0.5),
-        //     ))
-        //     .unwrap();
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date(), ema_b[id])),
+                &MAGENTA.mix(0.5),
+            ))
+            .unwrap();
 
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date(), ema_c[id])),
-        //         &BLUE.mix(0.5),
-        //     ))
-        //     .unwrap();
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date(), ema_c[id])),
+                &BLUE.mix(0.5),
+            ))
+            .unwrap();
 
         // rsi_pannel
         //     .draw_series(LineSeries::new(

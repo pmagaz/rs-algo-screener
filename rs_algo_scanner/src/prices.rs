@@ -1,9 +1,10 @@
 use crate::candle::Candle;
-use crate::helpers::poly::fit;
+
 use rs_algo_shared::helpers::comp::percentage_change;
 
 use rs_algo_shared::helpers::date::Local;
 use rs_algo_shared::models::{DataPoints, DbDateTime};
+use std::env;
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
 
@@ -64,20 +65,31 @@ pub fn search_price_break(
     candles: &Vec<Candle>,
     comparator: &dyn Fn(f64, f64) -> bool,
 ) -> PriceBreak {
+    let price_break_checkpoints = env::var("PRICE_BREAK_CHECKPOINTS")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
     let keys: Vec<usize> = band.iter().map(|(x, _y)| *x).collect();
     let mut id = keys[0];
     if band.len() > 1 {
-        let break_point = calculate_next_point(band);
+        let next_point = calculate_next_point(band.clone());
+        let last = band.last().unwrap().1;
+        let increment = (next_point - last) / 4.;
         while id < candles.len() {
             let price = &candles[id].close();
-            if comparator(*price, break_point) {
-                return (
-                    true,
-                    id,
-                    *price,
-                    DbDateTime::from_chrono(candles[id].date()),
-                );
+            let mut break_point = last;
+            for _n in 1..price_break_checkpoints {
+                break_point += increment;
+                if comparator(*price, break_point) {
+                    return (
+                        true,
+                        id,
+                        *price,
+                        DbDateTime::from_chrono(candles[id].date()),
+                    );
+                }
             }
+
             id += 1;
         }
     }

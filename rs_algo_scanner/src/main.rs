@@ -113,7 +113,7 @@ async fn main() -> Result<()> {
 
                         println!(
                             "[RESPONSE] {:?} status {:?} at {:?} in {:?}",
-                            &instrument.horizontal_levels(),
+                            &instrument.symbol(),
                             res.status(),
                             Local::now(),
                             now.elapsed()

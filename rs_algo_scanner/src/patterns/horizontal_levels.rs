@@ -1,11 +1,13 @@
 use super::peaks::Peaks;
+
 use crate::error::Result;
 use rs_algo_shared::helpers::comp::is_same_band;
-
+use rs_algo_shared::helpers::date::{Duration, Local};
+use rs_algo_shared::models::{DbDateTime, HorizontalLevel, HorizontalLevelType};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
-
+/*
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum HorizontalLevelType {
     Resistance,
@@ -25,7 +27,7 @@ impl HorizontalLevel {
     pub fn level_type(&self) -> &HorizontalLevelType {
         &self.level_type
     }
-}
+}*/
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HorizontalLevels {
@@ -81,6 +83,7 @@ impl HorizontalLevels {
                         HorizontalLevel {
                             price,
                             occurrences,
+                            date: DbDateTime::from_chrono(Local::now() + Duration::hours(2)),
                             level_type,
                         },
                     );

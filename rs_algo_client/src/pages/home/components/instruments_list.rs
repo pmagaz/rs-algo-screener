@@ -1,6 +1,7 @@
 use round::{round};
 use rs_algo_shared::models::*;
 use rs_algo_shared::helpers::date::{Local, DateTime,Datelike, Duration};
+use rs_algo_shared::helpers::comp::is_equal;
 use yew::{function_component, html, Callback, use_state, Properties};
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
@@ -133,17 +134,18 @@ pub fn instrument_list(props: &Props
                     _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
-            let horizontal_levels =  instrument.horizontal_levels.highs.len();
-
-            //FIXME
-            let h_levels_status = match instrument.horizontal_levels.highs.len() {
-                _x if horizontal_levels > 1 =>
-                {
-                    Status::Bullish
-                }
-                _ => Status::Default,
+            let horizontal_lows: Vec<&HorizontalLevel> =  instrument.horizontal_levels.lows.iter().filter(|h| h.occurrences >= 3 && is_equal(h.price, instrument.current_price)).map(|x| x).collect();
+            
+            let horizontal_info = match horizontal_lows.get(0) {
+                Some(val) => val.occurrences.to_string(),
+                None   => "".to_string(),
             };
-
+            
+              let horizontal_status = match horizontal_lows.get(0) {
+                Some(val) => Status::Bullish,
+                None   => Status::Default 
+            }; 
+            
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
@@ -152,7 +154,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.0)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.2)}</td>
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.3)}</td>
-                    <td class={get_status_class(&h_levels_status)}>{format!("{}", horizontal_levels)}</td>
+                    <td class={get_status_class(&horizontal_status)}>{format!("{}", horizontal_info)}</td>
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     <td class={get_status_class(&macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
