@@ -4,7 +4,7 @@ jobs:
       repository: pmagaz/rs-algo-scanner
       tag: latest
       imagePullPolicy: Always
-    schedule: "0 */4,16,20,21 * * *"
+    schedule: "0 */4,18,21 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
