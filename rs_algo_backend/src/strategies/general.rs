@@ -5,6 +5,7 @@ use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::Cursor;
 
+use round::round;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::comp::is_equal;
 use rs_algo_shared::helpers::date::Local;
@@ -152,8 +153,8 @@ impl General {
                     };
 
                     let ema_status = match ema_a {
-                        _x if ema_a.current_a > ema_b.current_a
-                            && ema_b.current_a > ema_c.current_a =>
+                        _x if round(ema_a.current_a, 2) >= round(ema_b.current_a, 2)
+                            && round(ema_b.current_a, 2) >= round(ema_c.current_a, 2) =>
                         {
                             Status::Bullish
                         }
