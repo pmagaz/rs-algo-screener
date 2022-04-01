@@ -119,7 +119,7 @@ pub fn instrument_list(props: &Props
                 {
                     Status::Bullish
                 }
-                _x if ema_c.current_a < ema_b.current_a
+                 _x if ema_a.current_a < ema_b.current_a
                     && ema_b.current_a < ema_c.current_a =>
                 {
                     Status::Bearish

@@ -52,6 +52,12 @@ impl General {
                  {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.prev_a"]}},
                  {"$expr": {"$lte": ["$indicators.macd.prev_a","$indicators.macd.prev_b"]}}
                ]},
+                {
+               "$and": [
+                 {"$expr": {"$gt": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
+                 {"$expr": {"$gt": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
+                 {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
+               ]},
                 {"$and": [
                  {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
@@ -167,7 +173,9 @@ impl General {
                     if instrument.current_candle == CandleType::Karakasa
                         || instrument.current_candle == CandleType::BullishGap
                         || pattern_status != Status::Neutral
-                        || (stoch_status != Status::Bearish && macd_status != Status::Bearish)
+                        || (stoch_status != Status::Bearish
+                            && macd_status != Status::Bearish
+                            && ema_status != Status::Bearish)
                     {
                         docs.push(instrument);
                     }
