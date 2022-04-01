@@ -3,6 +3,7 @@
   hosts: all
   roles:
     - { role: "deployment/git/roles" }
+    - { role: "deployment/docker-registry/roles/" }
     - { role: "deployment/mongodb/roles/" }
     - { role: "rs_algo_backend/deployment/roles/" }
     - { role: "rs_algo_scanner/deployment/roles/" }
