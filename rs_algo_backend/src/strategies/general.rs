@@ -33,13 +33,13 @@ impl General {
                  {"current_candle": "Karakasa"},
                  {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
                  {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-                 //{"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
+                 {"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
                ]},
                 {"$and": [
                  {"current_candle": "MorningStar"},
                  {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
                  {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-                 //{"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
+                 {"indicators.stoch.current_a":  {"$lt": stoch_bottom }},
                ]},
                 {"$and": [
                  {"current_candle": "BullishGap"},
