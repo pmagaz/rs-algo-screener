@@ -135,15 +135,20 @@ impl General {
                     };
 
                     let macd_status = match macd {
-                        _x if round(macd.current_a, 1) >= round(macd.current_b, 1)
+                        _x if round(macd.current_a, 2) >= round(macd.current_b, 2)
                             && macd.current_a > 0. =>
                         {
                             Status::Bullish
                         }
-                        _x if round(macd.current_a, 1) >= round(macd.current_b, 1)
-                            && round(macd.current_a, 1) < 0. =>
+                        _x if round(macd.current_a, 2) >= round(macd.current_b, 2)
+                            && round(macd.current_a, 2) < 0. =>
                         {
                             Status::Bearish
+                        }
+                        _x if round(macd.current_a, 1) == round(macd.current_b, 1)
+                            && round(macd.current_a, 1) == 0. =>
+                        {
+                            Status::Neutral
                         }
                         _x if macd.current_a < macd.current_b => Status::Bearish,
                         _ => Status::Neutral,
@@ -157,13 +162,18 @@ impl General {
                     };
 
                     let ema_status = match ema_a {
-                        _x if round(ema_a.current_a, 1) >= round(ema_b.current_a, 1)
-                            && round(ema_b.current_a, 1) >= round(ema_c.current_a, 1) =>
+                        _x if round(ema_a.current_a, 2) >= round(ema_b.current_a, 2)
+                            && round(ema_b.current_a, 2) >= round(ema_c.current_a, 2) =>
                         {
                             Status::Bullish
                         }
-                        _x if round(ema_a.current_a, 1) < round(ema_b.current_a, 1)
-                            && round(ema_b.current_a, 1) < round(ema_c.current_a, 1) =>
+                        _x if round(ema_a.current_a, 1) == round(ema_b.current_a, 1)
+                            && round(ema_b.current_a, 1) == round(ema_c.current_a, 1) =>
+                        {
+                            Status::Neutral
+                        }
+                        _x if round(ema_a.current_a, 2) < round(ema_b.current_a, 2)
+                            && round(ema_b.current_a, 2) < round(ema_c.current_a, 2) =>
                         {
                             Status::Bearish
                         }
