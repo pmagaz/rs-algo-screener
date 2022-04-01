@@ -94,7 +94,7 @@ impl Backend {
         chart
             .draw_series(data.iter().enumerate().map(|(id, candle)| {
                 let (bullish, bearish): (ShapeStyle, ShapeStyle) = match candle {
-                    _x if id == data.len() => (BLUE.filled(), BLUE.filled()),
+                    _x if id == data.len() - 1 => (BLUE.filled(), BLUE.filled()),
                     _x if candle.close >= candle.open => (GREEN.filled(), GREEN.filled()),
                     _x if candle.close <= candle.open => (RED.filled(), RED.filled()),
                     _ => (GREEN.filled(), GREEN.filled()),
@@ -452,7 +452,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, ema_a[id])),
-                &BLUE.mix(0.5),
+                &BLUE.mix(0.4),
             ))
             .unwrap();
 
@@ -461,7 +461,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, ema_b[id])),
-                &MAGENTA.mix(0.5),
+                &MAGENTA.mix(0.4),
             ))
             .unwrap();
 
