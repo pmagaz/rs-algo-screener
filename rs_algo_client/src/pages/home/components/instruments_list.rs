@@ -76,8 +76,6 @@ pub fn instrument_list(props: &Props
                 None   => PatternType::None,
             };
 
-        
-
             let candle_status = match instrument.current_candle {
                 CandleType::Karakasa => Status::Bullish,
                 CandleType::MorningStar => Status::Bullish,
@@ -110,22 +108,8 @@ pub fn instrument_list(props: &Props
             let stoch = instrument.indicators.stoch.clone();
             let rsi = instrument.indicators.rsi.clone();
             let ema_a = instrument.indicators.ema_a.clone(); //9
-            let ema_b = instrument.indicators.ema_b.clone(); //21
-            let ema_c = instrument.indicators.ema_c.clone(); //50
-
-            let ema_status = match ema_a {
-                _x if ema_a.current_a > ema_b.current_a
-                    && ema_b.current_a > ema_c.current_a =>
-                {
-                    Status::Bullish
-                }
-                 _x if ema_a.current_a < ema_b.current_a
-                    && ema_b.current_a < ema_c.current_a =>
-                {
-                    Status::Bearish
-                }
-                _ => Status::Neutral,
-            };
+            // let _ema_b = instrument.indicators.ema_b.clone(); //21
+            // let _ema_c = instrument.indicators.ema_c.clone(); //50
 
             let date = instrument.date.to_chrono();
 
@@ -142,7 +126,7 @@ pub fn instrument_list(props: &Props
             };
             
               let horizontal_status = match horizontal_lows.get(0) {
-                Some(val) => Status::Bullish,
+                Some(_val) => Status::Bullish,
                 None   => Status::Default 
             }; 
             
@@ -158,7 +142,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     <td class={get_status_class(&macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    <td class={get_status_class(&ema_status)}> {format!("{:?} / {:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 1), round(instrument.indicators.ema_c.current_a, 1))}</td>
+                    <td class={get_status_class(&ema_a.status)}> {format!("{:?} / {:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 1), round(instrument.indicators.ema_c.current_a, 1))}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }

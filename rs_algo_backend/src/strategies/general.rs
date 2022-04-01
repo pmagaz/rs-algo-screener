@@ -183,13 +183,17 @@ impl General {
                     instrument.indicators.stoch.status = stoch_status.clone();
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
+                    instrument.indicators.ema_a.status = ema_status.clone();
 
                     //FIXME or ?
                     if pattern_status != Status::Neutral
                         || (ema_status != Status::Bearish
-                            && (instrument.current_candle == CandleType::Karakasa
-                                || instrument.current_candle == CandleType::BullishGap
-                                || instrument.current_candle == CandleType::MorningStar))
+                            && ((instrument.current_candle == CandleType::Karakasa
+                                && ema_status != Status::Bearish)
+                                || (instrument.current_candle == CandleType::BullishGap
+                                    && ema_status != Status::Bearish)
+                                || (instrument.current_candle == CandleType::MorningStar
+                                    && ema_status != Status::Bearish)))
                     {
                         docs.push(instrument);
                     }
