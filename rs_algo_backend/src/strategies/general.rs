@@ -162,8 +162,8 @@ impl General {
                     };
 
                     let ema_status = match ema_a {
-                        _x if round(ema_a.current_a, 2) >= round(ema_b.current_a, 2)
-                            && round(ema_b.current_a, 2) >= round(ema_c.current_a, 2) =>
+                        _x if round(ema_a.current_a, 2) > round(ema_b.current_a, 2)
+                            && round(ema_b.current_a, 2) > round(ema_c.current_a, 2) =>
                         {
                             Status::Bullish
                         }
