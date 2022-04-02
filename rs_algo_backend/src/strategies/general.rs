@@ -1,4 +1,3 @@
-use super::Strategy;
 use async_trait::async_trait;
 use bson::{doc, Document};
 use chrono::Duration;
@@ -7,8 +6,7 @@ use mongodb::Cursor;
 
 use round::round;
 use rs_algo_shared::error::Result;
-use rs_algo_shared::helpers::comp::is_equal;
-use rs_algo_shared::helpers::date::Local;
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::*;
 use std::env;
 
@@ -21,14 +19,39 @@ impl General {
     pub fn new() -> Result<General> {
         let stoch_bottom = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
         let minimum_pattern_target = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
+
         let min_horizontal_level_ocurrences = env::var("MIN_HORIZONTAL_LEVELS_OCCURENCES")
             .unwrap()
             .parse::<f64>()
             .unwrap();
 
+        //  {"$and": [{
         Ok(Self {
             query: doc! {
-             "$or": [
+            "$and": [
+                {"$or": [
+                    {"$and": [
+                        {"patterns.local_patterns": {"$elemMatch" : {
+                        "date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(35)) }
+                        }}}
+                    ]},
+                    {"$and": [
+                        {"patterns.local_patterns": {"$elemMatch" : {
+                        "active.target":{"$gte": minimum_pattern_target },
+                        //"active.pattern_type":{"$nin": ["None"] },
+                        "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
+                        }}}
+                    ]},
+                ]
+                },
+                {"$and": [
+                    {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
+                    {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
+                    {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
+               ]},
+
+            ]},
+            /* *"$or": [
                 {"$and": [
                  {"current_candle": "Karakasa"},
                  {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
@@ -81,7 +104,7 @@ impl General {
                 }}},
             ]},
                 { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } }
-            ]},
+            ]*/
             //  format: |ins: CompactInstrument| ins,
         })
     }
@@ -193,17 +216,17 @@ impl General {
                     instrument.indicators.ema_a.status = ema_status.clone();
 
                     //FIXME or ?
-                    if pattern_status != Status::Neutral
-                        || (ema_status != Status::Bearish
-                            && ((instrument.current_candle == CandleType::Karakasa
-                                && ema_status != Status::Bearish)
-                                || (instrument.current_candle == CandleType::BullishGap
-                                    && ema_status != Status::Bearish)
-                                || (instrument.current_candle == CandleType::MorningStar
-                                    && ema_status != Status::Bearish)))
-                    {
-                        docs.push(instrument);
-                    }
+                    // if pattern_status != Status::Neutral
+                    //     || (ema_status != Status::Bearish
+                    //         && ((instrument.current_candle == CandleType::Karakasa
+                    //             && ema_status != Status::Bearish)
+                    //             || (instrument.current_candle == CandleType::BullishGap
+                    //                 && ema_status != Status::Bearish)
+                    //             || (instrument.current_candle == CandleType::MorningStar
+                    //                 && ema_status != Status::Bearish)))
+                    // {
+                    docs.push(instrument);
+                    //}
                 }
                 _ => {}
             }
