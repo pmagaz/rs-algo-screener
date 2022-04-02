@@ -8,7 +8,7 @@ use rs_algo_shared::models::*;
 
 pub fn is_ascendant_top(data: &DataPoints) -> bool {
     if is_higher_highs_top(data)
-        && is_higher_lows_top(data)
+        && is_higher_lows_bottom(data)
         && is_equal_distance((data[0].1, data[1].1), (data[2].1, data[3].1))
     {
         true
@@ -19,7 +19,7 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
 
 pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
     if is_higher_highs_bottom(data)
-        && is_higher_lows_bottom(data)
+        && is_higher_lows_top(data)
         && is_equal_distance((data[0].1, data[1].1), (data[2].1, data[3].1))
     {
         true
@@ -30,7 +30,7 @@ pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
 
 pub fn is_descendant_top(data: &DataPoints) -> bool {
     if is_lower_highs_top(data)
-        && is_lower_lows_top(data)
+        && is_lower_lows_bottom(data)
         && is_equal_distance((data[0].1, data[1].1), (data[2].1, data[3].1))
     {
         true
@@ -41,7 +41,7 @@ pub fn is_descendant_top(data: &DataPoints) -> bool {
 
 pub fn is_descendant_bottom(data: &DataPoints) -> bool {
     if is_lower_highs_bottom(data)
-        && is_lower_lows_bottom(data)
+        && is_lower_lows_top(data)
         && is_equal_distance((data[0].1, data[1].1), (data[2].1, data[3].1))
     {
         true

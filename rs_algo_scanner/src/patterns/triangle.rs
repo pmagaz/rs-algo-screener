@@ -6,7 +6,77 @@ use crate::prices::*;
 use rs_algo_shared::models::*;
 
 pub fn is_ascendant_top(data: &DataPoints) -> bool {
-    if upper_band_is_equal_top(data) && is_higher_lows_top(data) {
+    if upper_band_is_equal_top(data)
+        && is_higher_lows_bottom(data)
+        && data[0].1 > data[1].1
+        && data[2].1 > data[3].1
+        && data[4].1 > data[3].1
+    {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
+    if is_higher_lows_top(data)
+        && upper_band_is_equal_bottom(data)
+        && data[1].1 > data[0].1
+        && data[3].1 > data[2].1
+        && data[3].1 > data[4].1
+    {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_descendant_top(data: &DataPoints) -> bool {
+    if is_lower_highs_top(data)
+        && lower_band_is_equal_bottom(data)
+        && data[0].1 > data[1].1
+        && data[2].1 < data[1].1
+        && data[4].1 > data[3].1
+    {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_descendant_bottom(data: &DataPoints) -> bool {
+    if lower_band_is_equal_top(data)
+        && is_lower_highs_bottom(data)
+        && data[1].1 > data[0].1
+        && data[3].1 > data[2].1
+        && data[3].1 > data[4].1
+    {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_symmetrical_top(data: &DataPoints) -> bool {
+    if is_lower_highs_top(data)
+        && is_higher_lows_bottom(data)
+        && data[0].1 > data[1].1
+        && data[2].1 > data[3].1
+        && data[4].1 > data[3].1
+    {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_symmetrical_bottom(data: &DataPoints) -> bool {
+    if is_lower_highs_bottom(data)
+        && is_higher_lows_top(data)
+        && data[1].1 > data[0].1
+        && data[3].1 > data[2].1
+        && data[3].1 > data[4].1
+    {
         true
     } else {
         false
@@ -59,53 +129,4 @@ pub fn symetrical_bottom_active(data: &DataPoints, candles: &Vec<Candle>) -> Pat
         price_is_higher_upper_band_bottom(&data, candles),
         price_is_lower_low_band_bottom(&data, candles),
     )
-}
-
-pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
-    if upper_band_is_equal_bottom(data) && is_higher_lows_bottom(data) {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_descendant_top(data: &DataPoints) -> bool {
-    if lower_band_is_equal_top(data) && is_lower_highs_top(data) {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_descendant_bottom(data: &DataPoints) -> bool {
-    if lower_band_is_equal_bottom(data) && is_lower_highs_top(data) {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_symmetrical_top(data: &DataPoints) -> bool {
-    if is_lower_highs_top(data)
-        && is_higher_lows_top(data)
-        && data[1].1 < data[2].1
-        && data[3].1 < data[4].1
-    {
-        true
-    } else {
-        false
-    }
-}
-
-pub fn is_symmetrical_bottom(data: &DataPoints) -> bool {
-    if is_lower_highs_bottom(data)
-        && is_higher_lows_bottom(data)
-        && is_lower_highs_top(data)
-        && data[1].1 > data[2].1
-        && data[3].1 < data[4].1
-    {
-        true
-    } else {
-        false
-    }
 }

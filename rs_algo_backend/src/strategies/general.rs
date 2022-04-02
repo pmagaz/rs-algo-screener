@@ -6,6 +6,7 @@ use mongodb::Cursor;
 
 use round::round;
 use rs_algo_shared::error::Result;
+use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::*;
 use std::env;
@@ -17,7 +18,6 @@ pub struct General {
 //FIMXE impl trait (fix asyn-trait)
 impl General {
     pub fn new() -> Result<General> {
-        let stoch_bottom = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
         let minimum_pattern_target = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
 
         let min_horizontal_level_ocurrences = env::var("MIN_HORIZONTAL_LEVELS_OCCURENCES")
@@ -28,74 +28,27 @@ impl General {
         //  {"$and": [{
         Ok(Self {
             query: doc! {
-            "$and": [
+            "$or": [
                 {"$or": [
                     {"$and": [
                         {"patterns.local_patterns": {"$elemMatch" : {
-                        "date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(35)) }
+                        "date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(50)) },
                         }}}
                     ]},
                     {"$and": [
                         {"patterns.local_patterns": {"$elemMatch" : {
                         "active.target":{"$gte": minimum_pattern_target },
-                        //"active.pattern_type":{"$nin": ["None"] },
                         "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
                         }}}
                     ]},
-                ]
+                    ]
                 },
                 {"$and": [
                     {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
                     {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-                    {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
                ]},
-
-            ]},
-            /* *"$or": [
-                {"$and": [
-                 {"current_candle": "Karakasa"},
-                 {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
-                 {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-                 {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
-               ]},
-                {"$and": [
-                 {"current_candle": "MorningStar"},
-                 {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
-                 {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-                 {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
-               ]},
-                {"$and": [
-                 {"current_candle": "BullishGap"},
-                 {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
-                 {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-                 {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
-               ]},
-              {
-               "$and": [
-                 {"indicators.stoch.current_a":  {"$lte": stoch_bottom }},
-                 {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.current_b"]}},
-                 {"$expr": {"$gt": ["$indicators.stoch.current_a","$indicators.stoch.prev_a"]}},
-                 {"$expr": {"$lte": ["$indicators.stoch.prev_a","$indicators.stoch.prev_b"]}}
-               ]},
-               {
-               "$and": [
-                 {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.current_b"]}},
-                 {"$expr": {"$gt": ["$indicators.macd.current_a","$indicators.macd.prev_a"]}},
-                 {"$expr": {"$lte": ["$indicators.macd.prev_a","$indicators.macd.prev_b"]}}
-               ]},
-                {
-               "$and": [
-                 {"$expr": {"$gt": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
-                 {"$expr": {"$gt": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-                 {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
-               ]},
-                {"$and": [
-                 {"patterns.local_patterns": {"$elemMatch" : {
-                    "active.target":{"$gte": minimum_pattern_target },
-                    "active.pattern_type":{"$nin": ["None"] },
-                    "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
-                }}},
-            ]},
+                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
+                { "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
                 {"$and": [
                  {
                     "horizontal_levels.lows": {"$elemMatch" : {
@@ -103,8 +56,7 @@ impl General {
                     "occurrences":{"$gte": min_horizontal_level_ocurrences },
                 }}},
             ]},
-                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } }
-            ]*/
+            ]},
             //  format: |ins: CompactInstrument| ins,
         })
     }
@@ -115,6 +67,10 @@ impl General {
     ) -> Vec<CompactInstrument> {
         println!("[STRATEGY] Formating ");
         let mut docs: Vec<CompactInstrument> = vec![];
+        let ema_crossover_th = env::var("EMA_CROSSOVER_THRESHOLD")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
 
         while let Some(result) = instruments.next().await {
             match result {
@@ -197,6 +153,11 @@ impl General {
                         {
                             Status::Bullish
                         }
+                        _x if percentage_change(ema_a.prev_a, ema_b.prev_a) < ema_crossover_th
+                            && round(ema_b.current_a, 1) > round(ema_c.current_a, 1) =>
+                        {
+                            Status::Neutral
+                        }
                         _x if round(ema_a.current_a, 1) == round(ema_b.current_a, 1)
                             && round(ema_b.current_a, 1) == round(ema_c.current_a, 1) =>
                         {
@@ -215,17 +176,17 @@ impl General {
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.ema_a.status = ema_status.clone();
 
-                    //FIXME or ?
-                    // if pattern_status != Status::Neutral
-                    //     || (ema_status != Status::Bearish
-                    //         && ((instrument.current_candle == CandleType::Karakasa
-                    //             && ema_status != Status::Bearish)
-                    //             || (instrument.current_candle == CandleType::BullishGap
-                    //                 && ema_status != Status::Bearish)
-                    //             || (instrument.current_candle == CandleType::MorningStar
-                    //                 && ema_status != Status::Bearish)))
-                    // {
-                    docs.push(instrument);
+                    if pattern_status != Status::Default
+                        || (ema_status != Status::Bearish
+                            && (
+                                percentage_change(instrument.indicators.ema_a.prev_a, ema_b.prev_a)
+                                    < ema_crossover_th
+                                //  && percentage_change(ema_b.current_a, ema_c.prev_a) < 0.3
+                                //&& round(ema_b.current_a, 2) < round(ema_c.current_a, 2))
+                            ))
+                    {
+                        docs.push(instrument);
+                    }
                     //}
                 }
                 _ => {}

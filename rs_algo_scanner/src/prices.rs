@@ -16,7 +16,6 @@ pub fn price_is_higher_upper_band_top(data: &DataPoints, candles: &Vec<Candle>) 
 
 pub fn price_is_higher_upper_band_bottom(data: &DataPoints, candles: &Vec<Candle>) -> PriceBreak {
     let band = vec![data[1], data[3]];
-    println!("22222 {:?}", band);
     let break_price_comparator = |price: f64, break_point: f64| price > break_point;
     search_price_break(band, candles, &break_price_comparator)
 }
@@ -74,7 +73,6 @@ pub fn search_price_break(
     let mut id = keys[0];
     if band.len() > 1 {
         let next_point = calculate_next_point(band.clone());
-        println!("33333 {:?} {:?}", band, next_point);
 
         let last = band.last().unwrap().1;
         let increment = (next_point - last) / 4.;

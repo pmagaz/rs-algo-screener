@@ -75,7 +75,7 @@ impl Patterns {
             let mut locals = [&maxima[max_start..max_end], &minima[min_start..min_end]].concat();
 
             locals.sort_by(|(id_a, _price_a), (id_b, _price_b)| id_a.cmp(id_b));
-            locals.reverse();
+            //locals.reverse();
 
             let mut iter = locals.windows(window_size);
             let mut unfinished = true;
@@ -84,12 +84,50 @@ impl Patterns {
                 match iter.next() {
                     Some(window) => {
                         let data_points = window.to_vec();
-                        //  println!("000000 {:?}", data_points);
-
                         let last_index = data_points.last().unwrap().0;
                         let candle_date = candles.get(last_index).unwrap().date();
                         let change = self.calculate_change(&data_points);
-                        if triangle::is_ascendant_top(&data_points) {
+                        if rectangle::is_renctangle_top(&data_points) {
+                            self.set_pattern(
+                                PatternType::Rectangle,
+                                PatternDirection::Top,
+                                &pattern_size,
+                                &data_points,
+                                change,
+                                candle_date,
+                                rectangle::rectangle_top_active(&data_points, candles),
+                            );
+                        } else if rectangle::is_renctangle_bottom(&data_points) {
+                            self.set_pattern(
+                                PatternType::Rectangle,
+                                PatternDirection::Bottom,
+                                &pattern_size,
+                                &data_points,
+                                change,
+                                candle_date,
+                                rectangle::rectangle_bottom_active(&data_points, candles),
+                            );
+                        } else if channel::is_ascendant_top(&data_points) {
+                            self.set_pattern(
+                                PatternType::ChannelUp,
+                                PatternDirection::Top,
+                                &pattern_size,
+                                &data_points,
+                                change,
+                                candle_date,
+                                channel::channel_top_active(&data_points, candles),
+                            );
+                        } else if channel::is_ascendant_bottom(&data_points) {
+                            self.set_pattern(
+                                PatternType::ChannelUp,
+                                PatternDirection::Bottom,
+                                &pattern_size,
+                                &data_points,
+                                change,
+                                candle_date,
+                                channel::channel_bottom_active(&data_points, candles),
+                            );
+                        } else if triangle::is_ascendant_top(&data_points) {
                             self.set_pattern(
                                 PatternType::TriangleAscendant,
                                 PatternDirection::Top,
@@ -148,46 +186,6 @@ impl Patterns {
                                 change,
                                 candle_date,
                                 triangle::symetrical_bottom_active(&data_points, candles),
-                            );
-                        } else if rectangle::is_renctangle_top(&data_points) {
-                            self.set_pattern(
-                                PatternType::Rectangle,
-                                PatternDirection::Top,
-                                &pattern_size,
-                                &data_points,
-                                change,
-                                candle_date,
-                                rectangle::rectangle_top_active(&data_points, candles),
-                            );
-                        } else if rectangle::is_renctangle_bottom(&data_points) {
-                            self.set_pattern(
-                                PatternType::Rectangle,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                &data_points,
-                                change,
-                                candle_date,
-                                rectangle::rectangle_bottom_active(&data_points, candles),
-                            );
-                        } else if channel::is_ascendant_top(&data_points) {
-                            self.set_pattern(
-                                PatternType::ChannelUp,
-                                PatternDirection::Top,
-                                &pattern_size,
-                                &data_points,
-                                change,
-                                candle_date,
-                                channel::channel_top_active(&data_points, candles),
-                            );
-                        } else if channel::is_ascendant_bottom(&data_points) {
-                            self.set_pattern(
-                                PatternType::ChannelUp,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                &data_points,
-                                change,
-                                candle_date,
-                                channel::channel_bottom_active(&data_points, candles),
                             );
                         } else if channel::is_descendant_top(&data_points) {
                             self.set_pattern(
@@ -373,6 +371,7 @@ pub fn pattern_active_result(
     let price_change = calculate_price_change(&data);
     //FIXME
     let price_target = calculate_price_target(&data);
+    let date = Local::now() - Duration::days(1000);
     if top_result {
         PatternActive {
             active: true,
@@ -403,7 +402,7 @@ pub fn pattern_active_result(
             completed: false,
             status: Status::Default,
             index: 0,
-            date: DbDateTime::from_chrono(Local::now()),
+            date: DbDateTime::from_chrono(date),
             price: 0.,
             change: 0.,
             target: 0.,

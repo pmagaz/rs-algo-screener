@@ -63,15 +63,15 @@ pub fn instrument_list(props: &Props
             };
             
 
-            let patterns = instrument.patterns.local_patterns.get(0); 
+            let pattern = instrument.patterns.local_patterns.get(0); 
 
 
-            let break_direction = match patterns {
+            let break_direction = match pattern {
                 Some(val) => val.active.break_direction.clone(),
                 None   => PatternDirection::None,
             };
             
-            let pattern_type = match patterns {
+            let pattern_type = match pattern {
                 Some(val) => val.pattern_type.clone(),
                 None   => PatternType::None,
             };
@@ -86,20 +86,33 @@ pub fn instrument_list(props: &Props
                 _ => Status::Default,
             };
 
+            let pattern_active = match pattern {
+                Some(pattern) => pattern.active.active,
+                None   => false 
+            };
 
-            let pattern_date = match patterns {
+
+            let pattern_date = match pattern {
+                Some(val) => val.date.to_chrono(),
+                None   => DateTime::from(Local::now() - Duration::days(1000))
+            };
+
+            let pattern_active_date = match pattern {
                 Some(val) => val.active.date.to_chrono(),
                 None   => DateTime::from(Local::now() - Duration::days(1000))
             };
             
-            let pattern_change = match patterns {
+            let pattern_change = match pattern {
                 Some(val) => round(val.active.change,0),
                 None   => 0.,
             };
 
-            let pattern_status = match patterns {
-                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(5)) => Status::Bullish,
-                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(10)) => Status::Neutral,
+            let pattern_status = match pattern {
+                _x if pattern_active && pattern_active_date > DateTime::<Local>::from(Local::now() - Duration::days(5)) => Status::Bullish,
+                _x if pattern_active && pattern_active_date > DateTime::<Local>::from(Local::now() - Duration::days(10)) => Status::Neutral,
+                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(20)) => Status::Neutral,
+                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(30)) => Status::Default,
+                _x if pattern_type == PatternType::None => Status::Default,
                  _  => Status::Default,
             };
 
@@ -114,9 +127,12 @@ pub fn instrument_list(props: &Props
             let date = instrument.date.to_chrono();
 
              let pattern_info: (String, String, String, String) = match pattern_date {
-                    _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(7)) => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), pattern_date.format("%d/%m/%Y").to_string()),
-                    _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if pattern_status == Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), pattern_active_date.format("%d/%m/%Y").to_string()),
+                _x if pattern_status == Status::Neutral || pattern_status == Status::Default => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), "".to_string()),
+                _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
+
 
             let horizontal_lows: Vec<&HorizontalLevel> =  instrument.horizontal_levels.lows.iter().filter(|h| h.occurrences >= 3 && is_equal(h.price, instrument.current_price)).map(|x| x).collect();
             
