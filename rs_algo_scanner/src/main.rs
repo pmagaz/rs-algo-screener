@@ -56,12 +56,12 @@ async fn main() -> Result<()> {
     let symbols = screener.get_symbols().await.unwrap().symbols;
 
     let symbols = [
-        Symbol {
-            symbol: "SE1.US_4".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        },
+        // Symbol {
+        //     symbol: "SE1.US_4".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
         // Symbol {
         //     symbol: "T10G.UK".to_owned(),
         //     category: "".to_owned(),
