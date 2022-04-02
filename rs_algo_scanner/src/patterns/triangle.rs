@@ -86,7 +86,11 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
 }
 
 pub fn is_symmetrical_top(data: &DataPoints) -> bool {
-    if is_lower_highs_top(data) && is_higher_lows_top(data) {
+    if is_lower_highs_top(data)
+        && is_higher_lows_top(data)
+        && data[1].1 < data[2].1
+        && data[3].1 < data[4].1
+    {
         true
     } else {
         false
@@ -94,7 +98,12 @@ pub fn is_symmetrical_top(data: &DataPoints) -> bool {
 }
 
 pub fn is_symmetrical_bottom(data: &DataPoints) -> bool {
-    if is_lower_highs_bottom(data) && is_higher_lows_bottom(data) {
+    if is_lower_highs_bottom(data)
+        && is_higher_lows_bottom(data)
+        && is_lower_highs_top(data)
+        && data[1].1 > data[2].1
+        && data[3].1 < data[4].1
+    {
         true
     } else {
         false

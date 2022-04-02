@@ -9,4 +9,3 @@ pub mod pattern;
 pub mod peaks;
 pub mod rectangle;
 pub mod triangle;
-pub mod upper_channel;

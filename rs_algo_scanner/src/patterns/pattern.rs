@@ -2,7 +2,7 @@ use crate::candle::Candle;
 use crate::patterns::*;
 use crate::prices::{calculate_price_change, calculate_price_target};
 use rs_algo_shared::helpers::comp::percentage_change;
-use rs_algo_shared::helpers::date::Local;
+use rs_algo_shared::helpers::date::{DateTime, Duration, Local};
 pub use rs_algo_shared::models::*;
 
 use serde::{Deserialize, Serialize};
@@ -76,19 +76,27 @@ impl Patterns {
 
             locals.sort_by(|(id_a, _price_a), (id_b, _price_b)| id_a.cmp(id_b));
             locals.reverse();
+
             let mut iter = locals.windows(window_size);
             let mut unfinished = true;
+
             while unfinished {
                 match iter.next() {
                     Some(window) => {
                         let data_points = window.to_vec();
+                        //  println!("000000 {:?}", data_points);
+
+                        let last_index = data_points.last().unwrap().0;
+                        let candle_date = candles.get(last_index).unwrap().date();
+                        let change = self.calculate_change(&data_points);
                         if triangle::is_ascendant_top(&data_points) {
                             self.set_pattern(
                                 PatternType::TriangleAscendant,
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 triangle::ascendant_top_active(&data_points, candles),
                             );
                         } else if triangle::is_ascendant_bottom(&data_points) {
@@ -97,7 +105,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 triangle::ascendant_bottom_active(&data_points, candles),
                             );
                         } else if triangle::is_descendant_top(&data_points) {
@@ -106,7 +115,8 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 triangle::descendant_top_active(&data_points, candles),
                             );
                         } else if triangle::is_descendant_bottom(&data_points) {
@@ -115,7 +125,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 triangle::descendant_bottom_active(&data_points, candles),
                             );
                         } else if triangle::is_symmetrical_top(&data_points) {
@@ -124,7 +135,8 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 triangle::symetrical_top_active(&data_points, candles),
                             );
                         } else if triangle::is_symmetrical_bottom(&data_points) {
@@ -133,7 +145,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 triangle::symetrical_bottom_active(&data_points, candles),
                             );
                         } else if rectangle::is_renctangle_top(&data_points) {
@@ -142,7 +155,8 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 rectangle::rectangle_top_active(&data_points, candles),
                             );
                         } else if rectangle::is_renctangle_bottom(&data_points) {
@@ -151,7 +165,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 rectangle::rectangle_bottom_active(&data_points, candles),
                             );
                         } else if channel::is_ascendant_top(&data_points) {
@@ -160,7 +175,8 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 channel::channel_top_active(&data_points, candles),
                             );
                         } else if channel::is_ascendant_bottom(&data_points) {
@@ -169,7 +185,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 channel::channel_bottom_active(&data_points, candles),
                             );
                         } else if channel::is_descendant_top(&data_points) {
@@ -178,7 +195,8 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 channel::channel_top_active(&data_points, candles),
                             );
                         } else if channel::is_descendant_bottom(&data_points) {
@@ -187,7 +205,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 channel::channel_bottom_active(&data_points, candles),
                             );
                         } else if broadening::is_top(&data_points) {
@@ -196,7 +215,8 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 broadening::broadening_top_active(&data_points, candles),
                             );
                         } else if broadening::is_bottom(&data_points) {
@@ -205,7 +225,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 broadening::broadening_top_active(&data_points, candles),
                             );
                         } else if double::is_top(&data_points) {
@@ -214,7 +235,8 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 double::top_active(&data_points, candles),
                             );
                         } else if double::is_bottom(&data_points) {
@@ -223,7 +245,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 double::top_active(&data_points, candles),
                             );
                         } else if head_shoulders::is_hs(&data_points) {
@@ -232,7 +255,8 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 head_shoulders::hs_active(&data_points, candles),
                             );
                         } else if head_shoulders::is_inverse(&data_points) {
@@ -241,23 +265,26 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
-                                self.calculate_change(&data_points),
+                                change,
+                                candle_date,
                                 head_shoulders::hs_active(&data_points, candles),
                             );
                         }
                     }
                     None => {
+                        let date = Local::now() - Duration::days(1000);
                         self.set_pattern(
                             PatternType::None,
                             PatternDirection::None,
                             &pattern_size,
                             &vec![(0, 0.)],
                             0.,
+                            date,
                             PatternActive {
                                 active: false,
                                 completed: true,
                                 status: Status::Default,
-                                date: DbDateTime::from_chrono(Local::now()),
+                                date: DbDateTime::from_chrono(date),
                                 target: 0.,
                                 change: 0.,
                                 index: 0,
@@ -270,16 +297,18 @@ impl Patterns {
                 }
             }
         } else {
+            let date = Local::now() - Duration::days(1000);
             self.set_pattern(
                 PatternType::None,
                 PatternDirection::None,
                 &pattern_size,
                 &vec![(0, 0.)],
                 0.,
+                date,
                 PatternActive {
                     active: false,
                     completed: true,
-                    date: DbDateTime::from_chrono(Local::now()),
+                    date: DbDateTime::from_chrono(date),
                     status: Status::Default,
                     target: 0.,
                     change: 0.,
@@ -295,6 +324,7 @@ impl Patterns {
         percentage_change(data_points[4].1, data_points[3].1).abs()
     }
 
+    //FXIME too many arguments
     fn set_pattern(
         &mut self,
         pattern_type: PatternType,
@@ -302,13 +332,17 @@ impl Patterns {
         pattern_size: &PatternSize,
         data_points: &DataPoints,
         change: f64,
+        date: DateTime<Local>,
         active: PatternActive,
     ) {
+        let index = data_points.last().unwrap().0;
         if pattern_type != PatternType::None {
             match &pattern_size {
                 PatternSize::Local => self.local_patterns.push(Pattern {
                     pattern_type,
                     change,
+                    index,
+                    date: DbDateTime::from_chrono(date),
                     direction,
                     active,
                     pattern_size: pattern_size.clone(),
@@ -317,6 +351,8 @@ impl Patterns {
                 PatternSize::Extrema => self.extrema_patterns.push(Pattern {
                     pattern_type,
                     change,
+                    index,
+                    date: DbDateTime::from_chrono(date),
                     direction,
                     active,
                     pattern_size: pattern_size.clone(),
