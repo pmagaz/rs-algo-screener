@@ -43,6 +43,6 @@ pub fn hs_active(data: &DataPoints, candles: &Vec<Candle>) -> PatternActive {
 //     pattern_active_result(
 //         &data,
 //         price_is_higher_peak(&data, candles),
-//         price_is_lower_low_band_top(&data, candles),
+//         price_is_lower_low_band_bottom(&data, candles),
 //     )
 // }

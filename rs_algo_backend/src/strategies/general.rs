@@ -52,11 +52,11 @@ impl General {
             },
             {"$and": [
                 {"$expr": {"$gt": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
-                //{"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
+                {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
                 //{"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
-            { "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
+            //{ "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
             {"$and": [
              {
                 "horizontal_levels.lows": {"$elemMatch" : {

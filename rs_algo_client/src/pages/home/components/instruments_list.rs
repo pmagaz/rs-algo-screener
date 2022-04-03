@@ -128,7 +128,7 @@ pub fn instrument_list(props: &Props
             };
 
 
-            let horizontal_lows: Vec<&HorizontalLevel> =  instrument.horizontal_levels.lows.iter().filter(|h| h.occurrences >= 3 && is_equal(h.price, instrument.current_price)).map(|x| x).collect();
+            let horizontal_lows: Vec<&HorizontalLevel> =  instrument.horizontal_levels.lows.iter().filter(|h| h.occurrences >= 3 && is_equal(h.price, instrument.current_price,1.5)).map(|x| x).collect();
             
             let horizontal_info = match horizontal_lows.get(0) {
                 Some(val) => val.occurrences.to_string(),

@@ -2,8 +2,8 @@ use crate::candle::Candle;
 
 use rs_algo_shared::helpers::comp::percentage_change;
 
-use rs_algo_shared::helpers::date::Local;
-use rs_algo_shared::models::{DataPoints, DbDateTime};
+use rs_algo_shared::helpers::date::{DbDateTime, Local};
+use rs_algo_shared::models::DataPoints;
 use std::env;
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
@@ -20,13 +20,13 @@ pub fn price_is_higher_upper_band_bottom(data: &DataPoints, candles: &Vec<Candle
     search_price_break(band, candles, &break_price_comparator)
 }
 
-pub fn price_is_lower_low_band_top(data: &DataPoints, candles: &Vec<Candle>) -> PriceBreak {
+pub fn price_is_lower_low_band_bottom(data: &DataPoints, candles: &Vec<Candle>) -> PriceBreak {
     let band = vec![data[1], data[3]];
     let bottom_break = |price: f64, break_point: f64| price < break_point;
     search_price_break(band, candles, &bottom_break)
 }
 
-pub fn price_is_lower_low_band_bottom(data: &DataPoints, candles: &Vec<Candle>) -> PriceBreak {
+pub fn price_is_lower_low_band_top(data: &DataPoints, candles: &Vec<Candle>) -> PriceBreak {
     let band = vec![data[0], data[2], data[4]];
     let break_price_comparator = |price: f64, break_point: f64| price < break_point;
     search_price_break(band, candles, &break_price_comparator)

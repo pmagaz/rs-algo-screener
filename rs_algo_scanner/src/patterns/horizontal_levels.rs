@@ -2,8 +2,8 @@ use super::peaks::Peaks;
 
 use crate::error::Result;
 use rs_algo_shared::helpers::comp::is_same_band;
-use rs_algo_shared::helpers::date::{Duration, Local};
-use rs_algo_shared::models::{DbDateTime, HorizontalLevel, HorizontalLevelType};
+use rs_algo_shared::helpers::date::{DbDateTime, Duration, Local};
+use rs_algo_shared::models::{HorizontalLevel, HorizontalLevelType};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;
@@ -64,10 +64,15 @@ impl HorizontalLevels {
             .parse::<usize>()
             .unwrap();
 
+        let threshold = env::var("HORIZONTAL_LEVELS_THRESHOLD")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
         for (_peak_index, peak_price) in data {
             let price = peak_price.abs();
             for (_compare_index, compare_price) in data {
-                if is_same_band(price, *compare_price) {
+                if is_same_band(price, *compare_price, threshold) {
                     let mut occurrences = 1;
                     if hash.contains_key(&price.to_string()) {
                         occurrences += 1;

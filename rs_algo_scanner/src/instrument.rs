@@ -6,8 +6,8 @@ use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::{PatternSize, Patterns};
 use crate::patterns::peaks::Peaks;
 
-use rs_algo_shared::helpers::date::{DateTime, Duration, Local};
-use rs_algo_shared::models::{DbDateTime, TimeFrameType};
+use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Duration, Local};
+use rs_algo_shared::models::TimeFrameType;
 
 use serde::{Deserialize, Serialize};
 use std::env;

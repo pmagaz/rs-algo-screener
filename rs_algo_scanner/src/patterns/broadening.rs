@@ -35,7 +35,7 @@ pub fn broadening_top_active(data: &DataPoints, candles: &Vec<Candle>) -> Patter
     pattern_active_result(
         &data,
         price_is_higher_upper_band_top(&data, candles),
-        price_is_lower_low_band_top(&data, candles),
+        price_is_lower_low_band_bottom(&data, candles),
     )
 }
 
@@ -43,6 +43,6 @@ pub fn broadening_bottom_active(data: &DataPoints, candles: &Vec<Candle>) -> Pat
     pattern_active_result(
         &data,
         price_is_higher_upper_band_bottom(&data, candles),
-        price_is_lower_low_band_bottom(&data, candles),
+        price_is_lower_low_band_top(&data, candles),
     )
 }

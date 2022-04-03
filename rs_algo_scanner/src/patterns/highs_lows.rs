@@ -1,5 +1,6 @@
 use super::pattern::DataPoints;
 use rs_algo_shared::helpers::comp::*;
+use std::env;
 
 pub fn is_higher_highs_top(data: &DataPoints) -> bool {
     if data[0].1 < data[2].1 && data[2].1 < data[4].1 {
@@ -74,7 +75,8 @@ pub fn is_lower_lows_bottom(data: &DataPoints) -> bool {
 }
 
 pub fn upper_band_is_equal_top(data: &DataPoints) -> bool {
-    if is_equal(data[0].1, data[2].1) && is_equal(data[2].1, data[4].1) {
+    let threshold = env::var("EQUAL_THRESHOLD").unwrap().parse::<f64>().unwrap();
+    if is_equal(data[0].1, data[2].1, threshold) && is_equal(data[2].1, data[4].1, threshold) {
         true
     } else {
         false
@@ -82,7 +84,9 @@ pub fn upper_band_is_equal_top(data: &DataPoints) -> bool {
 }
 
 pub fn upper_band_is_equal_bottom(data: &DataPoints) -> bool {
-    if is_equal(data[3].1, data[1].1) {
+    let threshold = env::var("EQUAL_THRESHOLD").unwrap().parse::<f64>().unwrap();
+
+    if is_equal(data[3].1, data[1].1, threshold) {
         true
     } else {
         false
@@ -90,7 +94,8 @@ pub fn upper_band_is_equal_bottom(data: &DataPoints) -> bool {
 }
 
 pub fn lower_band_is_equal_bottom(data: &DataPoints) -> bool {
-    if is_equal(data[3].1, data[1].1) {
+    let threshold = env::var("EQUAL_THRESHOLD").unwrap().parse::<f64>().unwrap();
+    if is_equal(data[3].1, data[1].1, threshold) {
         true
     } else {
         false
@@ -98,7 +103,8 @@ pub fn lower_band_is_equal_bottom(data: &DataPoints) -> bool {
 }
 
 pub fn lower_band_is_equal_top(data: &DataPoints) -> bool {
-    if is_equal(data[0].1, data[2].1) && is_equal(data[2].1, data[4].1) {
+    let threshold = env::var("EQUAL_THRESHOLD").unwrap().parse::<f64>().unwrap();
+    if is_equal(data[0].1, data[2].1, threshold) && is_equal(data[2].1, data[4].1, threshold) {
         true
     } else {
         false
