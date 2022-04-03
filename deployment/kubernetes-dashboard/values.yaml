@@ -173,15 +173,15 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: traefik
   hosts:
-    - host: cluster.local
-      paths:
-      - path: /dashboard
-        pathType: Prefix
-        backend:
-          service:
-            name: kubernetes-dashboard 
-            port:
-              number: 80 
+    #- host: cluster.local
+    paths:
+    - path: /dashboard
+      pathType: Prefix
+      backend:
+        service:
+          name: kubernetes-dashboard 
+          port:
+            number: 80 
   tls: []
 
   ## Kubernetes Dashboard Ingress labels
