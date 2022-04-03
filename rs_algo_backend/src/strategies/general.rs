@@ -13,52 +13,58 @@ use std::env;
 
 pub struct General {
     pub query: Document,
-    //pub format: fn(CompactInstrument) -> CompactInstrument,
+    pub max_pattern_date: DbDateTime,
+    pub max_activated_date: DbDateTime,
 }
+
 //FIMXE impl trait (fix asyn-trait)
 impl General {
     pub fn new() -> Result<General> {
-        let minimum_pattern_target = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
+        Ok(Self {
+            query: doc! {},
+            max_pattern_date: DbDateTime::from_chrono(Local::now() - Duration::days(30)),
+            max_activated_date: DbDateTime::from_chrono(Local::now() - Duration::days(10)),
+        })
+    }
 
+    pub fn query(&self) -> Document {
+        let minimum_pattern_target = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
         let min_horizontal_level_ocurrences = env::var("MIN_HORIZONTAL_LEVELS_OCCURENCES")
             .unwrap()
             .parse::<f64>()
             .unwrap();
 
-        //  {"$and": [{
-        Ok(Self {
-            query: doc! {
-            "$or": [
-                {"$or": [
-                    {"$and": [
-                        {"patterns.local_patterns": {"$elemMatch" : {
-                        "date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(50)) },
-                        }}}
-                    ]},
-                    {"$and": [
-                        {"patterns.local_patterns": {"$elemMatch" : {
-                        "active.target":{"$gte": minimum_pattern_target },
-                        "active.date": { "$gte" : DbDateTime::from_chrono(Local::now() - Duration::days(5)) }
-                        }}}
-                    ]},
-                    ]
-                },
+        doc! {
+        "$or": [
+            {"$or": [
                 {"$and": [
-                    {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-                    //{"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
-               ]},
-                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
-                { "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
+                    {"patterns.local_patterns": {"$elemMatch" : {
+                    "date": { "$gte" : self.max_pattern_date },
+                    }}}
+                ]},
                 {"$and": [
-                 {
-                    "horizontal_levels.lows": {"$elemMatch" : {
-                   // "price":{"$gte": "$current_price" },
-                    "occurrences":{"$gte": min_horizontal_level_ocurrences },
-                }}},
-            ]},
-            ]},
-            //  format: |ins: CompactInstrument| ins,
-        })
+                    {"patterns.local_patterns": {"$elemMatch" : {
+                    //"active.target":{"$gte": minimum_pattern_target },
+                    "active.date": { "$gte" : self.max_activated_date }
+                    }}}
+                ]},
+                ]
+            },
+            {"$and": [
+                {"$expr": {"$gt": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
+                //{"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
+                //{"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
+           ]},
+            { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
+            { "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
+            {"$and": [
+             {
+                "horizontal_levels.lows": {"$elemMatch" : {
+               // "price":{"$gte": "$current_price" },
+                "occurrences":{"$gte": min_horizontal_level_ocurrences },
+            }}},
+        ]},
+        ]}
     }
 
     pub async fn format_instrument(
@@ -83,22 +89,13 @@ impl General {
                     let ema_b = instrument.indicators.ema_b.clone(); //21
                     let ema_c = instrument.indicators.ema_c.clone(); //55
 
-                    let pattern_status = match instrument.patterns.local_patterns.get(0) {
+                    let pattern_status = match instrument.patterns.local_patterns.last() {
                         Some(val) => {
-                            if val.active.date
-                                > DbDateTime::from_chrono(Local::now() - Duration::days(5))
-                            {
-                                let inst = instrument.patterns.local_patterns.get(0);
-                                match inst {
-                                    Some(_val) => {
-                                        instrument.patterns.local_patterns[0].active.status =
-                                            Status::Bullish
-                                    }
-                                    None => {
-                                        instrument.patterns.local_patterns[0].active.status =
-                                            Status::Default
-                                    }
-                                }
+                            if val.active.date > self.max_activated_date {
+                                //let inst = instrument.patterns.local_patterns.last();
+                                let len = instrument.patterns.local_patterns.len();
+                                instrument.patterns.local_patterns[len - 1].active.status =
+                                    Status::Bullish
                             }
                             instrument.patterns.local_patterns[0].active.status.clone()
                         }
@@ -153,24 +150,25 @@ impl General {
                         {
                             Status::Bullish
                         }
-                        _x if round(ema_b.current_a, 2) < round(ema_c.current_a, 2) => {
-                            Status::Bearish
-                        }
-                        _x if percentage_change(ema_a.prev_a, ema_b.prev_a) < ema_crossover_th
+                        _x if round(ema_a.current_a, 2) < round(ema_b.current_a, 2)
                             && round(ema_b.current_a, 2) > round(ema_c.current_a, 2) =>
                         {
                             Status::Neutral
                         }
-                        _x if round(ema_a.current_a, 2) == round(ema_b.current_a, 2)
-                            && round(ema_b.current_a, 2) == round(ema_c.current_a, 2) =>
+                        _x if percentage_change(ema_a.prev_a, ema_b.prev_a) <= ema_crossover_th
+                            && round(ema_b.current_a, 2) >= round(ema_c.current_a, 2) =>
                         {
                             Status::Neutral
+                        }
+                        _x if round(ema_b.current_a, 2) < round(ema_c.current_a, 2) => {
+                            Status::Bearish
                         }
                         _x if round(ema_a.current_a, 2) < round(ema_b.current_a, 2)
                             && round(ema_b.current_a, 2) < round(ema_c.current_a, 2) =>
                         {
                             Status::Bearish
                         }
+
                         _ => Status::Neutral,
                     };
 
@@ -179,14 +177,9 @@ impl General {
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.ema_a.status = ema_status.clone();
 
-                    if pattern_status != Status::Default
-                        || (ema_status != Status::Bearish
-                            && (
-                                percentage_change(instrument.indicators.ema_a.prev_a, ema_b.prev_a)
-                                    < ema_crossover_th
-                                //  && percentage_change(ema_b.current_a, ema_c.prev_a) < 0.3
-                                //&& round(ema_b.current_a, 2) < round(ema_c.current_a, 2))
-                            ))
+                    if ema_status != Status::Bearish
+                        && (percentage_change(instrument.indicators.ema_a.prev_a, ema_b.prev_a)
+                            < ema_crossover_th)
                     {
                         docs.push(instrument);
                     }
@@ -196,10 +189,5 @@ impl General {
             }
         }
         docs
-    }
-
-    pub fn query(&self) -> &Document {
-        println!("[STRATEGY] General ");
-        &self.query
     }
 }

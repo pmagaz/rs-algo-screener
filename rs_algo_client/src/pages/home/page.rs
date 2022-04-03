@@ -17,8 +17,8 @@ extern "C" {
 
 #[function_component(Home)]
 pub fn home() -> Html {
-    //let url = "http://192.168.1.10/api/instruments";
-    let url = "http://localhost:8000/api/instruments";
+    let url = "http://192.168.1.10/api/instruments";
+    //let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_query = use_state(|| String::from(""));

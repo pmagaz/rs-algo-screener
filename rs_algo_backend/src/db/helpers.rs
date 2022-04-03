@@ -23,9 +23,10 @@ pub async fn get_collection<T>(state: &web::Data<AppState>, collection: &str) ->
 //     Ok(instrument)
 // }
 
-pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
+pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
     let len = doc.indicators.macd.data_a.len();
-
+    // doc.patterns.local_patterns.reverse();
+    // doc.patterns.extrema_patterns.reverse();
     let doc = CompactInstrument {
         symbol: doc.symbol,
         date: doc.date,
@@ -82,7 +83,9 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 .local_patterns
                 .into_iter()
                 .enumerate()
-                .filter(|(key, _inst)| key < &3)
+                .rev()
+                .take(3)
+                .rev()
                 .map(|(key, inst)| inst)
                 .collect(),
             extrema_patterns: doc
@@ -90,7 +93,9 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 .extrema_patterns
                 .into_iter()
                 .enumerate()
-                .filter(|(key, _inst)| key < &3)
+                .rev()
+                .take(3)
+                .rev()
                 .map(|(key, inst)| inst)
                 .collect(),
         },

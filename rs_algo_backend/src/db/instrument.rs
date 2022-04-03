@@ -1,16 +1,12 @@
 use super::helpers::get_collection;
 use crate::models::app_state::AppState;
 use crate::models::instrument::{CompactInstrument, Instrument};
-use crate::strategies::Strategy;
 
 use crate::strategies::general::General;
 use actix_web::web;
-use bson::{doc, Document};
-use futures::stream::StreamExt;
+use bson::doc;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
-use rs_algo_shared::helpers::date::Local;
-use rs_algo_shared::models::*;
 use std::env;
 
 pub async fn find_by_symbol(

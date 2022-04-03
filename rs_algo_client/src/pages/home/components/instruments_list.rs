@@ -96,10 +96,9 @@ pub fn instrument_list(props: &Props
             };
 
             let pattern_status = match pattern {
-                _x if pattern_active && pattern_active_date > DateTime::<Local>::from(Local::now() - Duration::days(5)) => Status::Bullish,
-                _x if pattern_active && pattern_active_date > DateTime::<Local>::from(Local::now() - Duration::days(10)) => Status::Neutral,
-                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(20)) => Status::Neutral,
-                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(30)) => Status::Default,
+                _x if pattern_active && pattern_active_date > DateTime::<Local>::from(Local::now() - Duration::days(10)) => Status::Bullish,
+                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(30)) => Status::Neutral,
+                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(50)) => Status::Default,
                 _x if pattern_type == PatternType::None => Status::Default,
                  _  => Status::Default,
             };
@@ -117,7 +116,7 @@ pub fn instrument_list(props: &Props
              let pattern_info: (String, String, String, String) = match pattern_date {
                 _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
                 _x if pattern_status == Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), pattern_active_date.format("%d/%m/%Y").to_string()),
-                _x if pattern_status == Status::Neutral || pattern_status == Status::Default => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), "".to_string()),
+                _x if pattern_status == Status::Neutral || pattern_status == Status::Default => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), ("").to_string()),
                 _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
@@ -153,13 +152,6 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    // <td class={get_status_class(&ema_a.status)}>
-                    //     <span class={ema_style.0}> {round(instrument.indicators.ema_a.current_a, 1)} </span>
-                        
-                    //     <span class={ema_style.1}> {round(instrument.indicators.ema_b.current_a, 1)} </span>
-
-                    //     <span class={ema_style.2}> {round(instrument.indicators.ema_c.current_a, 1)}</span>
-                    // </td>
                     <td class={get_status_class(&ema_a.status)}> {format!("{:?} / {:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 1), round(instrument.indicators.ema_c.current_a, 1))}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
