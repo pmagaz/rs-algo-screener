@@ -41,11 +41,11 @@ labels: {}
 
 ## Additional container arguments
 ##
- extraArgs:
+extraArgs:
   - --enable-skip-login
   - --enable-insecure-login
   - --system-banner="Welcome to Kubernetes"
-  - --insecure-bind-address="0.0.0.0"
+  - --insecure-bind-address=0.0.0.0
   - --disable-settings-authorizer
 
 ## Additional container environment variables
@@ -141,7 +141,7 @@ resources:
 protocolHttp: true
 
 service:
-  type: LoadBalancer
+  type: LoadBalancer 
   # Dashboard service port
   externalPort: 9090
 
