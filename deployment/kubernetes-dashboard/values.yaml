@@ -141,10 +141,14 @@ resources:
 protocolHttp: true
 
 service:
-  type: LoadBalancer 
+  type: ClusterIP 
   # Dashboard service port
-  externalPort: 9090
-
+  externalPort: 80
+  targetPort: 9090
+  metadata:
+    name: kubernetes-dashboard 
+    labels:
+      app: kubernetes-dashboard 
   ## LoadBalancerSourcesRange is a list of allowed CIDR values, which are combined with ServicePort to
   ## set allowed inbound rules on the security group assigned to the master load balancer
   # loadBalancerSourceRanges: []
@@ -165,9 +169,20 @@ service:
     key: "kubernetes.io/cluster-service"
 
 ingress:
-  ## If true, Kubernetes Dashboard Ingress will be created.
-  ##
-  enabled: false
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+  hosts:
+    - host: cluster.local
+      paths:
+      - path: /dashboard
+        pathType: Prefix
+        backend:
+          service:
+            name: kubernetes-dashboard 
+            port:
+              number: 80 
+  tls: []
 
   ## Kubernetes Dashboard Ingress labels
   # labels:
