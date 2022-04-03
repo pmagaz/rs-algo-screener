@@ -280,22 +280,39 @@ impl Backend {
 
         // EXTREMA MAXIMA MINIMA
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_maxima.contains(&(i, candle.close())) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date(),
-                            candle.high() + candle.close() / peaks_marker_distance + 6.,
-                        ),
-                        -4,
-                        RED.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
+        // chart
+        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+        //         if extrema_maxima.contains(&(i, candle.close())) {
+        //             return TriangleMarker::new(
+        //                 (
+        //                     candle.date(),
+        //                     candle.high() + candle.close() / peaks_marker_distance + 6.,
+        //                 ),
+        //                 -4,
+        //                 RED.mix(0.4),
+        //             );
+        //         } else {
+        //             return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
+        //         }
+        //     }))
+        //     .unwrap();
+
+        //             chart
+        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+        //         if extrema_pattern_breaks.contains(&(i)) {
+        //             return TriangleMarker::new(
+        //                 (
+        //                     candle.date(),
+        //                     candle.high() + candle.close() / peaks_marker_distance + 5.,
+        //                 ),
+        //                 -4,
+        //                 BLACK.mix(0.4),
+        //             );
+        //         } else {
+        //             return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
+        //         }
+        //     }))
+        //     .unwrap();
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
@@ -314,23 +331,6 @@ impl Backend {
             }))
             .unwrap();
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_pattern_breaks.contains(&(i)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date(),
-                            candle.high() + candle.close() / peaks_marker_distance + 5.,
-                        ),
-                        -4,
-                        BLACK.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
-
         for x in instrument.peaks().smooth_highs().iter() {
             chart
                 .draw_series(LineSeries::new(
@@ -342,16 +342,32 @@ impl Backend {
                             let date = data[idx].date();
                             (date, value)
                         }),
-                    &BLACK.mix(0.8),
+                    &MAGENTA.mix(0.014),
                 ))
                 .unwrap();
         }
 
-        for x in instrument.peaks().smooth_highs().iter() {
+        for x in instrument.peaks().smooth_lows().iter() {
             chart
                 .draw_series(LineSeries::new(
                     (0..)
-                        .zip(instrument.peaks().smooth_highs().iter())
+                        .zip(instrument.peaks().smooth_lows().iter())
+                        .map(|(_k, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date();
+                            (date, value)
+                        }),
+                    MAGENTA.mix(0.014),
+                ))
+                .unwrap();
+        }
+
+        for x in instrument.peaks().smooth_close().iter() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(instrument.peaks().smooth_close().iter())
                         .map(|(_k, highs)| {
                             let idx = highs.0;
                             let value = highs.1;
