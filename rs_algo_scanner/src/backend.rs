@@ -331,37 +331,37 @@ impl Backend {
             }))
             .unwrap();
 
-        // for x in instrument.peaks().smooth_highs().iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(instrument.peaks().smooth_highs().iter())
-        //                 .map(|(_k, highs)| {
-        //                     let idx = highs.0;
-        //                     let value = highs.1;
-        //                     let date = data[idx].date();
-        //                     (date, value)
-        //                 }),
-        //             &BLACK.mix(0.8),
-        //         ))
-        //         .unwrap();
-        // }
+        for x in instrument.peaks().smooth_highs().iter() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(instrument.peaks().smooth_highs().iter())
+                        .map(|(_k, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date();
+                            (date, value)
+                        }),
+                    &BLACK.mix(0.8),
+                ))
+                .unwrap();
+        }
 
-        // for x in instrument.peaks().smooth_highs().iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(instrument.peaks().smooth_highs().iter())
-        //                 .map(|(_k, highs)| {
-        //                     let idx = highs.0;
-        //                     let value = highs.1;
-        //                     let date = data[idx].date();
-        //                     (date, value)
-        //                 }),
-        //             MAGENTA.mix(0.014),
-        //         ))
-        //         .unwrap();
-        // }
+        for x in instrument.peaks().smooth_highs().iter() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(instrument.peaks().smooth_highs().iter())
+                        .map(|(_k, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date();
+                            (date, value)
+                        }),
+                    MAGENTA.mix(0.014),
+                ))
+                .unwrap();
+        }
 
         // for x in instrument.peaks().smooth_lows().iter() {
         //     chart

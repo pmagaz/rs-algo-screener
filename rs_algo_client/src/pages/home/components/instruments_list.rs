@@ -39,18 +39,6 @@ pub fn instrument_list(props: &Props
                      class
                  }
 
-                // CONTINUE HERE 
-                //  fn get_candle_class<'a>(candle: &CandleType) -> &'a str {
-                //      let class = match candle {
-                //          candle::Primary => "", 
-                //          //Status::Neutral => "", 
-                //          Status::Bullish => "has-background-primary-light", 
-                //          Status::Bearish => "has-background-danger-light", 
-                //          Status::Neutral => "has-background-warning-light", 
-                //      };
-                //      class
-                //  }
-
     instruments
         .iter()
         .map(|instrument| {
@@ -63,7 +51,7 @@ pub fn instrument_list(props: &Props
             };
             
 
-            let pattern = instrument.patterns.local_patterns.get(0); 
+            let pattern = instrument.patterns.local_patterns.last(); 
 
 
             let break_direction = match pattern {
@@ -133,6 +121,13 @@ pub fn instrument_list(props: &Props
                 _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
+            let ema_style: (&str, &str, &str) = match ema_a.status {
+               Status::Bullish => ("has-text-primary","has-text-primary","has-text-primary"), 
+               Status::Neutral=> ("has-text-warning","has-text-primary","has-text-primary"),
+               Status::Bearish => ("has-text-warning","has-text-primary","has-text-primary"),
+               Status::Default=> ("has-text-danger","has-text-danger","has-text-dangery") 
+            };
+
 
             let horizontal_lows: Vec<&HorizontalLevel> =  instrument.horizontal_levels.lows.iter().filter(|h| h.occurrences >= 3 && is_equal(h.price, instrument.current_price)).map(|x| x).collect();
             
@@ -156,8 +151,15 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.3)}</td>
                     <td class={get_status_class(&horizontal_status)}>{format!("{}", horizontal_info)}</td>
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
-                    <td class={get_status_class(&macd.status)}> {format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
+                    <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
+                    // <td class={get_status_class(&ema_a.status)}>
+                    //     <span class={ema_style.0}> {round(instrument.indicators.ema_a.current_a, 1)} </span>
+                        
+                    //     <span class={ema_style.1}> {round(instrument.indicators.ema_b.current_a, 1)} </span>
+
+                    //     <span class={ema_style.2}> {round(instrument.indicators.ema_c.current_a, 1)}</span>
+                    // </td>
                     <td class={get_status_class(&ema_a.status)}> {format!("{:?} / {:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 1), round(instrument.indicators.ema_c.current_a, 1))}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>

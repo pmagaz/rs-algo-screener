@@ -2,6 +2,7 @@ use crate::error::Result;
 use crate::helpers::maxima_minima::maxima_minima;
 use crate::helpers::regression::kernel_regression;
 
+use rs_algo_shared::helpers::comp::*;
 use serde::{Deserialize, Serialize};
 use std::env;
 
@@ -67,19 +68,22 @@ impl Peaks {
         &self.extrema_minima
     }
 
-    pub fn calculate_peaks(&mut self, max_price: &f64) -> Result<()> {
-        let local_prominence = env::var("LOCAL_MIN_PROMINENCE")
+    pub fn calculate_peaks(&mut self, max_price: &f64, min_price: &f64) -> Result<()> {
+        let mut local_prominence = env::var("LOCAL_MIN_PROMINENCE")
             .unwrap()
             .parse::<f64>()
             .unwrap();
-        let extrema_prominence = env::var("EXTREMA_MIN_PROMINENCE")
+
+        let mut extrema_prominence = env::var("EXTREMA_MIN_PROMINENCE")
             .unwrap()
             .parse::<f64>()
             .unwrap();
-        // let local_distance = env::var("PROMINENCE_MIN_DISTANCE")
-        //     .unwrap()
-        //     .parse::<usize>()
-        //     .unwrap();
+
+        let min_distance = env::var("PROMINENCE_MIN_DISTANCE")
+            .unwrap()
+            .parse::<usize>()
+            .unwrap();
+
         let mut kernel_bandwidth = env::var("KERNEL_REGRESSION_BANDWIDTH")
             .unwrap()
             .parse::<f64>()
@@ -87,8 +91,10 @@ impl Peaks {
 
         let kernel_source = env::var("KERNEL_REGRESSION_SOURCE").unwrap();
 
-        //local_prominence = max_price * local_prominence;
-        kernel_bandwidth = max_price * kernel_bandwidth;
+        kernel_bandwidth = (max_price - min_price) * kernel_bandwidth;
+        local_prominence = (max_price - min_price) * local_prominence;
+        extrema_prominence = (max_price - min_price) * extrema_prominence;
+
         let mut smooth_highs: Vec<f64> = vec![];
         let mut smooth_lows: Vec<f64> = vec![];
         let mut smooth_close: Vec<f64> = vec![];
@@ -119,14 +125,15 @@ impl Peaks {
 
         let minima_smooth: Vec<f64> = source.2.iter().map(|x| -x).collect();
 
-        self.local_maxima = maxima_minima(source.0, source.1, local_prominence, max_price)?;
+        self.local_maxima = maxima_minima(source.0, source.1, local_prominence, min_distance)?;
 
-        self.local_minima = maxima_minima(&minima_smooth, source.3, local_prominence, max_price)?;
+        self.local_minima =
+            maxima_minima(&minima_smooth, source.3, local_prominence, min_distance)?;
 
-        self.extrema_maxima = maxima_minima(source.0, source.2, extrema_prominence, max_price)?;
+        self.extrema_maxima = maxima_minima(source.0, source.2, extrema_prominence, min_distance)?;
 
         self.extrema_minima =
-            maxima_minima(&minima_smooth, source.3, extrema_prominence, max_price)?;
+            maxima_minima(&minima_smooth, source.3, extrema_prominence, min_distance)?;
 
         Ok(())
     }

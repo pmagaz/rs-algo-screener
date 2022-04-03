@@ -6,16 +6,10 @@ pub fn maxima_minima(
     x_values: &Vec<f64>,
     y_values: &Vec<f64>,
     min_prominence: f64,
-    max_value: &f64,
+    min_distance: usize,
 ) -> Result<Vec<(usize, f64)>> {
-    let prominence = max_value * min_prominence;
-    let min_distance = env::var("PROMINENCE_MIN_DISTANCE")
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
-
     let result: Vec<(usize, f64)> = PeakFinder::new(&x_values)
-        .with_min_prominence(prominence)
+        .with_min_prominence(min_prominence)
         .with_min_distance(min_distance)
         .find_peaks()
         .iter()

@@ -147,7 +147,9 @@ impl Instrument {
         if candles.len() > 0 {
             self.set_current_price(candles.last().unwrap().close());
 
-            self.peaks.calculate_peaks(&self.max_price).unwrap();
+            self.peaks
+                .calculate_peaks(&self.max_price, &self.min_price)
+                .unwrap();
             let local_maxima = self.peaks.local_maxima();
             let local_minima = self.peaks.local_minima();
 

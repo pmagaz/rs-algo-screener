@@ -31,10 +31,9 @@ impl Divergences {
         ];
 
         for (indicator_type, data) in data_indicators {
-            let maxima = maxima_minima(&data, &data, prominence, &100.).unwrap();
+            let maxima = maxima_minima(&data, &data, prominence, 100).unwrap();
             let minima =
-                maxima_minima(&data.iter().map(|x| -x).collect(), &data, prominence, &100.)
-                    .unwrap();
+                maxima_minima(&data.iter().map(|x| -x).collect(), &data, prominence, 100).unwrap();
 
             self.detect_pattern(&maxima, &minima, &indicator_type, &100.);
         }

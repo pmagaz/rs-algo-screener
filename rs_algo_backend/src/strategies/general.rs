@@ -44,8 +44,8 @@ impl General {
                     ]
                 },
                 {"$and": [
-                    {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
                     {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
+                    //{"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
                ]},
                 { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
                 { "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
@@ -153,13 +153,16 @@ impl General {
                         {
                             Status::Bullish
                         }
+                        _x if round(ema_b.current_a, 2) < round(ema_c.current_a, 2) => {
+                            Status::Bearish
+                        }
                         _x if percentage_change(ema_a.prev_a, ema_b.prev_a) < ema_crossover_th
-                            && round(ema_b.current_a, 1) > round(ema_c.current_a, 1) =>
+                            && round(ema_b.current_a, 2) > round(ema_c.current_a, 2) =>
                         {
                             Status::Neutral
                         }
-                        _x if round(ema_a.current_a, 1) == round(ema_b.current_a, 1)
-                            && round(ema_b.current_a, 1) == round(ema_c.current_a, 1) =>
+                        _x if round(ema_a.current_a, 2) == round(ema_b.current_a, 2)
+                            && round(ema_b.current_a, 2) == round(ema_c.current_a, 2) =>
                         {
                             Status::Neutral
                         }
