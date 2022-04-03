@@ -116,7 +116,8 @@ pub fn instrument_list(props: &Props
              let pattern_info: (String, String, String, String) = match pattern_date {
                 _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
                 _x if pattern_status == Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), pattern_active_date.format("%d/%m/%Y").to_string()),
-                _x if pattern_status == Status::Neutral || pattern_status == Status::Default => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), ("").to_string()),
+                _x if pattern_status == Status::Neutral => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), ("").to_string()),
+                _x if pattern_status == Status::Default =>  ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
                 _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
