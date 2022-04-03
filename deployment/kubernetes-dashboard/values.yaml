@@ -46,7 +46,8 @@ extraArgs:
   - --enable-insecure-login
   - --system-banner="Welcome to Kubernetes"
   - --insecure-bind-address=0.0.0.0
-  - --disable-settings-authorizer
+    #- --insecure-port:5443
+    #- --disable-settings-authorizer
 
 ## Additional container environment variables
 ##
@@ -132,7 +133,7 @@ resources:
     cpu: 100m
     memory: 200Mi
   limits:
-    cpu: 100m
+    cpu: 200m
     memory: 200Mi
 
 ## Serve application over HTTP without TLS
@@ -304,14 +305,15 @@ rbac:
   # access to persistentvolumes, pods/log etc.
   #
   # Independent from rbac.create parameter.
-  clusterReadOnlyRole: false
+  clusterReadOnlyRole: true 
+  clusterAdminRole: false
 
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name:
+  name: 
 
 livenessProbe:
   # Number of seconds to wait before sending first probe
