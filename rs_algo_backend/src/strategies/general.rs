@@ -91,13 +91,15 @@ impl General {
 
                     let pattern_status = match instrument.patterns.local_patterns.last() {
                         Some(val) => {
+                            let len = instrument.patterns.local_patterns.len();
                             if val.active.date > self.max_activated_date {
-                                //let inst = instrument.patterns.local_patterns.last();
-                                let len = instrument.patterns.local_patterns.len();
                                 instrument.patterns.local_patterns[len - 1].active.status =
-                                    Status::Bullish
+                                    Status::Bullish;
                             }
-                            instrument.patterns.local_patterns[0].active.status.clone()
+                            instrument.patterns.local_patterns[len - 1]
+                                .active
+                                .status
+                                .clone()
                         }
                         None => Status::Default,
                     };
@@ -177,9 +179,12 @@ impl General {
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.ema_a.status = ema_status.clone();
 
-                    if ema_status != Status::Bearish
-                        && (percentage_change(instrument.indicators.ema_a.prev_a, ema_b.prev_a)
-                            < ema_crossover_th)
+                    if pattern_status != Status::Default
+                        || (ema_status != Status::Bearish
+                            && (percentage_change(
+                                instrument.indicators.ema_a.prev_a,
+                                ema_b.prev_a,
+                            ) < ema_crossover_th))
                     {
                         docs.push(instrument);
                     }
