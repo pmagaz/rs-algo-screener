@@ -44,7 +44,6 @@ labels: {}
 extraArgs:
   - --enable-skip-login
   - --enable-insecure-login
-  - --system-banner="Welcome to Kubernetes"
   - --insecure-bind-address=0.0.0.0
     #- --insecure-port:5443
     #- --disable-settings-authorizer
