@@ -48,6 +48,7 @@ async fn main() -> Result<()> {
             .app_data(web::PayloadConfig::new(10000000))
             .wrap(Logger::default())
             .route("/", web::get().to(index))
+            .route("/instruments", web::post().to(instrument::find))
             .service(
                 web::scope("/api")
                     .route("/instruments", web::get().to(instrument::render))

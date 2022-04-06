@@ -43,9 +43,18 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: traefik
   hosts:
+    - host: api.cluster.loc
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rs-algo-backend 
+            port:
+              number: 80 
     - host: cluster.loc
       paths:
-      - path: /api/.*
+      - path: /api
         pathType: Prefix
         backend:
           service:
