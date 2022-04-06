@@ -17,7 +17,12 @@ impl Backend {
 
         let font = env::var("PLOTTER_FONT").unwrap();
 
-        let peaks_marker_distance = env::var("MARKERS_DISTANCE")
+        let local_peaks_marker_pos = env::var("LOCAL_PEAKS_MARKERS_POS")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
+        let extrema_peaks_marker_pos = env::var("EXTREMA_PEAKS_MARKERS_POS")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -37,7 +42,7 @@ impl Backend {
         let local_minima = &instrument.peaks.local_minima;
         let extrema_maxima = &instrument.peaks.extrema_maxima;
         let extrema_minima = &instrument.peaks.extrema_minima;
-        // let horizontal_levels = instrument.horizontal_levels.horizontal_levels;
+        //let horizontal_levels = instrument.horizontal_levels.horizontal_levels;
 
         let local_patterns = &instrument.patterns.local_patterns;
         let local_pattern_breaks: Vec<usize> = instrument
@@ -195,7 +200,7 @@ impl Backend {
         //     //     return TriangleMarker::new(
         //     //         (
         //     //             candle.date,
-        //     //             candle.high + candle.high / peaks_marker_distance - 10.,
+        //     //             candle.high + candle.high / peaks_marker_pos - 10.,
         //     //         ),
         //     //         4,
         //     //         BLUE.filled(),
@@ -223,23 +228,6 @@ impl Backend {
                 .label(format!("{:?}", pattern.pattern_type));
         }
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_pattern_breaks.contains(&(i)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.high + candle.close / peaks_marker_distance + 5.,
-                        ),
-                        -4,
-                        BLACK.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
-
         // LOCAL MAXIMA MINIMA
 
         chart
@@ -248,7 +236,7 @@ impl Backend {
                     return TriangleMarker::new(
                         (
                             candle.date,
-                            candle.high + candle.close / peaks_marker_distance + 5.,
+                            candle.high + (candle.high * local_peaks_marker_pos),
                         ),
                         -4,
                         BLUE.mix(0.4),
@@ -265,7 +253,7 @@ impl Backend {
                     return TriangleMarker::new(
                         (
                             candle.date,
-                            candle.high + candle.high / peaks_marker_distance - 10.,
+                            candle.low - (candle.low * local_peaks_marker_pos),
                         ),
                         4,
                         BLUE.mix(0.4),
@@ -284,7 +272,7 @@ impl Backend {
                     return TriangleMarker::new(
                         (
                             candle.date,
-                            candle.high + candle.close / peaks_marker_distance + 6.,
+                            candle.high + (candle.high * extrema_peaks_marker_pos),
                         ),
                         -4,
                         RED.mix(0.4),
@@ -301,7 +289,7 @@ impl Backend {
                     return TriangleMarker::new(
                         (
                             candle.date,
-                            candle.high + candle.high / peaks_marker_distance - 11.,
+                            candle.low - (candle.low * extrema_peaks_marker_pos),
                         ),
                         4,
                         RED.mix(0.4),
@@ -312,13 +300,31 @@ impl Backend {
             }))
             .unwrap();
 
+        //BREAKS MAXIMA MINIMA
+        chart
+            .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                if local_pattern_breaks.contains(&(i)) {
+                    return TriangleMarker::new(
+                        (
+                            candle.date,
+                            candle.low + (candle.low * (extrema_peaks_marker_pos + 0.1)),
+                        ),
+                        -4,
+                        BLACK.mix(0.4),
+                    );
+                } else {
+                    return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
+                }
+            }))
+            .unwrap();
+
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
                 if extrema_pattern_breaks.contains(&(i)) {
                     return TriangleMarker::new(
                         (
                             candle.date,
-                            candle.high + candle.close / peaks_marker_distance + 5.,
+                            candle.low + (candle.low * (extrema_peaks_marker_pos + 0.2)),
                         ),
                         -4,
                         BLACK.mix(0.4),
@@ -474,152 +480,7 @@ impl Backend {
             ))
             .unwrap();
 
-        //         chart
-        //   .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date, ema_a[id])),
-        //         &RED,
-        //     ))
-        //     .unwrap();
-
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..).zip(data.iter()).map(|(_id, candle)| {
-        //       let date = candle.date;
-        //       let value = ema_c.next(candle.close);
-        //       (date, value)
-        //     }),
-        //     &RED,
-        //   ))
-        //   .unwrap();
-
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..).zip(data.iter()).map(|(_id, candle)| {
-        //       let date = candle.date;
-        //       let value = ema_a.next(candle.close);
-        //       (date, value)
-        //     }),
-        //     &YELLOW,
-        //   ))
-        //   .unwrap();
-
-        // PEAKS
-
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_maxima.contains(&(i, candle.high)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.high + candle.high / peaks_marker_distance + 5.,
-                        ),
-                        -4,
-                        BLUE.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
-
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_minima.contains(&(i, candle.low)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.low - candle.low / peaks_marker_distance - 5.,
-                        ),
-                        4,
-                        BLUE.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date, candle.low), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
-
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_maxima.contains(&(i, candle.high)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.low - candle.low / peaks_marker_distance + 25.,
-                        ),
-                        -4,
-                        RED.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date, candle.low), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
-
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_minima.contains(&(i, candle.low)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.low - candle.low / peaks_marker_distance - 25.,
-                        ),
-                        4,
-                        RED.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date, candle.low), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
-
-        // let mut rsi_pannel = ChartBuilder::on(&lower_1)
-        //     .x_label_area_size(40)
-        //     .y_label_area_size(40)
-        //     //.margin(2)
-        //     //.caption("RSI", (font.as_ref(), 8.0).into_font())
-        //     .build_cartesian_2d(from_date..to_date, -0f64..100f64)
-        //     .unwrap();
-
-        // INDICATORS EMAS
-
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date, ema_a[id])),
-        //         &RED.mix(0.5),
-        //     ))
-        //     .unwrap();
-
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date, ema_b[id])),
-        //         &MAGENTA.mix(0.5),
-        //     ))
-        //     .unwrap();
-
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date, ema_c[id])),
-        //         &BLUE.mix(0.5),
-        //     ))
-        //     .unwrap();
-
-        // rsi_pannel
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date, rsi[id])),
-        //         &RED,
-        //     ))
-        //     .unwrap();
+        //STOCH PANNEL
 
         let mut stoch_pannel = ChartBuilder::on(&indicator_1)
             .x_label_area_size(40)

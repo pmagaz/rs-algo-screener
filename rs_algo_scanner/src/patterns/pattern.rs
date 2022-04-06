@@ -49,6 +49,11 @@ impl Patterns {
             .parse::<usize>()
             .unwrap();
 
+        let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
         let mut max_start = 0;
         let mut max_end = 0;
         let mut min_start = 0;
@@ -110,7 +115,9 @@ impl Patterns {
                         let last_index = data_points.last().unwrap().0;
                         let candle_date = candles.get(last_index).unwrap().date();
                         let change = self.calculate_change(&data_points);
-                        if rectangle::is_renctangle_top(&data_points) {
+                        if rectangle::is_renctangle_top(&data_points)
+                            && change > minimum_pattern_target
+                        {
                             self.set_pattern(
                                 PatternType::Rectangle,
                                 PatternDirection::Top,
@@ -121,7 +128,9 @@ impl Patterns {
                                 rectangle::rectangle_top_active(&data_points, candles),
                             );
                             not_founded = true;
-                        } else if rectangle::is_renctangle_bottom(&data_points) {
+                        } else if rectangle::is_renctangle_bottom(&data_points)
+                            && change > minimum_pattern_target
+                        {
                             self.set_pattern(
                                 PatternType::Rectangle,
                                 PatternDirection::Bottom,
@@ -132,7 +141,9 @@ impl Patterns {
                                 rectangle::rectangle_bottom_active(&data_points, candles),
                             );
                             not_founded = true;
-                        } else if channel::is_ascendant_top(&data_points) {
+                        } else if channel::is_ascendant_top(&data_points)
+                            && change > minimum_pattern_target
+                        {
                             self.set_pattern(
                                 PatternType::ChannelUp,
                                 PatternDirection::Top,

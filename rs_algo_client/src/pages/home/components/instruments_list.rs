@@ -53,7 +53,8 @@ pub fn instrument_list(props: &Props
 
             let pattern = instrument.patterns.local_patterns.last(); 
 
-
+            
+        
             let break_direction = match pattern {
                 Some(val) => val.active.break_direction.clone(),
                 None   => PatternDirection::None,
@@ -79,7 +80,6 @@ pub fn instrument_list(props: &Props
                 None   => false 
             };
 
-
             let pattern_date = match pattern {
                 Some(val) => val.date.to_chrono(),
                 None   => DateTime::from(Local::now() - Duration::days(1000))
@@ -96,28 +96,23 @@ pub fn instrument_list(props: &Props
             };
 
             let pattern_status = match pattern {
-                _x if pattern_active && pattern_active_date > DateTime::<Local>::from(Local::now() - Duration::days(10)) => Status::Bullish,
-                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(30)) => Status::Neutral,
-                _x if pattern_date > DateTime::<Local>::from(Local::now() - Duration::days(50)) => Status::Default,
-                _x if pattern_type == PatternType::None => Status::Default,
-                 _  => Status::Default,
+                Some(val) => &val.active.status,
+                None   => &Status::Default 
             };
+
 
 
             let macd = instrument.indicators.macd.clone();
             let stoch = instrument.indicators.stoch.clone();
             let rsi = instrument.indicators.rsi.clone();
             let ema_a = instrument.indicators.ema_a.clone(); //9
-            // let _ema_b = instrument.indicators.ema_b.clone(); //21
-            // let _ema_c = instrument.indicators.ema_c.clone(); //50
-
             let date = instrument.date.to_chrono();
 
              let pattern_info: (String, String, String, String) = match pattern_date {
                 _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
-                _x if pattern_status == Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), pattern_active_date.format("%d/%m/%Y").to_string()),
-                _x if pattern_status == Status::Neutral => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), ("").to_string()),
-                _x if pattern_status == Status::Default =>  ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if pattern_status == &Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), pattern_active_date.format("%d/%m/%Y").to_string()),
+                _x if pattern_status == &Status::Neutral => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), ("").to_string()),
+                _x if pattern_status == &Status::Default =>  ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
                 _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 

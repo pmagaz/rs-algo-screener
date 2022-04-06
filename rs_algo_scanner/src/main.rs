@@ -55,38 +55,38 @@ async fn main() -> Result<()> {
     screener.login(username, password).await?;
     let symbols = screener.get_symbols().await.unwrap().symbols;
 
-    // let symbols = [
-    //     Symbol {
-    //         symbol: "SHOP.US_4".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     // Symbol {
-    //     //     symbol: "GOLD".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "TSLA.US_4".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "USDIDX".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "EURRON".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    // ];
+    let symbols = [
+        Symbol {
+            symbol: "SHOP.US_4".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        // Symbol {
+        //     symbol: "GOLD".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "TSLA.US_4".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "USDIDX".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "EURRON".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+    ];
 
     let ignore_list: Vec<String> = env::var("SYMBOL_IGNORE_LIST")
         .unwrap()

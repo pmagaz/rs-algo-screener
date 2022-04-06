@@ -1,3 +1,5 @@
+use super::pattern_status::get_pattern_status;
+
 use async_trait::async_trait;
 use bson::{doc, Document};
 use chrono::Duration;
@@ -20,15 +22,33 @@ pub struct General {
 //FIMXE impl trait (fix asyn-trait)
 impl General {
     pub fn new() -> Result<General> {
+        let max_pattern_days = env::var("MAX_PATTERN_DAYS")
+            .unwrap()
+            .parse::<i64>()
+            .unwrap();
+
+        let max_pattern_activated_days = env::var("MAX_PATTERN_ACTIVATED_DAYS")
+            .unwrap()
+            .parse::<i64>()
+            .unwrap();
+
         Ok(Self {
             query: doc! {},
-            max_pattern_date: DbDateTime::from_chrono(Local::now() - Duration::days(30)),
-            max_activated_date: DbDateTime::from_chrono(Local::now() - Duration::days(10)),
+            max_pattern_date: DbDateTime::from_chrono(
+                Local::now() - Duration::days(max_pattern_days),
+            ),
+            max_activated_date: DbDateTime::from_chrono(
+                Local::now() - Duration::days(max_pattern_activated_days),
+            ),
         })
     }
 
     pub fn query(&self) -> Document {
-        let minimum_pattern_target = env::var("STOCH_BOTTOM").unwrap().parse::<f64>().unwrap();
+        let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
         let min_horizontal_level_ocurrences = env::var("MIN_HORIZONTAL_LEVELS_OCCURENCES")
             .unwrap()
             .parse::<f64>()
@@ -39,12 +59,25 @@ impl General {
             {"$or": [
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
+                    "active.target":{"$gte": minimum_pattern_target },
                     "date": { "$gte" : self.max_pattern_date },
                     }}}
                 ]},
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
-                    //"active.target":{"$gte": minimum_pattern_target },
+                    "active.target":{"$gte": minimum_pattern_target },
+                    "active.date": { "$gte" : self.max_activated_date }
+                    }}}
+                ]},
+                {"$and": [
+                    {"patterns.extrema_patterns": {"$elemMatch" : {
+                    "active.target":{"$gte": minimum_pattern_target },
+                    "date": { "$gte" : self.max_pattern_date },
+                    }}}
+                ]},
+                {"$and": [
+                    {"patterns.extrema_patterns": {"$elemMatch" : {
+                    "active.target":{"$gte": minimum_pattern_target },
                     "active.date": { "$gte" : self.max_activated_date }
                     }}}
                 ]},
@@ -73,7 +106,13 @@ impl General {
     ) -> Vec<CompactInstrument> {
         println!("[STRATEGY] Formating ");
         let mut docs: Vec<CompactInstrument> = vec![];
+
         let ema_crossover_th = env::var("EMA_CROSSOVER_THRESHOLD")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
+        let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -88,21 +127,32 @@ impl General {
                     let ema_a = instrument.indicators.ema_a.clone(); //9
                     let ema_b = instrument.indicators.ema_b.clone(); //21
                     let ema_c = instrument.indicators.ema_c.clone(); //55
+                    let local_pattern = instrument.patterns.local_patterns.last();
 
-                    let pattern_status = match instrument.patterns.local_patterns.last() {
-                        Some(val) => {
-                            let len = instrument.patterns.local_patterns.len();
-                            if val.active.date > self.max_activated_date {
-                                instrument.patterns.local_patterns[len - 1].active.status =
-                                    Status::Bullish;
-                            }
-                            instrument.patterns.local_patterns[len - 1]
-                                .active
-                                .status
-                                .clone()
-                        }
-                        None => Status::Default,
+                    let local_pattern_target = match local_pattern {
+                        Some(val) => round(val.active.change, 0),
+                        None => 0.,
                     };
+
+                    let local_pattern_status = get_pattern_status(local_pattern);
+
+                    if local_pattern_status != Status::Default {
+                        let len = instrument.patterns.local_patterns.len();
+                        instrument.patterns.local_patterns[len - 1].active.status =
+                            local_pattern_status.clone();
+                    }
+
+                    let extrema_pattern = instrument.patterns.extrema_patterns.last();
+                    let extrema_pattern_target = match extrema_pattern {
+                        Some(val) => round(val.active.change, 0),
+                        None => 0.,
+                    };
+                    let extrema_pattern_status = get_pattern_status(extrema_pattern);
+                    if extrema_pattern_status != Status::Default {
+                        let len = instrument.patterns.extrema_patterns.len();
+                        instrument.patterns.extrema_patterns[len - 1].active.status =
+                            extrema_pattern_status.clone();
+                    }
 
                     let stoch_status = match stoch {
                         _x if stoch.current_a > stoch.current_b
@@ -179,7 +229,10 @@ impl General {
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.ema_a.status = ema_status.clone();
 
-                    if pattern_status != Status::Default
+                    if (local_pattern_status != Status::Default
+                        && local_pattern_target > minimum_pattern_target)
+                        || (extrema_pattern_status != Status::Default
+                            && extrema_pattern_target > minimum_pattern_target)
                         || (ema_status != Status::Bearish
                             && (percentage_change(
                                 instrument.indicators.ema_a.prev_a,
