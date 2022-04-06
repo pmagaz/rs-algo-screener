@@ -36,7 +36,7 @@ ingress:
   hosts:
     - host: cluster.loc
       paths:
-      - path: /
+      - path: /instruments
         pathType: Prefix 
         backend:
           service:
