@@ -178,7 +178,7 @@ ingress:
     - host: cluster.loc
       paths:
       - path: /dashboard
-        pathType: Prefix
+        pathType: Exact
         backend:
           service:
             name: kubernetes-dashboard

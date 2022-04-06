@@ -1,9 +1,9 @@
 replicaCount: 1
-nodeName: "node"
+nodeName: "node.loc"
 
 image:
   repository: pmagaz/docker-registry
-  pullPolicy: "Always" 
+  pullPolicy: "IfNotPresent" 
   tag: "latest"
 
 imagePullSecrets:
