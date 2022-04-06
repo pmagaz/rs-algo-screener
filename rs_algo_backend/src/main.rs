@@ -32,7 +32,7 @@ async fn main() -> Result<()> {
         .unwrap();
 
     println!(
-        "[Server] Launching {:} on port {:?}",
+        "[Server] Launching {:} on port2 {:?}",
         app_name,
         port.clone()
     );

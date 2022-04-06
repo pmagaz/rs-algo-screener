@@ -8,5 +8,5 @@
     name: "{{ release_name }}" 
     chart_ref: "{{ local_path }}/{{ package_name }}/{{ chart_path }}"
     force: yes 
-    purge: yes 
+    purge: yes
     release_namespace: default
