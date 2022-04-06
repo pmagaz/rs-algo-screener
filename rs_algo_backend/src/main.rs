@@ -32,7 +32,7 @@ async fn main() -> Result<()> {
         .unwrap();
 
     println!(
-        "[Server] Launching {:} on port {:?}",
+        "[Server] Launching {:} on port2 {:?}",
         app_name,
         port.clone()
     );
@@ -48,15 +48,15 @@ async fn main() -> Result<()> {
             .app_data(web::PayloadConfig::new(10000000))
             .wrap(Logger::default())
             .route("/", web::get().to(index))
-            .route("/instruments", web::get().to(instrument::render))
-            .route("/instruments", web::post().to(instrument::find))
-            .route("/instruments", web::put().to(instrument::upsert))
-        // .service(
-        //     web::scope("/api")
-        //         .route("/instruments", web::get().to(instrument::render))
-        //         .route("/instruments", web::post().to(instrument::find))
-        //         .route("/instruments", web::put().to(instrument::upsert)),
-        // )
+            // .route("/instruments", web::get().to(instrument::render))
+            // .route("/instruments", web::post().to(instrument::find))
+            // .route("/instruments", web::put().to(instrument::upsert))
+            .service(
+                web::scope("/api")
+                    .route("/instruments", web::get().to(instrument::render))
+                    .route("/instruments", web::post().to(instrument::find))
+                    .route("/instruments", web::put().to(instrument::upsert)),
+            )
     })
     .bind(["0.0.0.0:", &port].concat())
     .expect("[Error] Can't launch server!")
