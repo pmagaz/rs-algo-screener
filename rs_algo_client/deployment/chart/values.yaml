@@ -37,7 +37,7 @@ ingress:
     - host: cluster.loc
       paths:
       - path: /
-        pathType: Exact
+        pathType: Prefix 
         backend:
           service:
             name: rs-algo-client 
