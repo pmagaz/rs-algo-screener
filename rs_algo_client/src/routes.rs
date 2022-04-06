@@ -6,7 +6,7 @@ use yew_router::prelude::*;
 pub enum Route {
     // #[at("/posts/:id")]
     // Post { id: u64 },
-    #[at("/instruments")]
+    #[at("/")]
     Home,
     // #[at("/404")]
     // NotFound,
