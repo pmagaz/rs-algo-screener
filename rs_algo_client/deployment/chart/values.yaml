@@ -34,7 +34,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: traefik
   hosts:
-    - host: cluster.io
+    - host: cluster.dev
       paths:
       - path: /
         pathType: Exact
