@@ -1,4 +1,5 @@
 replicaCount: 1
+nodeName: "node"
 
 image:
   repository: pmagaz/docker-registry
