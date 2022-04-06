@@ -45,7 +45,7 @@ ingress:
   hosts:
     - host: cluster.local
       paths:
-      - path: /api
+      - path: /api/.*
         pathType: Prefix
         backend:
           service:
