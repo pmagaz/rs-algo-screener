@@ -146,6 +146,10 @@ service:
   externalPort: 9090
   port: 80
   targetPort: 9090
+  metadata:
+    name: kubernetes-dashboard
+    labels:
+      app: kubernetes-dashboard
 
   ## LoadBalancerSourcesRange is a list of allowed CIDR values, which are combined with ServicePort to
   ## set allowed inbound rules on the security group assigned to the master load balancer
