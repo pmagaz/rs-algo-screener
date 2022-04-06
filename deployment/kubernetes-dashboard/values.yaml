@@ -175,7 +175,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: traefik
   hosts:
-    - host: cluster.dev
+    - host: cluster.loc
       paths:
       - path: /dashboard/
         pathType: Prefix
