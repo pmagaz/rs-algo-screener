@@ -42,7 +42,16 @@ ingress:
           service:
             name: rs-algo-client 
             port:
-              number: 80 
+              number: 80
+    - host: 192.168.1.10
+      paths:
+      - path: /
+        pathType: Prefix 
+        backend:
+          service:
+            name: rs-algo-client 
+            port:
+              number: 80  
   tls: []
 
 resources:
