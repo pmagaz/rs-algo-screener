@@ -43,7 +43,7 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: traefik
   hosts:
-    - host: cluster.local
+    - host: cluster.io
       paths:
       - path: /api/.*
         pathType: Prefix
