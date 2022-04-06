@@ -32,7 +32,7 @@ async fn main() -> Result<()> {
         .unwrap();
 
     println!(
-        "[Server] Launching {:} on port2 {:?}",
+        "[Server] Launching {:} on port {:?}",
         app_name,
         port.clone()
     );
@@ -51,6 +51,12 @@ async fn main() -> Result<()> {
             .route("/instruments", web::get().to(instrument::render))
             .route("/instruments", web::post().to(instrument::find))
             .route("/instruments", web::put().to(instrument::upsert))
+            .service(
+                web::scope("/api")
+                    .route("/instruments", web::get().to(instrument::render))
+                    .route("/instruments", web::post().to(instrument::find))
+                    .route("/instruments", web::put().to(instrument::upsert)),
+            )
     })
     .bind(["0.0.0.0:", &port].concat())
     .expect("[Error] Can't launch server!")
