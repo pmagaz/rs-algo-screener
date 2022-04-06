@@ -24,7 +24,7 @@ pub struct Props {
 pub fn instrument_list(props: &Props
 ) -> Html {
         let Props { instruments, on_symbol_click } = props;
-    let base_url = "http://192.168.1.10/api/instruments?symbol=";
+    let base_url = "http://cluster.loc/api/instruments?symbol=";
     let use_url = use_state(|| String::from(""));
 
       
