@@ -18,6 +18,6 @@ jobs:
       limits:
         cpu: 1000m
         memory: 256Mi
+    nodeSelector:
+      storage: memory
     
-nodeSelector:
-  storage: memory
