@@ -1,6 +1,6 @@
 use round::{round};
 use rs_algo_shared::models::*;
-use rs_algo_shared::helpers::date::{Local, DateTime,Datelike, Duration};
+use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
 use rs_algo_shared::helpers::comp::is_equal;
 use yew::{function_component, html, Callback, use_state, Properties};
 use wasm_bindgen::prelude::*;
@@ -16,6 +16,75 @@ extern "C" {
 }
 
 
+pub struct PatternInfo {
+   pattern_type: PatternType,
+   active: bool,
+   date: DateTime<Utc>,
+   active_date: DateTime<Utc>,
+   status: Status,
+   change: f64,
+   break_direction: PatternDirection,
+   info: (String, String, String, String)
+}
+
+pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
+        
+            let break_direction = match pattern {
+                Some(val) => val.active.break_direction.clone(),
+                None   => PatternDirection::None,
+            };
+            
+            let pattern_type = match pattern {
+                Some(val) => val.pattern_type.clone(),
+                None   => PatternType::None,
+            };
+
+            let active = match pattern {
+                Some(pattern) => pattern.active.active,
+                None   => false 
+            };
+
+            let date = match pattern {
+                Some(val) => val.date.to_chrono(),
+                None   => DateTime::from(Local::now() - Duration::days(1000))
+            };
+
+            let active_date = match pattern {
+                Some(val) => val.active.date.to_chrono(),
+                None   => DateTime::from(Local::now() - Duration::days(1000))
+            };
+            
+            let change = match pattern {
+                Some(val) => round(val.active.change,0),
+                None   => 0.,
+            };
+
+            let status = match pattern {
+                Some(val) => val.active.status.clone(),
+                None   => Status::Default 
+            };
+
+            let info: (String, String, String, String) = match date {
+                _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if status == Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), active_date.format("%d/%m/%Y").to_string()),
+                _x if status == Status::Neutral => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), ("").to_string()),
+                _x if status == Status::Default =>  ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+            };
+
+            PatternInfo{
+                pattern_type,
+                active,
+                date,
+                active_date,
+                status,
+                change,
+                break_direction,
+                info
+            }
+        }
+
+
 #[derive(Clone, Properties, PartialEq)]
 pub struct Props {
     pub instruments: Vec<CompactInstrument>,
@@ -28,7 +97,7 @@ pub fn instrument_list(props: &Props
         let Props { instruments, on_symbol_click } = props;
     let base_url = get_base_url();
     let url = [base_url.as_str(), "api/instruments?symbol="].concat();
-    //let base_url = "http://cluster.loc/api/instruments?symbol=";
+    //let url = "http://localhost:8000/api/instruments?symbol=".to_owned();
     let use_url = use_state(|| String::from(""));
 
       
@@ -54,21 +123,9 @@ pub fn instrument_list(props: &Props
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
             };
             
-
-            let pattern = instrument.patterns.local_patterns.last(); 
-
-            
-        
-            let break_direction = match pattern {
-                Some(val) => val.active.break_direction.clone(),
-                None   => PatternDirection::None,
-            };
-            
-            let pattern_type = match pattern {
-                Some(val) => val.pattern_type.clone(),
-                None   => PatternType::None,
-            };
-
+            let local_pattern = pattern_info(instrument.patterns.local_patterns.last()); 
+            let extrema_pattern = pattern_info(instrument.patterns.extrema_patterns.last()); 
+           
             let candle_status = match instrument.current_candle {
                 CandleType::Karakasa => Status::Bullish,
                 CandleType::MorningStar => Status::Bullish,
@@ -79,31 +136,6 @@ pub fn instrument_list(props: &Props
                 _ => Status::Default,
             };
 
-            let pattern_active = match pattern {
-                Some(pattern) => pattern.active.active,
-                None   => false 
-            };
-
-            let pattern_date = match pattern {
-                Some(val) => val.date.to_chrono(),
-                None   => DateTime::from(Local::now() - Duration::days(1000))
-            };
-
-            let pattern_active_date = match pattern {
-                Some(val) => val.active.date.to_chrono(),
-                None   => DateTime::from(Local::now() - Duration::days(1000))
-            };
-            
-            let pattern_change = match pattern {
-                Some(val) => round(val.active.change,0),
-                None   => 0.,
-            };
-
-            let pattern_status = match pattern {
-                Some(val) => &val.active.status,
-                None   => &Status::Default 
-            };
-
 
 
             let macd = instrument.indicators.macd.clone();
@@ -112,13 +144,7 @@ pub fn instrument_list(props: &Props
             let ema_a = instrument.indicators.ema_a.clone(); //9
             let date = instrument.date.to_chrono();
 
-             let pattern_info: (String, String, String, String) = match pattern_date {
-                _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
-                _x if pattern_status == &Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), pattern_active_date.format("%d/%m/%Y").to_string()),
-                _x if pattern_status == &Status::Neutral => (pattern_type.to_string(), break_direction.to_string(), [pattern_change.to_string(),"%".to_string()].concat(), ("").to_string()),
-                _x if pattern_status == &Status::Default =>  ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
-                _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
-            };
+
 
             let ema_style: (&str, &str, &str) = match ema_a.status {
                Status::Bullish => ("has-text-primary","has-text-primary","has-text-primary"), 
@@ -145,10 +171,12 @@ pub fn instrument_list(props: &Props
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
-                    <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.0)}</td>
-                    <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.2)}</td>
-                    <td class={get_status_class(&pattern_status)}> {format!("{}", pattern_info.3)}</td>
-                    <td class={get_status_class(&horizontal_status)}>{format!("{}", horizontal_info)}</td>
+                    <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.0)}</td>
+                    <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.2)}</td>
+                    <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.3)}</td>
+                    <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.0)}</td>
+                    <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.2)}</td>
+                    <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.3)}</td>
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>

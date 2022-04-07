@@ -20,8 +20,8 @@ extern "C" {
 #[function_component(Home)]
 pub fn home() -> Html {
     let base_url = get_base_url();
-    let url = [base_url.as_str(), "api/instruments"].concat();
-    //let url = "http://localhost:8000/api/instruments";
+    //let url = [base_url.as_str(), "api/instruments"].concat();
+    let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_query = use_state(|| String::from(""));
@@ -101,10 +101,12 @@ pub fn home() -> Html {
                     <th><abbr>{ "Symbol" }</abbr></th>
                     <th><abbr>{ "Price" }</abbr></th>
                     <th><abbr>{ "Candle" }</abbr></th>
-                    <th><abbr>{ "Pattern" }</abbr></th>
-                    <th><abbr>{ "Target" }</abbr></th>
-                    <th><abbr>{ "Activated" }</abbr></th>
-                    <th><abbr>{ "H Levels" }</abbr></th>
+                    <th><abbr>{ "L. Pattern" }</abbr></th>
+                    <th><abbr>{ "L. Target" }</abbr></th>
+                    <th><abbr>{ "L. Activated" }</abbr></th>
+                    <th><abbr>{ "E. Pattern" }</abbr></th>
+                    <th><abbr>{ "E. Target" }</abbr></th>
+                    <th><abbr>{ "E. Activated" }</abbr></th>
                     <th><abbr>{ "Stoch" }</abbr></th>
                     <th><abbr>{ "MacD" }</abbr></th>
                     <th><abbr>{ "Rsi" }</abbr></th>

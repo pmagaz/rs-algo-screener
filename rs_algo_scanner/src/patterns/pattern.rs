@@ -167,7 +167,7 @@ impl Patterns {
                             not_founded = true;
                         } else if triangle::is_ascendant_top(&data_points) {
                             self.set_pattern(
-                                PatternType::TriangleAscendant,
+                                PatternType::TriangleUp,
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
@@ -178,7 +178,7 @@ impl Patterns {
                             not_founded = true;
                         } else if triangle::is_ascendant_bottom(&data_points) {
                             self.set_pattern(
-                                PatternType::TriangleAscendant,
+                                PatternType::TriangleUp,
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
@@ -189,7 +189,7 @@ impl Patterns {
                             not_founded = true;
                         } else if triangle::is_descendant_top(&data_points) {
                             self.set_pattern(
-                                PatternType::TriangleDescendant,
+                                PatternType::TriangleDown,
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
@@ -200,7 +200,7 @@ impl Patterns {
                             not_founded = true;
                         } else if triangle::is_descendant_bottom(&data_points) {
                             self.set_pattern(
-                                PatternType::TriangleDescendant,
+                                PatternType::TriangleDown,
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
@@ -211,7 +211,7 @@ impl Patterns {
                             not_founded = true;
                         } else if triangle::is_symmetrical_top(&data_points) {
                             self.set_pattern(
-                                PatternType::TriangleSymmetrical,
+                                PatternType::TriangleSym,
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
@@ -222,7 +222,7 @@ impl Patterns {
                             not_founded = true;
                         } else if triangle::is_symmetrical_bottom(&data_points) {
                             self.set_pattern(
-                                PatternType::TriangleSymmetrical,
+                                PatternType::TriangleSym,
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
@@ -299,7 +299,7 @@ impl Patterns {
                             not_founded = true;
                         } else if head_shoulders::is_hs(&data_points) {
                             self.set_pattern(
-                                PatternType::HeadAndShoulders,
+                                PatternType::HeadShoulders,
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 &data_points,
@@ -310,7 +310,7 @@ impl Patterns {
                             not_founded = true;
                         } else if head_shoulders::is_inverse(&data_points) {
                             self.set_pattern(
-                                PatternType::HeadAndShoulders,
+                                PatternType::HeadShoulders,
                                 PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,

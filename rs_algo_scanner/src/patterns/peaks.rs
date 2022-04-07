@@ -2,7 +2,6 @@ use crate::error::Result;
 use crate::helpers::maxima_minima::maxima_minima;
 use crate::helpers::regression::kernel_regression;
 
-use rs_algo_shared::helpers::comp::*;
 use serde::{Deserialize, Serialize};
 use std::env;
 
@@ -79,7 +78,12 @@ impl Peaks {
             .parse::<f64>()
             .unwrap();
 
-        let min_distance = env::var("PROMINENCE_MIN_DISTANCE")
+        let local_min_distance = env::var("LOCAL_PROMINENCE_MIN_DISTANCE")
+            .unwrap()
+            .parse::<usize>()
+            .unwrap();
+
+        let extrema_min_distance = env::var("EXTREMA_PROMINENCE_MIN_DISTANCE")
             .unwrap()
             .parse::<usize>()
             .unwrap();
@@ -125,15 +129,25 @@ impl Peaks {
 
         let minima_smooth: Vec<f64> = source.2.iter().map(|x| -x).collect();
 
-        self.local_maxima = maxima_minima(source.0, source.1, local_prominence, min_distance)?;
+        self.local_maxima =
+            maxima_minima(source.0, source.1, local_prominence, local_min_distance)?;
 
-        self.local_minima =
-            maxima_minima(&minima_smooth, source.3, local_prominence, min_distance)?;
+        self.local_minima = maxima_minima(
+            &minima_smooth,
+            source.3,
+            local_prominence,
+            local_min_distance,
+        )?;
 
-        self.extrema_maxima = maxima_minima(source.0, source.2, extrema_prominence, min_distance)?;
+        self.extrema_maxima =
+            maxima_minima(source.0, source.2, extrema_prominence, extrema_min_distance)?;
 
-        self.extrema_minima =
-            maxima_minima(&minima_smooth, source.3, extrema_prominence, min_distance)?;
+        self.extrema_minima = maxima_minima(
+            &minima_smooth,
+            source.3,
+            extrema_prominence,
+            extrema_min_distance,
+        )?;
 
         Ok(())
     }
