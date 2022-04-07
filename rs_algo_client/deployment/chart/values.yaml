@@ -61,7 +61,7 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 nodeSelector:
-  storage: memory
+  storage: persistent
 
 tolerations: []
 
