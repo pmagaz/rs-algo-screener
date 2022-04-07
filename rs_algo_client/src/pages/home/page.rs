@@ -11,13 +11,14 @@ use yew::{function_component, html, use_effect_with_deps, use_state, Callback, P
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
     fn get_query_value() -> String;
+    fn get_base_url() -> String;
     fn open_modal();
 
 }
 
 #[function_component(Home)]
 pub fn home() -> Html {
-    let url = "/api/instruments";
+    let url = get_base_url().push_str("api/instruments");
     //let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
