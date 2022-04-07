@@ -1,5 +1,4 @@
 replicaCount: 1
-nodeName: "node"
 
 image:
   repository: pmagaz/docker-registry
@@ -50,7 +49,8 @@ ingress: {}
 
 autoscaling: {}
 
-nodeSelector: {}
+nodeSelector:
+  storage: persistent
 
 tolerations: []
 

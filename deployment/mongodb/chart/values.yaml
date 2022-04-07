@@ -43,14 +43,15 @@ resources:
      cpu: 800m
   limits:
     cpu: 1000m
-    ephemeral-storage: 3Gi
-    memory: 3Gi
+    ephemeral-storage: 4Gi
+    memory: 4Gi
 
 ingress: {}
 
 autoscaling: {}
 
-nodeSelector: {}
+nodeSelector:
+  storage: memory 
 
 tolerations: []
 
