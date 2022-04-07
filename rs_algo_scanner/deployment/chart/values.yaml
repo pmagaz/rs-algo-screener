@@ -19,5 +19,5 @@ jobs:
         cpu: 1000m
         memory: 256Mi
     nodeSelector:
-      storage: memory
+      storage: persistent
     

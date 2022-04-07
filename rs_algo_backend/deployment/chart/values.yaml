@@ -58,7 +58,7 @@ resources:
   requests:
     cpu: 1800m
   limits:
-    cpu: 2000m
+    cpu: 2200m
     ephemeral-storage: 256Mi 
     memory: 256Mi
 
@@ -69,8 +69,8 @@ autoscaling:
   targetCPUUtilizationPercentage: 25
   # targetMemoryUtilizationPercentage: 80
 
-nodeSelector: {}
-  #storage: memory 
+nodeSelector:
+  storage: memory 
 
 tolerations: []
 
