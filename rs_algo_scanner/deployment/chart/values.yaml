@@ -20,4 +20,4 @@ jobs:
         memory: 256Mi
     
 nodeSelector:
-  master: true
+  storage: memory
