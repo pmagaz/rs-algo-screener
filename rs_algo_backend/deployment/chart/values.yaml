@@ -62,7 +62,6 @@ resources:
     ephemeral-storage: 256Mi 
     memory: 256Mi
 
-
 autoscaling:
   enabled: false
   minReplicas: 1
