@@ -11,6 +11,7 @@ use yew::{function_component, html, use_effect_with_deps, use_state, Callback, P
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
     fn get_query_value() -> String;
+    #[wasm_bindgen(js_name = get_base_url)]
     fn get_base_url() -> String;
     fn open_modal();
 
@@ -18,7 +19,8 @@ extern "C" {
 
 #[function_component(Home)]
 pub fn home() -> Html {
-    let url = get_base_url().push_str("api/instruments");
+    let mut base_url = get_base_url();
+    let url = [base_url.as_str(), "api/instruments"].concat();
     //let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
@@ -28,14 +30,14 @@ pub fn home() -> Html {
     {
         let instruments = instruments.clone();
         let use_loading = use_loading.clone();
-
+        let url = url.clone();
         use_effect_with_deps(
             move |_| {
                 log::info!("[CLIENT] API call...");
                 let use_loading = use_loading.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let query = get_query_value();
-                    instruments.set(api::get_instruments(url, query).await.unwrap());
+                    instruments.set(api::get_instruments(&url, query).await.unwrap());
                     use_loading.set(false);
                 });
                 || ()
@@ -56,8 +58,10 @@ pub fn home() -> Html {
             let query = get_query_value();
             use_query.set(query.clone());
             use_loading.set(true);
+            let url = url.clone();
+
             wasm_bindgen_futures::spawn_local(async move {
-                instruments.set(api::get_instruments(url, query).await.unwrap());
+                instruments.set(api::get_instruments(&url, query).await.unwrap());
                 use_loading.set(false);
             });
         })
