@@ -14,10 +14,10 @@ jobs:
     envSecretName: rs-algo-screener-secrets
     resources:
       requests:
-        cpu: 1000m
+        cpu: 900m
       limits:
-        cpu: 1200m
+        cpu: 1000m
         memory: 256Mi
     nodeSelector:
-      storage: persistent
+      storage: memory
     
