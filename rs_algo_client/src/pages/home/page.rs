@@ -17,7 +17,7 @@ extern "C" {
 
 #[function_component(Home)]
 pub fn home() -> Html {
-    let url = "http://cluster.loc/api/instruments";
+    let url = "/api/instruments";
     //let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
