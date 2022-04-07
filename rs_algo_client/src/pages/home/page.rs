@@ -19,7 +19,7 @@ extern "C" {
 
 #[function_component(Home)]
 pub fn home() -> Html {
-    let mut base_url = get_base_url();
+    let base_url = get_base_url();
     let url = [base_url.as_str(), "api/instruments"].concat();
     //let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);

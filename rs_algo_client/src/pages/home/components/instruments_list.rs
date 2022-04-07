@@ -10,6 +10,8 @@ use web_sys::MouseEvent;
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
     fn open_modal(modal: &str);
+    #[wasm_bindgen(js_name = get_base_url)]
+    fn get_base_url() -> String;
     fn close_modal(modal: &str);
 }
 
@@ -24,7 +26,9 @@ pub struct Props {
 pub fn instrument_list(props: &Props
 ) -> Html {
         let Props { instruments, on_symbol_click } = props;
-    let base_url = "http://cluster.loc/api/instruments?symbol=";
+    let base_url = get_base_url();
+    let url = [base_url.as_str(), "api/instruments?symbol="].concat();
+    //let base_url = "http://cluster.loc/api/instruments?symbol=";
     let use_url = use_state(|| String::from(""));
 
       
@@ -45,7 +49,7 @@ pub fn instrument_list(props: &Props
             let on_instrument_select = {
                 let on_symbol_click = on_symbol_click.clone();
                 let instrument = instrument.clone();
-                let url = [base_url,&instrument.symbol].concat();
+                let url = [url.clone(),instrument.symbol].concat();
                 open_modal("modal");
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
             };
