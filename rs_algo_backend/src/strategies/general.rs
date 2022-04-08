@@ -69,18 +69,18 @@ impl General {
                     "active.date": { "$gte" : self.max_activated_date }
                     }}}
                 ]},
-                {"$and": [
-                    {"patterns.extrema_patterns": {"$elemMatch" : {
-                    "active.target":{"$gte": minimum_pattern_target },
-                    "date": { "$gte" : self.max_pattern_date },
-                    }}}
-                ]},
-                {"$and": [
-                    {"patterns.extrema_patterns": {"$elemMatch" : {
-                    "active.target":{"$gte": minimum_pattern_target },
-                    "active.date": { "$gte" : self.max_activated_date }
-                    }}}
-                ]},
+                // {"$and": [
+                //     {"patterns.extrema_patterns": {"$elemMatch" : {
+                //     "active.target":{"$gte": minimum_pattern_target },
+                //     "date": { "$gte" : self.max_pattern_date },
+                //     }}}
+                // ]},
+                // {"$and": [
+                //     {"patterns.extrema_patterns": {"$elemMatch" : {
+                //     "active.target":{"$gte": minimum_pattern_target },
+                //     "active.date": { "$gte" : self.max_activated_date }
+                //     }}}
+                // ]},
                 ]
             },
             {"$and": [
@@ -142,17 +142,17 @@ impl General {
                             local_pattern_status.clone();
                     }
 
-                    let extrema_pattern = instrument.patterns.extrema_patterns.last();
-                    let extrema_pattern_target = match extrema_pattern {
-                        Some(val) => round(val.active.change, 0),
-                        None => 0.,
-                    };
-                    let extrema_pattern_status = get_pattern_status(extrema_pattern);
-                    if extrema_pattern_status != Status::Default {
-                        let len = instrument.patterns.extrema_patterns.len();
-                        instrument.patterns.extrema_patterns[len - 1].active.status =
-                            extrema_pattern_status.clone();
-                    }
+                    // let extrema_pattern = instrument.patterns.extrema_patterns.last();
+                    // let extrema_pattern_target = match extrema_pattern {
+                    //     Some(val) => round(val.active.change, 0),
+                    //     None => 0.,
+                    // };
+                    // let extrema_pattern_status = get_pattern_status(extrema_pattern);
+                    // if extrema_pattern_status != Status::Default {
+                    //     let len = instrument.patterns.extrema_patterns.len();
+                    //     instrument.patterns.extrema_patterns[len - 1].active.status =
+                    //         extrema_pattern_status.clone();
+                    // }
 
                     let stoch_status = match stoch {
                         _x if stoch.current_a > stoch.current_b
@@ -231,8 +231,8 @@ impl General {
 
                     if (local_pattern_status != Status::Default
                         && local_pattern_target > minimum_pattern_target)
-                        || (extrema_pattern_status != Status::Default
-                            && extrema_pattern_target > minimum_pattern_target)
+                        // || (extrema_pattern_status != Status::Default
+                        //     && extrema_pattern_target > minimum_pattern_target)
                         || (ema_status != Status::Bearish
                             && (percentage_change(
                                 instrument.indicators.ema_a.prev_a,

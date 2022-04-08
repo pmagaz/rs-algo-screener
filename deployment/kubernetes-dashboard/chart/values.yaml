@@ -178,7 +178,7 @@ ingress:
   hosts:
     - host: cluster.loc
       paths:
-      - path: /dashboard
+      - path: /admin/dashboard
         pathType: Exact
         backend:
           service:

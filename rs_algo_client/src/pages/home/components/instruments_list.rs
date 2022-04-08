@@ -124,7 +124,7 @@ pub fn instrument_list(props: &Props
             };
             
             let local_pattern = pattern_info(instrument.patterns.local_patterns.last()); 
-            let extrema_pattern = pattern_info(instrument.patterns.extrema_patterns.last()); 
+            //let extrema_pattern = pattern_info(instrument.patterns.extrema_patterns.last()); 
            
             let candle_status = match instrument.current_candle {
                 CandleType::Karakasa => Status::Bullish,
@@ -174,9 +174,9 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.0)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.2)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.3)}</td>
-                    <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.0)}</td>
-                    <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.2)}</td>
-                    <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.3)}</td>
+                    // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.0)}</td>
+                    // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.2)}</td>
+                    // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.3)}</td>
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
