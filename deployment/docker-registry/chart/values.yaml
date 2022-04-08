@@ -50,9 +50,16 @@ ingress: {}
 
 autoscaling: {}
 
-nodeSelector:
-  nodeType: storage
+nodeSelector: {}
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: nodeType
+          operator: In
+          values:
+          - storage
 
 tolerations: []
-
-affinity: {}
