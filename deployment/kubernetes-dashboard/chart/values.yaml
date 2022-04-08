@@ -178,7 +178,7 @@ ingress:
   hosts:
     - host: cluster.loc
       paths:
-      - path: /dashboard
+      - path: /admin
         pathType: Prefix
         backend:
           service:
@@ -209,8 +209,6 @@ ingress:
   ## Both `/` and `/*` are required to work on gce ingress.
   paths:
     - /
-    - /dashboard
-    - /admin
   #  - /*
 
   ## Custom Kubernetes Dashboard Ingress paths. Will override default paths.
@@ -296,7 +294,7 @@ metricsScraper:
 ##  - https://github.com/kubernetes-sigs/metrics-server
 ##  - https://github.com/kubernetes-sigs/metrics-server/tree/master/charts/metrics-server
 metrics-server:
-  enabled: true
+  enabled: false
   ## Example for additional args
   # args:
   #  - --kubelet-preferred-address-types=InternalIP
