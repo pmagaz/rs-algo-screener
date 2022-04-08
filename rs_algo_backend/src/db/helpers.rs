@@ -82,40 +82,33 @@ pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
                 .patterns
                 .local_patterns
                 .into_iter()
-                .enumerate()
                 .rev()
                 .take(3)
                 .rev()
-                .map(|(key, inst)| inst)
                 .collect(),
             extrema_patterns: doc
                 .patterns
                 .extrema_patterns
                 .into_iter()
-                .enumerate()
                 .rev()
                 .take(3)
                 .rev()
-                .map(|(key, inst)| inst)
                 .collect(),
         },
         horizontal_levels: doc.horizontal_levels,
         //divergences: doc.divergences,
-        divergences: CompactDivergences {
-            divergences: doc
-                .divergences
-                .divergences
-                .into_iter()
-                .enumerate()
-                .rev()
-                .take(3)
-                .rev()
-                .map(|(key, inst)| CompactDivergence {
-                    indicator: inst.indicator,
-                    divergence_type: inst.divergence_type,
-                })
-                .collect(),
-        },
+        divergences: doc
+            .divergences
+            .into_iter()
+            //.enumerate()
+            .rev()
+            .take(3)
+            .rev()
+            .map(|inst| CompactDivergence {
+                indicator: inst.indicator,
+                divergence_type: inst.divergence_type,
+            })
+            .collect(),
     };
     Ok(doc)
 }

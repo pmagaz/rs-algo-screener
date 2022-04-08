@@ -24,22 +24,62 @@ impl Divergences {
             .parse::<f64>()
             .unwrap();
 
+        let min_distance = env::var("DIVERGENCE_PROMINENCE_MIN_DISTANCE")
+            .unwrap()
+            .parse::<usize>()
+            .unwrap();
+
         let data_indicators = [
-            (IndicatorType::Stoch, indicators.stoch().get_data_a()),
-            // (IndicatorType::Macd, indicators.macd().get_data_a()),
-            // (IndicatorType::Rsi, indicators.rsi().get_data_a()),
+            (
+                IndicatorType::Stoch,
+                indicators
+                    .stoch()
+                    .get_data_a()
+                    .into_iter()
+                    .rev()
+                    .take(34)
+                    .map(|x| *x)
+                    .collect(),
+            ),
+            (
+                IndicatorType::Macd,
+                indicators
+                    .macd()
+                    .get_data_a()
+                    .into_iter()
+                    .rev()
+                    .take(34)
+                    .map(|x| *x)
+                    .collect(),
+            ),
+            // (
+            //     IndicatorType::Rsi,
+            //     indicators
+            //         .rsi()
+            //         .get_data_a()
+            //         .into_iter()
+            //         .rev()
+            //         .take(5)
+            //         .map(|x| *x)
+            //         .collect(),
+            // ),
         ];
 
         for (indicator_type, data) in data_indicators {
-            let maxima = maxima_minima(&data, &data, prominence, 100).unwrap();
-            let minima =
-                maxima_minima(&data.iter().map(|x| -x).collect(), &data, prominence, 100).unwrap();
+            let maxima = maxima_minima(&data, &data, prominence, min_distance).unwrap();
+            let minima = maxima_minima(
+                &data.iter().map(|x| -x).collect(),
+                &data,
+                prominence,
+                min_distance,
+            )
+            .unwrap();
 
             self.detect_pattern(&maxima, &minima, &indicator_type, &patterns);
         }
     }
 
-    //FIXME Improve this (just that)
+    //FIXME divergences should have id or date
     pub fn detect_pattern(
         &mut self,
         maxima: &Vec<(usize, f64)>,
@@ -94,7 +134,7 @@ impl Divergences {
             let mut locals = [&maxima[max_start..max_end], &minima[min_start..min_end]].concat();
 
             locals.sort_by(|(id_a, _price_a), (id_b, _price_b)| id_a.cmp(id_b));
-            locals.reverse();
+            //locals.reverse();
             let mut iter = locals.windows(window_size);
             let mut no_pattern = true;
             while no_pattern {
@@ -108,8 +148,8 @@ impl Divergences {
                                     || is_higher_highs_bottom(&data_points))
                         {
                             self.set_pattern(&data_points, indicator_type, DivergenceType::Bullish);
-                        } else if pattern_type == &PatternType::ChannelDown
-                            || pattern_type == &PatternType::TriangleDown
+                        } else if pattern_type == &PatternType::ChannelUp
+                            || pattern_type == &PatternType::TriangleUp
                                 && (is_lower_highs_top(&data_points)
                                     || is_lower_highs_bottom(&data_points))
                         {
