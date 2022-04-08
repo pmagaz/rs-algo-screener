@@ -51,7 +51,7 @@ ingress: {}
 autoscaling: {}
 
 nodeSelector:
-  storage: memory 
+  nodeType: cpu
 
 tolerations: []
 

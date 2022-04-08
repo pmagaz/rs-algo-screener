@@ -111,7 +111,7 @@ podAnnotations: {}
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
 nodeSelector:
-  storage: persistent
+  nodeType: storage
 
 ## List of node taints to tolerate (requires Kubernetes >= 1.6)
 tolerations: []
@@ -142,7 +142,7 @@ resources:
 protocolHttp: true
 
 service:
-  type: LoadBalancer 
+  type: LoadBalancer
   # Dashboard service port
   externalPort: 9090
   port: 80
@@ -172,14 +172,14 @@ service:
     key: "kubernetes.io/cluster-service"
 
 ingress:
-  enabled: true
+  enabled: false
   annotations:
     kubernetes.io/ingress.class: traefik
   hosts:
     - host: cluster.loc
       paths:
-      - path: /admin
-        pathType: Prefix
+      - path: /dashboard
+        pathType: Exact
         backend:
           service:
             name: kubernetes-dashboard
