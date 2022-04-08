@@ -44,7 +44,7 @@ resources:
     cpu: 100m
   limits:
     cpu: 300m
-    storage: 1Gi
+   #storage: 1Gi
 
 ingress: {}
 
