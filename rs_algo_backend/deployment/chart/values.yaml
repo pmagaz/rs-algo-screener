@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: pmagaz/rs-algo-backend 
+  repository: cluster.loc:5000/rs-algo-backend 
   pullPolicy: Always 
   tag: "latest"
 
