@@ -50,7 +50,8 @@ ingress: {}
 
 autoscaling: {}
 
-nodeSelector: {}
+nodeSelector:
+  nodeType: cpu
 
 affinity:
   nodeAffinity:

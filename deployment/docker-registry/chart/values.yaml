@@ -50,16 +50,17 @@ ingress: {}
 
 autoscaling: {}
 
-nodeSelector: {}
+nodeSelector:
+  nodeType: storage
 
 affinity:
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
       - matchExpressions:
-        - key: nodeType
+        - key: kubernetes.io/hostname
           operator: In
           values:
-          - storage
+          - node
 
 tolerations: []
