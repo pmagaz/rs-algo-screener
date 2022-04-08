@@ -8,14 +8,12 @@ use std::env;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Divergences {
-    divergences: Vec<Divergence>,
+    data: Vec<Divergence>,
 }
 
 impl Divergences {
     pub fn new() -> Result<Self> {
-        Ok(Self {
-            divergences: vec![],
-        })
+        Ok(Self { data: vec![] })
     }
     // CONTINUE HERE
     pub fn calculate(&mut self, indicators: &Indicators, patterns: &Vec<Pattern>) {
@@ -181,7 +179,7 @@ impl Divergences {
         indicator: &IndicatorType,
         divergence_type: DivergenceType,
     ) {
-        self.divergences.push(Divergence {
+        self.data.push(Divergence {
             divergence_type,
             indicator: indicator.to_owned(),
             data: data_points.to_owned(),

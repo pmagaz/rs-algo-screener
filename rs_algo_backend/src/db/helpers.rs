@@ -97,18 +97,20 @@ pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
         },
         horizontal_levels: doc.horizontal_levels,
         //divergences: doc.divergences,
-        divergences: doc
-            .divergences
-            .into_iter()
-            //.enumerate()
-            .rev()
-            .take(3)
-            .rev()
-            .map(|inst| CompactDivergence {
-                indicator: inst.indicator,
-                divergence_type: inst.divergence_type,
-            })
-            .collect(),
+        divergences: CompactDivergences {
+            data: doc
+                .divergences
+                .data
+                .into_iter()
+                .rev()
+                .take(3)
+                .rev()
+                .map(|inst| CompactDivergence {
+                    indicator: inst.indicator,
+                    divergence_type: inst.divergence_type,
+                })
+                .collect(),
+        },
     };
     Ok(doc)
 }

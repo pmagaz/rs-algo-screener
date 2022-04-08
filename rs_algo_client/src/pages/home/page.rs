@@ -111,6 +111,7 @@ pub fn home() -> Html {
                     <th><abbr>{ "MacD" }</abbr></th>
                     <th><abbr>{ "Rsi" }</abbr></th>
                     <th><abbr>{ "Emas" }</abbr></th>
+                    <th><abbr>{ "Divergence" }</abbr></th>
                     <th><abbr>{ "Updated" }</abbr></th>
                     </tr>
                 </thead>

@@ -164,6 +164,11 @@ pub fn instrument_list(props: &Props
               let horizontal_status = match horizontal_lows.get(0) {
                 Some(_val) => Status::Bullish,
                 None   => Status::Default 
+            };
+            
+            let divergence = match instrument.divergences.data.last() {
+                Some(val) => &val.divergence_type,
+                None   => &DivergenceType::None
             }; 
             
             html! {
@@ -181,6 +186,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
                     <td class={get_status_class(&ema_a.status)}> {format!("{:?} / {:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 1), round(instrument.indicators.ema_c.current_a, 1))}</td>
+                    <td class={get_status_class(&ema_a.status)}> {format!("{:?}", divergence)}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }
