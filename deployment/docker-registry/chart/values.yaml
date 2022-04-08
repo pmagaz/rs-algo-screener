@@ -40,10 +40,11 @@ service:
       app: docker-registry
 
 resources:
-  requests: {}
-  limits:
+  requests:
     cpu: 100m
-    #storage: 1Gi
+  limits:
+    cpu: 300m
+    storage: 1Gi
 
 ingress: {}
 
