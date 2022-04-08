@@ -19,7 +19,7 @@ jobs:
         cpu: 1000m
         memory: 256Mi
     nodeSelector:
-      nodeType: storage
+      nodeType: cpu
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
