@@ -51,7 +51,7 @@ ingress: {}
 autoscaling: {}
 
 nodeSelector:
-  storage: persistent 
+  storage: persistent
 
 tolerations: []
 
