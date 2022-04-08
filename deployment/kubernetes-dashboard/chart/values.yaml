@@ -142,7 +142,7 @@ resources:
 protocolHttp: true
 
 service:
-  type: ClusterIP 
+  type: LoadBalancer 
   # Dashboard service port
   externalPort: 9090
   port: 80

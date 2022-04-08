@@ -3,6 +3,6 @@ name: docker-registry
 description: Private Docker registry 
 type: application
 version: 0.1.3
-appVersion: "1.16.0"
+appVersion: "1.16.1"
 maintainers:
   - name: pablomagaz
