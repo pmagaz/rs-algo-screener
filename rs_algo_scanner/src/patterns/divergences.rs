@@ -18,7 +18,7 @@ impl Divergences {
         })
     }
     // CONTINUE HERE
-    pub fn calculate(&mut self, indicators: &Indicators, local_maxima: &Vec<(usize, f64)>) {
+    pub fn calculate(&mut self, indicators: &Indicators, patterns: &Vec<Pattern>) {
         let prominence = env::var("DIVERGENCE_MIN_PROMINENCE")
             .unwrap()
             .parse::<f64>()
@@ -26,8 +26,8 @@ impl Divergences {
 
         let data_indicators = [
             (IndicatorType::Stoch, indicators.stoch().get_data_a()),
-            (IndicatorType::Macd, indicators.macd().get_data_a()),
-            (IndicatorType::Rsi, indicators.rsi().get_data_a()),
+            // (IndicatorType::Macd, indicators.macd().get_data_a()),
+            // (IndicatorType::Rsi, indicators.rsi().get_data_a()),
         ];
 
         for (indicator_type, data) in data_indicators {
@@ -35,7 +35,7 @@ impl Divergences {
             let minima =
                 maxima_minima(&data.iter().map(|x| -x).collect(), &data, prominence, 100).unwrap();
 
-            self.detect_pattern(&maxima, &minima, &indicator_type, &100.);
+            self.detect_pattern(&maxima, &minima, &indicator_type, &patterns);
         }
     }
 
@@ -45,7 +45,7 @@ impl Divergences {
         maxima: &Vec<(usize, f64)>,
         minima: &Vec<(usize, f64)>,
         indicator_type: &IndicatorType,
-        max_value: &f64,
+        patterns: &Vec<Pattern>,
     ) {
         let local_max_points = env::var("PATTERNS_MAX_POINTS")
             .unwrap()
@@ -61,6 +61,12 @@ impl Divergences {
             .unwrap()
             .parse::<usize>()
             .unwrap();
+
+        let last_pattern = patterns.last();
+        let pattern_type = match last_pattern {
+            Some(pat) => &pat.pattern_type,
+            None => &PatternType::None,
+        };
 
         let mut max_start = 0;
         let mut max_end = 0;
@@ -95,11 +101,17 @@ impl Divergences {
                 match iter.next() {
                     Some(window) => {
                         let data_points = window.to_vec();
-                        if is_higher_highs_top(&data_points) || is_higher_highs_bottom(&data_points)
+
+                        if pattern_type == &PatternType::ChannelDown
+                            || pattern_type == &PatternType::TriangleDown
+                                && (is_higher_highs_top(&data_points)
+                                    || is_higher_highs_bottom(&data_points))
                         {
                             self.set_pattern(&data_points, indicator_type, DivergenceType::Bullish);
-                        } else if is_lower_highs_top(&data_points)
-                            || is_lower_highs_bottom(&data_points)
+                        } else if pattern_type == &PatternType::ChannelDown
+                            || pattern_type == &PatternType::TriangleDown
+                                && (is_lower_highs_top(&data_points)
+                                    || is_lower_highs_bottom(&data_points))
                         {
                             self.set_pattern(&data_points, indicator_type, DivergenceType::Bearish);
                         } else {

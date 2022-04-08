@@ -177,7 +177,7 @@ impl Instrument {
             self.data = candles;
 
             self.divergences
-                .calculate(&self.indicators, self.peaks.local_maxima());
+                .calculate(&self.indicators, &self.patterns.local_patterns);
 
             self.current_candle = self.current_candle().candle_type().clone();
         }
