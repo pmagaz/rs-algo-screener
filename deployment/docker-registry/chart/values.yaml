@@ -58,9 +58,9 @@ affinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
       - matchExpressions:
-        - key: kubernetes.io/hostname
+        - key: nodeType 
           operator: In
           values:
-          - node
+          - storage
 
 tolerations: []
