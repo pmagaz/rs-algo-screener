@@ -174,10 +174,10 @@ impl Instrument {
                 .calculate_horizontal_lows(&self.current_price, &self.peaks)
                 .unwrap();
 
-            self.data = candles;
-
             self.divergences
-                .calculate(&self.indicators, &self.patterns.local_patterns);
+                .calculate(&self.indicators, &self.patterns.local_patterns, &candles);
+
+            self.data = candles;
 
             self.current_candle = self.current_candle().candle_type().clone();
         }

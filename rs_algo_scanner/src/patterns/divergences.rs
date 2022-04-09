@@ -1,7 +1,10 @@
+use crate::candle::Candle;
 use crate::error::Result;
 use crate::helpers::maxima_minima::maxima_minima;
 use crate::indicators::{Indicator, Indicators};
 use crate::patterns::highs_lows::*;
+use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Duration, Local};
+
 pub use rs_algo_shared::models::*;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -16,7 +19,12 @@ impl Divergences {
         Ok(Self { data: vec![] })
     }
     // CONTINUE HERE
-    pub fn calculate(&mut self, indicators: &Indicators, patterns: &Vec<Pattern>) {
+    pub fn calculate(
+        &mut self,
+        indicators: &Indicators,
+        patterns: &Vec<Pattern>,
+        candles: &Vec<Candle>,
+    ) {
         let prominence = env::var("DIVERGENCE_MIN_PROMINENCE")
             .unwrap()
             .parse::<f64>()
@@ -27,29 +35,19 @@ impl Divergences {
             .parse::<usize>()
             .unwrap();
 
-        let data_indicators = [
-            (
-                IndicatorType::Stoch,
-                indicators
-                    .stoch()
-                    .get_data_a()
-                    .into_iter()
-                    .rev()
-                    .take(34)
-                    .map(|x| *x)
-                    .collect(),
-            ),
-            (
-                IndicatorType::Macd,
-                indicators
-                    .macd()
-                    .get_data_a()
-                    .into_iter()
-                    .rev()
-                    .take(34)
-                    .map(|x| *x)
-                    .collect(),
-            ),
+        let data_indicators: [(IndicatorType, &Vec<f64>); 1] = [
+            (IndicatorType::Stoch, indicators.stoch().get_data_a()),
+            // (
+            //     IndicatorType::Macd,
+            //     indicators
+            //         .macd()
+            //         .get_data_a()
+            //         .into_iter()
+            //         .rev()
+            //         .take(34)
+            //         .map(|x| *x)
+            //         .collect(),
+            // ),
             // (
             //     IndicatorType::Rsi,
             //     indicators
@@ -63,27 +61,28 @@ impl Divergences {
             // ),
         ];
 
-        for (indicator_type, data) in data_indicators {
-            let maxima = maxima_minima(&data, &data, prominence, min_distance).unwrap();
+        for (indicator_type, price) in data_indicators {
+            let maxima = maxima_minima(&price, &price, prominence, min_distance).unwrap();
             let minima = maxima_minima(
-                &data.iter().map(|x| -x).collect(),
-                &data,
+                &price.iter().map(|x| -x).collect(),
+                &price,
                 prominence,
                 min_distance,
             )
             .unwrap();
 
-            self.detect_pattern(&maxima, &minima, &indicator_type, &patterns);
+            //FIXME too many arguments
+            self.detect_pattern(&maxima, &minima, &indicator_type, &patterns, &candles);
         }
     }
 
-    //FIXME divergences should have id or date
     pub fn detect_pattern(
         &mut self,
         maxima: &Vec<(usize, f64)>,
         minima: &Vec<(usize, f64)>,
         indicator_type: &IndicatorType,
         patterns: &Vec<Pattern>,
+        candles: &Vec<Candle>,
     ) {
         let local_max_points = env::var("PATTERNS_MAX_POINTS")
             .unwrap()
@@ -139,48 +138,59 @@ impl Divergences {
                 match iter.next() {
                     Some(window) => {
                         let data_points = window.to_vec();
+                        let last_id = window.last().unwrap().0;
+                        let candle = candles.get(last_id).unwrap();
 
                         if pattern_type == &PatternType::ChannelDown
                             || pattern_type == &PatternType::TriangleDown
                                 && (is_higher_highs_top(&data_points)
                                     || is_higher_highs_bottom(&data_points))
                         {
-                            self.set_pattern(&data_points, indicator_type, DivergenceType::Bullish);
+                            self.set_pattern(
+                                &data_points,
+                                indicator_type,
+                                DivergenceType::Bullish,
+                                candle.date(),
+                            );
                         } else if pattern_type == &PatternType::ChannelUp
                             || pattern_type == &PatternType::TriangleUp
                                 && (is_lower_highs_top(&data_points)
                                     || is_lower_highs_bottom(&data_points))
                         {
-                            self.set_pattern(&data_points, indicator_type, DivergenceType::Bearish);
+                            self.set_pattern(
+                                &data_points,
+                                indicator_type,
+                                DivergenceType::Bearish,
+                                candle.date(),
+                            );
                         } else {
                             no_pattern = false;
                         }
                     }
                     None => {
-                        self.set_pattern(&vec![(0, 0.)], indicator_type, DivergenceType::None);
+                        self.set_pattern(
+                            &vec![(0, 0.)],
+                            indicator_type,
+                            DivergenceType::None,
+                            Local::now() - Duration::days(1000),
+                        );
                         no_pattern = false;
                     }
                 }
             }
-        } else {
-            self.set_pattern(&vec![(0, 0.)], indicator_type, DivergenceType::None);
-
-            //self.set_pattern(&vec![(0, 0.)], &pattern_size, 0., PatternType::None);
         }
     }
-
-    // fn calculate_change(&self, data_points: &DataPoints) -> f64 {
-    //     (data_points[4].1 - data_points[3].1).abs()
-    // }
 
     fn set_pattern(
         &mut self,
         data_points: &DataPoints,
         indicator: &IndicatorType,
         divergence_type: DivergenceType,
+        date: DateTime<Local>,
     ) {
         self.data.push(Divergence {
             divergence_type,
+            date: DbDateTime::from_chrono(date),
             indicator: indicator.to_owned(),
             data: data_points.to_owned(),
         })

@@ -58,15 +58,21 @@ impl General {
         "$or": [
             {"$or": [
                 {"$and": [
-                    {"patterns.local_patterns": {"$elemMatch" : {
+                    {"patterns.last_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
                     "date": { "$gte" : self.max_pattern_date },
                     }}}
                 ]},
                 {"$and": [
-                    {"patterns.local_patterns": {"$elemMatch" : {
+                    {"patterns.last_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
                     "active.date": { "$gte" : self.max_activated_date }
+                    }}}
+                ]},
+                {"$and": [
+                    {"divergences.data": {"$elemMatch" : {
+                        "date": { "$gte" : self.max_pattern_date },
+                        "divergence_type": { "$in": ["Bullish","Bearish"] } ,
                     }}}
                 ]},
                 // {"$and": [
@@ -127,19 +133,25 @@ impl General {
                     let ema_a = instrument.indicators.ema_a.clone(); //9
                     let ema_b = instrument.indicators.ema_b.clone(); //21
                     let ema_c = instrument.indicators.ema_c.clone(); //55
-                    let local_pattern = instrument.patterns.local_patterns.last();
+                    let last_pattern = instrument.patterns.local_patterns.last();
+                    let last_divergence = instrument.divergences.data.last();
 
-                    let local_pattern_target = match local_pattern {
+                    let last_pattern_target = match last_pattern {
                         Some(val) => round(val.active.change, 0),
                         None => 0.,
                     };
 
-                    let local_pattern_status = get_pattern_status(local_pattern);
+                    let last_divergence_type = match last_divergence {
+                        Some(val) => &val.divergence_type,
+                        None => &DivergenceType::None,
+                    };
 
-                    if local_pattern_status != Status::Default {
+                    let last_pattern_status = get_pattern_status(last_pattern);
+
+                    if last_pattern_status != Status::Default {
                         let len = instrument.patterns.local_patterns.len();
                         instrument.patterns.local_patterns[len - 1].active.status =
-                            local_pattern_status.clone();
+                            last_pattern_status.clone();
                     }
 
                     // let extrema_pattern = instrument.patterns.extrema_patterns.last();
@@ -229,10 +241,11 @@ impl General {
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.ema_a.status = ema_status.clone();
 
-                    if (local_pattern_status != Status::Default
-                        && local_pattern_target > minimum_pattern_target)
+                    if (last_pattern_status != Status::Default
+                        && last_pattern_target > minimum_pattern_target)
                         // || (extrema_pattern_status != Status::Default
                         //     && extrema_pattern_target > minimum_pattern_target)
+                        || (last_divergence_type != &DivergenceType::None)
                         || (ema_status != Status::Bearish
                             && (percentage_change(
                                 instrument.indicators.ema_a.prev_a,

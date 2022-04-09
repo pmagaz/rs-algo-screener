@@ -1,3 +1,5 @@
+use std::ops::Div;
+
 use round::{round};
 use rs_algo_shared::models::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
@@ -166,19 +168,30 @@ pub fn instrument_list(props: &Props
                 None   => Status::Default 
             };
             
-            let divergence = match instrument.divergences.data.last() {
+            let divergence_type = match instrument.divergences.data.last() {
                 Some(val) => &val.divergence_type,
                 None   => &DivergenceType::None
             }; 
-            
+
+            let divergence_status = match divergence_type {
+                DivergenceType::Bullish => Status::Bullish,
+                DivergenceType::Bearish => Status::Bearish,
+                DivergenceType::None => Status::Default,
+            };
+
+            let divergence_str = match divergence_type {
+                DivergenceType::Bullish => divergence_type.to_string(),
+                DivergenceType::Bearish => divergence_type.to_string(),
+                DivergenceType::None   => "".to_owned() 
+            }; 
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
-                    <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.0)}</td>
-                    <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.2)}</td>
-                    <td class={get_status_class(&local_pattern.status)}> {format!("{}", local_pattern.info.3)}</td>
+                    <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
+                    <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.2}</td>
+                    <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.3}</td>
                     // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.0)}</td>
                     // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.2)}</td>
                     // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.3)}</td>
@@ -186,7 +199,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
                     <td class={get_status_class(&ema_a.status)}> {format!("{:?} / {:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 1), round(instrument.indicators.ema_c.current_a, 1))}</td>
-                    <td class={get_status_class(&ema_a.status)}> {format!("{:?}", divergence)}</td>
+                    <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>
             }

@@ -11,22 +11,8 @@ pub async fn get_collection<T>(state: &web::Data<AppState>, collection: &str) ->
         .collection::<T>(collection)
 }
 
-// pub fn compact_instrument2(doc: &Document) -> Result<CompactInstrument> {
-//     let instrument = CompactInstrument {
-//         symbol: doc.get_str("symbol").unwrap().to_owned(),
-//         time_frame: doc.get_str("time_frame").unwrap().to_owned(),
-//         current_price: doc.get_f64("current_price").unwrap(),
-//         current_candle: doc.get_str("current_candle").unwrap().to_owned(),
-//         //date: doc.get_datetime(key)
-//     };
-
-//     Ok(instrument)
-// }
-
 pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
     let len = doc.indicators.macd.data_a.len();
-    // doc.patterns.local_patterns.reverse();
-    // doc.patterns.extrema_patterns.reverse();
     let doc = CompactInstrument {
         symbol: doc.symbol,
         date: doc.date,
@@ -104,10 +90,11 @@ pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
                 .into_iter()
                 .rev()
                 .take(3)
-                .rev()
-                .map(|inst| CompactDivergence {
-                    indicator: inst.indicator,
-                    divergence_type: inst.divergence_type,
+                //.rev()
+                .map(|div| CompactDivergence {
+                    indicator: div.indicator,
+                    date: div.date,
+                    divergence_type: div.divergence_type,
                 })
                 .collect(),
         },

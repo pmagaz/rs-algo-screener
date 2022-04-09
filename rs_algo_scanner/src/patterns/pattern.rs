@@ -346,28 +346,28 @@ impl Patterns {
                     }
                 }
             }
-        } else {
-            let date = Local::now() - Duration::days(1000);
-            self.set_pattern(
-                PatternType::None,
-                PatternDirection::None,
-                &pattern_size,
-                &vec![(0, 0.)],
-                0.,
-                date,
-                PatternActive {
-                    active: false,
-                    completed: true,
-                    date: DbDateTime::from_chrono(date),
-                    status: Status::Default,
-                    target: 0.,
-                    change: 0.,
-                    index: 0,
-                    price: 0.,
-                    break_direction: PatternDirection::None,
-                },
-            );
-        }
+        } /* *else {
+              let date = Local::now() - Duration::days(1000);
+              self.set_pattern(
+                  PatternType::None,
+                  PatternDirection::None,
+                  &pattern_size,
+                  &vec![(0, 0.)],
+                  0.,
+                  date,
+                  PatternActive {
+                      active: false,
+                      completed: true,
+                      date: DbDateTime::from_chrono(date),
+                      status: Status::Default,
+                      target: 0.,
+                      change: 0.,
+                      index: 0,
+                      price: 0.,
+                      break_direction: PatternDirection::None,
+                  },
+              );
+          }*/
     }
 
     fn calculate_change(&self, data_points: &DataPoints) -> f64 {
