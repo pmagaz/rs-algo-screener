@@ -67,6 +67,7 @@ impl General {
                     {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
                     "active.date": { "$gte" : self.max_activated_date },
+                   // "divergence_type": { "$in": ["Bullish","Bearish"]
                    // "pattern_type": { "$in": ["TriangleUp","Rectangle","DoubleTop","DoubleBottom","HeadShoulders"] }
                     }}}
                 ]},
