@@ -70,12 +70,12 @@ impl General {
                     "pattern_type": { "$in": ["TriangleUp","Rectangle","DoubleTop","DoubleBottom","HeadShoulders"] }
                     }}}
                 ]},
-                {"$and": [
-                    {"divergences.data": {"$elemMatch" : {
-                        "date": { "$gte" : self.max_pattern_date },
-                        "divergence_type": { "$in": ["Bullish","Bearish"] } ,
-                    }}}
-                ]},
+                // {"$and": [
+                //     {"divergences.data": {"$elemMatch" : {
+                //         "date": { "$gte" : self.max_pattern_date },
+                //         "divergence_type": { "$in": ["Bullish","Bearish"] } ,
+                //     }}}
+                // ]},
                 // {"$and": [
                 //     {"patterns.extrema_patterns": {"$elemMatch" : {
                 //     "active.target":{"$gte": minimum_pattern_target },
