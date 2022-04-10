@@ -68,7 +68,7 @@ impl General {
                     "active.target":{"$gte": minimum_pattern_target },
                     "active.date": { "$gte" : self.max_activated_date },
                    // "divergence_type": { "$in": ["Bullish","Bearish"]
-                   // "pattern_type": { "$in": ["TriangleUp","Rectangle","DoubleTop","DoubleBottom","HeadShoulders"] }
+                    "pattern_type": { "$in": ["TriangleUp","Rectangle","DoubleTop","DoubleBottom","HeadShoulders"] }
                     }}}
                 ]},
                 {"$and": [
@@ -92,8 +92,8 @@ impl General {
                 ]
             },
             {"$and": [
-                {"$expr": {"$lte": ["$indicators.ema_b.prev_a","$indicators.ema_c.prev_a"]}},
-                {"$expr": {"$gte": ["$indicators.ema_b.prev_a","$indicators.ema_c.current_a"]}},
+                {"$expr": {"$gte": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
+                {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
                 //{"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
