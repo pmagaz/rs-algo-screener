@@ -97,13 +97,13 @@ impl General {
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
             //{ "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
-            {"$and": [
-             {
-                "horizontal_levels.lows": {"$elemMatch" : {
-               // "price":{"$gte": "$current_price" },
-                "occurrences":{"$gte": min_horizontal_level_ocurrences },
-            }}},
-        ]},
+            // {"$and": [
+            //  {
+            //     "horizontal_levels.lows": {"$elemMatch" : {
+            //    // "price":{"$gte": "$current_price" },
+            //     "occurrences":{"$gte": min_horizontal_level_ocurrences },
+            //     }}},
+            // ]},
         ]}
     }
 
