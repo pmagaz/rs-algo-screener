@@ -98,9 +98,18 @@ impl Patterns {
                         //Channel up
                         //let data_points =
                         // vec![(1, 285.), (1, 189.), (1, 306.), (1, 201.), (1, 329.)];
-                        //Channel Down
+                        //Channel Down Top
                         // let mut data_points =
-                        //     vec![(1, 285.), (1, 189.), (1, 306.), (1, 201.), (1, 329.)];
+                        //     vec![(3, 174.), (4, 133.), (5, 164.), (6, 121.), (500, 155.)];
+                        // //Channel Down Bottom
+                        // // let data_points = vec![
+                        // //     (3, 143.),
+                        // //     (3, 174.),
+                        // //     (4, 133.),
+                        // //     (5, 164.),
+                        // //     (6, 121.),
+                        // //     (5, 155.),
+                        // // ];
                         // data_points.reverse();
                         //Broadening
                         // let mut data_points =
@@ -114,6 +123,7 @@ impl Patterns {
                         //     vec![(1, 100.), (1, 80.), (1, 90.), (1, 79.), (1, 99.)];
                         let last_index = data_points.last().unwrap().0;
                         let candle_date = candles.get(last_index).unwrap().date();
+
                         let change = self.calculate_change(&data_points);
                         if rectangle::is_renctangle_top(&data_points)
                             && change > minimum_pattern_target
@@ -125,7 +135,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                rectangle::rectangle_top_active(&data_points, candles),
+                                rectangle::rectangle_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::Rectangle,
+                                ),
                             );
                             not_founded = true;
                         } else if rectangle::is_renctangle_bottom(&data_points)
@@ -138,7 +152,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                rectangle::rectangle_bottom_active(&data_points, candles),
+                                rectangle::rectangle_bottom_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::Rectangle,
+                                ),
                             );
                             not_founded = true;
                         } else if channel::is_ascendant_top(&data_points)
@@ -151,7 +169,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                channel::channel_top_active(&data_points, candles),
+                                channel::channel_ascendant_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::ChannelUp,
+                                ),
                             );
                             not_founded = true;
                         } else if channel::is_ascendant_bottom(&data_points) {
@@ -162,7 +184,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                channel::channel_bottom_active(&data_points, candles),
+                                channel::channel_ascendant_bottom_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::ChannelUp,
+                                ),
                             );
                             not_founded = true;
                         } else if triangle::is_ascendant_top(&data_points) {
@@ -173,7 +199,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                triangle::ascendant_top_active(&data_points, candles),
+                                triangle::ascendant_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::TriangleUp,
+                                ),
                             );
                             not_founded = true;
                         } else if triangle::is_ascendant_bottom(&data_points) {
@@ -184,7 +214,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                triangle::ascendant_bottom_active(&data_points, candles),
+                                triangle::ascendant_bottom_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::TriangleUp,
+                                ),
                             );
                             not_founded = true;
                         } else if triangle::is_descendant_top(&data_points) {
@@ -195,7 +229,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                triangle::descendant_top_active(&data_points, candles),
+                                triangle::descendant_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::TriangleDown,
+                                ),
                             );
                             not_founded = true;
                         } else if triangle::is_descendant_bottom(&data_points) {
@@ -206,7 +244,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                triangle::descendant_bottom_active(&data_points, candles),
+                                triangle::descendant_bottom_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::TriangleDown,
+                                ),
                             );
                             not_founded = true;
                         } else if triangle::is_symmetrical_top(&data_points) {
@@ -217,7 +259,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                triangle::symetrical_top_active(&data_points, candles),
+                                triangle::symetrical_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::TriangleSym,
+                                ),
                             );
                             not_founded = true;
                         } else if triangle::is_symmetrical_bottom(&data_points) {
@@ -228,7 +274,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                triangle::symetrical_bottom_active(&data_points, candles),
+                                triangle::symetrical_bottom_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::TriangleSym,
+                                ),
                             );
                             not_founded = true;
                         } else if channel::is_descendant_top(&data_points) {
@@ -239,18 +289,26 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                channel::channel_top_active(&data_points, candles),
+                                channel::channel_descendant_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::ChannelDown,
+                                ),
                             );
                             not_founded = true;
                         } else if channel::is_descendant_bottom(&data_points) {
                             self.set_pattern(
                                 PatternType::ChannelDown,
-                                PatternDirection::Bottom,
+                                PatternDirection::Top,
                                 &pattern_size,
                                 &data_points,
                                 change,
                                 candle_date,
-                                channel::channel_bottom_active(&data_points, candles),
+                                channel::channel_descendant_bottom_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::ChannelDown,
+                                ),
                             );
                             not_founded = true;
                         } else if broadening::is_top(&data_points) {
@@ -261,7 +319,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                broadening::broadening_top_active(&data_points, candles),
+                                broadening::broadening_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::Broadening,
+                                ),
                             );
                             not_founded = true;
                         } else if broadening::is_bottom(&data_points) {
@@ -272,7 +334,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                broadening::broadening_top_active(&data_points, candles),
+                                broadening::broadening_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::Broadening,
+                                ),
                             );
                             not_founded = true;
                         } else if double::is_top(&data_points) {
@@ -283,7 +349,7 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                double::top_active(&data_points, candles),
+                                double::top_active(&data_points, candles, PatternType::DoubleTop),
                             );
                             not_founded = true;
                         } else if double::is_bottom(&data_points) {
@@ -294,7 +360,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                double::top_active(&data_points, candles),
+                                double::top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::DoubleBottom,
+                                ),
                             );
                             not_founded = true;
                         } else if head_shoulders::is_hs(&data_points) {
@@ -305,7 +375,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                head_shoulders::hs_active(&data_points, candles),
+                                head_shoulders::hs_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::HeadShoulders,
+                                ),
                             );
                             not_founded = true;
                         } else if head_shoulders::is_inverse(&data_points) {
@@ -316,7 +390,11 @@ impl Patterns {
                                 &data_points,
                                 change,
                                 candle_date,
-                                head_shoulders::hs_active(&data_points, candles),
+                                head_shoulders::hs_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::HeadShoulders,
+                                ),
                             );
                         }
                         not_founded = true;
@@ -423,7 +501,7 @@ pub fn pattern_active_result(
     let price_change = calculate_price_change(&data);
     //FIXME
     let price_target = calculate_price_target(&data);
-    let date = Local::now() - Duration::days(1000);
+    let fake_date = Local::now() - Duration::days(10000);
     if top_result {
         PatternActive {
             active: true,
@@ -454,7 +532,7 @@ pub fn pattern_active_result(
             completed: false,
             status: Status::Default,
             index: 0,
-            date: DbDateTime::from_chrono(date),
+            date: DbDateTime::from_chrono(fake_date),
             price: 0.,
             change: 0.,
             target: 0.,

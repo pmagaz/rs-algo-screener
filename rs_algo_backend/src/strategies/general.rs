@@ -66,7 +66,8 @@ impl General {
                 {"$and": [
                     {"patterns.last_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
-                    "active.date": { "$gte" : self.max_activated_date }
+                    "active.date": { "$gte" : self.max_activated_date },
+                    "pattern_type": { "$in": ["TriangleUp","Rectangle","DoubleTop","DoubleBottom","HeadShoulders"] }
                     }}}
                 ]},
                 {"$and": [

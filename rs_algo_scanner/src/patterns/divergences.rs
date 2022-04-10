@@ -35,31 +35,8 @@ impl Divergences {
             .parse::<usize>()
             .unwrap();
 
-        let data_indicators: [(IndicatorType, &Vec<f64>); 1] = [
-            (IndicatorType::Stoch, indicators.stoch().get_data_a()),
-            // (
-            //     IndicatorType::Macd,
-            //     indicators
-            //         .macd()
-            //         .get_data_a()
-            //         .into_iter()
-            //         .rev()
-            //         .take(34)
-            //         .map(|x| *x)
-            //         .collect(),
-            // ),
-            // (
-            //     IndicatorType::Rsi,
-            //     indicators
-            //         .rsi()
-            //         .get_data_a()
-            //         .into_iter()
-            //         .rev()
-            //         .take(5)
-            //         .map(|x| *x)
-            //         .collect(),
-            // ),
-        ];
+        let data_indicators: [(IndicatorType, &Vec<f64>); 1] =
+            [(IndicatorType::Stoch, indicators.stoch().get_data_a())];
 
         for (indicator_type, price) in data_indicators {
             let maxima = maxima_minima(&price, &price, prominence, min_distance).unwrap();
@@ -143,8 +120,9 @@ impl Divergences {
 
                         if pattern_type == &PatternType::ChannelDown
                             || pattern_type == &PatternType::TriangleDown
-                                && (is_higher_highs_top(&data_points)
+                                && ((is_higher_highs_top(&data_points)
                                     || is_higher_highs_bottom(&data_points))
+                                    && data_points[0].1 < data_points[1].1)
                         {
                             self.set_pattern(
                                 &data_points,
@@ -155,7 +133,8 @@ impl Divergences {
                         } else if pattern_type == &PatternType::ChannelUp
                             || pattern_type == &PatternType::TriangleUp
                                 && (is_lower_highs_top(&data_points)
-                                    || is_lower_highs_bottom(&data_points))
+                                    || is_lower_highs_bottom(&data_points)
+                                        && data_points[0].1 > data_points[1].1)
                         {
                             self.set_pattern(
                                 &data_points,
