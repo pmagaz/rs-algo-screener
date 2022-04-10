@@ -48,7 +48,7 @@ pub fn get_pattern_status(pattern: Option<&Pattern>) -> Status {
             let pattern_status = match pattern {
                 _x if pattern_active && pattern_active_date > max_activated_date => Status::Bullish,
                 _x if pattern_date > max_pattern_date => Status::Neutral,
-                _x if pattern_date > super_date => Status::Default,
+                _x if pattern_date > super_date => Status::Neutral,
                 _x if pattern_type == PatternType::None => Status::Default,
                 _ => Status::Default,
             };

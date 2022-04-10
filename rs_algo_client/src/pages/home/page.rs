@@ -20,8 +20,8 @@ extern "C" {
 #[function_component(Home)]
 pub fn home() -> Html {
     let base_url = get_base_url();
-    let url = [base_url.as_str(), "api/instruments"].concat();
-    //let url = "http://localhost:8000/api/instruments";
+    //let url = [base_url.as_str(), "api/instruments"].concat();
+    let url = "http://localhost:8000/api/instruments";
     let instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_query = use_state(|| String::from(""));

@@ -58,24 +58,24 @@ impl General {
         "$or": [
             {"$or": [
                 {"$and": [
-                    {"patterns.last_patterns": {"$elemMatch" : {
+                    {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
                     "date": { "$gte" : self.max_pattern_date },
                     }}}
                 ]},
                 {"$and": [
-                    {"patterns.last_patterns": {"$elemMatch" : {
+                    {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
                     "active.date": { "$gte" : self.max_activated_date },
-                    "pattern_type": { "$in": ["TriangleUp","Rectangle","DoubleTop","DoubleBottom","HeadShoulders"] }
+                   // "pattern_type": { "$in": ["TriangleUp","Rectangle","DoubleTop","DoubleBottom","HeadShoulders"] }
                     }}}
                 ]},
-                // {"$and": [
-                //     {"divergences.data": {"$elemMatch" : {
-                //         "date": { "$gte" : self.max_pattern_date },
-                //         "divergence_type": { "$in": ["Bullish","Bearish"] } ,
-                //     }}}
-                // ]},
+                {"$and": [
+                    {"divergences.data": {"$elemMatch" : {
+                        "date": { "$gte" : self.max_pattern_date },
+                        "divergence_type": { "$in": ["Bullish","Bearish"] } ,
+                    }}}
+                ]},
                 // {"$and": [
                 //     {"patterns.extrema_patterns": {"$elemMatch" : {
                 //     "active.target":{"$gte": minimum_pattern_target },
@@ -91,8 +91,8 @@ impl General {
                 ]
             },
             {"$and": [
-                {"$expr": {"$gt": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
-                {"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
+                {"$expr": {"$lte": ["$indicators.ema_b.prev_a","$indicators.ema_c.prev_a"]}},
+                {"$expr": {"$gte": ["$indicators.ema_b.prev_a","$indicators.ema_c.current_a"]}},
                 //{"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
@@ -246,7 +246,7 @@ impl General {
                         && last_pattern_target > minimum_pattern_target)
                         // || (extrema_pattern_status != Status::Default
                         //     && extrema_pattern_target > minimum_pattern_target)
-                        || (last_divergence_type != &DivergenceType::None)
+                       //|| (last_divergence_type != &DivergenceType::None)
                         || (ema_status != Status::Bearish
                             && (percentage_change(
                                 instrument.indicators.ema_a.prev_a,

@@ -76,10 +76,24 @@ impl Divergences {
             .parse::<usize>()
             .unwrap();
 
+        let max_pattern_days = env::var("MAX_PATTERN_DAYS")
+            .unwrap()
+            .parse::<i64>()
+            .unwrap();
+
+        let max_pattern_date = Local::now() - Duration::days(max_pattern_days);
+
+        let fake_date = Local::now() - Duration::days(1000);
+
         let last_pattern = patterns.last();
         let pattern_type = match last_pattern {
             Some(pat) => &pat.pattern_type,
             None => &PatternType::None,
+        };
+
+        let pattern_date = match last_pattern {
+            Some(pat) => pat.date.to_chrono(),
+            None => DateTime::from(fake_date),
         };
 
         let mut max_start = 0;
@@ -118,11 +132,12 @@ impl Divergences {
                         let last_id = window.last().unwrap().0;
                         let candle = candles.get(last_id).unwrap();
 
-                        if pattern_type == &PatternType::ChannelDown
-                            || pattern_type == &PatternType::TriangleDown
-                                && ((is_higher_highs_top(&data_points)
-                                    || is_higher_highs_bottom(&data_points))
-                                    && data_points[0].1 < data_points[1].1)
+                        if pattern_date > max_pattern_date
+                            && (pattern_type == &PatternType::ChannelDown
+                                || pattern_type == &PatternType::TriangleDown)
+                            && ((is_higher_highs_top(&data_points)
+                                || is_higher_highs_bottom(&data_points))
+                                && data_points[0].1 < data_points[1].1)
                         {
                             self.set_pattern(
                                 &data_points,
@@ -130,11 +145,12 @@ impl Divergences {
                                 DivergenceType::Bullish,
                                 candle.date(),
                             );
-                        } else if pattern_type == &PatternType::ChannelUp
-                            || pattern_type == &PatternType::TriangleUp
-                                && (is_lower_highs_top(&data_points)
-                                    || is_lower_highs_bottom(&data_points)
-                                        && data_points[0].1 > data_points[1].1)
+                        } else if pattern_date > max_pattern_date
+                            && (pattern_type == &PatternType::ChannelUp
+                                || pattern_type == &PatternType::TriangleUp)
+                            && ((is_lower_highs_top(&data_points)
+                                || is_lower_highs_bottom(&data_points))
+                                && data_points[0].1 > data_points[1].1)
                         {
                             self.set_pattern(
                                 &data_points,
@@ -151,7 +167,7 @@ impl Divergences {
                             &vec![(0, 0.)],
                             indicator_type,
                             DivergenceType::None,
-                            Local::now() - Duration::days(1000),
+                            fake_date,
                         );
                         no_pattern = false;
                     }
