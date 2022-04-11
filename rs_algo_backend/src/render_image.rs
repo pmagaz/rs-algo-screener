@@ -64,7 +64,7 @@ impl Backend {
         let BACKGROUND = &RGBColor(192, 200, 212);
         let CANDLE_BULLISH = &RGBColor(105, 138, 190);
         let CANDLE_BEARISH = &RGBColor(255, 255, 255);
-        let RED_LINE = &RGBColor(222, 110, 152);
+        let RED_LINE_LINE = &RGBColor(222, 110, 152);
         let BLUE_LINE = &RGBColor(71, 113, 181);
 
         let patterns = local_patterns;
@@ -121,7 +121,7 @@ impl Backend {
                 };
 
                 let (bullish, bearish) = match candle.candle_type {
-                    CandleType::Engulfing => (RED_LINE.filled(), RED_LINE.filled()),
+                    CandleType::Engulfing => (RED_LINE_LINE.filled(), RED_LINE_LINE.filled()),
                     _ => candle_color,
                 };
 
@@ -150,7 +150,7 @@ impl Backend {
                         (date, value, i)
                     }),
                     0,
-                    ShapeStyle::from(&RED).filled(),
+                    ShapeStyle::from(&RED_LINE).filled(),
                     &|coord, _size: i32, _style| {
                         let new_coord = (coord.0, coord.1);
                         let mut pattern_name;
@@ -202,7 +202,7 @@ impl Backend {
                             candle.high + (candle.high * local_peaks_marker_pos),
                         ),
                         -4,
-                        BLUE.mix(0.1),
+                        BLUE_LINE.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
@@ -219,7 +219,7 @@ impl Backend {
                             candle.low - (candle.low * local_peaks_marker_pos),
                         ),
                         4,
-                        BLUE.mix(0.1),
+                        BLUE_LINE.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
@@ -238,7 +238,7 @@ impl Backend {
                             candle.high + (candle.high * extrema_peaks_marker_pos),
                         ),
                         -4,
-                        RED.mix(0.1),
+                        RED_LINE.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
@@ -255,7 +255,7 @@ impl Backend {
                             candle.low - (candle.low * extrema_peaks_marker_pos),
                         ),
                         4,
-                        RED.mix(0.1),
+                        RED_LINE.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
@@ -350,8 +350,8 @@ impl Backend {
         /*
         for x in horizontal_levels.iter() {
             let color = match x.1.level_type() {
-                HorizontalLevelType::Support => BLUE.filled(),
-                HorizontalLevelType::Resistance => RED.filled(),
+                HorizontalLevelType::Support => BLUE_LINE.filled(),
+                HorizontalLevelType::Resistance => RED_LINE.filled(),
                 _ => TRANSPARENT.filled(),
             };
             chart
@@ -370,7 +370,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_a[id])),
-                RED_LINE,
+                RED_LINE_LINE,
             ))
             .unwrap();
 
@@ -418,7 +418,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, stoch_b[id])),
-                &RED,
+                &RED_LINE,
             ))
             .unwrap();
 
@@ -444,7 +444,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, macd_b[id])),
-                &RED,
+                &RED_LINE,
             ))
             .unwrap();
 
