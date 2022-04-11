@@ -92,8 +92,8 @@ impl General {
                 ]
             },
             {"$and": [
-                {"$expr": {"$gte": ["$indicators.ttema_a.current_a","$indicators.tema_c.current_a"]}},
-                {"$expr": {"$lte": ["$indicators.ttema_a.prev_a","$indicators.tema_c.prev_a"]}},
+                {"$expr": {"$gte": ["$indicators.tema_a.current_a","$indicators.tema_c.current_a"]}},
+                {"$expr": {"$lte": ["$indicators.tema_a.prev_a","$indicators.tema_c.prev_a"]}},
                 //{"$expr": {"$gte": ["$indicators.tema_c.current_a","$indicators.ema_c.current_a"]}},
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
