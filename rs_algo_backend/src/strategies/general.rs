@@ -115,7 +115,7 @@ impl General {
         println!("[STRATEGY] Formating ");
         let mut docs: Vec<CompactInstrument> = vec![];
 
-        let ema_crossover_th = env::var("EMA_CROSSOVER_THRESHOLD")
+        let ema_crossover_th = env::var("TEMA_CROSSOVER_THRESHOLD")
             .unwrap()
             .parse::<f64>()
             .unwrap();
