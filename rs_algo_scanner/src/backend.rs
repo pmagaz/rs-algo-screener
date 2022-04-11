@@ -4,6 +4,7 @@ use crate::indicators::Indicator;
 use crate::instrument::Instrument;
 
 use plotters::prelude::*;
+
 use std::env;
 
 #[derive(Debug, Clone)]
@@ -59,6 +60,12 @@ impl Backend {
             .map(|x| x.active.index)
             .collect();
 
+        let BACKGROUND = &RGBColor(192, 200, 212);
+        let CANDLE_BULLISH = &RGBColor(71, 113, 181);
+        let CANDLE_BEARISH = &RGBColor(255, 255, 255);
+        let RED_LINE = &RGBColor(222, 110, 152);
+        let BLUE_LINE = &RGBColor(71, 113, 181);
+
         let stoch = instrument.indicators().stoch();
         let stoch_a = stoch.get_data_a();
         let stoch_b = stoch.get_data_b();
@@ -77,7 +84,7 @@ impl Backend {
         let (upper, lower) = root.split_vertically((80).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
-        root.fill(&WHITE).unwrap();
+        root.fill(BACKGROUND).unwrap();
 
         let mut chart = ChartBuilder::on(&upper)
             .x_label_area_size(40)
@@ -89,7 +96,7 @@ impl Backend {
 
         chart
             .configure_mesh()
-            .light_line_style(&WHITE)
+            .light_line_style(BACKGROUND)
             .x_label_formatter(&|v| format!("{:.1}", v))
             .y_label_formatter(&|v| format!("{:.1}", v))
             .draw()
@@ -97,13 +104,17 @@ impl Backend {
         chart
             .draw_series(data.iter().map(|candle| {
                 let candle_color: (ShapeStyle, ShapeStyle) = match candle {
-                    _x if candle.close() >= candle.open() => (GREEN.filled(), GREEN.filled()),
-                    _x if candle.close() <= candle.open() => (RED.filled(), RED.filled()),
-                    _ => (GREEN.filled(), GREEN.filled()),
+                    _x if candle.close() >= candle.open() => {
+                        (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled())
+                    }
+                    _x if candle.close() <= candle.open() => {
+                        (CANDLE_BEARISH.filled(), CANDLE_BEARISH.filled())
+                    }
+                    _ => (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled()),
                 };
 
                 let (bullish, bearish) = match candle.candle_type() {
-                    CandleType::Engulfing => (BLUE.filled(), BLUE.filled()),
+                    CandleType::Engulfing => (RED_LINE.filled(), RED_LINE.filled()),
                     _ => candle_color,
                 };
 
@@ -179,7 +190,7 @@ impl Backend {
                     &|coord, _size: i32, _style| {
                         let new_coord = (coord.0, coord.1);
                         let pattern_name;
-                        if coord.2 == 4 {
+                        if coord.2 == 0 {
                             pattern_name = Text::new(
                                 format!("{:?}", pattern.pattern_type),
                                 (0, 0),
@@ -221,9 +232,9 @@ impl Backend {
                         (date, value)
                     }),
                     if x < 1 {
-                        BLACK.mix(0.4)
+                        BLACK.mix(0.2)
                     } else {
-                        BLACK.mix(0.4)
+                        BLACK.mix(0.2)
                     },
                 ))
                 .unwrap()
@@ -630,7 +641,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), tema_a[id])),
-                &BLUE.mix(0.6),
+                &RED_LINE,
             ))
             .unwrap();
 
@@ -648,7 +659,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), tema_c[id])),
-                &MAGENTA.mix(0.6),
+                &BLUE_LINE,
             ))
             .unwrap();
 

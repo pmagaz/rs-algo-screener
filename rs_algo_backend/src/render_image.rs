@@ -1,5 +1,6 @@
 use crate::error::Result;
 use crate::models::*;
+
 use plotters::prelude::*;
 use std::env;
 
@@ -60,6 +61,12 @@ impl Backend {
             .map(|x| x.active.index)
             .collect();
 
+        let BACKGROUND = &RGBColor(192, 200, 212);
+        let CANDLE_BULLISH = &RGBColor(105, 138, 190);
+        let CANDLE_BEARISH = &RGBColor(255, 255, 255);
+        let RED_LINE = &RGBColor(222, 110, 152);
+        let BLUE_LINE = &RGBColor(71, 113, 181);
+
         let patterns = local_patterns;
         let stoch = &instrument.indicators.stoch;
         let stoch_a = &stoch.data_a;
@@ -83,7 +90,7 @@ impl Backend {
         let (upper, lower) = root.split_vertically((82).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
-        root.fill(&WHITE).unwrap();
+        root.fill(BACKGROUND).unwrap();
 
         let mut chart = ChartBuilder::on(&upper)
             .x_label_area_size(40)
@@ -95,18 +102,27 @@ impl Backend {
 
         chart
             .configure_mesh()
-            .light_line_style(&WHITE)
+            .light_line_style(BACKGROUND)
             .x_label_formatter(&|v| format!("{:.1}", v))
             .y_label_formatter(&|v| format!("{:.1}", v))
             .draw()
             .unwrap();
         chart
             .draw_series(data.iter().enumerate().map(|(id, candle)| {
-                let (bullish, bearish): (ShapeStyle, ShapeStyle) = match candle {
-                    _x if id == data.len() - 1 => (BLUE.filled(), BLUE.filled()),
+                let candle_color: (ShapeStyle, ShapeStyle) = match candle {
+                    _x if id == data.len() - 1 => {
+                        (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled())
+                    }
                     _x if candle.close >= candle.open => (GREEN.filled(), GREEN.filled()),
-                    _x if candle.close <= candle.open => (RED.filled(), RED.filled()),
-                    _ => (GREEN.filled(), GREEN.filled()),
+                    _x if candle.close <= candle.open => {
+                        (CANDLE_BEARISH.filled(), CANDLE_BEARISH.filled())
+                    }
+                    _ => (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled()),
+                };
+
+                let (bullish, bearish) = match candle.candle_type {
+                    CandleType::Engulfing => (RED_LINE.filled(), RED_LINE.filled()),
+                    _ => candle_color,
                 };
 
                 CandleStick::new(
@@ -354,7 +370,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_a[id])),
-                &BLUE.mix(0.7),
+                RED_LINE,
             ))
             .unwrap();
 
@@ -374,7 +390,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_c[id])),
-                &MAGENTA.mix(0.7),
+                BLUE_LINE,
             ))
             .unwrap();
 
