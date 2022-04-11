@@ -86,8 +86,9 @@ impl Backend {
         let tema_b = &instrument.indicators.tema_b.data_a;
         let tema_c = &instrument.indicators.tema_c.data_a;
 
-        let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
-        let (upper, lower) = root.split_vertically((82).percent());
+        //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
+        let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
+        let (upper, lower) = root.split_vertically((85).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
         root.fill(BACKGROUND).unwrap();
@@ -411,7 +412,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, stoch_a[id])),
-                &BLUE,
+                BLUE_LINE,
             ))
             .unwrap();
 
@@ -420,7 +421,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, stoch_b[id])),
-                &RED,
+                RED_LINE,
             ))
             .unwrap();
 
@@ -437,7 +438,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, macd_a[id])),
-                &BLUE,
+                BLUE_LINE,
             ))
             .unwrap();
 
@@ -446,7 +447,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, macd_b[id])),
-                &RED,
+                RED_LINE,
             ))
             .unwrap();
 

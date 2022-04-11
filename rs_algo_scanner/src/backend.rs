@@ -65,6 +65,7 @@ impl Backend {
         let CANDLE_BEARISH = &RGBColor(255, 255, 255);
         let RED_LINE = &RGBColor(222, 110, 152);
         let BLUE_LINE = &RGBColor(71, 113, 181);
+        let RED_LINE2 = &BLUE_LINE;
 
         let stoch = instrument.indicators().stoch();
         let stoch_a = stoch.get_data_a();
@@ -80,8 +81,9 @@ impl Backend {
         let ema_b = instrument.indicators().ema_b().get_data_a();
         let tema_c = instrument.indicators().tema_c.get_data_a();
 
-        let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
-        let (upper, lower) = root.split_vertically((80).percent());
+        //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
+        let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
+        let (upper, lower) = root.split_vertically((85).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
         root.fill(BACKGROUND).unwrap();
@@ -96,7 +98,7 @@ impl Backend {
 
         chart
             .configure_mesh()
-            .light_line_style(BACKGROUND)
+            .light_line_style(BACKGROUND.mix(0.1))
             .x_label_formatter(&|v| format!("{:.1}", v))
             .y_label_formatter(&|v| format!("{:.1}", v))
             .draw()
@@ -382,21 +384,21 @@ impl Backend {
         //         .unwrap();
         // }
 
-        for x in instrument.peaks().smooth_close().iter() {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(instrument.peaks().smooth_close().iter())
-                        .map(|(_k, highs)| {
-                            let idx = highs.0;
-                            let value = highs.1;
-                            let date = data[idx].date();
-                            (date, value)
-                        }),
-                    MAGENTA.mix(0.014),
-                ))
-                .unwrap();
-        }
+        // for x in instrument.peaks().smooth_close().iter() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(instrument.peaks().smooth_close().iter())
+        //                 .map(|(_k, highs)| {
+        //                     let idx = highs.0;
+        //                     let value = highs.1;
+        //                     let date = data[idx].date();
+        //                     (date, value)
+        //                 }),
+        //             MAGENTA.mix(0.014),
+        //         ))
+        //         .unwrap();
+        // }
 
         // for x in instrument.peaks().smooth_lows().iter() {
         //     chart
@@ -659,7 +661,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), tema_c[id])),
-                &BLUE_LINE,
+                &RED_LINE2,
             ))
             .unwrap();
 
@@ -685,7 +687,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), stoch_a[id])),
-                &BLUE,
+                &BLUE_LINE,
             ))
             .unwrap();
 
@@ -694,7 +696,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), stoch_b[id])),
-                &RED,
+                &RED_LINE,
             ))
             .unwrap();
 
@@ -709,7 +711,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), macd_a[id])),
-                &BLUE,
+                &BLUE_LINE,
             ))
             .unwrap();
 
@@ -718,7 +720,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), macd_b[id])),
-                &RED,
+                &RED_LINE,
             ))
             .unwrap();
 
