@@ -62,6 +62,27 @@ pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
                 prev_b: 0.,
                 status: Status::Default,
             },
+            tema_a: CompactIndicator {
+                current_a: *doc.indicators.tema_a.data_a.last().unwrap(),
+                current_b: 0.,
+                prev_a: *doc.indicators.tema_a.data_a.get(len - 2).unwrap(),
+                prev_b: 0.,
+                status: Status::Default,
+            },
+            tema_b: CompactIndicator {
+                current_a: *doc.indicators.tema_a.data_a.last().unwrap(),
+                current_b: 0.,
+                prev_a: *doc.indicators.tema_a.data_a.get(len - 2).unwrap(),
+                prev_b: 0.,
+                status: Status::Default,
+            },
+            tema_c: CompactIndicator {
+                current_a: *doc.indicators.tema_a.data_a.last().unwrap(),
+                current_b: 0.,
+                prev_a: *doc.indicators.tema_a.data_a.get(len - 2).unwrap(),
+                prev_b: 0.,
+                status: Status::Default,
+            },
         },
         patterns: Patterns {
             local_patterns: doc

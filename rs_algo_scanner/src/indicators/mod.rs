@@ -9,6 +9,7 @@ use crate::indicators::ema::Ema;
 use crate::indicators::macd::Macd;
 use crate::indicators::rsi::Rsi;
 use crate::indicators::stoch::Stoch;
+use crate::indicators::tema::Tema;
 
 use rs_algo_shared::models::*;
 use serde::{Deserialize, Serialize};
@@ -23,6 +24,9 @@ pub struct Indicators {
     pub ema_a: Ema,
     pub ema_b: Ema,
     pub ema_c: Ema,
+    pub tema_a: Tema,
+    pub tema_b: Tema,
+    pub tema_c: Tema,
 }
 
 impl Indicators {
@@ -30,6 +34,9 @@ impl Indicators {
         let ema_a = &env::var("EMA_A").unwrap().parse::<usize>().unwrap();
         let ema_b = &env::var("EMA_B").unwrap().parse::<usize>().unwrap();
         let ema_c = &env::var("EMA_C").unwrap().parse::<usize>().unwrap();
+        let tema_a = &env::var("TEMA_A").unwrap().parse::<usize>().unwrap();
+        let tema_b = &env::var("TEMA_B").unwrap().parse::<usize>().unwrap();
+        let tema_c = &env::var("TEMA_C").unwrap().parse::<usize>().unwrap();
 
         Ok(Self {
             macd: Macd::new().unwrap(),
@@ -38,6 +45,9 @@ impl Indicators {
             ema_a: Ema::new_ema(*ema_a).unwrap(),
             ema_b: Ema::new_ema(*ema_b).unwrap(),
             ema_c: Ema::new_ema(*ema_c).unwrap(),
+            tema_a: Tema::new_tema(*tema_a).unwrap(),
+            tema_b: Tema::new_tema(*tema_b).unwrap(),
+            tema_c: Tema::new_tema(*tema_c).unwrap(),
         })
     }
 
@@ -72,6 +82,9 @@ impl Indicators {
         self.ema_a.next(close).unwrap();
         self.ema_b.next(close).unwrap();
         self.ema_c.next(close).unwrap();
+        self.tema_a.next(close).unwrap();
+        self.tema_b.next(close).unwrap();
+        self.tema_c.next(close).unwrap();
         Ok(())
     }
 }

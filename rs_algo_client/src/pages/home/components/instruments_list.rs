@@ -143,12 +143,12 @@ pub fn instrument_list(props: &Props
             let macd = instrument.indicators.macd.clone();
             let stoch = instrument.indicators.stoch.clone();
             let rsi = instrument.indicators.rsi.clone();
-            let ema_a = instrument.indicators.ema_a.clone(); //9
+            let tema_a = instrument.indicators.tema_a.clone(); //9
             let date = instrument.date.to_chrono();
 
 
 
-            let ema_style: (&str, &str, &str) = match ema_a.status {
+            let ema_style: (&str, &str, &str) = match tema_a.status {
                Status::Bullish => ("has-text-primary","has-text-primary","has-text-primary"), 
                Status::Neutral=> ("has-text-warning","has-text-primary","has-text-primary"),
                Status::Bearish => ("has-text-warning","has-text-primary","has-text-primary"),
@@ -198,7 +198,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    <td class={get_status_class(&ema_a.status)}> {format!("{:?} / {:?} / {:?}", round(instrument.indicators.ema_a.current_a, 1), round(instrument.indicators.ema_b.current_a, 1), round(instrument.indicators.ema_c.current_a, 1))}</td>
+                    <td class={get_status_class(&tema_a.status)}> {format!("{:?} / {:?}", round(instrument.indicators.tema_a.current_a, 1), round(instrument.indicators.tema_c.current_a, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                 </tr>

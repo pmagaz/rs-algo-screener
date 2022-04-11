@@ -75,6 +75,10 @@ impl Backend {
         let ema_b = &instrument.indicators.ema_b.data_a;
         let ema_c = &instrument.indicators.ema_c.data_a;
 
+        let tema_a = &instrument.indicators.tema_a.data_a;
+        let tema_b = &instrument.indicators.tema_b.data_a;
+        let tema_c = &instrument.indicators.tema_c.data_a;
+
         let root = BitMapBackend::new(&output_file, (1024, 768)).into_drawing_area();
         let (upper, lower) = root.split_vertically((82).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
@@ -457,25 +461,25 @@ impl Backend {
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, ema_a[id])),
+                    .map(|(id, candle)| (candle.date, tema_a[id])),
                 &BLUE.mix(0.4),
             ))
             .unwrap();
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, ema_b[id])),
-                &MAGENTA.mix(0.4),
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date, tema_b[id])),
+        //         &MAGENTA.mix(0.4),
+        //     ))
+        //     .unwrap();
 
         chart
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, ema_c[id])),
+                    .map(|(id, candle)| (candle.date, tema_c[id])),
                 &RED.mix(0.5),
             ))
             .unwrap();

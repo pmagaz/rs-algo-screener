@@ -92,9 +92,9 @@ impl General {
                 ]
             },
             {"$and": [
-                {"$expr": {"$gt": ["$indicators.ema_a.current_a","$indicators.ema_b.current_a"]}},
-                {"$expr": {"$lte": ["$indicators.ema_a.prev_a","$indicators.ema_b.prev_a"]}},
-                //{"$expr": {"$gte": ["$indicators.ema_b.current_a","$indicators.ema_c.current_a"]}},
+                {"$expr": {"$gte": ["$indicators.ttema_a.current_a","$indicators.tema_c.current_a"]}},
+                {"$expr": {"$lte": ["$indicators.ttema_a.prev_a","$indicators.tema_c.prev_a"]}},
+                //{"$expr": {"$gte": ["$indicators.tema_c.current_a","$indicators.ema_c.current_a"]}},
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
             //{ "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
@@ -132,9 +132,9 @@ impl General {
                     let stoch = instrument.indicators.stoch.clone();
                     let macd = instrument.indicators.stoch.clone();
                     let rsi = instrument.indicators.rsi.clone();
-                    let ema_a = instrument.indicators.ema_a.clone(); //9
-                    let ema_b = instrument.indicators.ema_b.clone(); //21
-                    let ema_c = instrument.indicators.ema_c.clone(); //55
+                    let tema_a = instrument.indicators.tema_a.clone(); //9
+                    let tema_c = instrument.indicators.tema_c.clone(); //21
+                                                                       //let ema_c = instrument.indicators.ema_c.clone(); //55
                     let last_pattern = instrument.patterns.local_patterns.last();
                     let last_divergence = instrument.divergences.data.last();
 
@@ -210,28 +210,22 @@ impl General {
                         _ => Status::Neutral,
                     };
 
-                    let ema_status = match ema_a {
-                        _x if round(ema_a.current_a, 2) > round(ema_b.current_a, 2)
-                            && round(ema_b.current_a, 2) > round(ema_c.current_a, 2) =>
-                        {
+                    let ema_status = match tema_a {
+                        _x if round(tema_a.current_a, 2) > round(tema_c.current_a, 2) => {
                             Status::Bullish
                         }
-                        _x if round(ema_a.current_a, 2) < round(ema_b.current_a, 2)
-                            && round(ema_b.current_a, 2) > round(ema_c.current_a, 2) =>
+                        _x if round(tema_a.current_a, 2) < round(tema_c.current_a, 2) => {
+                            Status::Neutral
+                        }
+                        _x if percentage_change(tema_a.prev_a, tema_c.prev_a)
+                            <= ema_crossover_th =>
                         {
                             Status::Neutral
                         }
-                        _x if percentage_change(ema_a.prev_a, ema_b.prev_a) <= ema_crossover_th
-                            && round(ema_b.current_a, 2) >= round(ema_c.current_a, 2) =>
-                        {
-                            Status::Neutral
-                        }
-                        _x if round(ema_b.current_a, 2) < round(ema_c.current_a, 2) => {
+                        _x if round(tema_a.current_a, 2) < round(tema_c.current_a, 2) => {
                             Status::Bearish
                         }
-                        _x if round(ema_a.current_a, 2) < round(ema_b.current_a, 2)
-                            && round(ema_b.current_a, 2) < round(ema_c.current_a, 2) =>
-                        {
+                        _x if round(tema_a.current_a, 2) < round(tema_c.current_a, 2) => {
                             Status::Bearish
                         }
 
@@ -241,7 +235,7 @@ impl General {
                     instrument.indicators.stoch.status = stoch_status.clone();
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
-                    instrument.indicators.ema_a.status = ema_status.clone();
+                    instrument.indicators.tema_a.status = ema_status.clone();
 
                     if (last_pattern_status != Status::Default
                         && last_pattern_target > minimum_pattern_target)
@@ -250,8 +244,8 @@ impl General {
                        //|| (last_divergence_type != &DivergenceType::None)
                         || (ema_status != Status::Bearish
                             && (percentage_change(
-                                instrument.indicators.ema_a.prev_a,
-                                ema_b.prev_a,
+                                instrument.indicators.tema_a.prev_a,
+                                tema_c.prev_a,
                             ) < ema_crossover_th))
                     {
                         docs.push(instrument);

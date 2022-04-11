@@ -20,11 +20,11 @@ jobs:
       - name: Build rs-algo-backend
         run: docker build rs_algo_backend --tag pmagaz/rs-algo-backend:latest
 
-      - name: Docker Push rs-algo-backend
-        run: docker push pmagaz/rs-algo-backend:latest
+      # - name: Docker Push rs-algo-backend
+      #   run: docker push pmagaz/rs-algo-backend:latest
 
       - name: Build rs-algo-scanner
         run: docker build rs_algo_scanner --tag pmagaz/rs-algo-scanner:latest
 
-      - name: Docker Push rs-algo-scanner
-        run: docker push pmagaz/rs-algo-scanner:latest
+      # - name: Docker Push rs-algo-scanner
+      #   run: docker push pmagaz/rs-algo-scanner:latest
