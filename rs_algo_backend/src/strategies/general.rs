@@ -210,7 +210,7 @@ impl General {
                         _ => Status::Neutral,
                     };
 
-                    let ema_status = match tema_a {
+                    let tema_status = match tema_a {
                         _x if round(tema_a.current_a, 2) > round(tema_c.current_a, 2) => {
                             Status::Bullish
                         }
@@ -225,28 +225,25 @@ impl General {
                         _x if round(tema_a.current_a, 2) < round(tema_c.current_a, 2) => {
                             Status::Bearish
                         }
-                        _x if round(tema_a.current_a, 2) < round(tema_c.current_a, 2) => {
-                            Status::Bearish
-                        }
-
                         _ => Status::Neutral,
                     };
 
                     instrument.indicators.stoch.status = stoch_status.clone();
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
-                    instrument.indicators.tema_a.status = ema_status.clone();
+                    instrument.indicators.tema_a.status = tema_status.clone();
 
                     if (last_pattern_status != Status::Default
                         && last_pattern_target > minimum_pattern_target)
                         // || (extrema_pattern_status != Status::Default
                         //     && extrema_pattern_target > minimum_pattern_target)
                        //|| (last_divergence_type != &DivergenceType::None)
-                        || (ema_status != Status::Bearish
-                            && (percentage_change(
-                                instrument.indicators.tema_a.prev_a,
-                                tema_c.prev_a,
-                            ) < ema_crossover_th))
+                        || (tema_status != Status::Bearish
+                            // && (percentage_change(
+                            //     instrument.indicators.tema_a.prev_a,
+                            //     tema_c.prev_a,
+                            // ) < ema_crossover_th)
+                        )
                     {
                         docs.push(instrument);
                     }
