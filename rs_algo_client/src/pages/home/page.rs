@@ -82,12 +82,13 @@ pub fn home() -> Html {
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
                 <div class="field">
-                    <Loading loading={ *use_loading} />
-                    // <label class="label">{ "Query" }</label>
-                    // <div class="control">
-                    //     <textarea id="query_box" class="textarea is-link" placeholder="Textarea" cols="60" rows="2" value={ {format!("{}", *use_query)}}></textarea>
-                    //     <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
-                    // </div>
+                     <Loading loading={ *use_loading} />
+                        //<label class="label">{ "Query" }</label>
+                     <div class="control">
+                        <textarea id="query_box" class="textarea is-link is-invisible" placeholder="Textarea" cols="60" rows="0" value={ {format!("{}", *use_query)}}></textarea>
+                    // <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
+                //<div width="400" height="400"></div>
+                     </div>
                     </div>
                 </div>
             </div>

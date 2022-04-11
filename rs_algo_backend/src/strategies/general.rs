@@ -239,10 +239,10 @@ impl General {
                         //     && extrema_pattern_target > minimum_pattern_target)
                        //|| (last_divergence_type != &DivergenceType::None)
                         || (tema_status != Status::Bearish
-                            // && (percentage_change(
-                            //     instrument.indicators.tema_a.prev_a,
-                            //     tema_c.prev_a,
-                            // ) < ema_crossover_th)
+                            && (percentage_change(
+                                instrument.indicators.tema_a.prev_a,
+                                tema_c.prev_a,
+                            ) < ema_crossover_th)
                         )
                     {
                         docs.push(instrument);

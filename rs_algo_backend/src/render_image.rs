@@ -462,7 +462,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_a[id])),
-                &BLUE.mix(0.6),
+                &BLUE.mix(0.7),
             ))
             .unwrap();
 
@@ -480,7 +480,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_c[id])),
-                &MAGENTA.mix(0.6),
+                &MAGENTA.mix(0.7),
             ))
             .unwrap();
 
