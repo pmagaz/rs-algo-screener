@@ -122,50 +122,7 @@ impl Backend {
             }))
             .unwrap();
 
-        // for (x, pattern) in extrema_patterns.iter().enumerate() {
-        //     chart
-        //         .draw_series(PointSeries::of_element(
-        //             (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
-        //                 let idx = highs.0;
-        //                 let value = highs.1;
-        //                 let date = data[idx].date;
-        //                 (date, value, i)
-        //             }),
-        //             0,
-        //             ShapeStyle::from(&RED).filled(),
-        //             &|coord, _size: i32, _style| {
-        //                 let new_coord = (coord.0, coord.1);
-        //                 let mut pattern_name;
-        //                 if coord.2 == 4 {
-        //                     pattern_name = Text::new(
-        //                         format!("{:?}", pattern.pattern_type),
-        //                         (0, 0),
-        //                         (font.as_ref(), 15),
-        //                     )
-        //                 } else {
-        //                     pattern_name = Text::new(format!("{:?}", ""), (0, 15), (font.as_ref(), 0))
-        //                 }
-
-        //                 EmptyElement::at(new_coord) + pattern_name
-        //             },
-        //         ))
-        //         .unwrap();
-        // }
-
-        // for (x, pattern) in extrema_patterns.iter().enumerate() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
-        //                 let idx = highs.0;
-        //                 let value = highs.1;
-        //                 let date = data[idx].date;
-        //                 (date, value)
-        //             }),
-        //             (if x < 1 { &BLACK } else { &BLACK }),
-        //         ))
-        //         .unwrap()
-        //         .label(format!("{:?}", pattern.pattern_type));
-        // }
+        // PATTERN NAME
 
         for (x, pattern) in patterns.iter().enumerate() {
             chart
@@ -181,7 +138,7 @@ impl Backend {
                     &|coord, _size: i32, _style| {
                         let new_coord = (coord.0, coord.1);
                         let mut pattern_name;
-                        if coord.2 == 4 {
+                        if coord.2 == 0 {
                             pattern_name = Text::new(
                                 format!("{:?}", pattern.pattern_type),
                                 (0, 0),
@@ -198,21 +155,7 @@ impl Backend {
                 .unwrap();
         }
 
-        //  for (x, pattern) in local_patterns.iter().enumerate() {
-        //     if pattern.active.id
-        //     // if local_minima.contains(&(i, candle.close)) {
-        //     //     return TriangleMarker::new(
-        //     //         (
-        //     //             candle.date,
-        //     //             candle.high + candle.high / peaks_marker_pos - 10.,
-        //     //         ),
-        //     //         4,
-        //     //         BLUE.filled(),
-        //     //     );
-        //     // } else {
-        //     //     return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
-        //     // }
-        //     }
+        // PATTERN LINE
         for (x, pattern) in patterns.iter().enumerate() {
             chart
                 .draw_series(LineSeries::new(
@@ -387,57 +330,6 @@ impl Backend {
         //         .unwrap();
         // }
 
-        // for x in local_maxima.iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..).zip(local_maxima.iter()).map(|(_k, highs)| {
-        //                 let idx = highs.0;
-        //                 let value = highs.1;
-        //                 let date = data[idx].date;
-        //                 (date, value)
-        //             }),
-        //             &BLUE,
-        //         ))
-        //         .unwrap();
-        // }
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..).zip(upper_channel.lower_band()[2].iter()).map(|(_k, highs)| {
-        //       let idx = highs.0;
-        //       let value = highs.1;
-        //       let date = data[idx].date;
-        //       (date, value)
-        //     }),
-        //     &RED,
-        //   ))
-        //   .unwrap();
-
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..)
-        //       .zip(upper_channel.lower_band()[0].iter())
-        //       .map(|(key, value)| {
-        //         let date = data[value.0].date;
-        //         (date, value.1)
-        //       }),
-        //     &RED,
-        //   ))
-        //   .unwrap();
-        // // }
-
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..)
-        //       .zip(upper_channel.lower_band().iter())
-        //       .map(|(key, value)| {
-        //         let date = data[value.0].date;
-        //         //println!("222222, {:?}, {:?}", date, value);
-        //         (date, value.1)
-        //       }),
-        //     &RED,
-        //   ))
-        //   .unwrap();
-
         // HORIZONTAL LEVELS
         /*
         for x in horizontal_levels.iter() {
@@ -465,6 +357,8 @@ impl Backend {
                 &BLUE.mix(0.7),
             ))
             .unwrap();
+
+        // TEMAS
 
         // chart
         //     .draw_series(LineSeries::new(
