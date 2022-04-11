@@ -12,5 +12,5 @@ public_url = "/"
 dotenv = "0.15.0"
 
 [[proxy]]
-rewrite = "/localhost:8080/api/instruments"
-backend = "http://localhost:8000/api/instruments/"
+rewrite = "/api/"
+backend = "http://localhost:8000/api/"
