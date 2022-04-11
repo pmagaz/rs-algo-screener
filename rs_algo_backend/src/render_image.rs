@@ -243,7 +243,7 @@ impl Backend {
                             candle.high + (candle.high * local_peaks_marker_pos),
                         ),
                         -4,
-                        BLUE.mix(0.2),
+                        BLUE.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
@@ -260,7 +260,7 @@ impl Backend {
                             candle.low - (candle.low * local_peaks_marker_pos),
                         ),
                         4,
-                        BLUE.mix(0.2),
+                        BLUE.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
@@ -279,7 +279,7 @@ impl Backend {
                             candle.high + (candle.high * extrema_peaks_marker_pos),
                         ),
                         -4,
-                        RED.mix(0.2),
+                        RED.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
@@ -296,7 +296,7 @@ impl Backend {
                             candle.low - (candle.low * extrema_peaks_marker_pos),
                         ),
                         4,
-                        RED.mix(0.2),
+                        RED.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
@@ -314,7 +314,7 @@ impl Backend {
                             candle.low + (candle.low * (extrema_peaks_marker_pos + 0.1)),
                         ),
                         -4,
-                        BLACK.mix(0.2),
+                        BLACK.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
@@ -331,7 +331,7 @@ impl Backend {
                             candle.low + (candle.low * (extrema_peaks_marker_pos + 0.2)),
                         ),
                         -4,
-                        BLACK.mix(0.2),
+                        BLACK.mix(0.1),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
