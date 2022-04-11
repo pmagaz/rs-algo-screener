@@ -5,7 +5,7 @@ jobs:
       tag: latest
       imagePullPolicy: Always
     #schedule: "0 */4,10,17,18,21,22 * * *"
-    schedule: "0 */4,10,13,17,18,20,21 * * *"
+    schedule: "0 */4,10,14,17,18,20,21 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
@@ -16,7 +16,7 @@ jobs:
       requests:
         cpu: 700m
       limits:
-        cpu: 900m
+        cpu: 800m
         memory: 256Mi
     nodeSelector:
       nodeType: cpu
