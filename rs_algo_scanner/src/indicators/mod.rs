@@ -2,6 +2,7 @@ pub mod ema;
 pub mod macd;
 pub mod rsi;
 pub mod stoch;
+pub mod tema;
 
 use crate::error::Result;
 use crate::indicators::ema::Ema;
