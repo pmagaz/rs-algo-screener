@@ -55,38 +55,38 @@ async fn main() -> Result<()> {
     screener.login(username, password).await?;
     let symbols = screener.get_symbols().await.unwrap().symbols;
 
-    // let symbols = [
-    //     Symbol {
-    //         symbol: "TDOC.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     //     // Symbol {
-    //     //     //     symbol: "GOLD".to_owned(),
-    //     //     //     category: "".to_owned(),
-    //     //     //     description: "".to_owned(),
-    //     //     //     currency: "".to_owned(),
-    //     //     // },
-    //     //     // Symbol {
-    //     //     //     symbol: "TSLA.US_4".to_owned(),
-    //     //     //     category: "".to_owned(),
-    //     //     //     description: "".to_owned(),
-    //     //     //     currency: "".to_owned(),
-    //     //     // },
-    //     //     // Symbol {
-    //     //     //     symbol: "USDIDX".to_owned(),
-    //     //     //     category: "".to_owned(),
-    //     //     //     description: "".to_owned(),
-    //     //     //     currency: "".to_owned(),
-    //     //     // },
-    //     //     // Symbol {
-    //     //     //     symbol: "EURRON".to_owned(),
-    //     //     //     category: "".to_owned(),
-    //     //     //     description: "".to_owned(),
-    //     //     //     currency: "".to_owned(),
-    //     //     // },
-    // ];
+    let symbols = [
+        Symbol {
+            symbol: "TDOC.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        //     // Symbol {
+        //     //     symbol: "GOLD".to_owned(),
+        //     //     category: "".to_owned(),
+        //     //     description: "".to_owned(),
+        //     //     currency: "".to_owned(),
+        //     // },
+        //     // Symbol {
+        //     //     symbol: "TSLA.US_4".to_owned(),
+        //     //     category: "".to_owned(),
+        //     //     description: "".to_owned(),
+        //     //     currency: "".to_owned(),
+        //     // },
+        //     // Symbol {
+        //     //     symbol: "USDIDX".to_owned(),
+        //     //     category: "".to_owned(),
+        //     //     description: "".to_owned(),
+        //     //     currency: "".to_owned(),
+        //     // },
+        //     // Symbol {
+        //     //     symbol: "EURRON".to_owned(),
+        //     //     category: "".to_owned(),
+        //     //     description: "".to_owned(),
+        //     //     currency: "".to_owned(),
+        //     // },
+    ];
 
     let ignore_list: Vec<String> = env::var("SYMBOL_IGNORE_LIST")
         .unwrap()
@@ -105,9 +105,9 @@ async fn main() -> Result<()> {
                     from,
                     |instrument: Instrument| async move {
                         println!(
-                            "[INSTRUMENT] {:?} processed in {:?}",
-                            &instrument.date(),
-                            now.elapsed()
+                            "[INSTRUMENT] processed in {:?} at {:?}",
+                            now.elapsed(),
+                            &instrument.date()
                         );
 
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
