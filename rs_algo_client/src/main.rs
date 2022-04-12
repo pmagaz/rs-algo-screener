@@ -3,11 +3,9 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 mod components;
 mod pages;
-mod render_image;
 mod routes;
 use components::footer::Footer;
 use components::header::Header;
-use render_image::Backend;
 use routes::{switch, Route};
 use std::env;
 
