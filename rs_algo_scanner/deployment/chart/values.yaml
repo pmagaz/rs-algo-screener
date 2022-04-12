@@ -16,7 +16,7 @@ jobs:
       requests:
         cpu: 500m
       limits:
-        cpu: 600m
+        cpu: 650m
         memory: 256Mi
     nodeSelector:
       nodeType: cpu
