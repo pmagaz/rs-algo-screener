@@ -94,8 +94,23 @@ pub async fn upsert(
     instrument: String,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+    println!(
+        "[INSTRUMENT] Received at {:?} in {:?}",
+        Local::now(),
+        now.elapsed()
+    );
+
+    let now = Instant::now();
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
+
+    println!(
+        "[INSTRUMENT] Parsed {:?} at {:?} in {:?}",
+        symbol,
+        Local::now(),
+        now.elapsed()
+    );
 
     //FOR XTB
     if symbol.contains("_") {
