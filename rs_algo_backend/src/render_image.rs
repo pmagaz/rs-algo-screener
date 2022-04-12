@@ -61,7 +61,8 @@ impl Backend {
             .map(|x| x.active.index)
             .collect();
 
-        let BACKGROUND = &RGBColor(192, 200, 212);
+        //let BACKGROUND = &RGBColor(192, 200, 212);
+        let BACKGROUND = &RGBColor(208, 213, 222);
         let CANDLE_BULLISH = &RGBColor(71, 113, 181);
         let CANDLE_BEARISH = &RGBColor(255, 255, 255);
         let RED_LINE = &RGBColor(235, 69, 125);
