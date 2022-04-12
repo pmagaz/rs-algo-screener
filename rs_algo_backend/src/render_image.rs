@@ -178,9 +178,9 @@ impl Backend {
                         (date, value)
                     }),
                     if x < 1 {
-                        BLACK.mix(0.2)
+                        BLACK.mix(0.15)
                     } else {
-                        BLACK.mix(0.2)
+                        BLACK.mix(0.15)
                     },
                 ))
                 .unwrap()
@@ -366,7 +366,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_a[id])),
-                RED_LINE.mix(0.8),
+                GREEN_LINE,
             ))
             .unwrap();
 
@@ -386,7 +386,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_c[id])),
-                BLUE_LINE,
+                RED_LINE.mix(0.8),
             ))
             .unwrap();
 
