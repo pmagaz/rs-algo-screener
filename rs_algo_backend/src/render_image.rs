@@ -62,10 +62,11 @@ impl Backend {
             .collect();
 
         let BACKGROUND = &RGBColor(192, 200, 212);
-        let CANDLE_BULLISH = &RGBColor(105, 138, 190);
+        let CANDLE_BULLISH = &RGBColor(71, 113, 181);
         let CANDLE_BEARISH = &RGBColor(255, 255, 255);
-        let RED_LINE = &RGBColor(222, 110, 152);
+        let RED_LINE = &RGBColor(235, 69, 125);
         let BLUE_LINE = &RGBColor(71, 113, 181);
+        let GREEN_LINE = &RGBColor(56, 142, 59);
 
         let patterns = local_patterns;
         let stoch = &instrument.indicators.stoch;
@@ -86,8 +87,8 @@ impl Backend {
         let tema_b = &instrument.indicators.tema_b.data_a;
         let tema_c = &instrument.indicators.tema_c.data_a;
 
-        //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
-        let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
+        let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
+        //let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
         let (upper, lower) = root.split_vertically((85).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
@@ -110,10 +111,7 @@ impl Backend {
             .unwrap();
         chart
             .draw_series(data.iter().enumerate().map(|(id, candle)| {
-                let candle_color: (ShapeStyle, ShapeStyle) = match candle {
-                    _x if id == data.len() - 1 => {
-                        (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled())
-                    }
+                let (bullish, bearish): (ShapeStyle, ShapeStyle) = match candle {
                     _x if candle.close >= candle.open => {
                         (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled())
                     }
@@ -121,11 +119,6 @@ impl Backend {
                         (CANDLE_BEARISH.filled(), CANDLE_BEARISH.filled())
                     }
                     _ => (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled()),
-                };
-
-                let (bullish, bearish) = match candle.candle_type {
-                    CandleType::Engulfing => (RED_LINE.filled(), RED_LINE.filled()),
-                    _ => candle_color,
                 };
 
                 CandleStick::new(
@@ -373,7 +366,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_a[id])),
-                RED_LINE,
+                RED_LINE.mix(0.8),
             ))
             .unwrap();
 

@@ -63,9 +63,10 @@ impl Backend {
         let BACKGROUND = &RGBColor(192, 200, 212);
         let CANDLE_BULLISH = &RGBColor(71, 113, 181);
         let CANDLE_BEARISH = &RGBColor(255, 255, 255);
-        let RED_LINE = &RGBColor(222, 110, 152);
+        let RED_LINE = &RGBColor(235, 69, 125);
         let BLUE_LINE = &RGBColor(71, 113, 181);
-        let RED_LINE2 = &BLUE_LINE;
+        let GREEN_LINE = &RGBColor(56, 142, 59);
+        //let GREEN_LINE = &RGBColor(27, 94, 32);
 
         let stoch = instrument.indicators().stoch();
         let stoch_a = stoch.get_data_a();
@@ -81,8 +82,8 @@ impl Backend {
         let ema_b = instrument.indicators().ema_b().get_data_a();
         let tema_c = instrument.indicators().tema_c.get_data_a();
 
-        //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
-        let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
+        let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
+        //let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
         let (upper, lower) = root.split_vertically((85).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
@@ -105,7 +106,7 @@ impl Backend {
             .unwrap();
         chart
             .draw_series(data.iter().map(|candle| {
-                let candle_color: (ShapeStyle, ShapeStyle) = match candle {
+                let (bullish, bearish): (ShapeStyle, ShapeStyle) = match candle {
                     _x if candle.close() >= candle.open() => {
                         (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled())
                     }
@@ -115,10 +116,10 @@ impl Backend {
                     _ => (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled()),
                 };
 
-                let (bullish, bearish) = match candle.candle_type() {
-                    CandleType::Engulfing => (RED_LINE.filled(), RED_LINE.filled()),
-                    _ => candle_color,
-                };
+                // let (bullish, bearish) = match candle.candle_type() {
+                //     CandleType::Engulfing => (RED_LINE.filled(), RED_LINE.filled()),
+                //     _ => candle_color,
+                // };
 
                 CandleStick::new(
                     candle.date(),
@@ -234,9 +235,9 @@ impl Backend {
                         (date, value)
                     }),
                     if x < 1 {
-                        BLACK.mix(0.2)
+                        BLACK.mix(0.08)
                     } else {
-                        BLACK.mix(0.2)
+                        BLACK.mix(0.08)
                     },
                 ))
                 .unwrap()
@@ -643,7 +644,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), tema_a[id])),
-                &RED_LINE,
+                GREEN_LINE,
             ))
             .unwrap();
 
@@ -660,8 +661,9 @@ impl Backend {
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), tema_c[id])),
-                &RED_LINE2,
+                    //.filter(|(id, candle)| tema_a[*id] > tema_c[*id])
+                    .map(|(id, candle)| ({ (candle.date(), tema_c[id]) })),
+                RED_LINE.mix(0.8),
             ))
             .unwrap();
 
