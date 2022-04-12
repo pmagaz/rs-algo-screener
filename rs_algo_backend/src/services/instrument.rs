@@ -112,50 +112,50 @@ pub async fn upsert(
         now.elapsed()
     );
 
-    //FOR XTB
-    if symbol.contains("_") {
-        let symbol_str: Vec<&str> = symbol.split('_').collect();
-        instrument.symbol = symbol_str[0].to_owned();
-    }
+    // //FOR XTB
+    // if symbol.contains("_") {
+    //     let symbol_str: Vec<&str> = symbol.split('_').collect();
+    //     instrument.symbol = symbol_str[0].to_owned();
+    // }
 
-    let insert_instruments_detail = env::var("INSERT_INSTRUMENTS_DETAIL")
-        .unwrap()
-        .parse::<bool>()
-        .unwrap();
+    // let insert_instruments_detail = env::var("INSERT_INSTRUMENTS_DETAIL")
+    //     .unwrap()
+    //     .parse::<bool>()
+    //     .unwrap();
 
-    if insert_instruments_detail {
-        let now = Instant::now();
+    // if insert_instruments_detail {
+    //     let now = Instant::now();
 
-        let _insert_result = db::instrument::insert_detail(&instrument, &state)
-            .await
-            .unwrap();
+    //     let _insert_result = db::instrument::insert_detail(&instrument, &state)
+    //         .await
+    //         .unwrap();
 
-        println!(
-            "[INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
-            symbol,
-            Local::now(),
-            now.elapsed()
-        );
-    }
+    //     println!(
+    //         "[INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
+    //         symbol,
+    //         Local::now(),
+    //         now.elapsed()
+    //     );
+    // }
 
-    let insert_instruments = env::var("INSERT_INSTRUMENTS")
-        .unwrap()
-        .parse::<bool>()
-        .unwrap();
+    // let insert_instruments = env::var("INSERT_INSTRUMENTS")
+    //     .unwrap()
+    //     .parse::<bool>()
+    //     .unwrap();
 
-    if insert_instruments {
-        let now = Instant::now();
-        let _insert_compact =
-            db::instrument::insert(compact_instrument(instrument).unwrap(), &state)
-                .await
-                .unwrap();
+    // if insert_instruments {
+    //     let now = Instant::now();
+    //     let _insert_compact =
+    //         db::instrument::insert(compact_instrument(instrument).unwrap(), &state)
+    //             .await
+    //             .unwrap();
 
-        println!(
-            "[INSTRUMENT DETAIL UPSERTED] {:?} at {:?} in {:?}",
-            symbol,
-            Local::now(),
-            now.elapsed()
-        );
-    }
+    //     println!(
+    //         "[INSTRUMENT DETAIL UPSERTED] {:?} at {:?} in {:?}",
+    //         symbol,
+    //         Local::now(),
+    //         now.elapsed()
+    //     );
+    // }
     Ok(HttpResponse::Ok().json("ok"))
 }
