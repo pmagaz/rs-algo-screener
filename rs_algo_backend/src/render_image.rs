@@ -88,8 +88,8 @@ impl Backend {
         let tema_b = &instrument.indicators.tema_b.data_a;
         let tema_c = &instrument.indicators.tema_c.data_a;
 
-        let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
-        //let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
+        //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
+        let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
         let (upper, lower) = root.split_vertically((85).percent());
         let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
