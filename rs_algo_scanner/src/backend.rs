@@ -80,7 +80,7 @@ impl Backend {
         let rsi = instrument.indicators().rsi().get_data_a();
 
         let tema_a = instrument.indicators().tema_a.get_data_a();
-        let ema_b = instrument.indicators().ema_b().get_data_a();
+        let tema_b = instrument.indicators().tema_b.get_data_a();
         let tema_c = instrument.indicators().tema_c.get_data_a();
 
         let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
@@ -542,7 +542,7 @@ impl Backend {
         //   .draw_series(LineSeries::new(
         //     (0..).zip(data.iter()).map(|(_id, candle)| {
         //       let date = candle.date();
-        //       let value = tema_c.next(candle.close());
+        //       let value = tema_b.next(candle.close());
         //       (date, value)
         //     }),
         //     &RED,
@@ -662,8 +662,8 @@ impl Backend {
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    //.filter(|(id, candle)| tema_a[*id] > tema_c[*id])
-                    .map(|(id, candle)| ({ (candle.date(), tema_c[id]) })),
+                    //.filter(|(id, candle)| tema_a[*id] > tema_b[*id])
+                    .map(|(id, candle)| ({ (candle.date(), tema_b[id]) })),
                 RED_LINE.mix(0.8),
             ))
             .unwrap();

@@ -386,7 +386,7 @@ impl Backend {
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, tema_c[id])),
+                    .map(|(id, candle)| (candle.date, tema_b[id])),
                 RED_LINE.mix(0.8),
             ))
             .unwrap();
