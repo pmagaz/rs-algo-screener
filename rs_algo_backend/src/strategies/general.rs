@@ -5,6 +5,7 @@ use bson::{doc, Document};
 use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::Cursor;
+use std::cmp::Ordering;
 
 use round::round;
 use rs_algo_shared::error::Result;
@@ -73,7 +74,7 @@ impl General {
                 ]},
                 {"$and": [
                     {"divergences.data": {"$elemMatch" : {
-                        "date": { "$gte" : self.max_pattern_date },
+                        //"date": { "$gte" : self.max_pattern_date },
                         "divergence_type": { "$in": ["Bullish","Bearish"] } ,
                     }}}
                 ]},
@@ -93,7 +94,8 @@ impl General {
             },
             {"$and": [
                 {"$expr": {"$gte": ["$indicators.tema_a.current_a","$indicators.tema_c.current_a"]}},
-                {"$expr": {"$lte": ["$indicators.tema_a.prev_a","$indicators.tema_c.prev_a"]}},
+                //{"$expr": {"$lte": ["$indicators.tema_a.current_a","$indicators.tema_c.prev_a"]}},
+                {"$expr": {"$lt": ["$indicators.tema_a.prev_a","$indicators.tema_c.prev_a"]}},
                 //{"$expr": {"$gte": ["$indicators.tema_c.current_a","$indicators.ema_c.current_a"]}},
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
@@ -134,8 +136,11 @@ impl General {
                     let rsi = instrument.indicators.rsi.clone();
                     let tema_a = instrument.indicators.tema_a.clone(); //9
                     let tema_c = instrument.indicators.tema_c.clone(); //21
-                                                                       //let ema_c = instrument.indicators.ema_c.clone(); //55
+
+                    //let ema_c = instrument.indicators.ema_c.clone(); //55
+                    let len = instrument.patterns.local_patterns.len();
                     let last_pattern = instrument.patterns.local_patterns.last();
+
                     let last_divergence = instrument.divergences.data.last();
 
                     let last_pattern_target = match last_pattern {
@@ -143,12 +148,43 @@ impl General {
                         None => 0.,
                     };
 
+                    let fake_date = DbDateTime::from_chrono(Local::now() - Duration::days(1000));
+
+                    let last_pattern_date = match last_pattern {
+                        Some(val) => val.date,
+                        None => fake_date,
+                    };
+
                     let last_divergence_type = match last_divergence {
                         Some(val) => &val.divergence_type,
                         None => &DivergenceType::None,
                     };
 
-                    let last_pattern_status = get_pattern_status(last_pattern);
+                    let second_last_pattern_type = match len.cmp(&2) {
+                        Ordering::Less => &PatternType::None,
+                        Ordering::Greater => {
+                            &instrument
+                                .patterns
+                                .local_patterns
+                                .get(len - 2)
+                                .unwrap()
+                                .pattern_type
+                        }
+                        Ordering::Equal => {
+                            &instrument
+                                .patterns
+                                .local_patterns
+                                .get(len - 2)
+                                .unwrap()
+                                .pattern_type
+                        }
+                    };
+
+
+
+                    let last_pattern_status =
+                        get_pattern_status(last_pattern, second_last_pattern_type);
+                    //let second_last_pattern_status = get_pattern_status(second_last_pattern);
 
                     if last_pattern_status != Status::Default {
                         let len = instrument.patterns.local_patterns.len();
@@ -232,19 +268,22 @@ impl General {
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.tema_a.status = tema_status.clone();
-
-                    if (last_pattern_status != Status::Default
+                    if (last_pattern_status != Status::Bearish
+                        && last_pattern_status != Status::Default
                         && last_pattern_target > minimum_pattern_target)
-                        // || (extrema_pattern_status != Status::Default
-                        //     && extrema_pattern_target > minimum_pattern_target)
-                       //|| (last_divergence_type != &DivergenceType::None)
-                        || (tema_status != Status::Bearish
-                            && (percentage_change(
-                                instrument.indicators.tema_a.prev_a,
-                                tema_c.prev_a,
-                            ) < ema_crossover_th)
-                        )
-                    {
+                    // || (extrema_pattern_status != Status::Default
+                    //     && extrema_pattern_target > minimum_pattern_target)
+                    //|| (last_divergence_type != &DivergenceType::None)
+                    || (tema_status != Status::Bearish
+                        && last_pattern_status != Status::Bearish
+                        && last_pattern_status != Status::Default
+                        && last_pattern_date > self.max_pattern_date 
+                      //  && last_pattern_target > minimum_pattern_target
+                        // && (percentage_change(
+                        //     instrument.indicators.tema_a.prev_a,
+                        //     tema_c.prev_a,
+                        // ) < ema_crossover_th)
+                    ) {
                         docs.push(instrument);
                     }
                     //}

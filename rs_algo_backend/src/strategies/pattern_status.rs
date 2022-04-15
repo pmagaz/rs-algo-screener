@@ -3,7 +3,10 @@ use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::*;
 use std::env;
 
-pub fn get_pattern_status(pattern: Option<&Pattern>) -> Status {
+pub fn get_pattern_status(
+    pattern: Option<&Pattern>,
+    second_last_pattern_type: &PatternType,
+) -> Status {
     let max_pattern_days = env::var("MAX_PATTERN_DAYS")
         .unwrap()
         .parse::<i64>()
@@ -47,6 +50,16 @@ pub fn get_pattern_status(pattern: Option<&Pattern>) -> Status {
 
             let pattern_status = match pattern {
                 _x if pattern_active && pattern_active_date > max_activated_date => Status::Bullish,
+                _x if second_last_pattern_type == &PatternType::ChannelDown
+                    && &pattern_type != second_last_pattern_type =>
+                {
+                    Status::Bullish
+                }
+                _x if second_last_pattern_type == &PatternType::ChannelDown
+                    && &pattern_type == second_last_pattern_type =>
+                {
+                    Status::Bearish
+                }
                 _x if pattern_date > max_pattern_date => Status::Neutral,
                 _x if pattern_date > super_date => Status::Neutral,
                 _x if pattern_type == PatternType::None => Status::Default,
