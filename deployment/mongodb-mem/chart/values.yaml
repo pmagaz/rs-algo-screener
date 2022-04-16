@@ -15,7 +15,7 @@ volumeMounts:
 volumes:
 - name: data
   emptyDir:
-      medium: Directory
+      medium: Memory
 
 envSecretName: rs-algo-screener-secrets
 
@@ -31,27 +31,27 @@ podSecurityContext:
 
 service:
   type: LoadBalancer 
-  port: 27018 
+  port: 27017 
   targetPort: 27017 
   metadata:
-    name: mongodb
+    name: mongodb-mem
     labels:
-      app: mongodb
+      app: mongodb-mem
 
 resources:
   requests:
-     cpu: 200m
+     cpu: 800m
   limits:
-    cpu: 400m
-    storage: 1Gi
-    memory: 256m
+    cpu: 1200m
+    ephemeral-storage: 4Gi
+    memory: 4Gi
 
 ingress: {}
 
 autoscaling: {}
 
 nodeSelector:
-  nodeType: storage
+  nodeType: cpu
 
 affinity:
   nodeAffinity:
@@ -61,7 +61,7 @@ affinity:
         - key: nodeType
           operator: In
           values:
-          - storage
+          - cpu
 
 tolerations: []
 

@@ -1,0 +1,3 @@
+release_name: mongodb-mem
+local_path: /home/dev/rs-algo-screener
+chart_path: deployment/mongodb-mem/chart

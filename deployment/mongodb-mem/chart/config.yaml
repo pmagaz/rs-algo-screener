@@ -1,0 +1,2 @@
+mongodb-mem_ENABLE_DIRECTORY_PER_DB: "no"
+TZ: "Europe/Madrid"

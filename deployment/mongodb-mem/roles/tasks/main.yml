@@ -1,0 +1,9 @@
+---
+
+- name: Deploy "{{ release_name }}" helm chart 
+  kubernetes.core.helm:
+    name: "{{ release_name }}" 
+    chart_ref: "{{ local_path }}/{{ chart_path }}"
+    force: yes 
+    purge: yes 
+    release_namespace: default
