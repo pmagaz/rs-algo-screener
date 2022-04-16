@@ -10,12 +10,13 @@ imagePullSecrets:
 
 volumeMounts:
 - name: data
-  mountPath: /data/db
+  mountPath: /data
 
 volumes:
 - name: data
-  emptyDir:
-      medium: Directory
+  hostPath:
+    path: /data
+    type: Directory
 
 envSecretName: rs-algo-screener-secrets
 
@@ -44,7 +45,7 @@ resources:
   limits:
     cpu: 400m
     storage: 1Gi
-    memory: 256m
+    memory: 256Mi
 
 ingress: {}
 
