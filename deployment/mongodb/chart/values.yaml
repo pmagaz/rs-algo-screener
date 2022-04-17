@@ -21,38 +21,30 @@ volumes:
 envSecretName: rs-algo-screener-secrets
 
 serviceAccount:
-  create: true
+  create: false
   annotations: {}
   name: ""
 
 podAnnotations: {}
 
-podSecurityContext:
-  fsGroup: 1000
+podSecurityContext: {}
 
 service:
   type: NodePort 
-  port: 31448 
+  port: 27017 
   targetPort: 27017
   metadata:
     name: mongodb
     labels:
       app: mongodb
 
-ingress:
-  enabled: false
-  annotations:
-    kubernetes.io/ingress.class: traefik
-  hosts:
-    - host: cluster.loc
-      paths:
-      - path: /db/mongodb
-        pathType: Prefix
-        backend:
-          service:
-            name: mongodb 
-            port:
-              number: 31448
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
 
 resources:
   requests:
