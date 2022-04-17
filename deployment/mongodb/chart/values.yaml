@@ -32,7 +32,6 @@ podSecurityContext: {}
 service:
   type: NodePort 
   port: 27017 
-  targetPort: 27017
   nodePort: 31235
   metadata:
     name: mongodb
