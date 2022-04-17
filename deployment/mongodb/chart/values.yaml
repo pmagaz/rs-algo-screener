@@ -31,13 +31,28 @@ podSecurityContext:
   fsGroup: 1000
 
 service:
-  type: LoadBalancer 
-  port: 27018 
-  targetPort: 27017 
+  type: ClusterIP 
+  port: 31448 
+  targetPort: 27017
   metadata:
     name: mongodb
     labels:
       app: mongodb
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+  hosts:
+    - host: cluster.loc
+      paths:
+      - path: /db/mongodb
+        pathType: Prefix
+        backend:
+          service:
+            name: mongodb 
+            port:
+              number: 31448
 
 resources:
   requests:
