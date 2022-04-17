@@ -14,7 +14,7 @@ pub async fn find_by_symbol(
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
-    let collection = get_collection::<Instrument>(state, collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
@@ -32,7 +32,7 @@ pub async fn find_by_params(
     let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
 
     println!("[PARAMS RECEIVED] {:?} ", params);
-    let collection = get_collection::<CompactInstrument>(state, collection_name).await;
+    let collection = get_collection::<CompactInstrument>(&state.db_mem, collection_name).await;
 
     let query = match params.as_ref() {
         "" => strategy.query().to_owned(),
@@ -53,7 +53,7 @@ pub async fn insert(
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
-    let collection = get_collection::<CompactInstrument>(state, collection_name).await;
+    let collection = get_collection::<CompactInstrument>(&state.db_mem, collection_name).await;
 
     collection
         .find_one_and_replace(
@@ -71,7 +71,7 @@ pub async fn insert_detail(
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
-    let collection = get_collection::<Instrument>(state, collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     collection
         .find_one_and_replace(

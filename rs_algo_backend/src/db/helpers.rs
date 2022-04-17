@@ -1,14 +1,13 @@
 use crate::error::Result;
 use crate::models::app_state::AppState;
+use crate::models::db::Db;
+
 use actix_web::web;
 use mongodb::Collection;
 use rs_algo_shared::models::*;
 
-pub async fn get_collection<T>(state: &web::Data<AppState>, collection: &str) -> Collection<T> {
-    state
-        .db
-        .database(&state.db_name)
-        .collection::<T>(collection)
+pub async fn get_collection<T>(db: &Db, collection: &str) -> Collection<T> {
+    db.client.database(&db.name).collection::<T>(collection)
 }
 
 pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
