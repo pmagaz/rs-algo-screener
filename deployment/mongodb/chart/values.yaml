@@ -31,7 +31,7 @@ podSecurityContext:
   fsGroup: 1000
 
 service:
-  type: ClusterIP 
+  type: NodePort 
   port: 31448 
   targetPort: 27017
   metadata:
@@ -40,7 +40,7 @@ service:
       app: mongodb
 
 ingress:
-  enabled: true
+  enabled: false
   annotations:
     kubernetes.io/ingress.class: traefik
   hosts:
