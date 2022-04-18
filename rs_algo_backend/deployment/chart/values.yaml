@@ -20,7 +20,7 @@ volumes:
 envSecretName: rs-algo-screener-secrets
 
 serviceAccount:
-  create: true
+  create: false
   annotations: {}
   name: ""
 

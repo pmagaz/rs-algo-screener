@@ -20,7 +20,7 @@ volumes:
 envSecretName: rs-algo-screener-secrets
 
 serviceAccount:
-  create: true
+  create: false
   annotations: {}
   name: ""
 
@@ -33,7 +33,7 @@ service:
   type: NodePort 
   port: 27017
   targetPort: 27017 
-  nodePort: 30017
+  nodePort: 30018
   metadata:
     name: mongodb-mem
     labels:
