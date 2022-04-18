@@ -33,7 +33,7 @@ service:
   type: NodePort 
   port: 27017
   targetPort: 27017 
-  nodePort: 30018
+  nodePort: 30017
   metadata:
     name: mongodb-mem
     labels:
