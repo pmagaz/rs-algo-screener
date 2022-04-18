@@ -8,7 +8,7 @@ storage:
   filesystem:
     rootdirectory: /data
 http:
-  addr: :30500
+  addr: :5000
   headers:
     X-Content-Type-Options: [nosniff]
 health:
