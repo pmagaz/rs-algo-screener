@@ -21,7 +21,6 @@ envSecretName: rs-algo-screener-secrets
 
 podAnnotations: {}
 
-
 service:
   type: NodePort 
   port: 27017
