@@ -19,15 +19,7 @@ volumes:
 
 envSecretName: rs-algo-screener-secrets
 
-serviceAccount:
-  create: false
-  annotations: {}
-  name: ""
-
 podAnnotations: {}
-
-podSecurityContext:
-  fsGroup: 1000
 
 service:
   type: ClusterIP
@@ -37,6 +29,8 @@ service:
     name: rs-algo-backend
     labels:
       app: rs-algo-backend
+
+serviceAccount: {}
 
 ingress:
   enabled: true
@@ -84,3 +78,4 @@ affinity:
 
 tolerations: []
 
+podSecurityContext: {}

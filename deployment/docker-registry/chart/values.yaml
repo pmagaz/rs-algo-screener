@@ -20,15 +20,7 @@ volumes:
 
 envSecretName: rs-algo-screener-secrets
 
-serviceAccount:
-  create: false
-  annotations: {}
-  name: ""
-
 podAnnotations: {}
-
-podSecurityContext:
-  fsGroup: 1000
 
 service:
   type: LoadBalancer 
@@ -38,6 +30,8 @@ service:
     name: docker-registry
     labels:
       app: docker-registry
+
+serviceAccount: {}
 
 resources:
   requests:
@@ -64,3 +58,5 @@ affinity:
           - storage
 
 tolerations: []
+
+podSecurityContext: {}

@@ -19,11 +19,8 @@ volumes:
 
 envSecretName: rs-algo-screener-secrets
 
-serviceAccount: {}
-
 podAnnotations: {}
 
-podSecurityContext: {}
 
 service:
   type: NodePort 
@@ -34,6 +31,8 @@ service:
     name: mongodb-mem
     labels:
       app: mongodb-mem
+
+serviceAccount: {}
 
 resources:
   requests:
@@ -71,3 +70,5 @@ livenessProbe:
   successThreshold: 1
 
 readinessProbe: {}
+
+podSecurityContext: {}
