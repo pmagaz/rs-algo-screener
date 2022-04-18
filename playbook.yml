@@ -6,7 +6,7 @@
     - { role: "deployment/mongodb/roles/" }
     - { role: "deployment/mongodb-mem/roles/" }
     #- { role: "deployment/kubernetes-dashboard/roles/" }
-    #- { role: "deployment/docker-registry/roles/" }
+    - { role: "deployment/docker-registry/roles/" }
     - { role: "rs_algo_backend/deployment/roles/" }
     - { role: "rs_algo_scanner/deployment/roles/" }
     - { role: "rs_algo_client/deployment/roles/" }
