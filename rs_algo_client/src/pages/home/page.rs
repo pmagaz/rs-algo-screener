@@ -6,6 +6,10 @@ use crate::components::plotter::Plotter;
 use rs_algo_shared::models::CompactInstrument;
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
+
+use rs_algo_shared::helpers::date::*;
+use rs_algo_shared::models::*;
+
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
 #[wasm_bindgen]
 extern "C" {
@@ -20,24 +24,32 @@ extern "C" {
 #[function_component(Home)]
 pub fn home() -> Html {
     let base_url = get_base_url();
-    let url = [base_url.as_str(), "api/instruments"].concat();
-    //let url = "http://localhost:8000/api/instruments";
-    let instruments = use_state(|| vec![]);
+    let instruments_url = [base_url.as_str(), "api/instruments"].concat();
+    let watch_list_url = [base_url.as_str(), "api/watchlist"].concat();
+    let use_instruments = use_state(|| vec![]);
+    let use_watch_instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_query = use_state(|| String::from(""));
-    let use_url = use_state(|| String::from(""));
+    let use_instruments_url = use_state(|| String::from(""));
 
     {
-        let instruments = instruments.clone();
+        let use_instruments = use_instruments.clone();
+        let use_watch_instruments = use_watch_instruments.clone();
         let use_loading = use_loading.clone();
-        let url = url.clone();
+        let instruments_url = instruments_url.clone();
+        let watch_list_url = watch_list_url.clone();
         use_effect_with_deps(
             move |_| {
                 log::info!("[CLIENT] API call...");
                 let use_loading = use_loading.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let query = get_query_value();
-                    instruments.set(api::get_instruments(&url, query).await.unwrap());
+                    //use_instruments.set(api::get_instruments(&instruments_url, query).await.unwrap());
+                    let instruments = api::get_instruments(&instruments_url, query).await.unwrap();
+                    let watch_instruments =
+                        api::get_watch_instruments(&watch_list_url).await.unwrap();
+                    use_instruments.set(instruments);
+                    use_watch_instruments.set(watch_instruments);
                     use_loading.set(false);
                 });
                 || ()
@@ -46,34 +58,67 @@ pub fn home() -> Html {
         );
     }
 
-    let on_query_send = {
-        let instruments = instruments.clone();
-        let use_query = use_query.clone();
-        let use_loading = use_loading.clone();
+    // let on_query_send = {
+    //     let use_instruments = use_instruments.clone();
+    //     let use_query = use_query.clone();
+    //     let use_loading = use_loading.clone();
 
-        Callback::from(move |_e: MouseEvent| {
-            let instruments = instruments.clone();
-            let use_query = use_query.clone();
-            let use_loading = use_loading.clone();
-            let query = get_query_value();
-            use_query.set(query.clone());
-            use_loading.set(true);
-            let url = url.clone();
+    //     Callback::from(move |_e: MouseEvent| {
+    //         let use_instruments = use_instruments.clone();
+    //         let use_query = use_query.clone();
+    //         let use_loading = use_loading.clone();
+    //         let query = get_query_value();
+    //         use_query.set(query.clone());
+    //         use_loading.set(true);
+    //         let instruments_url = instruments_url.clone();
 
-            wasm_bindgen_futures::spawn_local(async move {
-                instruments.set(api::get_instruments(&url, query).await.unwrap());
-                use_loading.set(false);
-            });
+    //         wasm_bindgen_futures::spawn_local(async move {
+    //             use_instruments.set(api::get_instruments(&instruments_url, query).await.unwrap());
+    //             use_loading.set(false);
+    //         });
+    //     })
+    // };
+
+    let on_symbol_click = {
+        let use_instruments_url = use_instruments_url.clone();
+        Callback::from(move |instruments_url: String| {
+            log::info!("[CLIENT] Selecting {}", &instruments_url);
+            let use_instruments_url = use_instruments_url.clone();
+            use_instruments_url.set(instruments_url);
+            open_modal();
         })
     };
 
-    let on_symbol_click = {
-        let use_url = use_url.clone();
-        Callback::from(move |url: String| {
-            log::info!("[CLIENT] Selecting {}", &url);
-            let use_url = use_url.clone();
-            use_url.set(url);
-            open_modal();
+    let on_watch_click = {
+        let use_watch_instruments = use_watch_instruments.clone();
+        let use_loading = use_loading.clone();
+
+        Callback::from(move |inst: CompactInstrument| {
+            let use_watch_instruments = use_watch_instruments.clone();
+            let watch_list_url = watch_list_url.clone();
+            let use_loading = use_loading.clone();
+            use_loading.set(true);
+
+            let fake_date = DbDateTime::from_chrono(Local::now() - Duration::days(1000));
+            let watch_instrument = WatchInstrument {
+                symbol: inst.symbol.clone(),
+                alarm: Alarm {
+                    active: false,
+                    completed: false,
+                    price: 0.0,
+                    date: fake_date,
+                    condition: AlarmCondition::None,
+                },
+            };
+
+            wasm_bindgen_futures::spawn_local(async move {
+                let watch_list_url = watch_list_url.clone();
+                let _res = api::upsert_watch_instrument(&watch_list_url, watch_instrument)
+                    .await
+                    .unwrap();
+                use_watch_instruments.set(vec![inst.clone()]);
+                use_loading.set(false);
+            });
         })
     };
 
@@ -81,45 +126,22 @@ pub fn home() -> Html {
         <div class="tile is-ancestor is-vertical ">
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
-                <div class="field">
                         //<label class="label">{ "Query" }</label>
-                     <h1 class="navbar-item is-size-3">{ "INSTRUMENTS" }</h1>
+                     <h1 class="navbar-item is-size-2">{ "Instruments" }</h1>
+
                         //<textarea id="query_box" class="textarea is-link is-invisible" placeholder="Textarea" cols="60" rows="0" value={ {format!("{}", *use_query)}}></textarea>
                         // <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
                         //<div width="400" height="400"></div>
                         <Loading loading={ *use_loading} />
-
-                    </div>
                 </div>
             </div>
-            <Plotter url={(*use_url).clone()}/>
+            <Plotter url={(*use_instruments_url).clone()}/>
            <div class="container">
-                <div class="notification is-fluid">
-                { "Results:" } { &instruments.len()}
-            <table class="table is-bordered">
-                <thead class="has-background-grey-lighter">
-                    <tr>
-                    <th><abbr>{ "Symbol" }</abbr></th>
-                    <th><abbr>{ "Price" }</abbr></th>
-                    <th><abbr>{ "Candle" }</abbr></th>
-                    <th><abbr>{ "Pattern" }</abbr></th>
-                    <th><abbr>{ "Band" }</abbr></th>
-                    <th><abbr>{ "Target" }</abbr></th>
-                    <th><abbr>{ "Activated" }</abbr></th>
-                    // <th><abbr>{ "E. Target" }</abbr></th>
-                    // <th><abbr>{ "E. Activated" }</abbr></th>
-                    <th><abbr>{ "Stoch" }</abbr></th>
-                    <th><abbr>{ "MacD" }</abbr></th>
-                    <th><abbr>{ "Rsi" }</abbr></th>
-                    <th><abbr>{ "Tema (8 / 21)" }</abbr></th>
-                    <th><abbr>{ "Divergence" }</abbr></th>
-                    <th><abbr>{ "Updated" }</abbr></th>
-                    </tr>
-                </thead>
-                 <tbody>
-                          <InstrumentsList on_symbol_click={ on_symbol_click } instruments={(*instruments).clone()} />
-                </tbody>
-            </table>
+                <div class="notification is-fluid ">
+                    <h2 class="navbar-item is-size-3">{ "Watch List" }</h2>
+                    <InstrumentsList on_symbol_click={ on_symbol_click.clone()} on_watch_click={ on_watch_click.clone()} instruments={(*use_watch_instruments).clone()} />
+                    <h2 class="navbar-item is-size-3">{ "Suggested" }</h2>
+                    <InstrumentsList on_symbol_click={ on_symbol_click } on_watch_click={ on_watch_click } instruments={(*use_instruments).clone()} />
             </div>
             </div>
         </div>
@@ -128,6 +150,5 @@ pub fn home() -> Html {
 
 #[derive(Clone, Properties, PartialEq)]
 struct InstrumentsProps {
-    instruments: Vec<CompactInstrument>,
-    //on_click: Callback<CompactInstrument>,
+    use_instruments: Vec<CompactInstrument>,
 }

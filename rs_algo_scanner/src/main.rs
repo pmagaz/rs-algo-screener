@@ -113,7 +113,7 @@ async fn main() -> Result<()> {
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
                         let now = Instant::now();
 
-                        let res = request::<Instrument>(&endpoint, &instrument, HttpMethod::Put)
+                        let res = request(&endpoint, &instrument, HttpMethod::Put)
                             .await
                             .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 

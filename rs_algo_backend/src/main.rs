@@ -17,6 +17,7 @@ use models::app_state::AppState;
 use models::db::Db;
 use services::index::index;
 use services::instrument;
+use services::watch_list;
 use std::env;
 
 #[actix_web::main]
@@ -74,7 +75,9 @@ async fn main() -> Result<()> {
                 web::scope("/api")
                     .route("/instruments", web::get().to(instrument::render))
                     .route("/instruments", web::post().to(instrument::find))
-                    .route("/instruments", web::put().to(instrument::upsert)),
+                    .route("/instruments", web::put().to(instrument::upsert))
+                    .route("/watchlist", web::get().to(watch_list::find))
+                    .route("/watchlist", web::put().to(watch_list::upsert)),
             )
     })
     .bind(["0.0.0.0:", &port].concat())

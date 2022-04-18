@@ -48,7 +48,7 @@ pub async fn find_by_params(
     Ok(docs)
 }
 
-pub async fn insert(
+pub async fn upsert(
     doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {

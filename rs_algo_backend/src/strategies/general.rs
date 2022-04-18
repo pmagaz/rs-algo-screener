@@ -269,6 +269,7 @@ impl General {
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.tema_a.status = tema_status.clone();
+                    
                     if (last_pattern_status != Status::Bearish
                         && last_pattern_status != Status::Default
                         && last_pattern_target > minimum_pattern_target)

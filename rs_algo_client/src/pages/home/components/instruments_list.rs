@@ -4,7 +4,7 @@ use round::{round};
 use rs_algo_shared::models::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
 use rs_algo_shared::helpers::comp::is_equal;
-use yew::{function_component, html, Callback, use_state, Properties};
+use yew::{function_component, html, Callback, use_state, Properties, Html};
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
 
@@ -91,38 +91,44 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
 pub struct Props {
     pub instruments: Vec<CompactInstrument>,
     pub on_symbol_click: Callback<String>,
+    pub on_watch_click: Callback<CompactInstrument>,
 }
 
 #[function_component(InstrumentsList)]
 pub fn instrument_list(props: &Props
 ) -> Html {
-        let Props { instruments, on_symbol_click } = props;
+    let Props { instruments, on_symbol_click, on_watch_click } = props;
     let base_url = get_base_url();
     let url = [base_url.as_str(), "api/instruments?symbol="].concat();
-    //let url = "http://localhost:8000/api/instruments?symbol=".to_owned();
     let use_url = use_state(|| String::from(""));
 
       
-                 fn get_status_class<'a>(status: &Status) -> &'a str {
-                     let class = match status {
-                         Status::Default => "", 
-                         //Status::Neutral => "", 
-                         Status::Bullish => "has-background-primary-light", 
-                         Status::Bearish => "has-background-danger-light", 
-                         Status::Neutral => "has-background-warning-light", 
-                     };
-                     class
-                 }
+    fn get_status_class<'a>(status: &Status) -> &'a str {
+        let class = match status {
+            Status::Default => "", 
+            //Status::Neutral => "", 
+            Status::Bullish => "has-background-primary-light", 
+            Status::Bearish => "has-background-danger-light", 
+            Status::Neutral => "has-background-warning-light", 
+        };
+        class
+    }
 
-    instruments
+
+    let instrument_list: Html = instruments
         .iter()
         .map(|instrument| {
             let on_instrument_select = {
                 let on_symbol_click = on_symbol_click.clone();
-                let instrument = instrument.clone();
-                let url = [url.clone(),instrument.symbol].concat();
-                open_modal("modal");
+                let symbol = instrument.symbol.clone();
+                let url = [url.clone(),symbol].concat();
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
+            };
+
+            let on_watch_select = {
+                let instrument = instrument.clone();
+                let on_watch_click = on_watch_click.clone();
+                Callback::from(move |_| on_watch_click.emit(instrument.clone()))
             };
             
             let local_pattern = pattern_info(instrument.patterns.local_patterns.last()); 
@@ -184,6 +190,7 @@ pub fn instrument_list(props: &Props
                 DivergenceType::Bearish => divergence_type.to_string(),
                 DivergenceType::None   => "".to_owned() 
             }; 
+            
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
@@ -202,8 +209,40 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&tema_a.status)}> {format!("{:?} / {:?}", round(instrument.indicators.tema_a.current_a, 1), round(instrument.indicators.tema_b.current_a, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
+                    <td  onclick={ on_watch_select }><a href={"javascript:void(0);"}>{ "x" }</a></td>
                 </tr>
             }
         })
-        .collect()
+        .collect();
+
+
+    let table = html! {
+        <table class="table is-bordered">
+            <thead class="has-background-grey-lighter">
+                <tr>
+                <th><abbr>{ "Symbol" }</abbr></th>
+                <th><abbr>{ "Price" }</abbr></th>
+                <th><abbr>{ "Candle" }</abbr></th>
+                <th><abbr>{ "Pattern" }</abbr></th>
+                <th><abbr>{ "Band" }</abbr></th>
+                <th><abbr>{ "Target" }</abbr></th>
+                <th><abbr>{ "Activated" }</abbr></th>
+                // <th><abbr>{ "E. Target" }</abbr></th>
+                // <th><abbr>{ "E. Activated" }</abbr></th>
+                <th><abbr>{ "Stoch" }</abbr></th>
+                <th><abbr>{ "MacD" }</abbr></th>
+                <th><abbr>{ "Rsi" }</abbr></th>
+                <th><abbr>{ "Tema (8 / 21)" }</abbr></th>
+                <th><abbr>{ "Divergence" }</abbr></th>
+                <th><abbr>{ "Updated" }</abbr></th>
+                <th><abbr>{ "W" }</abbr></th>
+                </tr>
+            </thead>
+            <tbody>
+                { instrument_list }
+            </tbody>
+        </table>
+    };
+
+           table
 }

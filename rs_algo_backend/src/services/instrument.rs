@@ -1,11 +1,10 @@
 use crate::db;
-use crate::db::helpers::{compact_instrument, get_collection};
+use crate::db::helpers::compact_instrument;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
 use crate::models::Instrument;
 use crate::render_image::Backend;
 use crate::strategies::general::General;
-use crate::strategies::Strategy;
 
 pub use rs_algo_shared::models::*;
 use std::time::Instant;
@@ -146,7 +145,7 @@ pub async fn upsert(
     if insert_instruments {
         let now = Instant::now();
         let _insert_compact =
-            db::instrument::insert(compact_instrument(instrument).unwrap(), &state)
+            db::instrument::upsert(compact_instrument(instrument).unwrap(), &state)
                 .await
                 .unwrap();
 
@@ -157,5 +156,7 @@ pub async fn upsert(
             now.elapsed()
         );
     }
-    Ok(HttpResponse::Ok().json("ok"))
+    Ok(HttpResponse::Ok().json(ApiResponse {
+        result: "ok".to_owned(),
+    }))
 }

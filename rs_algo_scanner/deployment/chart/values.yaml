@@ -1,7 +1,7 @@
 jobs:
   - name: daily
     image:
-      repository: cluster.loc:5000/rs-algo-scanner
+      repository: cluster.loc:305000/rs-algo-scanner
       tag: latest
       imagePullPolicy: Always
     schedule: "0 */4,10,17,18,20,21 * * *"
