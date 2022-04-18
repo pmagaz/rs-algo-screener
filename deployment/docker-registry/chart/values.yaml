@@ -23,10 +23,10 @@ envSecretName: rs-algo-screener-secrets
 podAnnotations: {}
 
 service:
-  type: NodePort 
-  port: 5000 
-  targetPort: 5000
-  nodePort: 30500 
+  type: NodePort
+  port: 30500 
+  targetPort: 30500
+  nodePort: 30500
   metadata:
     name: docker-registry
     labels:

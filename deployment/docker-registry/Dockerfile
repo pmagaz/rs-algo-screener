@@ -6,5 +6,5 @@ RUN apk update \
 
 ADD ./config.yml /etc/docker-registry/config.yml
 
-EXPOSE 5000
+EXPOSE 30500
 CMD ["/usr/bin/docker-registry", "serve", "/etc/docker-registry/config.yml"]
