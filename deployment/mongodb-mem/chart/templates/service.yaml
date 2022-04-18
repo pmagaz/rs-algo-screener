@@ -15,4 +15,5 @@ spec:
       {{- end }}
       protocol: TCP
       name: http
+  selector:
     {{- include "mongodb-mem.selectorLabels" . | nindent 4 }}
