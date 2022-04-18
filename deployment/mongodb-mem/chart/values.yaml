@@ -30,9 +30,10 @@ podSecurityContext:
   fsGroup: 1000
 
 service:
-  type: LoadBalancer 
-  port: 27017 
+  type: NodePort 
+  port: 27017
   targetPort: 27017 
+  nodePort: 27017
   metadata:
     name: mongodb-mem
     labels:
@@ -65,3 +66,12 @@ affinity:
 
 tolerations: []
 
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe: {}
