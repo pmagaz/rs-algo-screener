@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: cluster.loc:305000/rs-algo-backend 
+  repository: cluster.loc:30500/rs-algo-backend 
   pullPolicy: Always
   tag: "latest"
 
