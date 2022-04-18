@@ -19,15 +19,11 @@ volumes:
 
 envSecretName: rs-algo-screener-secrets
 
-serviceAccount:
-  create: false
-  annotations: {}
-  name: ""
+serviceAccount: {}
 
 podAnnotations: {}
 
-podSecurityContext:
-  fsGroup: 1000
+podSecurityContext: {}
 
 service:
   type: NodePort 
