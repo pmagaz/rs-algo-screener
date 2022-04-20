@@ -8,7 +8,9 @@ use rs_algo_shared::models::*;
 use std::env;
 
 pub fn is_renctangle_top(data: &DataPoints) -> bool {
-    let threshold = env::var("EQUAL_THRESHOLD").unwrap().parse::<f64>().unwrap();
+    let equal_threshold = env::var("EQUAL_THRESHOLD").unwrap().parse::<f64>().unwrap();
+    let threshold = percentage_change(data[1].1, data[0].1) * equal_threshold;
+
     if upper_band_is_equal_top(data)
         && lower_band_is_equal_bottom(data)
         && is_equal_distance((data[0].1, data[1].1), (data[2].1, data[3].1), threshold)
@@ -20,7 +22,9 @@ pub fn is_renctangle_top(data: &DataPoints) -> bool {
 }
 
 pub fn is_renctangle_bottom(data: &DataPoints) -> bool {
-    let threshold = env::var("EQUAL_THRESHOLD").unwrap().parse::<f64>().unwrap();
+    let equal_threshold = env::var("EQUAL_THRESHOLD").unwrap().parse::<f64>().unwrap();
+    let threshold = percentage_change(data[1].1, data[0].1) * equal_threshold;
+
     if upper_band_is_equal_bottom(data)
         && lower_band_is_equal_top(data)
         && is_equal_distance((data[0].1, data[1].1), (data[2].1, data[3].1), threshold)

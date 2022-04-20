@@ -36,7 +36,7 @@ impl Backend {
         .concat();
         let min_price = instrument.min_price();
         let max_price = instrument.max_price();
-
+        let leches = (max_price - min_price) * 0.1;
         let data = instrument.data();
         let local_maxima = instrument.peaks().local_maxima();
         let local_minima = instrument.peaks().local_minima();
@@ -236,9 +236,9 @@ impl Backend {
                         (date, value)
                     }),
                     if x < 1 {
-                        BLACK.mix(0.08)
+                        BLACK //.mix(0.08)
                     } else {
-                        BLACK.mix(0.08)
+                        BLACK //.mix(0.08)
                     },
                 ))
                 .unwrap()

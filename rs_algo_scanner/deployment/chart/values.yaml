@@ -4,7 +4,7 @@ jobs:
       repository: cluster.loc:5000/rs-algo-scanner
       tag: latest
       imagePullPolicy: Always
-    schedule: "0 */4,10,17,18,19,20,21 * * *"
+    schedule: "0 */4,10,14,18,20,21 * * *"
     #schedule: "*/30 * * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
