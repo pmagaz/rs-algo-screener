@@ -26,15 +26,6 @@ use rs_algo_shared::helpers::http::{request, HttpMethod};
 
 use std::env;
 use std::{thread, time};
-/*
-TODO LIST
-- Calculate % of the pattern
-- Add activated chart figures for channels and broadenings
-- Fix horizontal levels
-- Calculate divergences on indicators
-- Review candles formulas
-- Add degrees to higher_highs increment/decrement
-*/
 
 #[tokio::main]
 async fn main() -> Result<()> {
