@@ -169,20 +169,39 @@ impl Backend {
         }
 
         // PATTERN LINE
-        for (x, pattern) in patterns.iter().enumerate() {
+        for (x, pattern) in local_patterns.iter().enumerate() {
             chart
                 .draw_series(LineSeries::new(
-                    (0..).zip(pattern.data_points.iter()).map(|(_k, highs)| {
-                        let idx = highs.0;
-                        let value = highs.1;
-                        let date = data[idx].date;
-                        (date, value)
-                    }),
-                    if x < 1 {
-                        BLACK.mix(0.15)
-                    } else {
-                        BLACK.mix(0.15)
-                    },
+                    (0..)
+                        .zip(pattern.data_points.iter())
+                        .enumerate()
+                        .filter(|(key, (i, highs))| key % 2 == 0)
+                        .map(|(key, (i, highs))| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date;
+                            (date, value)
+                        }),
+                    RED_LINE.mix(0.6),
+                ))
+                .unwrap()
+                .label(format!("{:?}", pattern.pattern_type));
+        }
+
+        for (x, pattern) in local_patterns.iter().enumerate() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(pattern.data_points.iter())
+                        .enumerate()
+                        .filter(|(key, (i, highs))| key % 2 != 0)
+                        .map(|(key, (i, highs))| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date;
+                            (date, value)
+                        }),
+                    RED_LINE.mix(0.6),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));

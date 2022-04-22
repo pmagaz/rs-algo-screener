@@ -17,6 +17,7 @@ polyfit-rs="0.2.0"
 ta = {version = "0.5.0", features = ["serde"] }
 chrono = {version = "0.4.19",  features = ["serde"] }
 async-trait = "0.1.52"
+round = "0.1.2"
 futures = "0.3.21"
 reqwest = { version = "0.11.10", features = ["json"] }
 openssl = { version = "0.10.38", features = ["vendored"] }

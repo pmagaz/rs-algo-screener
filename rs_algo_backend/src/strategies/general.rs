@@ -55,29 +55,28 @@ impl General {
             .parse::<f64>()
             .unwrap();
 
+            
         doc! {
         "$or": [
             {"$or": [
+                {"$and": [
+                    {"patterns.local_patterns": {"$elemMatch" : {
+                    "pattern_type": { "$in": ["TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
+                    "active.target":{"$gte": minimum_pattern_target },
+                    }}}
+                ]},
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
                     "date": { "$gte" : self.max_pattern_date },
                     }}}
                 ]},
-                {"$and": [
-                    {"patterns.local_patterns": {"$elemMatch" : {
-                    "active.target":{"$gte": minimum_pattern_target },
-                    "active.date": { "$gte" : self.max_activated_date },
-                   // "divergence_type": { "$in": ["Bullish","Bearish"]
-                    "pattern_type": { "$in": ["TriangleUp","Rectangle","DoubleTop","DoubleBottom","HeadShoulders"] }
-                    }}}
-                ]},
-                {"$and": [
-                    {"divergences.data": {"$elemMatch" : {
-                        //"date": { "$gte" : self.max_pattern_date },
-                        "divergence_type": { "$in": ["Bullish","Bearish"] } ,
-                    }}}
-                ]},
+                // {"$and": [
+                //     {"divergences.data": {"$elemMatch" : {
+                //         //"date": { "$gte" : self.max_pattern_date },
+                //         "divergence_type": { "$in": ["Bullish","Bearish"] } ,
+                //     }}}
+                // ]},
                 // {"$and": [
                 //     {"patterns.extrema_patterns": {"$elemMatch" : {
                 //     "active.target":{"$gte": minimum_pattern_target },
@@ -155,7 +154,7 @@ impl General {
                         Some(val) => val.date,
                         None => fake_date,
                     };
-
+                    
                     let last_divergence_type = match last_divergence {
                         Some(val) => &val.divergence_type,
                         None => &DivergenceType::None,

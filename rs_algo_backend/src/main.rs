@@ -6,6 +6,7 @@ use std::io::Result;
 
 mod db;
 mod error;
+mod middleware;
 mod models;
 mod render_image;
 mod services;
@@ -13,6 +14,7 @@ mod strategies;
 
 use db::mongo;
 use error::RsAlgoError;
+use middleware::cors::cors_middleware;
 use models::app_state::AppState;
 use models::db::Db;
 use services::index::index;
@@ -56,7 +58,8 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .wrap(Cors::permissive())
+            .wrap(cors_middleware())
+            //.wrap(Cors::permissive())
             .data(AppState {
                 app_name: String::from(&app_name),
                 db_mem: Db {

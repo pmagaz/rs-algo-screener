@@ -29,6 +29,30 @@ use std::{thread, time};
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // fn slope(x1: f64, y1: f64, x2: f64, y2: f64) -> (f64, f64) {
+    //     let y = y2 - y1;
+    //     let x = x2 - x1;
+    //     let slope = y / x;
+    //     let y_intercept = y1 - slope * x1;
+    //     let q = y2 - (slope * x2);
+
+    //     let hypo = hypotenuse(x, y);
+
+    //     let new_x1 = x2 + hypo;
+    //     let new_y1 = (slope * new_x1) + q;
+
+    //     println!("foooo {:?}", (new_x1, new_y1));
+    //     return (slope, y_intercept);
+    // }
+
+    // fn hypotenuse(x: f64, y: f64) -> f64 {
+    //     println!("x y {:?} {:?}", x, y);
+
+    //     let num = x.powi(2) + y.powi(2);
+    //     num.powf(0.5)
+    // }
+
+    //println!("slope {:?}", slope(0., 86.19, 1., 96.25));
     dotenv().ok();
     let start = Instant::now();
     let username = &env::var("BROKER_USERNAME").unwrap();
@@ -48,35 +72,35 @@ async fn main() -> Result<()> {
 
     // let symbols = [
     //     Symbol {
-    //         symbol: "SWIR.US".to_owned(),
+    //         symbol: "ETSY.US_9".to_owned(),
     //         category: "".to_owned(),
     //         description: "".to_owned(),
     //         currency: "".to_owned(),
     //     },
-    //     //     // Symbol {
-    //     //     //     symbol: "GOLD".to_owned(),
-    //     //     //     category: "".to_owned(),
-    //     //     //     description: "".to_owned(),
-    //     //     //     currency: "".to_owned(),
-    //     //     // },
-    //     //     // Symbol {
-    //     //     //     symbol: "TSLA.US_4".to_owned(),
-    //     //     //     category: "".to_owned(),
-    //     //     //     description: "".to_owned(),
-    //     //     //     currency: "".to_owned(),
-    //     //     // },
-    //     //     // Symbol {
-    //     //     //     symbol: "USDIDX".to_owned(),
-    //     //     //     category: "".to_owned(),
-    //     //     //     description: "".to_owned(),
-    //     //     //     currency: "".to_owned(),
-    //     //     // },
-    //     //     // Symbol {
-    //     //     //     symbol: "EURRON".to_owned(),
-    //     //     //     category: "".to_owned(),
-    //     //     //     description: "".to_owned(),
-    //     //     //     currency: "".to_owned(),
-    //     //     // },
+    //     // Symbol {
+    //     //     symbol: "GOLD".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
+    //     // Symbol {
+    //     //     symbol: "TSLA.US_4".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
+    //     // Symbol {
+    //     //     symbol: "USDIDX".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
+    //     // Symbol {
+    //     //     symbol: "EURRON".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
     // ];
 
     let ignore_list: Vec<String> = env::var("SYMBOL_IGNORE_LIST")
@@ -123,7 +147,6 @@ async fn main() -> Result<()> {
             thread::sleep(sleep);
         }
     }
-
     println!("[Finished] at {:?}  in {:?}", Local::now(), start.elapsed());
 
     Ok(())

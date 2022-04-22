@@ -93,7 +93,7 @@ impl Peaks {
             .parse::<f64>()
             .unwrap();
 
-        let kernel_source = env::var("KERNEL_REGRESSION_SOURCE").unwrap();
+        let kernel_source = env::var("PRICE_SOURCE").unwrap();
 
         kernel_bandwidth = (max_price - min_price) * kernel_bandwidth;
         local_prominence = (max_price - min_price) * local_prominence;
@@ -128,7 +128,7 @@ impl Peaks {
         };
 
         let minima_smooth: Vec<f64> = source.2.iter().map(|x| -x).collect();
-
+        //ISSUE!
         self.local_maxima =
             maxima_minima(source.0, source.1, local_prominence, local_min_distance)?;
 

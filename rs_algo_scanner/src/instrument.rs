@@ -150,9 +150,9 @@ impl Instrument {
             self.peaks
                 .calculate_peaks(&self.max_price, &self.min_price)
                 .unwrap();
+
             let local_maxima = self.peaks.local_maxima();
             let local_minima = self.peaks.local_minima();
-
             let extrema_maxima = self.peaks.extrema_maxima();
             let extrema_minima = self.peaks.extrema_minima();
 

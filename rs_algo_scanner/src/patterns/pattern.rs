@@ -1,10 +1,10 @@
 use crate::candle::Candle;
+use crate::helpers::slope_intercept::{next_bottom_point, next_top_point};
 use crate::patterns::*;
 use crate::prices::{calculate_price_change, calculate_price_target};
 use rs_algo_shared::helpers::comp::percentage_change;
 use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Duration, Local};
 pub use rs_algo_shared::models::*;
-
 use serde::{Deserialize, Serialize};
 use std::env;
 
@@ -32,7 +32,6 @@ impl Patterns {
         maxima: &Vec<(usize, f64)>,
         minima: &Vec<(usize, f64)>,
         candles: &Vec<Candle>,
-        //close: &Vec<f64>,
     ) {
         let local_max_points = env::var("PATTERNS_MAX_POINTS")
             .unwrap()
@@ -88,7 +87,7 @@ impl Patterns {
             while not_founded {
                 match iter.next() {
                     Some(window) => {
-                        let data_points = window.to_vec();
+                        let mut data_points = window.to_vec();
                         //Rectangle
                         //let data_points = vec![(1, 100.), (1, 75.), (1, 99.), (1, 74.), (1, 99.9)];
                         //Triangle descendant
@@ -128,6 +127,8 @@ impl Patterns {
                         if rectangle::is_renctangle_top(&data_points)
                             && change > minimum_pattern_target
                         {
+                            data_points.push(next_bottom_point(&data_points));
+                            data_points.push(next_top_point(&data_points));
                             self.set_pattern(
                                 PatternType::Rectangle,
                                 PatternDirection::Top,
@@ -145,6 +146,8 @@ impl Patterns {
                         } else if rectangle::is_renctangle_bottom(&data_points)
                             && change > minimum_pattern_target
                         {
+                            data_points.push(next_top_point(&data_points));
+                            data_points.push(next_bottom_point(&data_points));
                             self.set_pattern(
                                 PatternType::Rectangle,
                                 PatternDirection::Bottom,
@@ -162,6 +165,9 @@ impl Patterns {
                         } else if channel::is_ascendant_top(&data_points)
                             && change > minimum_pattern_target
                         {
+                            data_points.push(next_bottom_point(&data_points));
+                            data_points.push(next_top_point(&data_points));
+
                             self.set_pattern(
                                 PatternType::ChannelUp,
                                 PatternDirection::Top,
@@ -177,6 +183,9 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if channel::is_ascendant_bottom(&data_points) {
+                            data_points.push(next_bottom_point(&data_points));
+                            data_points.push(next_top_point(&data_points));
+
                             self.set_pattern(
                                 PatternType::ChannelUp,
                                 PatternDirection::Bottom,
@@ -192,6 +201,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if triangle::is_ascendant_top(&data_points) {
+                            data_points.push(next_bottom_point(&data_points));
+                            data_points.push(next_top_point(&data_points));
                             self.set_pattern(
                                 PatternType::TriangleUp,
                                 PatternDirection::Top,
@@ -207,6 +218,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if triangle::is_ascendant_bottom(&data_points) {
+                            data_points.push(next_top_point(&data_points));
+                            data_points.push(next_bottom_point(&data_points));
                             self.set_pattern(
                                 PatternType::TriangleUp,
                                 PatternDirection::Bottom,
@@ -222,6 +235,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if triangle::is_descendant_top(&data_points) {
+                            data_points.push(next_bottom_point(&data_points));
+                            data_points.push(next_top_point(&data_points));
                             self.set_pattern(
                                 PatternType::TriangleDown,
                                 PatternDirection::Top,
@@ -237,6 +252,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if triangle::is_descendant_bottom(&data_points) {
+                            data_points.push(next_top_point(&data_points));
+                            data_points.push(next_bottom_point(&data_points));
                             self.set_pattern(
                                 PatternType::TriangleDown,
                                 PatternDirection::Bottom,
@@ -252,6 +269,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if triangle::is_symmetrical_top(&data_points) {
+                            data_points.push(next_bottom_point(&data_points));
+                            data_points.push(next_top_point(&data_points));
                             self.set_pattern(
                                 PatternType::TriangleSym,
                                 PatternDirection::Top,
@@ -267,6 +286,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if triangle::is_symmetrical_bottom(&data_points) {
+                            data_points.push(next_top_point(&data_points));
+                            data_points.push(next_bottom_point(&data_points));
                             self.set_pattern(
                                 PatternType::TriangleSym,
                                 PatternDirection::Bottom,
@@ -282,6 +303,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if channel::is_descendant_top(&data_points) {
+                            data_points.push(next_bottom_point(&data_points));
+                            data_points.push(next_top_point(&data_points));
                             self.set_pattern(
                                 PatternType::ChannelDown,
                                 PatternDirection::Top,
@@ -297,6 +320,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if channel::is_descendant_bottom(&data_points) {
+                            data_points.push(next_top_point(&data_points));
+                            data_points.push(next_bottom_point(&data_points));
                             self.set_pattern(
                                 PatternType::ChannelDown,
                                 PatternDirection::Top,
@@ -312,6 +337,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if broadening::is_top(&data_points) {
+                            data_points.push(next_bottom_point(&data_points));
+                            data_points.push(next_top_point(&data_points));
                             self.set_pattern(
                                 PatternType::Broadening,
                                 PatternDirection::Top,
@@ -327,6 +354,8 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if broadening::is_bottom(&data_points) {
+                            data_points.push(next_top_point(&data_points));
+                            data_points.push(next_bottom_point(&data_points));
                             self.set_pattern(
                                 PatternType::Broadening,
                                 PatternDirection::Bottom,
