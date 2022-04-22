@@ -64,6 +64,8 @@ impl Backend {
             .map(|x| x.active.index)
             .collect();
 
+        let total_len = instrument.data.len();
+
         //let BACKGROUND = &RGBColor(192, 200, 212);
         let BACKGROUND = &RGBColor(208, 213, 222);
         let CANDLE_BEARISH = &RGBColor(71, 113, 181);
@@ -143,12 +145,15 @@ impl Backend {
         for (x, pattern) in patterns.iter().enumerate() {
             chart
                 .draw_series(PointSeries::of_element(
-                    (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
-                        let idx = highs.0;
-                        let value = highs.1;
-                        let date = data[idx].date;
-                        (date, value, i)
-                    }),
+                    (0..)
+                        .zip(pattern.data_points.iter())
+                        .filter(|(i, highs)| highs.0 < total_len)
+                        .map(|(i, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date;
+                            (date, value, i)
+                        }),
                     0,
                     ShapeStyle::from(&RED).filled(),
                     &|coord, _size: i32, _style| {
@@ -178,7 +183,7 @@ impl Backend {
                     (0..)
                         .zip(pattern.data_points.iter())
                         .enumerate()
-                        .filter(|(key, (i, highs))| key % 2 == 0)
+                        .filter(|(key, (i, highs))| highs.0 < total_len && key % 2 == 0)
                         .map(|(key, (i, highs))| {
                             let idx = highs.0;
                             let value = highs.1;
@@ -197,7 +202,7 @@ impl Backend {
                     (0..)
                         .zip(pattern.data_points.iter())
                         .enumerate()
-                        .filter(|(key, (i, highs))| key % 2 != 0)
+                        .filter(|(key, (i, highs))| highs.0 < total_len && key % 2 != 0)
                         .map(|(key, (i, highs))| {
                             let idx = highs.0;
                             let value = highs.1;
