@@ -18,6 +18,7 @@ impl Backend {
     pub fn render(&self, instrument: &Instrument) -> Result<()> {
         let to_date = instrument.data().last().unwrap().date();
         let from_date = instrument.data().first().unwrap().date();
+        let price_source = env::var("PRICE_SOURCE").unwrap();
         let local_peaks_marker_pos = env::var("LOCAL_PEAKS_MARKERS_POS")
             .unwrap()
             .parse::<f64>()
@@ -268,34 +269,38 @@ impl Backend {
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_maxima.contains(&(i, candle.close())) {
+                let price = match price_source.as_ref() {
+                    "highs_lows" => candle.high(),
+                    "close" => candle.close(),
+                    &_ => candle.close(),
+                };
+                if local_maxima.contains(&(i, price)) {
                     return TriangleMarker::new(
-                        (
-                            candle.date(),
-                            candle.high() + (candle.high() * local_peaks_marker_pos),
-                        ),
+                        (candle.date(), price + (price * local_peaks_marker_pos)),
                         -4,
                         BLUE.mix(0.4),
                     );
                 } else {
-                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
+                    return TriangleMarker::new((candle.date(), price), 0, &TRANSPARENT);
                 }
             }))
             .unwrap();
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_minima.contains(&(i, candle.close())) {
+                let price = match price_source.as_ref() {
+                    "highs_lows" => candle.low(),
+                    "close" => candle.close(),
+                    &_ => candle.close(),
+                };
+                if local_minima.contains(&(i, price)) {
                     return TriangleMarker::new(
-                        (
-                            candle.date(),
-                            candle.low() - (candle.low() * local_peaks_marker_pos),
-                        ),
+                        (candle.date(), price - (price * local_peaks_marker_pos)),
                         4,
                         BLUE.mix(0.4),
                     );
                 } else {
-                    return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
+                    return TriangleMarker::new((candle.date(), price), 0, &TRANSPARENT);
                 }
             }))
             .unwrap();

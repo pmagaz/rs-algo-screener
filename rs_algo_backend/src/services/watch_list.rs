@@ -27,7 +27,6 @@ pub async fn find(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoErro
     let query = doc! {"symbol": { "$in": &watch_items_symbols }};
 
     let instruments = instrument::find(query.to_string(), state).await.unwrap();
-
     println!(
         "[FIND WATCH LIST] {:?} {:?} {:?}",
         Local::now(),

@@ -16,6 +16,8 @@ impl Backend {
         let to_date = instrument.data.last().unwrap().date;
         let from_date = instrument.data.first().unwrap().date;
 
+        let price_source = env::var("PRICE_SOURCE").unwrap();
+
         let font = env::var("PLOTTER_FONT").unwrap();
 
         let local_peaks_marker_pos = env::var("LOCAL_PEAKS_MARKERS_POS")
@@ -34,6 +36,7 @@ impl Backend {
             ".png",
         ]
         .concat();
+
         println!("BACKEND PATH {}", output_file);
         let min_price = instrument.min_price;
         let max_price = instrument.max_price;
@@ -182,7 +185,7 @@ impl Backend {
                             let date = data[idx].date;
                             (date, value)
                         }),
-                    RED_LINE.mix(0.6),
+                    RED_LINE.mix(0.4),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
@@ -201,83 +204,88 @@ impl Backend {
                             let date = data[idx].date;
                             (date, value)
                         }),
-                    RED_LINE.mix(0.6),
+                    RED_LINE.mix(0.4),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
         }
 
         // LOCAL MAXIMA MINIMA
-
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_maxima.contains(&(i, candle.close)) {
+                let price = match price_source.as_ref() {
+                    "highs_lows" => candle.high,
+                    "close" => candle.close,
+                    &_ => candle.close,
+                };
+
+                if local_maxima.contains(&(i, price)) {
                     return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.high + (candle.high * local_peaks_marker_pos),
-                        ),
+                        (candle.date, price + (price * local_peaks_marker_pos)),
                         -4,
-                        BLUE.mix(0.1),
+                        BLUE.mix(0.2),
                     );
                 } else {
-                    return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
+                    return TriangleMarker::new((candle.date, price), 0, &TRANSPARENT);
                 }
             }))
             .unwrap();
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if local_minima.contains(&(i, candle.close)) {
+                let price = match price_source.as_ref() {
+                    "highs_lows" => candle.low,
+                    "close" => candle.close,
+                    &_ => candle.close,
+                };
+
+                if local_minima.contains(&(i, price)) {
                     return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.low - (candle.low * local_peaks_marker_pos),
-                        ),
+                        (candle.date, price - (price * local_peaks_marker_pos)),
                         4,
-                        BLUE.mix(0.1),
+                        BLUE.mix(0.2),
                     );
                 } else {
-                    return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
+                    return TriangleMarker::new((candle.date, price), 0, &TRANSPARENT);
                 }
             }))
             .unwrap();
 
         // EXTREMA MAXIMA MINIMA
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_maxima.contains(&(i, candle.close)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.high + (candle.high * extrema_peaks_marker_pos),
-                        ),
-                        -4,
-                        RED.mix(0.1),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
+        // chart
+        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+        //         if extrema_maxima.contains(&(i, candle.close)) {
+        //             return TriangleMarker::new(
+        //                 (
+        //                     candle.date,
+        //                     candle.high + (candle.high * extrema_peaks_marker_pos),
+        //                 ),
+        //                 -4,
+        //                 RED.mix(0.4),
+        //             );
+        //         } else {
+        //             return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
+        //         }
+        //     }))
+        //     .unwrap();
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_minima.contains(&(i, candle.close)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.low - (candle.low * extrema_peaks_marker_pos),
-                        ),
-                        4,
-                        RED.mix(0.1),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
+        // chart
+        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+        //         if extrema_minima.contains(&(i, candle.close)) {
+        //             return TriangleMarker::new(
+        //                 (
+        //                     candle.date,
+        //                     candle.low - (candle.low * extrema_peaks_marker_pos),
+        //                 ),
+        //                 4,
+        //                 RED.mix(0.4),
+        //             );
+        //         } else {
+        //             return TriangleMarker::new((candle.date, candle.high), 0, &TRANSPARENT);
+        //         }
+        //     }))
+        //     .unwrap();
 
         //BREAKS MAXIMA MINIMA
         chart
