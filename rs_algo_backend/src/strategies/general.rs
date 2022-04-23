@@ -61,13 +61,14 @@ impl General {
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
                     "date": { "$gte" : self.max_pattern_date },
-                    //"pattern_type": { "$in": ["TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
+                    "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                     }}}
                 ]},
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
                     "active.date": { "$gte" : self.max_activated_date },
+                    "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                     }}}
                 ]},
                 // {"$and": [

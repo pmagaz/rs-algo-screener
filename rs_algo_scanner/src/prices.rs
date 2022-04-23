@@ -94,13 +94,14 @@ pub fn search_price_break(
 
         let (slope, y_intercept) = slope_intercept(start.0 as f64, start.1, end.0 as f64, end.1);
         for n in (start_index..=end_index).step_by(2) {
-            let next_index = start_index + n;
-            let next_price = (slope * n as f64) + y_intercept;
-            let current_price = &candles[n].close();
-            let current_date = &candles[n].date();
+            if n < end_index {
+                let next_price = (slope * n as f64) + y_intercept;
+                let current_price = &candles[n].close();
+                let current_date = &candles[n].date();
 
-            if comparator(*current_price, next_price) {
-                return (true, n, next_price, DbDateTime::from_chrono(*current_date));
+                if comparator(*current_price, next_price) {
+                    return (true, n, next_price, DbDateTime::from_chrono(*current_date));
+                }
             }
         }
     }

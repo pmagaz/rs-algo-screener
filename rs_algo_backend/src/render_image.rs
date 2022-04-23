@@ -309,7 +309,10 @@ impl Backend {
                     }
 
                     return TriangleMarker::new(
-                        (candle.date, candle.close - (candle.close)),
+                        (
+                            candle.date,
+                            candle.close - (candle.close * local_peaks_marker_pos - 2.),
+                        ),
                         direction,
                         GREEN_LINE.mix(0.8),
                     );
