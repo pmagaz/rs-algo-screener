@@ -296,13 +296,14 @@ impl Backend {
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
                 if local_pattern_breaks.contains(&(i)) {
-                    let mut direction = 0;
+                    let mut direction: (i32, f64) = (0, 0.);
+
                     for n in instrument.patterns.local_patterns.iter() {
                         if n.active.index == i {
                             let pos = match n.active.break_direction {
-                                PatternDirection::Top => -4,
-                                PatternDirection::Bottom => 4,
-                                PatternDirection::None => 4,
+                                PatternDirection::Bottom => (4, candle.low),
+                                PatternDirection::Top => (-4, candle.high),
+                                PatternDirection::None => (4, candle.close),
                             };
                             direction = pos;
                         }
@@ -311,10 +312,10 @@ impl Backend {
                     return TriangleMarker::new(
                         (
                             candle.date,
-                            candle.close - (candle.close * local_peaks_marker_pos - 2.),
+                            direction.1 - (direction.1 * local_peaks_marker_pos - 2.),
                         ),
-                        direction,
-                        GREEN_LINE.mix(0.8),
+                        direction.0,
+                        RED_LINE,
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
@@ -411,7 +412,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_a[id])),
-                GREEN_LINE,
+                GREEN_LINE.mix(0.6),
             ))
             .unwrap();
 
@@ -431,7 +432,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, tema_b[id])),
-                RED_LINE.mix(0.8),
+                RED_LINE.mix(0.6),
             ))
             .unwrap();
 

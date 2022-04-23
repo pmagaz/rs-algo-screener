@@ -10,8 +10,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css" />
 
   <style>
-    .modal-content { width: 1024px;}
+    .modal-content {
+      width: 1024px;
+      transition: transform .2s; /* Animation */
+      margin: 0 auto;
+    }
     .container { max-width: 2000px;}
+    .modal-content:hover {
+      transform: scale(1.5); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+    }
   </style>
   <script language="JavaScript">
     const get_query_value = () => {
