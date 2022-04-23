@@ -1,5 +1,5 @@
 use super::pattern::DataPoints;
-use crate::helpers::slope_intercept::{next_intercept, slope_intercept};
+use crate::helpers::slope_intercept::slope_intercept;
 
 use round::round;
 use rs_algo_shared::helpers::comp::*;

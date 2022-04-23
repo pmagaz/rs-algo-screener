@@ -2,7 +2,7 @@ use crate::candle::CandleType;
 use crate::error::Result;
 use crate::indicators::Indicator;
 use crate::instrument::Instrument;
-
+use crate::patterns::pattern::{PatternActive, PatternDirection};
 use plotters::prelude::*;
 
 use std::env;
@@ -53,13 +53,13 @@ impl Backend {
             .map(|x| x.active.index)
             .collect();
 
-        let extrema_patterns = instrument.patterns().extrema_patterns.clone();
-        let extrema_pattern_breaks: Vec<usize> = instrument
-            .patterns()
-            .extrema_patterns
-            .iter()
-            .map(|x| x.active.index)
-            .collect();
+        // let extrema_patterns = instrument.patterns().extrema_patterns.clone();
+        // let extrema_pattern_breaks: Vec<usize> = instrument
+        //     .patterns()
+        //     .extrema_patterns
+        //     .iter()
+        //     .map(|x| x.active.index)
+        //     .collect();
 
         let total_len = instrument.data().len();
 
@@ -186,12 +186,15 @@ impl Backend {
         for (x, pattern) in local_patterns.iter().enumerate() {
             chart
                 .draw_series(PointSeries::of_element(
-                    (0..).zip(pattern.data_points.iter()).map(|(i, highs)| {
-                        let idx = highs.0;
-                        let value = highs.1;
-                        let date = data[idx].date();
-                        (date, value, i)
-                    }),
+                    (0..)
+                        .zip(pattern.data_points.iter())
+                        .filter(|(i, highs)| highs.0 < total_len)
+                        .map(|(i, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date();
+                            (date, value, i)
+                        }),
                     0,
                     ShapeStyle::from(&RED).filled(),
                     &|coord, _size: i32, _style| {
@@ -229,6 +232,7 @@ impl Backend {
         //     //     return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
         //     // }
         //     }
+
         for (x, pattern) in local_patterns.iter().enumerate() {
             chart
                 .draw_series(LineSeries::new(
@@ -309,74 +313,86 @@ impl Backend {
 
         // EXTREMA MAXIMA MINIMA
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_maxima.contains(&(i, candle.close())) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date(),
-                            candle.high() + (candle.high() * extrema_peaks_marker_pos),
-                        ),
-                        -4,
-                        RED.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
+        // chart
+        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+        //         if extrema_maxima.contains(&(i, candle.close())) {
+        //             return TriangleMarker::new(
+        //                 (
+        //                     candle.date(),
+        //                     candle.high() + (candle.high() * extrema_peaks_marker_pos),
+        //                 ),
+        //                 -4,
+        //                 RED.mix(0.4),
+        //             );
+        //         } else {
+        //             return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
+        //         }
+        //     }))
+        //     .unwrap();
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_minima.contains(&(i, candle.close())) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date(),
-                            candle.low() - (candle.low() * extrema_peaks_marker_pos),
-                        ),
-                        4,
-                        RED.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
+        // chart
+        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+        //         if extrema_minima.contains(&(i, candle.close())) {
+        //             return TriangleMarker::new(
+        //                 (
+        //                     candle.date(),
+        //                     candle.low() - (candle.low() * extrema_peaks_marker_pos),
+        //                 ),
+        //                 4,
+        //                 RED.mix(0.4),
+        //             );
+        //         } else {
+        //             return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
+        //         }
+        //     }))
+        //     .unwrap();
 
         //breaks out
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
                 if local_pattern_breaks.contains(&(i)) {
+                    let mut direction = 0;
+                    for n in instrument.patterns().local_patterns.iter() {
+                        if n.active.index == i {
+                            let pos = match n.active.break_direction {
+                                PatternDirection::Top => -4,
+                                PatternDirection::Bottom => 4,
+                                PatternDirection::None => 4,
+                            };
+                            direction = pos;
+                        }
+                    }
+
                     return TriangleMarker::new(
                         (
                             candle.date(),
-                            candle.low() + (candle.low() * (extrema_peaks_marker_pos + 0.1)),
+                            candle.close() - (candle.close() * local_peaks_marker_pos - 2.),
                         ),
-                        -4,
-                        BLACK.mix(0.4),
+                        direction,
+                        GREEN_LINE.mix(0.8),
                     );
                 } else {
                     return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
                 }
             }))
             .unwrap();
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_pattern_breaks.contains(&(i)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date(),
-                            candle.low() + (candle.low() * (extrema_peaks_marker_pos + 0.2)),
-                        ),
-                        -4,
-                        BLACK.mix(0.4),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
+        // chart
+        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+        //         if extrema_pattern_breaks.contains(&(i)) {
+        //             return TriangleMarker::new(
+        //                 (
+        //                     candle.date(),
+        //                     candle.low() + (candle.low() * (extrema_peaks_marker_pos + 0.2)),
+        //                 ),
+        //                 -4,
+        //                 BLACK.mix(0.4),
+        //             );
+        //         } else {
+        //             return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
+        //         }
+        //     }))
+        //     .unwrap();
 
         for x in instrument.peaks().smooth_highs().iter() {
             chart

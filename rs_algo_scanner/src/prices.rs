@@ -1,5 +1,6 @@
 use crate::candle::Candle;
 
+use crate::helpers::slope_intercept::slope_intercept;
 use rs_algo_shared::helpers::comp::percentage_change;
 
 use rs_algo_shared::helpers::date::{DbDateTime, Duration, Local};
@@ -13,11 +14,9 @@ pub fn price_is_higher_upper_band_top(
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
 ) -> PriceBreak {
-    //let next_points = calculate_price_break(&data, pattern_type);
-    //let band = vec![data[0], data[2], data[4]];
-    let band = vec![data[4]];
+    let points = vec![data[4], data[6]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
-    search_price_break(band, candles, &break_price_comparator)
+    search_price_break(points, candles, &break_price_comparator)
 }
 
 pub fn price_is_higher_upper_band_bottom(
@@ -25,11 +24,9 @@ pub fn price_is_higher_upper_band_bottom(
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
 ) -> PriceBreak {
-    // let next_points = calculate_price_break(&data, pattern_type);
-    //let band = vec![data[1], data[3]];
-    let band = vec![data[3]];
+    let points = vec![data[3], data[5]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
-    search_price_break(band, candles, &break_price_comparator)
+    search_price_break(points, candles, &break_price_comparator)
 }
 
 pub fn price_is_lower_low_band_bottom(
@@ -37,11 +34,9 @@ pub fn price_is_lower_low_band_bottom(
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
 ) -> PriceBreak {
-    // let next_points = calculate_price_break(&data, pattern_type);
-    // let band = vec![data[1], data[3]];
-    let band = vec![data[3]];
+    let points = vec![data[3], data[5]];
     let bottom_break = |price: f64, price_break: f64| price < price_break;
-    search_price_break(band, candles, &bottom_break)
+    search_price_break(points, candles, &bottom_break)
 }
 
 pub fn price_is_lower_low_band_top(
@@ -49,11 +44,9 @@ pub fn price_is_lower_low_band_top(
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
 ) -> PriceBreak {
-    // let next_points = calculate_price_break(&data, pattern_type);
-    // let band = vec![data[0], data[2], data[4]];
-    let band = vec![data[4]];
+    let points = vec![data[4], data[6]];
     let break_price_comparator = |price: f64, price_break: f64| price < price_break;
-    search_price_break(band, candles, &break_price_comparator)
+    search_price_break(points, candles, &break_price_comparator)
 }
 
 pub fn price_is_higher_peak(
@@ -86,60 +79,29 @@ pub fn calculate_price_target(data_points: &DataPoints) -> f64 {
     percentage_change(data_points[4].1, data_points[3].1).abs()
 }
 
-pub fn calculate_price_break(data: &Vec<(usize, f64)>, pattern_type: &PatternType) -> (usize, f64) {
-    let percentage_change = percentage_change(data[0].1, data[1].1);
-    let price = data.get(data.len() - 1).unwrap().1;
-
-    let next_points = match pattern_type {
-        PatternType::ChannelUp => calculate_price_break_up(price, percentage_change),
-        PatternType::ChannelDown => calculate_price_break_down(price, percentage_change),
-        PatternType::Triangle => calculate_price_break_up(price, percentage_change),
-        PatternType::TriangleSym => calculate_price_break_up(price, percentage_change),
-        PatternType::TriangleDown => calculate_price_break_down(price, percentage_change),
-        PatternType::TriangleUp => calculate_price_break_up(price, percentage_change),
-        PatternType::Rectangle => calculate_price_break_up(price, percentage_change),
-        PatternType::ChannelUp => calculate_price_break_up(price, percentage_change),
-        PatternType::ChannelDown => calculate_price_break_down(price, percentage_change),
-        PatternType::Broadening => calculate_price_break_up(price, percentage_change),
-        PatternType::DoubleTop => calculate_price_break_down(price, percentage_change),
-        PatternType::DoubleBottom => calculate_price_break_up(price, percentage_change),
-        PatternType::HeadShoulders => calculate_price_break_down(price, percentage_change),
-        PatternType::None => (9999999, 9999999.),
-    };
-    next_points
-}
-
-pub fn calculate_price_break_up(price: f64, percentage: f64) -> (usize, f64) {
-    (9999999, price + percentage * (price / 100.))
-}
-
-pub fn calculate_price_break_down(price: f64, percentage: f64) -> (usize, f64) {
-    (9999999, price - percentage * (price / 100.))
-}
-
 pub fn search_price_break(
-    band: Vec<(usize, f64)>,
+    points: Vec<(usize, f64)>,
     candles: &Vec<Candle>,
     comparator: &dyn Fn(f64, f64) -> bool,
 ) -> PriceBreak {
-    let keys: Vec<usize> = band.iter().map(|(x, _y)| *x).collect();
-    let mut current_id = *keys.get(keys.len() - 1).unwrap();
-    if band.len() > 0 {
-        while current_id < candles.len() {
-            let current_price = &candles[current_id].close();
-            let current_date = &candles[current_id].date();
+    let len = points.len();
+    if len > 1 {
+        let start = points[0];
+        let end = points[1];
 
-            for (id, price_break) in &band {
-                if comparator(*current_price, *price_break) {
-                    return (
-                        true,
-                        *id,
-                        *price_break,
-                        DbDateTime::from_chrono(*current_date),
-                    );
-                }
+        let start_index = start.0 as usize;
+        let end_index = candles.len(); //end.0 as usize;
+
+        let (slope, y_intercept) = slope_intercept(start.0 as f64, start.1, end.0 as f64, end.1);
+        for n in (start_index..=end_index).step_by(2) {
+            let next_index = start_index + n;
+            let next_price = (slope * n as f64) + y_intercept;
+            let current_price = &candles[n].close();
+            let current_date = &candles[n].date();
+
+            if comparator(*current_price, next_price) {
+                return (true, n, next_price, DbDateTime::from_chrono(*current_date));
             }
-            current_id += 1;
         }
     }
 

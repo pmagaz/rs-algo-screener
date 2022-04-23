@@ -55,20 +55,19 @@ impl General {
             .parse::<f64>()
             .unwrap();
 
-            
         doc! {
         "$or": [
             {"$or": [
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
-                    "pattern_type": { "$in": ["TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
-                    "active.target":{"$gte": minimum_pattern_target },
+                    "date": { "$gte" : self.max_pattern_date },
+                    //"pattern_type": { "$in": ["TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                     }}}
                 ]},
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
-                    "date": { "$gte" : self.max_pattern_date },
+                    "active.date": { "$gte" : self.max_activated_date },
                     }}}
                 ]},
                 // {"$and": [
@@ -91,12 +90,12 @@ impl General {
                 // ]},
                 ]
             },
-            {"$and": [
-                {"$expr": {"$gte": ["$indicators.tema_a.current_a","$indicators.tema_b.current_a"]}},
-                //{"$expr": {"$lte": ["$indicators.tema_a.current_a","$indicators.tema_b.prev_a"]}},
-                {"$expr": {"$lt": ["$indicators.tema_a.prev_a","$indicators.tema_b.prev_a"]}},
-                //{"$expr": {"$gte": ["$indicators.tema_b.current_a","$indicators.ema_c.current_a"]}},
-           ]},
+        //     {"$and": [
+        //         {"$expr": {"$gte": ["$indicators.tema_a.current_a","$indicators.tema_b.current_a"]}},
+        //         //{"$expr": {"$lte": ["$indicators.tema_a.current_a","$indicators.tema_b.prev_a"]}},
+        //         {"$expr": {"$lt": ["$indicators.tema_a.prev_a","$indicators.tema_b.prev_a"]}},
+        //         //{"$expr": {"$gte": ["$indicators.tema_b.current_a","$indicators.ema_c.current_a"]}},
+        //    ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
             //{ "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
             // {"$and": [
@@ -154,7 +153,7 @@ impl General {
                         Some(val) => val.date,
                         None => fake_date,
                     };
-                    
+
                     let last_divergence_type = match last_divergence {
                         Some(val) => &val.divergence_type,
                         None => &DivergenceType::None,
@@ -179,8 +178,6 @@ impl General {
                                 .pattern_type
                         }
                     };
-
-
 
                     let last_pattern_status =
                         get_pattern_status(last_pattern, second_last_pattern_type);
@@ -268,23 +265,23 @@ impl General {
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.tema_a.status = tema_status.clone();
-                    
+
                     if (last_pattern_status != Status::Bearish
-                        && last_pattern_status != Status::Default
-                        && last_pattern_target > minimum_pattern_target)
+                        && last_pattern_status != Status::Default)
                     // || (extrema_pattern_status != Status::Default
                     //     && extrema_pattern_target > minimum_pattern_target)
                     //|| (last_divergence_type != &DivergenceType::None)
-                    || (tema_status != Status::Bearish
-                        && last_pattern_status != Status::Bearish
-                        && last_pattern_status != Status::Default
-                        && last_pattern_date > self.max_pattern_date 
-                      //  && last_pattern_target > minimum_pattern_target
-                        // && (percentage_change(
-                        //     instrument.indicators.tema_a.prev_a,
-                        //     tema_b.prev_a,
-                        // ) < tema_crossover_th)
-                    ) {
+                    // || (tema_status != Status::Bearish
+                    //     && last_pattern_status != Status::Bearish
+                    //     && last_pattern_status != Status::Default
+                    //     && last_pattern_date > self.max_pattern_date
+                    //   //  && last_pattern_target > minimum_pattern_target
+                    //     // && (percentage_change(
+                    //     //     instrument.indicators.tema_a.prev_a,
+                    //     //     tema_b.prev_a,
+                    //     // ) < tema_crossover_th)
+                    // )
+                    {
                         docs.push(instrument);
                     }
                     //}

@@ -56,13 +56,13 @@ impl Backend {
             .map(|x| x.active.index)
             .collect();
 
-        let extrema_patterns = &instrument.patterns.extrema_patterns;
-        let extrema_pattern_breaks: Vec<usize> = instrument
-            .patterns
-            .extrema_patterns
-            .iter()
-            .map(|x| x.active.index)
-            .collect();
+        // let extrema_patterns = &instrument.patterns.extrema_patterns;
+        // let extrema_pattern_breaks: Vec<usize> = instrument
+        //     .patterns
+        //     .extrema_patterns
+        //     .iter()
+        //     .map(|x| x.active.index)
+        //     .collect();
 
         let total_len = instrument.data.len();
 
@@ -296,13 +296,22 @@ impl Backend {
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
                 if local_pattern_breaks.contains(&(i)) {
+                    let mut direction = 0;
+                    for n in instrument.patterns.local_patterns.iter() {
+                        if n.active.index == i {
+                            let pos = match n.active.break_direction {
+                                PatternDirection::Top => -4,
+                                PatternDirection::Bottom => 4,
+                                PatternDirection::None => 4,
+                            };
+                            direction = pos;
+                        }
+                    }
+
                     return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.low + (candle.low * (extrema_peaks_marker_pos + 0.1)),
-                        ),
-                        -4,
-                        BLACK.mix(0.1),
+                        (candle.date, candle.close - (candle.close)),
+                        direction,
+                        GREEN_LINE.mix(0.8),
                     );
                 } else {
                     return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
@@ -310,22 +319,22 @@ impl Backend {
             }))
             .unwrap();
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                if extrema_pattern_breaks.contains(&(i)) {
-                    return TriangleMarker::new(
-                        (
-                            candle.date,
-                            candle.low + (candle.low * (extrema_peaks_marker_pos + 0.2)),
-                        ),
-                        -4,
-                        BLACK.mix(0.1),
-                    );
-                } else {
-                    return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
-                }
-            }))
-            .unwrap();
+        // chart
+        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+        //         if extrema_pattern_breaks.contains(&(i)) {
+        //             return TriangleMarker::new(
+        //                 (
+        //                     candle.date,
+        //                     candle.low + (candle.low * (extrema_peaks_marker_pos + 0.2)),
+        //                 ),
+        //                 -4,
+        //                 BLACK.mix(0.1),
+        //             );
+        //         } else {
+        //             return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
+        //         }
+        //     }))
+        //     .unwrap();
 
         // for x in instrument.peaks.smooth_highs.iter() {
         //     chart
