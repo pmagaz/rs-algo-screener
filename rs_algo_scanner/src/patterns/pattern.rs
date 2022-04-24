@@ -462,7 +462,7 @@ impl Patterns {
     }
 
     fn calculate_change(&self, data_points: &DataPoints) -> f64 {
-        percentage_change(data_points[4].1, data_points[3].1).abs()
+        percentage_change(data_points[0].1, data_points[1].1).abs()
     }
 
     //FXIME too many arguments
