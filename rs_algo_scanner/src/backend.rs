@@ -238,14 +238,16 @@ impl Backend {
                     (0..)
                         .zip(pattern.data_points.iter())
                         .enumerate()
-                        .filter(|(key, (i, highs))| highs.0 < total_len && key % 2 == 0)
+                        .filter(|(key, (i, highs))| {
+                            key < &(total_len - 3) && highs.0 < total_len && key % 2 == 0
+                        })
                         .map(|(key, (i, highs))| {
                             let idx = highs.0;
                             let value = highs.1;
                             let date = data[idx].date();
                             (date, value)
                         }),
-                    RED_LINE.mix(0.4),
+                    RED_LINE.mix(0.3),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
@@ -257,14 +259,16 @@ impl Backend {
                     (0..)
                         .zip(pattern.data_points.iter())
                         .enumerate()
-                        .filter(|(key, (i, highs))| highs.0 < total_len && key % 2 != 0)
+                        .filter(|(key, (i, highs))| {
+                            key < &(total_len - 3) && highs.0 < total_len && key % 2 != 0
+                        })
                         .map(|(key, (i, highs))| {
                             let idx = highs.0;
                             let value = highs.1;
                             let date = data[idx].date();
                             (date, value)
                         }),
-                    RED_LINE.mix(0.4),
+                    RED_LINE.mix(0.3),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));

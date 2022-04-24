@@ -98,6 +98,7 @@ impl General {
         //         //{"$expr": {"$gte": ["$indicators.tema_b.current_a","$indicators.ema_c.current_a"]}},
         //    ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
+            { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
             //{ "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
             // {"$and": [
             //  {
@@ -131,7 +132,7 @@ impl General {
                 Ok(mut instrument) => {
                     //MOVE THIS TO SHARED
                     let stoch = instrument.indicators.stoch.clone();
-                    let macd = instrument.indicators.stoch.clone();
+                    let macd = instrument.indicators.macd.clone();
                     let rsi = instrument.indicators.rsi.clone();
                     let tema_a = instrument.indicators.tema_a.clone(); //8
                     let tema_b = instrument.indicators.tema_b.clone(); //21
@@ -218,22 +219,23 @@ impl General {
                     };
 
                     let macd_status = match macd {
-                        _x if round(macd.current_a, 2) >= round(macd.current_b, 2)
+                        _x if round(macd.current_a, 2) > round(macd.current_b, 2)
                             && macd.current_a > 0. =>
                         {
                             Status::Bullish
                         }
-                        _x if round(macd.current_a, 2) >= round(macd.current_b, 2)
+                        _x if round(macd.clone().current_a, 2)
+                            < round(macd.clone().current_b, 2)
                             && round(macd.current_a, 2) < 0. =>
                         {
                             Status::Bearish
                         }
-                        _x if round(macd.current_a, 1) == round(macd.current_b, 1)
-                            && round(macd.current_a, 1) == 0. =>
+                        _x if round(macd.current_a, 1) >= round(macd.current_b, 1)
+                            && round(macd.current_a, 1) <= 0. =>
                         {
                             Status::Neutral
                         }
-                        _x if macd.current_a < macd.current_b => Status::Bearish,
+                        //_x if macd.current_a < macd.current_b => Status::Bearish,
                         _ => Status::Neutral,
                     };
 
@@ -267,25 +269,7 @@ impl General {
                     instrument.indicators.rsi.status = rsi_status.clone();
                     instrument.indicators.tema_a.status = tema_status.clone();
 
-                    if (last_pattern_status != Status::Bearish
-                        && last_pattern_status != Status::Default)
-                    // || (extrema_pattern_status != Status::Default
-                    //     && extrema_pattern_target > minimum_pattern_target)
-                    //|| (last_divergence_type != &DivergenceType::None)
-                    // || (tema_status != Status::Bearish
-                    //     && last_pattern_status != Status::Bearish
-                    //     && last_pattern_status != Status::Default
-                    //     && last_pattern_date > self.max_pattern_date
-                    //   //  && last_pattern_target > minimum_pattern_target
-                    //     // && (percentage_change(
-                    //     //     instrument.indicators.tema_a.prev_a,
-                    //     //     tema_b.prev_a,
-                    //     // ) < tema_crossover_th)
-                    // )
-                    {
-                        docs.push(instrument);
-                    }
-                    //}
+                    docs.push(instrument);
                 }
                 _ => {}
             }

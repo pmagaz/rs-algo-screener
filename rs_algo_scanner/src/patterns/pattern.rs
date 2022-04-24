@@ -1,4 +1,5 @@
 use crate::candle::Candle;
+use crate::helpers::poly::{self, poly_fit};
 use crate::helpers::slope_intercept::{add_next_bottom_points, add_next_top_points};
 use crate::patterns::*;
 use crate::prices::{calculate_price_change, calculate_price_target};
@@ -170,7 +171,6 @@ impl Patterns {
                             && change > minimum_pattern_target
                         {
                             data_points = add_next_top_points(data_points);
-
                             self.set_pattern(
                                 PatternType::ChannelUp,
                                 PatternDirection::Top,
@@ -187,7 +187,6 @@ impl Patterns {
                             not_founded = true;
                         } else if channel::is_ascendant_bottom(&data_points) {
                             data_points = add_next_bottom_points(data_points);
-
                             self.set_pattern(
                                 PatternType::ChannelUp,
                                 PatternDirection::Bottom,
@@ -401,35 +400,37 @@ impl Patterns {
                                 ),
                             );
                             not_founded = true;
-                        } else if head_shoulders::is_hs(&data_points) {
-                            self.set_pattern(
-                                PatternType::HeadShoulders,
-                                PatternDirection::Bottom,
-                                &pattern_size,
-                                data_points.to_owned(),
-                                change,
-                                candle_date,
-                                head_shoulders::hs_active(
-                                    &data_points,
-                                    candles,
-                                    PatternType::HeadShoulders,
-                                ),
-                            );
-                            not_founded = true;
-                        } else if head_shoulders::is_inverse(&data_points) {
-                            self.set_pattern(
-                                PatternType::HeadShoulders,
-                                PatternDirection::Top,
-                                &pattern_size,
-                                data_points.to_owned(),
-                                change,
-                                candle_date,
-                                head_shoulders::hs_active(
-                                    &data_points,
-                                    candles,
-                                    PatternType::HeadShoulders,
-                                ),
-                            );
+                            // } else if head_shoulders::is_hs(&data_points) {
+                            //     data_points = add_next_top_points(data_points);
+                            //     self.set_pattern(
+                            //         PatternType::HeadShoulders,
+                            //         PatternDirection::Bottom,
+                            //         &pattern_size,
+                            //         data_points.to_owned(),
+                            //         change,
+                            //         candle_date,
+                            //         head_shoulders::hs_active(
+                            //             &data_points,
+                            //             candles,
+                            //             PatternType::HeadShoulders,
+                            //         ),
+                            //     );
+                            //     not_founded = true;
+                            // } else if head_shoulders::is_inverse(&data_points) {
+                            //     data_points = add_next_top_points(data_points);
+                            //     self.set_pattern(
+                            //         PatternType::HeadShoulders,
+                            //         PatternDirection::Top,
+                            //         &pattern_size,
+                            //         data_points.to_owned(),
+                            //         change,
+                            //         candle_date,
+                            //         head_shoulders::hs_active(
+                            //             &data_points,
+                            //             candles,
+                            //             PatternType::HeadShoulders,
+                            //         ),
+                            //     );
                         }
                         not_founded = true;
                     }
@@ -479,8 +480,69 @@ impl Patterns {
         let len = data_points.len();
         if len > 3 {
             let index = data_points.get(data_points.len() - 2).unwrap().0;
-
             if pattern_type != PatternType::None {
+                let x_values_top: Vec<f64> = data_points
+                    .iter()
+                    .enumerate()
+                    .filter(|(key, x)| key % 2 == 0)
+                    .map(|(key, x)| x.0 as f64)
+                    .collect();
+
+                let y_values_top: Vec<f64> = data_points
+                    .iter()
+                    .enumerate()
+                    .filter(|(key, x)| key % 2 == 0)
+                    .map(|(key, x)| x.1)
+                    .collect();
+
+                let x_values_bottom: Vec<f64> = data_points
+                    .iter()
+                    .enumerate()
+                    .filter(|(key, x)| key % 2 != 0)
+                    .map(|(key, x)| x.0 as f64)
+                    .collect();
+
+                let y_values_bottom: Vec<f64> = data_points
+                    .iter()
+                    .enumerate()
+                    .filter(|(key, x)| key % 2 != 0)
+                    .map(|(key, x)| x.1)
+                    .collect();
+
+                let polynomial_top = poly_fit(&x_values_top, &y_values_top, 1);
+                let polynomial_bottom = poly_fit(&x_values_bottom, &y_values_bottom, 1);
+                let top_len = polynomial_top.len();
+                let bottom_len = polynomial_bottom.len();
+                // CONTINUE
+                // let mut poly_points = vec![
+                //     (x_values_top[0] as usize, y_values_top[0]),
+                //     (x_values_bottom[0] as usize, y_values_bottom[0]),
+                //     (x_values_top[1] as usize, y_values_top[1]),
+                //     (x_values_bottom[1] as usize, y_values_bottom[1]),
+                //     (x_values_top[2] as usize, y_values_top[2]),
+                //     (x_values_bottom[2] as usize, y_values_bottom[2]),
+                //     (x_values_top[3] as usize, y_values_top[3]),
+                // ];
+                let mut poly_points = match direction {
+                    PatternDirection::Top => [
+                        &polynomial_top[0..top_len],
+                        &polynomial_bottom[0..bottom_len],
+                    ]
+                    .concat(),
+                    PatternDirection::Bottom => [
+                        &polynomial_top[0..top_len],
+                        &polynomial_bottom[0..bottom_len],
+                    ]
+                    .concat(),
+                    PatternDirection::None => [
+                        &polynomial_top[0..top_len],
+                        &polynomial_bottom[0..bottom_len],
+                    ]
+                    .concat(),
+                };
+
+                poly_points.sort_by(|(id_a, _price_a), (id_b, _price_b)| id_a.cmp(id_b));
+                //data_points = poly_points;
                 match &pattern_size {
                     PatternSize::Local => self.local_patterns.push(Pattern {
                         pattern_type,

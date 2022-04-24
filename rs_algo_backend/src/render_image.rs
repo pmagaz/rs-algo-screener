@@ -190,7 +190,7 @@ impl Backend {
                             let date = data[idx].date;
                             (date, value)
                         }),
-                    RED_LINE.mix(0.4),
+                    RED_LINE.mix(0.3),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
@@ -209,7 +209,7 @@ impl Backend {
                             let date = data[idx].date;
                             (date, value)
                         }),
-                    RED_LINE.mix(0.4),
+                    RED_LINE.mix(0.3),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
