@@ -9,6 +9,7 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
     if is_higher_highs_top(data)
         && is_higher_lows_bottom(data)
         && points_are_in_slope(data)
+        && bands_have_same_slope(data)
         && are_parallel_lines(data)
         && data[0].1 > data[1].1
     {
@@ -22,6 +23,7 @@ pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
     if is_higher_highs_bottom(data)
         && is_higher_lows_top(data)
         && points_are_in_slope(data)
+        && bands_have_same_slope(data)
         && are_parallel_lines(data)
         && data[0].1 < data[1].1
     {

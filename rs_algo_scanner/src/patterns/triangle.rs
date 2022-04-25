@@ -65,6 +65,7 @@ pub fn is_symmetrical_top(data: &DataPoints) -> bool {
     if is_lower_highs_top(data)
         && is_higher_lows_bottom(data)
         && points_are_in_slope(data)
+        && bands_have_same_slope(data)
         && data[0].1 > data[1].1
         && data[2].1 > data[3].1
         && data[4].1 > data[3].1
@@ -79,6 +80,7 @@ pub fn is_symmetrical_bottom(data: &DataPoints) -> bool {
     if is_lower_highs_bottom(data)
         && is_higher_lows_top(data)
         && points_are_in_slope(data)
+        && bands_have_same_slope(data)
         && data[1].1 > data[0].1
         && data[3].1 > data[2].1
         && data[3].1 > data[4].1

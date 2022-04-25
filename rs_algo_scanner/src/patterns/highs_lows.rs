@@ -133,6 +133,18 @@ pub fn points_are_in_slope(data: &DataPoints) -> bool {
     (round(points_1.abs(), 2) - round(points_2.abs(), 2)).abs() < threshold
 }
 
+pub fn bands_have_same_slope(data: &DataPoints) -> bool {
+    let slope_threshold = env::var("SLOPE_DEVIATION_THRESHOLD")
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
+
+    let threshold = ((data[1].1 - data[2].1) * slope_threshold).abs();
+    let (points_1, _y) = slope_intercept(data[0].0 as f64, data[0].1, data[2].0 as f64, data[2].1);
+    let (points_2, _y) = slope_intercept(data[1].0 as f64, data[1].1, data[3].0 as f64, data[3].1);
+    (round(points_1.abs(), 2) - round(points_2.abs(), 2)).abs() < threshold
+}
+
 pub fn are_parallel_lines(data: &DataPoints) -> bool {
     let slope_threshold = env::var("SLOPE_DEVIATION_THRESHOLD")
         .unwrap()

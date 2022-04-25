@@ -409,7 +409,7 @@ impl Backend {
                             let date = data[idx].date();
                             (date, value)
                         }),
-                    &MAGENTA.mix(0.014),
+                    &GREEN_LINE.mix(0.014),
                 ))
                 .unwrap();
         }
@@ -425,7 +425,7 @@ impl Backend {
                             let date = data[idx].date();
                             (date, value)
                         }),
-                    MAGENTA.mix(0.014),
+                    GREEN_LINE.mix(0.014),
                 ))
                 .unwrap();
         }
