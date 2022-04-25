@@ -158,3 +158,12 @@ pub fn are_parallel_lines(data: &DataPoints) -> bool {
         slope_intercept(data[1].0 as f64, data[1].1, data[3].0 as f64, data[3].1);
     (round(bottom_slope, 2) - round(points_1, 2)).abs() < threshold
 }
+
+pub fn has_minimum_bars(data: &DataPoints) -> bool {
+    let min_bars = env::var("MIN_PATTERN_BARS")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+
+    (data[2].0 - data[0].0 > min_bars)
+}

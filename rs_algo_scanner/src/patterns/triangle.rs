@@ -9,6 +9,7 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
     if upper_band_is_equal_top(data)
         && is_higher_lows_bottom(data)
         && points_are_in_slope(data)
+        && has_minimum_bars(data)
         && data[0].1 > data[1].1
         && data[2].1 > data[3].1
         && data[4].1 > data[3].1
@@ -23,6 +24,7 @@ pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
     if is_higher_lows_top(data)
         && upper_band_is_equal_bottom(data)
         && points_are_in_slope(data)
+        && has_minimum_bars(data)
         && data[1].1 > data[0].1
         && data[3].1 > data[2].1
         && data[3].1 > data[4].1
@@ -37,6 +39,7 @@ pub fn is_descendant_top(data: &DataPoints) -> bool {
     if is_lower_highs_top(data)
         && lower_band_is_equal_bottom(data)
         && points_are_in_slope(data)
+        && has_minimum_bars(data)
         && data[0].1 > data[1].1
         && data[2].1 > data[1].1
         && data[4].1 > data[3].1
@@ -51,6 +54,7 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
     if lower_band_is_equal_top(data)
         && is_lower_highs_bottom(data)
         && points_are_in_slope(data)
+        && has_minimum_bars(data)
         && data[1].1 > data[0].1
         && data[3].1 > data[2].1
         && data[3].1 > data[4].1
@@ -66,6 +70,7 @@ pub fn is_symmetrical_top(data: &DataPoints) -> bool {
         && is_higher_lows_bottom(data)
         && points_are_in_slope(data)
         && bands_have_same_slope(data)
+        && has_minimum_bars(data)
         && data[0].1 > data[1].1
         && data[2].1 > data[3].1
         && data[4].1 > data[3].1
@@ -81,6 +86,7 @@ pub fn is_symmetrical_bottom(data: &DataPoints) -> bool {
         && is_higher_lows_top(data)
         && points_are_in_slope(data)
         && bands_have_same_slope(data)
+        && has_minimum_bars(data)
         && data[1].1 > data[0].1
         && data[3].1 > data[2].1
         && data[3].1 > data[4].1

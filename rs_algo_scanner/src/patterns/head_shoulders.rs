@@ -1,3 +1,4 @@
+use super::highs_lows::*;
 use super::pattern::pattern_active_result;
 use crate::candle::Candle;
 use crate::prices::*;
@@ -11,6 +12,7 @@ pub fn is_hs(data: &DataPoints) -> bool {
         && data[2].1 > data[4].1
         && (data[0].1 - data[4].1).abs() <= 0.03 * average(&[data[0].1, data[4].1])
         && (data[1].1 - data[3].1).abs() <= 0.03 * average(&[data[0].1, data[4].1])
+        && has_minimum_bars(data)
     {
         true
     } else {
@@ -24,6 +26,7 @@ pub fn is_inverse(data: &DataPoints) -> bool {
         && data[2].1 < data[4].1
         && (data[0].1 - data[4].1).abs() <= 0.03 * average(&[data[0].1, data[4].1])
         && (data[1].1 - data[3].1).abs() <= 0.03 * average(&[data[0].1, data[4].1])
+        && has_minimum_bars(data)
     {
         true
     } else {

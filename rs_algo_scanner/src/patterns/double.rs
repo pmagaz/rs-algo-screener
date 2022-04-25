@@ -1,3 +1,4 @@
+use super::highs_lows::*;
 use super::pattern::pattern_active_result;
 use crate::candle::Candle;
 use crate::prices::*;
@@ -11,6 +12,7 @@ pub fn is_top(data: &DataPoints) -> bool {
     let threshold = percentage_change(data[1].1, data[0].1) * equal_threshold;
 
     if is_equal(data[3].1, data[1].1, threshold)
+        && has_minimum_bars(data)
         && data[0].1 < data[1].1
         && data[2].1 < data[1].1
         && data[2].1 < data[3].1
@@ -39,6 +41,7 @@ pub fn is_bottom(data: &DataPoints) -> bool {
     let threshold = percentage_change(data[1].1, data[0].1) * equal_threshold;
 
     if is_equal(data[3].1, data[1].1, threshold)
+        && has_minimum_bars(data)
         && data[0].1 > data[1].1
         && data[2].1 > data[1].1
         && data[2].1 > data[3].1
