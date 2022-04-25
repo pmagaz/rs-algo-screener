@@ -199,7 +199,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.1}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.2}</td>
-                    //<td class={get_status_class(&local_pattern.status)}> {local_pattern.info.3}</td>
+                    <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.3}</td>
                     // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.0)}</td>
                     // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.2)}</td>
                     // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.3)}</td>
@@ -226,7 +226,7 @@ pub fn instrument_list(props: &Props
                 <th><abbr>{ "Pattern" }</abbr></th>
                 <th><abbr>{ "Band" }</abbr></th>
                 <th><abbr>{ "Target" }</abbr></th>
-                //<th><abbr>{ "Activated" }</abbr></th>
+                <th><abbr>{ "Activated" }</abbr></th>
                 // <th><abbr>{ "E. Target" }</abbr></th>
                 // <th><abbr>{ "E. Activated" }</abbr></th>
                 <th><abbr>{ "Stoch" }</abbr></th>
