@@ -272,6 +272,7 @@ impl Patterns {
                             );
                             not_founded = true;
                         } else if triangle::is_symmetrical_bottom(&data_points) {
+                            println!("22222222 {:?}", &data_points);
                             data_points = add_next_bottom_points(data_points);
                             self.set_pattern(
                                 PatternType::TriangleSym,

@@ -3,7 +3,7 @@ use std::ops::Div;
 use round::{round};
 use rs_algo_shared::models::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
-use rs_algo_shared::helpers::comp::is_equal;
+use rs_algo_shared::helpers::comp::{percentage_change, is_equal};
 use yew::{function_component, html, Callback, use_state, Properties, Html};
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
@@ -192,24 +192,26 @@ pub fn instrument_list(props: &Props
                 DivergenceType::Bearish => divergence_type.to_string(),
                 DivergenceType::None   => "".to_owned() 
             }; 
+          
+            let leches = (instrument.current_price - instrument.prev_price) as isize;
+            let price_change = percentage_change(instrument.current_price, instrument.prev_price);
+            let price_display = match leches.cmp(&0) {
+                Ordering::Greater => round(price_change,2).to_string(), 
+                Ordering::Equal => round(price_change,2).to_string(), 
+                Ordering::Less => format!("-{:?}", round(price_change,2))
+            };
 
-           
-            let price_change = round((instrument.current_price - instrument.prev_price),2);
-            let price_change_u = (instrument.current_price - instrument.prev_price) as isize;
-           
-            let price_change_status = match price_change_u.cmp(&0){
+            let price_change_status = match leches.cmp(&0){
                 Ordering::Greater => Status::Bullish, 
                 Ordering::Equal => Status::Bullish, 
                 Ordering::Less => Status::Bearish,   
             };
-           
-            log::info!("1111 {} {}", price_change, price_change_u);
-            
+
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
-                    <td class={get_status_class(&price_change_status)}> {format!("{:?}%", price_change)}</td>
+                    <td class={get_status_class(&price_change_status)}> {format!("{}%", price_display)}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.1}</td>
