@@ -122,10 +122,10 @@ impl General {
             .parse::<f64>()
             .unwrap();
 
-        let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
-            .unwrap()
-            .parse::<f64>()
-            .unwrap();
+        // let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
+        //     .unwrap()
+        //     .parse::<f64>()
+        //     .unwrap();
 
         while let Some(result) = instruments.next().await {
             match result {

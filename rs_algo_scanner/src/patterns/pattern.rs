@@ -50,11 +50,6 @@ impl Patterns {
             .parse::<usize>()
             .unwrap();
 
-        let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
-            .unwrap()
-            .parse::<f64>()
-            .unwrap();
-
         let mut max_start = 0;
         let mut max_end = 0;
         let mut min_start = 0;
@@ -124,15 +119,9 @@ impl Patterns {
                         //     vec![(1, 100.), (1, 80.), (1, 90.), (1, 79.), (1, 99.)];
                         let last_index = data_points.last().unwrap().0;
                         let candle_date = candles.get(last_index).unwrap().date();
-                        // println!(
-                        //     "999999999 {:?} {:?} {:?}",
-                        //     data_points, last_index, candle_date
-                        // );
 
                         let change = self.calculate_change(&data_points);
-                        if rectangle::is_renctangle_top(&data_points)
-                            && change > minimum_pattern_target
-                        {
+                        if rectangle::is_renctangle_top(&data_points) {
                             data_points = add_next_top_points(data_points);
 
                             self.set_pattern(
@@ -149,9 +138,7 @@ impl Patterns {
                                 ),
                             );
                             not_founded = true;
-                        } else if rectangle::is_renctangle_bottom(&data_points)
-                            && change > minimum_pattern_target
-                        {
+                        } else if rectangle::is_renctangle_bottom(&data_points) {
                             data_points = add_next_bottom_points(data_points);
                             self.set_pattern(
                                 PatternType::Rectangle,
@@ -167,9 +154,7 @@ impl Patterns {
                                 ),
                             );
                             not_founded = true;
-                        } else if channel::is_ascendant_top(&data_points)
-                            && change > minimum_pattern_target
-                        {
+                        } else if channel::is_ascendant_top(&data_points) {
                             data_points = add_next_top_points(data_points);
                             self.set_pattern(
                                 PatternType::ChannelUp,

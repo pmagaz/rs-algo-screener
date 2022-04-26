@@ -165,5 +165,14 @@ pub fn has_minimum_bars(data: &DataPoints) -> bool {
         .parse::<usize>()
         .unwrap();
 
-    (data[2].0 - data[0].0 > min_bars)
+    data[2].0 - data[0].0 > min_bars
+}
+
+pub fn has_minimum_target(data: &DataPoints) -> bool {
+    let min_target = env::var("MINIMUM_PATTERN_TARGET")
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
+
+    percentage_change(data[0].1, data[1].1).abs() > min_target
 }

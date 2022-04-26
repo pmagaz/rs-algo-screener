@@ -64,14 +64,14 @@ pub fn next_bottom_point(data: &DataPoints) -> (usize, f64) {
     (next_index as usize, next_price)
 }
 
-pub fn add_next_bottom_points(mut data: DataPoints) -> Vec<(usize, f64)> {
-    data.push(next_top_point(&data));
-    data.push(next_bottom_point(&data));
-    data
-}
-
 pub fn add_next_top_points(mut data: DataPoints) -> Vec<(usize, f64)> {
     data.push(next_bottom_point(&data));
     data.push(next_top_point(&data));
+    data
+}
+
+pub fn add_next_bottom_points(mut data: DataPoints) -> Vec<(usize, f64)> {
+    data.push(next_top_point(&data));
+    data.push(next_bottom_point(&data));
     data
 }
