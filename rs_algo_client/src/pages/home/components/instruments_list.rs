@@ -195,13 +195,15 @@ pub fn instrument_list(props: &Props
 
            
             let price_change = round((instrument.current_price - instrument.prev_price),2);
-            let price_change_u = (instrument.current_price - instrument.prev_price) as usize;
+            let price_change_u = (instrument.current_price - instrument.prev_price) as isize;
            
             let price_change_status = match price_change_u.cmp(&0){
                 Ordering::Greater => Status::Bullish, 
                 Ordering::Equal => Status::Bullish, 
                 Ordering::Less => Status::Bearish,   
             };
+           
+            log::info!("1111 {} {}", price_change, price_change_u);
             
             html! {
                 <tr>
