@@ -173,6 +173,6 @@ pub fn has_minimum_target(data: &DataPoints) -> bool {
         .unwrap()
         .parse::<f64>()
         .unwrap();
-
-    percentage_change(data[0].1, data[1].1).abs() > min_target
+    true
+    //percentage_change(data[0].1, data[1].1).abs() > min_target
 }
