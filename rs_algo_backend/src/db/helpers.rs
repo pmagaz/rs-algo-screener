@@ -11,24 +11,27 @@ pub async fn get_collection<T>(db: &Db, collection: &str) -> Collection<T> {
 }
 
 pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
-    let len = doc.indicators.macd.data_a.len();
+    let len = doc.data.len();
+    let second_last = len - 2;
     let doc = CompactInstrument {
         symbol: doc.symbol,
         date: doc.date,
         time_frame: doc.time_frame,
         current_price: doc.current_price,
+        prev_price: doc.data.get(second_last).unwrap().close,
         current_candle: doc.current_candle,
+        prev_candle: doc.data.get(second_last).unwrap().candle_type.clone(),
         indicators: CompactIndicators {
             macd: CompactIndicator {
                 current_a: *doc.indicators.macd.data_a.last().unwrap(),
                 current_b: *doc.indicators.macd.data_b.last().unwrap(),
-                prev_a: *doc.indicators.macd.data_a.get(len - 2).unwrap(),
-                prev_b: *doc.indicators.macd.data_b.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.macd.data_a.get(second_last).unwrap(),
+                prev_b: *doc.indicators.macd.data_b.get(second_last).unwrap(),
                 status: Status::Default,
             },
             atr: CompactIndicator {
                 current_a: *doc.indicators.atr.data_a.last().unwrap(),
-                prev_a: *doc.indicators.atr.data_a.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.atr.data_a.get(second_last).unwrap(),
                 current_b: 0.,
                 prev_b: 0.,
                 status: Status::Default,
@@ -36,63 +39,63 @@ pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
             kc: CompactIndicator {
                 current_a: *doc.indicators.kc.data_a.last().unwrap(),
                 current_b: *doc.indicators.kc.data_b.last().unwrap(),
-                prev_a: *doc.indicators.kc.data_a.get(len - 2).unwrap(),
-                prev_b: *doc.indicators.kc.data_b.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.kc.data_a.get(second_last).unwrap(),
+                prev_b: *doc.indicators.kc.data_b.get(second_last).unwrap(),
                 status: Status::Default,
             },
             rsi: CompactIndicator {
                 current_a: *doc.indicators.rsi.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.rsi.data_a.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.rsi.data_a.get(second_last).unwrap(),
                 prev_b: 0.,
                 status: Status::Default,
             },
             stoch: CompactIndicator {
                 current_a: *doc.indicators.stoch.data_a.last().unwrap(),
                 current_b: *doc.indicators.stoch.data_b.last().unwrap(),
-                prev_a: *doc.indicators.stoch.data_a.get(len - 2).unwrap(),
-                prev_b: *doc.indicators.stoch.data_b.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.stoch.data_a.get(second_last).unwrap(),
+                prev_b: *doc.indicators.stoch.data_b.get(second_last).unwrap(),
                 status: Status::Default,
             },
             ema_a: CompactIndicator {
                 current_a: *doc.indicators.ema_a.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_a.data_a.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.ema_a.data_a.get(second_last).unwrap(),
                 prev_b: 0.,
                 status: Status::Default,
             },
             ema_b: CompactIndicator {
                 current_a: *doc.indicators.ema_b.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_b.data_a.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.ema_b.data_a.get(second_last).unwrap(),
                 prev_b: 0.,
                 status: Status::Default,
             },
             ema_c: CompactIndicator {
                 current_a: *doc.indicators.ema_c.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_c.data_a.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.ema_c.data_a.get(second_last).unwrap(),
                 prev_b: 0.,
                 status: Status::Default,
             },
             tema_a: CompactIndicator {
                 current_a: *doc.indicators.tema_a.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.tema_a.data_a.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.tema_a.data_a.get(second_last).unwrap(),
                 prev_b: 0.,
                 status: Status::Default,
             },
             tema_b: CompactIndicator {
                 current_a: *doc.indicators.tema_b.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.tema_b.data_a.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.tema_b.data_a.get(second_last).unwrap(),
                 prev_b: 0.,
                 status: Status::Default,
             },
             tema_c: CompactIndicator {
                 current_a: *doc.indicators.tema_c.data_a.last().unwrap(),
                 current_b: 0.,
-                prev_a: *doc.indicators.tema_c.data_a.get(len - 2).unwrap(),
+                prev_a: *doc.indicators.tema_c.data_a.get(second_last).unwrap(),
                 prev_b: 0.,
                 status: Status::Default,
             },

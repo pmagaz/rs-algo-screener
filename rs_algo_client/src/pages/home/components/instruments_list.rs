@@ -7,6 +7,7 @@ use rs_algo_shared::helpers::comp::is_equal;
 use yew::{function_component, html, Callback, use_state, Properties, Html};
 use wasm_bindgen::prelude::*;
 use web_sys::MouseEvent;
+use std::cmp::Ordering;
 
 #[wasm_bindgen]
 extern "C" {
@@ -118,6 +119,7 @@ pub fn instrument_list(props: &Props
     let instrument_list: Html = instruments
         .iter()
         .map(|instrument| {
+
             let on_instrument_select = {
                 let on_symbol_click = on_symbol_click.clone();
                 let symbol = instrument.symbol.clone();
@@ -190,11 +192,22 @@ pub fn instrument_list(props: &Props
                 DivergenceType::Bearish => divergence_type.to_string(),
                 DivergenceType::None   => "".to_owned() 
             }; 
+
+           
+            let price_change = round((instrument.current_price - instrument.prev_price),2);
+            let price_change_u = (instrument.current_price - instrument.prev_price) as usize;
+           
+            let price_change_status = match price_change_u.cmp(&0){
+                Ordering::Greater => Status::Bullish, 
+                Ordering::Equal => Status::Bullish, 
+                Ordering::Less => Status::Bearish,   
+            };
             
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
+                    <td class={get_status_class(&price_change_status)}> {format!("{:?}%", price_change)}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.1}</td>
@@ -222,6 +235,7 @@ pub fn instrument_list(props: &Props
                 <tr>
                 <th><abbr>{ "Symbol" }</abbr></th>
                 <th><abbr>{ "Price" }</abbr></th>
+                <th><abbr>{ "Chg%" }</abbr></th>
                 <th><abbr>{ "Candle" }</abbr></th>
                 <th><abbr>{ "Pattern" }</abbr></th>
                 <th><abbr>{ "Band" }</abbr></th>
