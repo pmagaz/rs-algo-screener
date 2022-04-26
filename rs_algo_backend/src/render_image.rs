@@ -25,7 +25,7 @@ impl Backend {
             .parse::<f64>()
             .unwrap();
 
-        let extrema_peaks_marker_pos = env::var("EXTREMA_PEAKS_MARKERS_POS")
+        let _extrema_peaks_marker_pos = env::var("EXTREMA_PEAKS_MARKERS_POS")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -44,8 +44,8 @@ impl Backend {
         let data = instrument.data.clone();
         let local_maxima = &instrument.peaks.local_maxima;
         let local_minima = &instrument.peaks.local_minima;
-        let extrema_maxima = &instrument.peaks.extrema_maxima;
-        let extrema_minima = &instrument.peaks.extrema_minima;
+        let _extrema_maxima = &instrument.peaks.extrema_maxima;
+        let _extrema_minima = &instrument.peaks.extrema_minima;
         //let horizontal_levels = instrument.horizontal_levels.horizontal_levels;
 
         let local_patterns = &instrument.patterns.local_patterns;
@@ -83,15 +83,15 @@ impl Backend {
         let macd_a = &macd.data_a;
         let macd_b = &macd.data_b;
 
-        let rsi = &instrument.indicators.rsi.data_a;
+        let _rsi = &instrument.indicators.rsi.data_a;
 
-        let ema_a = &instrument.indicators.ema_a.data_a;
-        let ema_b = &instrument.indicators.ema_b.data_a;
-        let ema_c = &instrument.indicators.ema_c.data_a;
+        let _ema_a = &instrument.indicators.ema_a.data_a;
+        let _ema_b = &instrument.indicators.ema_b.data_a;
+        let _ema_c = &instrument.indicators.ema_c.data_a;
 
         let tema_a = &instrument.indicators.tema_a.data_a;
         let tema_b = &instrument.indicators.tema_b.data_a;
-        let tema_c = &instrument.indicators.tema_c.data_a;
+        let _tema_c = &instrument.indicators.tema_c.data_a;
 
         //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
         let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
@@ -116,7 +116,7 @@ impl Backend {
             .draw()
             .unwrap();
         chart
-            .draw_series(data.iter().enumerate().map(|(id, candle)| {
+            .draw_series(data.iter().enumerate().map(|(_id, candle)| {
                 let (bullish, bearish): (ShapeStyle, ShapeStyle) = match candle {
                     _x if candle.close >= candle.open => {
                         (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled())
@@ -142,12 +142,12 @@ impl Backend {
 
         // PATTERN NAME
 
-        for (x, pattern) in patterns.iter().enumerate() {
+        for (_x, pattern) in patterns.iter().enumerate() {
             chart
                 .draw_series(PointSeries::of_element(
                     (0..)
                         .zip(pattern.data_points.iter())
-                        .filter(|(i, highs)| highs.0 < total_len)
+                        .filter(|(_i, highs)| highs.0 < total_len)
                         .map(|(i, highs)| {
                             let idx = highs.0;
                             let value = highs.1;
@@ -158,7 +158,7 @@ impl Backend {
                     ShapeStyle::from(&RED).filled(),
                     &|coord, _size: i32, _style| {
                         let new_coord = (coord.0, coord.1);
-                        let mut pattern_name;
+                        let pattern_name;
                         if coord.2 == 0 {
                             pattern_name = Text::new(
                                 format!("{:?}", pattern.pattern_type),
@@ -177,14 +177,14 @@ impl Backend {
         }
 
         // PATTERN LINE
-        for (x, pattern) in local_patterns.iter().enumerate() {
+        for (_x, pattern) in local_patterns.iter().enumerate() {
             chart
                 .draw_series(LineSeries::new(
                     (0..)
                         .zip(pattern.data_points.iter())
                         .enumerate()
-                        .filter(|(key, (i, highs))| highs.0 < total_len && key % 2 == 0)
-                        .map(|(key, (i, highs))| {
+                        .filter(|(key, (_i, highs))| highs.0 < total_len && key % 2 == 0)
+                        .map(|(_key, (_i, highs))| {
                             let idx = highs.0;
                             let value = highs.1;
                             let date = data[idx].date;
@@ -196,14 +196,14 @@ impl Backend {
                 .label(format!("{:?}", pattern.pattern_type));
         }
 
-        for (x, pattern) in local_patterns.iter().enumerate() {
+        for (_x, pattern) in local_patterns.iter().enumerate() {
             chart
                 .draw_series(LineSeries::new(
                     (0..)
                         .zip(pattern.data_points.iter())
                         .enumerate()
-                        .filter(|(key, (i, highs))| highs.0 < total_len && key % 2 != 0)
-                        .map(|(key, (i, highs))| {
+                        .filter(|(key, (_i, highs))| highs.0 < total_len && key % 2 != 0)
+                        .map(|(_key, (_i, highs))| {
                             let idx = highs.0;
                             let value = highs.1;
                             let date = data[idx].date;
@@ -225,13 +225,13 @@ impl Backend {
                 };
 
                 if local_maxima.contains(&(i, price)) {
-                    return TriangleMarker::new(
+                    TriangleMarker::new(
                         (candle.date, price + (price * local_peaks_marker_pos)),
                         -4,
                         BLUE.mix(0.2),
-                    );
+                    )
                 } else {
-                    return TriangleMarker::new((candle.date, price), 0, &TRANSPARENT);
+                    TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
                 }
             }))
             .unwrap();
@@ -245,13 +245,13 @@ impl Backend {
                 };
 
                 if local_minima.contains(&(i, price)) {
-                    return TriangleMarker::new(
+                    TriangleMarker::new(
                         (candle.date, price - (price * local_peaks_marker_pos)),
                         4,
                         BLUE.mix(0.2),
-                    );
+                    )
                 } else {
-                    return TriangleMarker::new((candle.date, price), 0, &TRANSPARENT);
+                    TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
                 }
             }))
             .unwrap();
@@ -309,16 +309,16 @@ impl Backend {
                         }
                     }
 
-                    return TriangleMarker::new(
+                    TriangleMarker::new(
                         (
                             candle.date,
                             direction.1 - (direction.1 * local_peaks_marker_pos - 2.),
                         ),
                         direction.0,
                         RED_LINE,
-                    );
+                    )
                 } else {
-                    return TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT);
+                    TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT)
                 }
             }))
             .unwrap();

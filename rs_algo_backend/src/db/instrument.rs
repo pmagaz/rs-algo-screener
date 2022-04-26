@@ -35,7 +35,7 @@ pub async fn find_by_params(
     let collection = get_collection::<CompactInstrument>(&state.db_mem, collection_name).await;
 
     let query = match params.as_ref() {
-        "" => strategy.query().to_owned(),
+        "" => strategy.query(),
         _ => serde_json::from_str(&params).unwrap(),
     };
 

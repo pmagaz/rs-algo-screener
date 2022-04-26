@@ -6,7 +6,7 @@ use actix_web::web;
 use bson::doc;
 use futures::StreamExt;
 use mongodb::error::Error;
-use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
+use mongodb::options::{FindOneAndReplaceOptions};
 use std::env;
 
 pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<WatchInstrument>, Error> {

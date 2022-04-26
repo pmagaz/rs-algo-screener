@@ -112,7 +112,7 @@ pub async fn upsert(
     );
 
     //FOR XTB
-    if symbol.contains("_") {
+    if symbol.contains('_') {
         let symbol_str: Vec<&str> = symbol.split('_').collect();
         instrument.symbol = symbol_str[0].to_owned();
     }

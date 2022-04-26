@@ -1,7 +1,7 @@
 use crate::error::Result;
-use crate::models::app_state::AppState;
+
 use crate::models::db::Db;
-use actix_web::web;
+
 use mongodb::Collection;
 use rs_algo_shared::models::*;
 use std::cmp::Ordering;
@@ -10,7 +10,7 @@ pub async fn get_collection<T>(db: &Db, collection: &str) -> Collection<T> {
     db.client.database(&db.name).collection::<T>(collection)
 }
 
-pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
+pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
     let len = doc.data.len();
     let second_last = match len.cmp(&2) {
         Ordering::Greater => len - 2,

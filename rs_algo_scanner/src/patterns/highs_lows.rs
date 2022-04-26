@@ -174,5 +174,6 @@ pub fn has_minimum_target(data: &DataPoints) -> bool {
         .parse::<f64>()
         .unwrap();
     //true
+    //FIXME
     percentage_change(data[0].1, data[1].1).abs() > min_target
 }

@@ -1,5 +1,5 @@
 use actix_cors::Cors;
-use actix_web::{get, http, web, App, HttpRequest, HttpResponse, HttpServer};
+use actix_web::{http};
 
 pub fn cors_middleware() -> Cors {
     Cors::default()
