@@ -12,9 +12,9 @@ pub async fn get_collection<T>(db: &Db, collection: &str) -> Collection<T> {
 
 pub fn compact_instrument(mut doc: Instrument) -> Result<CompactInstrument> {
     let len = doc.data.len();
-    let second_last = match len.cmp(&1) {
+    let second_last = match len.cmp(&2) {
         Ordering::Greater => len - 2,
-        Ordering::Equal => len,
+        Ordering::Equal => len - 1,
         Ordering::Less => len,
     };
     let doc = CompactInstrument {
