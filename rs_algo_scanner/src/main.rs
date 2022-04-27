@@ -72,7 +72,7 @@ async fn main() -> Result<()> {
 
     // let symbols = [
     //     Symbol {
-    //         symbol: "SALM.NO".to_owned(),
+    //         symbol: "TSLA.US_9".to_owned(),
     //         category: "".to_owned(),
     //         description: "".to_owned(),
     //         currency: "".to_owned(),

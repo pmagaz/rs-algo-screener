@@ -1,13 +1,9 @@
-use std::ops::Div;
-
 use round::{round};
 use rs_algo_shared::models::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
-use rs_algo_shared::helpers::comp::{percentage_change, is_equal};
+use rs_algo_shared::helpers::comp::{percentage_change, price_change, is_equal};
 use yew::{function_component, html, Callback, use_state, Properties, Html};
 use wasm_bindgen::prelude::*;
-use web_sys::MouseEvent;
-use std::cmp::Ordering;
 
 #[wasm_bindgen]
 extern "C" {
@@ -193,19 +189,18 @@ pub fn instrument_list(props: &Props
                 DivergenceType::None   => "".to_owned() 
             }; 
           
-            let leches = (instrument.current_price - instrument.prev_price) as isize;
-            let price_change = percentage_change(instrument.current_price, instrument.prev_price);
-            let price_display = match leches.cmp(&0) {
-                Ordering::Greater => round(price_change,2).to_string(), 
-                Ordering::Equal => round(price_change,2).to_string(), 
-                Ordering::Less => format!("-{:?}", round(price_change,2))
+            let price_display = round(price_change(instrument.prev_price, instrument.current_price),2);
+
+            let price_change_status = match price_display {
+                   _x if price_display >= 0.0 => {
+                    Status::Bullish
+                }
+                _x if price_display < 0.0 => {
+                    Status::Bearish
+                }
+                _ => Status::Neutral 
             };
 
-            let price_change_status = match leches.cmp(&0){
-                Ordering::Greater => Status::Bullish, 
-                Ordering::Equal => Status::Bullish, 
-                Ordering::Less => Status::Bearish,   
-            };
 
             html! {
                 <tr>

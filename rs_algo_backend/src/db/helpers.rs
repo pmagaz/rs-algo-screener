@@ -17,6 +17,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
         Ordering::Equal => len - 1,
         Ordering::Less => len,
     };
+
     let doc = CompactInstrument {
         symbol: doc.symbol,
         date: doc.date,
