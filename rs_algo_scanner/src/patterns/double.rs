@@ -17,7 +17,6 @@ pub fn is_top(data: &DataPoints) -> bool {
         && data[0].1 < data[1].1
         && data[2].1 < data[1].1
         && data[2].1 < data[3].1
-        && data[4].1 < data[3].1
     {
         true
     } else {
@@ -47,7 +46,6 @@ pub fn is_bottom(data: &DataPoints) -> bool {
         && data[0].1 > data[1].1
         && data[2].1 > data[1].1
         && data[2].1 > data[3].1
-        && data[4].1 > data[3].1
     {
         true
     } else {
