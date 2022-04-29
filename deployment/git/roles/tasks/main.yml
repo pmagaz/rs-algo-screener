@@ -5,4 +5,5 @@
     repo: "{{ repo_url }}" 
     dest: "{{ local_path }}"
     clone: no
+    version: "feat/remove_datapoint"
     update: yes
