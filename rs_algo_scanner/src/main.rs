@@ -100,7 +100,7 @@ async fn main() -> Result<()> {
     //     //     category: "".to_owned(),
     //     //     description: "".to_owned(),
     //     //     currency: "".to_owned(),
-    //     // },g
+    //     // },
     // ];
 
     let ignore_list: Vec<String> = env::var("SYMBOL_IGNORE_LIST")
