@@ -139,10 +139,12 @@ pub fn bands_have_same_slope(data: &DataPoints) -> bool {
         .parse::<f64>()
         .unwrap();
 
-    let threshold = ((data[1].1 - data[2].1) * slope_threshold).abs();
     let (points_1, _y) = slope_intercept(data[0].0 as f64, data[0].1, data[2].0 as f64, data[2].1);
     let (points_2, _y) = slope_intercept(data[1].0 as f64, data[1].1, data[3].0 as f64, data[3].1);
-    (round(points_1.abs(), 2) - round(points_2.abs(), 2)).abs() < threshold
+
+    let threshold = (points_1 - points_2).abs();
+
+    (round(points_1.abs(), 2) - round(points_2.abs(), 2)).abs() < slope_threshold
 }
 
 pub fn are_parallel_lines(data: &DataPoints) -> bool {
@@ -151,12 +153,10 @@ pub fn are_parallel_lines(data: &DataPoints) -> bool {
         .parse::<f64>()
         .unwrap();
 
-    let threshold = ((data[1].1 - data[2].1) * slope_threshold).abs();
-
     let (points_1, _y) = slope_intercept(data[0].0 as f64, data[0].1, data[2].0 as f64, data[2].1);
-    let (bottom_slope, _y) =
-        slope_intercept(data[1].0 as f64, data[1].1, data[3].0 as f64, data[3].1);
-    (round(bottom_slope, 2) - round(points_1, 2)).abs() < threshold
+    let (points_2, _y) = slope_intercept(data[1].0 as f64, data[1].1, data[3].0 as f64, data[3].1);
+
+    (round(points_1.abs(), 2) - round(points_2.abs(), 2)).abs() < slope_threshold
 }
 
 pub fn has_minimum_bars(data: &DataPoints) -> bool {
