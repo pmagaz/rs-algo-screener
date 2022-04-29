@@ -12,7 +12,9 @@ pub fn next_intercept(x1: f64, y1: f64, x2: f64, y2: f64) -> (f64, f64) {
     let (slope, y_intercept) = slope_intercept(x1, y1, x2, y2);
     let hypo = hypotenuse(x2 - x1, y2 - y1);
     let new_x1 = x2 + hypo;
+
     let new_y1 = (slope * new_x1) + y_intercept;
+
     (new_x1, new_y1)
 }
 
