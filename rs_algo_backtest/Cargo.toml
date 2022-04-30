@@ -1,0 +1,22 @@
+[package]
+name = "rs_algo_backtest"
+version = "0.1.0"
+authors = ["pmagaz <magazpablo@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.56"
+thiserror = "1.0.30"
+tokio = { version = "1.17.0", features = ["rt-multi-thread", "macros"] }
+serde = { version = "1.0.136", features = ["derive"] }
+serde_json = "1.0.79"
+serde_qs = "0.9.1"
+dotenv = "0.15.0"
+chrono = {version = "0.4.19",  features = ["serde"] }
+async-trait = "0.1.52"
+round = "0.1.2"
+futures = "0.3.21"
+reqwest = { version = "0.11.10", features = ["json"] }
+
+plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "ccd5a16"}
