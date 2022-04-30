@@ -1,7 +1,7 @@
 use crate::error::Result;
-use crate::models::*;
-
 use plotters::prelude::*;
+use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::models::pattern::PatternDirection;
 use std::env;
 
 #[derive(Debug, Clone)]

@@ -3,7 +3,7 @@ use super::pattern::pattern_active_result;
 use crate::candle::Candle;
 use crate::prices::*;
 
-use rs_algo_shared::models::*;
+use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 
 pub fn is_ascendant_top(data: &DataPoints) -> bool {
     if is_higher_highs_top(data)

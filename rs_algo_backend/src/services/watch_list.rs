@@ -6,7 +6,8 @@ use crate::models::app_state::AppState;
 use actix_web::{web, HttpResponse};
 use bson::doc;
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::models::*;
+use rs_algo_shared::models::watch_instrument::*;
+
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
 

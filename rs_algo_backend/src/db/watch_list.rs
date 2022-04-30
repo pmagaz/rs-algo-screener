@@ -1,12 +1,12 @@
 use super::helpers::get_collection;
 use crate::models::app_state::AppState;
-use rs_algo_shared::models::*;
+use rs_algo_shared::models::watch_instrument::*;
 
 use actix_web::web;
 use bson::doc;
 use futures::StreamExt;
 use mongodb::error::Error;
-use mongodb::options::{FindOneAndReplaceOptions};
+use mongodb::options::FindOneAndReplaceOptions;
 use std::env;
 
 pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<WatchInstrument>, Error> {

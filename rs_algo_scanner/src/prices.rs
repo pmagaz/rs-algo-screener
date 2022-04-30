@@ -4,8 +4,7 @@ use crate::helpers::slope_intercept::slope_intercept;
 use rs_algo_shared::helpers::comp::percentage_change;
 
 use rs_algo_shared::helpers::date::{DbDateTime, Duration, Local};
-use rs_algo_shared::models::{DataPoints, PatternType};
-use std::env;
+use rs_algo_shared::models::pattern::{DataPoints, PatternType};
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
 

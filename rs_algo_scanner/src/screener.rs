@@ -3,7 +3,7 @@ use crate::broker::{Broker, Response, VEC_DOHLC};
 use crate::error::Result;
 use crate::instrument::Instrument;
 
-use rs_algo_shared::models::TimeFrameType;
+use rs_algo_shared::models::time_frame::TimeFrameType;
 use std::env;
 use std::future::Future;
 

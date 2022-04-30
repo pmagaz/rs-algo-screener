@@ -2,7 +2,8 @@ use crate::candle::CandleType;
 use crate::error::Result;
 use crate::indicators::Indicator;
 use crate::instrument::Instrument;
-use crate::patterns::pattern::{PatternActive, PatternDirection};
+use rs_algo_shared::models::pattern::PatternDirection;
+
 use plotters::prelude::*;
 
 use std::env;

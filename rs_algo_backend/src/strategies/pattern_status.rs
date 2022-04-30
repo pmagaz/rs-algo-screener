@@ -1,6 +1,6 @@
-
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::models::*;
+use rs_algo_shared::models::pattern::{Pattern, PatternType};
+use rs_algo_shared::models::status::Status;
 use std::env;
 
 pub fn get_pattern_status(
@@ -26,7 +26,6 @@ pub fn get_pattern_status(
 
     let fake_date = DbDateTime::from_chrono(Local::now() - Duration::days(1000));
 
-    
     match pattern {
         Some(_pat) => {
             let pattern_active = match pattern {
@@ -48,8 +47,6 @@ pub fn get_pattern_status(
                 Some(val) => val.pattern_type.clone(),
                 None => PatternType::None,
             };
-
-            
 
             match pattern {
                 _x if pattern_active && pattern_active_date > max_activated_date => Status::Bullish,

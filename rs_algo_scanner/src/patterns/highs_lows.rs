@@ -1,8 +1,8 @@
-use super::pattern::DataPoints;
 use crate::helpers::slope_intercept::slope_intercept;
 
 use round::round;
 use rs_algo_shared::helpers::comp::*;
+use rs_algo_shared::models::pattern::DataPoints;
 use std::env;
 
 pub fn is_higher_highs_top(data: &DataPoints) -> bool {

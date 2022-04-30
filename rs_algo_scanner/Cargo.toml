@@ -5,7 +5,7 @@ authors = ["pmagaz <magazpablo@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.56"
+anyhow = "1.0.57"
 thiserror = "1.0.30"
 tokio = { version = "1.17.0", features = ["rt-multi-thread", "macros"] }
 serde = { version = "1.0.136", features = ["derive"] }
@@ -24,4 +24,4 @@ openssl = { version = "0.10.38", features = ["vendored"] }
 tungstenite = {version = "0.17.2", features = ["native-tls"]}
 
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "ccd5a16"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "e73ab89"}

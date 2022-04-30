@@ -3,7 +3,7 @@ mod pattern_status;
 use async_trait::async_trait;
 use mongodb::Cursor;
 use rs_algo_shared::error::Result;
-use rs_algo_shared::models::CompactInstrument;
+use rs_algo_shared::models::instrument::CompactInstrument;
 
 use bson::Document;
 

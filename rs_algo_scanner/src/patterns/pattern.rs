@@ -1,17 +1,17 @@
 use crate::candle::Candle;
-use crate::helpers::poly::{self, poly_fit};
+use crate::helpers::poly::poly_fit;
 use crate::helpers::slope_intercept::{add_next_bottom_points, add_next_top_points};
 use crate::patterns::*;
 use crate::prices::{calculate_price_change, calculate_price_target};
-use plotters::data;
+
 use rs_algo_shared::helpers::comp::percentage_change;
 use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Duration, Local};
-pub use rs_algo_shared::models::*;
+use rs_algo_shared::models::pattern::*;
+use rs_algo_shared::models::status::Status;
+
 use serde::{Deserialize, Serialize};
 use std::env;
 
-type Point = (usize, f64);
-pub type DataPoints = Vec<Point>;
 pub type PatternActiveResult = (bool, usize, f64, DbDateTime);
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

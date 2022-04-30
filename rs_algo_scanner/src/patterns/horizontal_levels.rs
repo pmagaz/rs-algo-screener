@@ -3,7 +3,8 @@ use super::peaks::Peaks;
 use crate::error::Result;
 use rs_algo_shared::helpers::comp::is_same_band;
 use rs_algo_shared::helpers::date::{DbDateTime, Duration, Local};
-use rs_algo_shared::models::{HorizontalLevel, HorizontalLevelType};
+use rs_algo_shared::models::horizontal_level::{HorizontalLevel, HorizontalLevelType};
+
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::env;

@@ -1,6 +1,5 @@
 use crate::routes::Route;
-use std::rc::Rc;
-use yew::{classes, function_component, html, html::Scope, Html, Properties};
+use yew::{classes, function_component, html};
 use yew_router::prelude::*;
 
 #[function_component(Header)]

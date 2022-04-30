@@ -7,7 +7,7 @@ use broker::xtb::*;
 use instrument::Instrument;
 use rs_algo_shared::helpers::date;
 use rs_algo_shared::helpers::date::Local;
-use rs_algo_shared::models::TimeFrame;
+use rs_algo_shared::models::time_frame::TimeFrame;
 use screener::Screener;
 
 mod backend;

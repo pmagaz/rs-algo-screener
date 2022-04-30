@@ -1,5 +1,4 @@
 use super::Indicator;
-use super::Status;
 use crate::error::Result;
 
 use serde::{Deserialize, Serialize};

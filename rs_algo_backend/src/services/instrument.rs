@@ -2,11 +2,11 @@ use crate::db;
 use crate::db::helpers::compact_instrument;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::models::Instrument;
 use crate::render_image::Backend;
 use crate::strategies::general::General;
 
-pub use rs_algo_shared::models::*;
+use rs_algo_shared::models::api::*;
+use rs_algo_shared::models::instrument::*;
 use std::time::Instant;
 
 use actix_files as fs;
@@ -43,14 +43,13 @@ pub async fn find_one(
     Ok(HttpResponse::Ok().json(instrument))
 }
 
-pub async fn render(
-    query: web::Query<SymbolQuery>,
+pub async fn chart(
+    symbol: web::Path<String>,
     state: web::Data<AppState>,
 ) -> Result<fs::NamedFile, RsAlgoError> {
     let now = Instant::now();
-    let symbol = &query.symbol;
 
-    let instrument = db::instrument::find_by_symbol(symbol, &state)
+    let instrument = db::instrument::find_by_symbol(&*symbol, &state)
         .await
         .unwrap()
         .unwrap();
@@ -61,7 +60,7 @@ pub async fn render(
     let image_folder = &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap();
     let mut image_path = PathBuf::new();
     image_path.push(image_folder);
-    image_path.push([symbol, ".png"].concat());
+    image_path.push([&symbol, ".png"].concat());
 
     println!("[PATH] {:?}", image_path.to_str());
 
@@ -85,6 +84,33 @@ pub async fn find(params: String, state: web::Data<AppState>) -> Result<HttpResp
         .unwrap();
 
     println!("[FIND] {:?} {:?}", Local::now(), now.elapsed());
+
+    Ok(HttpResponse::Ok().json(instruments))
+}
+
+pub async fn find_detail(
+    params: String,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+    let strategy = General::new().unwrap();
+    let instruments = db::instrument::find_detail_by_params(&state, params, strategy)
+        .await
+        .unwrap();
+
+    println!("[FIND] {:?} {:?}", Local::now(), now.elapsed());
+
+    Ok(HttpResponse::Ok().json(instruments))
+}
+
+pub async fn find_all(
+    params: String,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+    let instruments = db::instrument::find_all(&state).await.unwrap();
+
+    println!("[FIND ALL] {:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(instruments))
 }
