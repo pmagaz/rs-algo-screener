@@ -1,10 +1,15 @@
 use super::pattern_status::get_pattern_status;
-
 use async_trait::async_trait;
 use bson::{doc, Document};
 use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::Cursor;
+use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Local};
+use rs_algo_shared::models::divergence::{Divergence, DivergenceType};
+use rs_algo_shared::models::indicator::IndicatorType;
+use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::models::pattern::{DataPoints, Pattern, PatternType};
+use rs_algo_shared::models::status::Status;
 use std::cmp::Ordering;
 
 use round::round;

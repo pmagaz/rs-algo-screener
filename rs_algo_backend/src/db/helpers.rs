@@ -3,7 +3,12 @@ use crate::error::Result;
 use crate::models::db::Db;
 
 use mongodb::Collection;
-use rs_algo_shared::models::*;
+use rs_algo_shared::models::divergence::*;
+use rs_algo_shared::models::indicator::*;
+use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::models::pattern::*;
+use rs_algo_shared::models::status::Status;
+
 use std::cmp::Ordering;
 
 pub async fn get_collection<T>(db: &Db, collection: &str) -> Collection<T> {

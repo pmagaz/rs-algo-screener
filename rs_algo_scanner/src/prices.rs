@@ -4,8 +4,7 @@ use crate::helpers::slope_intercept::slope_intercept;
 use rs_algo_shared::helpers::comp::percentage_change;
 
 use rs_algo_shared::helpers::date::{DbDateTime, Duration, Local};
-use rs_algo_shared::models::{DataPoints, PatternType};
-use std::env;
+use rs_algo_shared::models::pattern::{DataPoints, PatternType};
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
 
@@ -14,7 +13,7 @@ pub fn price_is_higher_upper_band_top(
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
 ) -> PriceBreak {
-    let points = vec![data[4], data[6]];
+    let points = vec![data[2], data[4]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
     search_price_break(points, candles, &break_price_comparator)
 }
@@ -44,7 +43,7 @@ pub fn price_is_lower_low_band_top(
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
 ) -> PriceBreak {
-    let points = vec![data[4], data[6]];
+    let points = vec![data[2], data[4]];
     let break_price_comparator = |price: f64, price_break: f64| price < price_break;
     search_price_break(points, candles, &break_price_comparator)
 }

@@ -2,13 +2,12 @@ use super::api;
 use crate::components::loading::Loading;
 use crate::pages::home::components::instruments_list::InstrumentsList;
 
-use crate::components::plotter::Plotter;
-use rs_algo_shared::models::CompactInstrument;
+use crate::components::chart::Chart;
+use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::models::watch_instrument::*;
 use wasm_bindgen::prelude::*;
-use web_sys::MouseEvent;
 
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::models::*;
 
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
 #[wasm_bindgen]
@@ -25,6 +24,7 @@ extern "C" {
 pub fn home() -> Html {
     let base_url = get_base_url();
     let instruments_url = [base_url.as_str(), "api/instruments"].concat();
+    let plotter_url = [base_url.as_str(), "api/instruments"].concat();
     let watch_list_url = [base_url.as_str(), "api/watchlist"].concat();
     let use_instruments = use_state(|| vec![]);
     let use_watch_instruments = use_state(|| vec![]);
@@ -181,7 +181,7 @@ pub fn home() -> Html {
                         <Loading loading={ *use_loading} />
                 </div>
             </div>
-            <Plotter url={(*use_instruments_url).clone()}/>
+            <Chart url={(*use_instruments_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid ">
                     <h2 class="navbar-item is-size-3">{ "Watch List" }</h2>

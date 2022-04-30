@@ -2,6 +2,7 @@
 members = [
     "rs_algo_scanner",
     "rs_algo_backend",
+    "rs_algo_backtest",
     "rs_algo_client",
 ]
-default-members = ["rs_algo_scanner","rs_algo_backend","rs_algo_client"]
+default-members = ["rs_algo_scanner","rs_algo_backend","rs_algo_client","rs_algo_backtest"]

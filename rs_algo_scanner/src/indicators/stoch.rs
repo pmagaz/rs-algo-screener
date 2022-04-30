@@ -1,8 +1,8 @@
 use super::Indicator;
-use super::Status;
+use rs_algo_shared::models::status::Status;
+
 use crate::error::Result;
 
-use ta::indicators::FastStochastic;
 use ta::indicators::SlowStochastic;
 
 use serde::{Deserialize, Serialize};

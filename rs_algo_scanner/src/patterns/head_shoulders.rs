@@ -4,7 +4,7 @@ use crate::candle::Candle;
 use crate::prices::*;
 use rs_algo_shared::helpers::comp::*;
 
-use rs_algo_shared::models::*;
+use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 
 pub fn is_hs(data: &DataPoints) -> bool {
     if data[0].1 > data[1].1

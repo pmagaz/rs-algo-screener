@@ -4,7 +4,7 @@ use crate::candle::Candle;
 use crate::prices::*;
 use rs_algo_shared::helpers::comp::*;
 
-use rs_algo_shared::models::*;
+use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 use std::env;
 
 pub fn is_top(data: &DataPoints) -> bool {
@@ -17,7 +17,6 @@ pub fn is_top(data: &DataPoints) -> bool {
         && data[0].1 < data[1].1
         && data[2].1 < data[1].1
         && data[2].1 < data[3].1
-        && data[4].1 < data[3].1
     {
         true
     } else {
@@ -47,7 +46,6 @@ pub fn is_bottom(data: &DataPoints) -> bool {
         && data[0].1 > data[1].1
         && data[2].1 > data[1].1
         && data[2].1 > data[3].1
-        && data[4].1 > data[3].1
     {
         true
     } else {

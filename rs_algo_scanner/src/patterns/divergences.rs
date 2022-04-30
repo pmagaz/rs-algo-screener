@@ -4,8 +4,10 @@ use crate::helpers::maxima_minima::maxima_minima;
 use crate::indicators::{Indicator, Indicators};
 use crate::patterns::highs_lows::*;
 use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Duration, Local};
+use rs_algo_shared::models::divergence::{Divergence, DivergenceType};
+use rs_algo_shared::models::indicator::IndicatorType;
+use rs_algo_shared::models::pattern::{DataPoints, Pattern, PatternType};
 
-pub use rs_algo_shared::models::*;
 use serde::{Deserialize, Serialize};
 use std::env;
 

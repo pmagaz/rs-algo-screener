@@ -1,4 +1,3 @@
-
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use dotenv::dotenv;
 
@@ -17,6 +16,7 @@ use error::RsAlgoError;
 use middleware::cors::cors_middleware;
 use models::app_state::AppState;
 use models::db::Db;
+use services::back_test;
 use services::index::index;
 use services::instrument;
 use services::watch_list;
@@ -76,11 +76,20 @@ async fn main() -> Result<()> {
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")
-                    .route("/instruments", web::get().to(instrument::render))
                     .route("/instruments", web::post().to(instrument::find))
                     .route("/instruments", web::put().to(instrument::upsert))
+                    .route("/instruments/{symbol}", web::get().to(instrument::find_one))
+                    .route(
+                        "/instruments/chart/{symbol}",
+                        web::get().to(instrument::chart),
+                    )
                     .route("/watchlist", web::get().to(watch_list::find))
-                    .route("/watchlist", web::put().to(watch_list::upsert)),
+                    .route("/watchlist", web::put().to(watch_list::upsert))
+                    .route("/backtest", web::get().to(back_test::find_all))
+                    .route(
+                        "/backtest/instruments",
+                        web::get().to(back_test::find_instruments),
+                    ),
             )
     })
     .bind(["0.0.0.0:", &port].concat())

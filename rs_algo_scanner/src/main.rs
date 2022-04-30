@@ -7,7 +7,7 @@ use broker::xtb::*;
 use instrument::Instrument;
 use rs_algo_shared::helpers::date;
 use rs_algo_shared::helpers::date::Local;
-use rs_algo_shared::models::TimeFrame;
+use rs_algo_shared::models::time_frame::TimeFrame;
 use screener::Screener;
 
 mod backend;
@@ -77,12 +77,18 @@ async fn main() -> Result<()> {
     //         description: "".to_owned(),
     //         currency: "".to_owned(),
     //     },
-    //     Symbol {
-    //         symbol: "OIL".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
+    //     // Symbol {
+    //     //     symbol: "OKE.US_4".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
+    //     // Symbol {
+    //     //     symbol: "NET.US".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
     //     // Symbol {
     //     //     symbol: "TSLA.US_4".to_owned(),
     //     //     category: "".to_owned(),
@@ -90,13 +96,7 @@ async fn main() -> Result<()> {
     //     //     currency: "".to_owned(),
     //     // },
     //     // Symbol {
-    //     //     symbol: "USDIDX".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "EURRON".to_owned(),
+    //     //     symbol: "OIL".to_owned(),
     //     //     category: "".to_owned(),
     //     //     description: "".to_owned(),
     //     //     currency: "".to_owned(),

@@ -3,11 +3,12 @@ use crate::error::{Result, RsAlgoError, RsAlgoErrorKind};
 use crate::indicators::Indicators;
 use crate::patterns::divergences::Divergences;
 use crate::patterns::horizontal_levels::HorizontalLevels;
-use crate::patterns::pattern::{PatternSize, Patterns};
+use crate::patterns::pattern::Patterns;
 use crate::patterns::peaks::Peaks;
 
 use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Duration, Local};
-use rs_algo_shared::models::TimeFrameType;
+use rs_algo_shared::models::pattern::PatternSize;
+use rs_algo_shared::models::time_frame::TimeFrameType;
 
 use serde::{Deserialize, Serialize};
 use std::env;

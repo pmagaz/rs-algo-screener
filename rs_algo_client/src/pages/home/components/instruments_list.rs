@@ -1,9 +1,16 @@
 use round::{round};
-use rs_algo_shared::models::*;
+use rs_algo_shared::models::pattern::*;
+use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::models::status::Status;
+use rs_algo_shared::models::divergence::*;
+use rs_algo_shared::models::candle::*;
+use rs_algo_shared::models::horizontal_level::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
-use rs_algo_shared::helpers::comp::{percentage_change, price_change, is_equal};
-use yew::{function_component, html, Callback, use_state, Properties, Html};
+use rs_algo_shared::helpers::comp::{price_change, is_equal};
+use yew::{function_component, html, Callback, Properties, Html};
 use wasm_bindgen::prelude::*;
+
+
 
 #[wasm_bindgen]
 extern "C" {
@@ -96,8 +103,7 @@ pub fn instrument_list(props: &Props
 ) -> Html {
     let Props { instruments, on_symbol_click, on_watch_click } = props;
     let base_url = get_base_url();
-    let url = [base_url.as_str(), "api/instruments?symbol="].concat();
-    let use_url = use_state(|| String::from(""));
+    let url = [base_url.as_str(), "api/instruments/chart/"].concat();
 
       
     fn get_status_class<'a>(status: &Status) -> &'a str {

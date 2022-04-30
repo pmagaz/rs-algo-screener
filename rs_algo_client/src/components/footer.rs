@@ -1,7 +1,4 @@
-use std::rc::Rc;
-
-use yew::{function_component, html, Html, Properties};
-use yew_router::prelude::*;
+use yew::{function_component, html};
 
 #[function_component(Footer)]
 pub fn footer() -> Html {
