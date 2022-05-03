@@ -10,7 +10,7 @@ pub fn maxima_minima(
 ) -> Result<Vec<(usize, f64)>> {
     let result: Vec<(usize, f64)> = PeakFinder::new(&x_values)
         .with_min_prominence(min_prominence)
-        .with_min_distance(min_distance)
+        //.with_min_distance(0)
         .find_peaks()
         .iter()
         .map(|peak| {
