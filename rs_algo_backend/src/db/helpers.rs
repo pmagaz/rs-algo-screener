@@ -129,7 +129,6 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 .collect(),
         },
         horizontal_levels: doc.horizontal_levels,
-        //divergences: doc.divergences,
         divergences: CompactDivergences {
             data: doc
                 .divergences

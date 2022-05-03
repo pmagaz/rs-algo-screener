@@ -2,8 +2,6 @@ use super::helpers::get_collection;
 use crate::models::app_state::AppState;
 use crate::models::backtest_instrument::BackTestInstrument;
 use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::watch_instrument::*;
 
 use actix_web::web;
 use bson::doc;
@@ -51,15 +49,15 @@ pub async fn find_instruments(
 }
 
 pub async fn upsert(
-    doc: WatchInstrument,
+    doc: BackTestResult,
     state: &web::Data<AppState>,
-) -> Result<Option<WatchInstrument>, Error> {
-    let collection_name = &env::var("DB_BACKTEST_COLLECTION").unwrap();
-    let collection = get_collection::<WatchInstrument>(&state.db_mem, collection_name).await;
+) -> Result<Option<BackTestResult>, Error> {
+    let collection_name = &env::var("DB_BACKTEST_RESULT_COLLECTION").unwrap();
+    let collection = get_collection::<BackTestResult>(&state.db_mem, collection_name).await;
 
     collection
         .find_one_and_replace(
-            doc! { "symbol": doc.symbol.clone() },
+            doc! { "instrument.symbol": doc.instrument.symbol.clone(), "strategy": doc.strategy.clone() },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))

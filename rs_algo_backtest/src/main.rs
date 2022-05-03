@@ -1,18 +1,20 @@
 use std::time::Instant;
 
 use rs_algo_shared::error::{Result, RsAlgoError};
-use rs_algo_shared::helpers::date;
 use rs_algo_shared::helpers::date::Local;
-use rs_algo_shared::models::backtest_instrument::BackTestInstrument;
 use rs_algo_shared::models::instrument::Instrument;
 
 use dotenv::dotenv;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
-
 use std::env;
-use std::{thread, time};
 
-mod back_test;
+mod helpers;
+mod portfolio;
+mod strategies;
+mod trade;
+
+use portfolio::PortFolio;
+use strategies::Strategy;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -30,7 +32,15 @@ async fn main() -> Result<()> {
         .await
         .unwrap();
 
-    back_test::backtest(&instruments);
+    let portfolio = PortFolio {
+        order_size: 1,
+        commission: 0.,
+        instruments: vec![],
+        strategy: strategies::macd::Macd::new().unwrap(),
+    };
+
+    portfolio.test(&instruments).await;
+
     println!("[Finished] at {:?}  in {:?}", Local::now(), start.elapsed());
 
     Ok(())

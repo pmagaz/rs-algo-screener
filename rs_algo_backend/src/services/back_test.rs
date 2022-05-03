@@ -2,7 +2,7 @@ use super::instrument;
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::models::backtest_instrument::BackTestInstrument;
+use crate::models::backtest_instrument::{BackTestInstrument, BackTestResult};
 
 use actix_web::{web, HttpResponse};
 use bson::doc;
@@ -54,4 +54,36 @@ pub async fn find_instruments(state: web::Data<AppState>) -> Result<HttpResponse
     );
 
     Ok(instruments)
+}
+
+pub async fn upsert(
+    backtested_result: String,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+    println!(
+        "[BACKTEST INSTRUMENT] Received at {:?} in {:?}",
+        Local::now(),
+        now.elapsed()
+    );
+
+    let now = Instant::now();
+    let backtested_result: BackTestResult = serde_json::from_str(&backtested_result).unwrap();
+
+    let symbol = backtested_result.instrument.symbol.clone();
+
+    let now = Instant::now();
+    let _upsert = db::back_test::upsert(backtested_result, &state)
+        .await
+        .unwrap();
+
+    println!(
+        "[BACKTEST RESULT UPSERTED] {:?} at {:?} in {:?}",
+        symbol,
+        Local::now(),
+        now.elapsed()
+    );
+    Ok(HttpResponse::Ok().json(ApiResponse {
+        result: "ok".to_owned(),
+    }))
 }
