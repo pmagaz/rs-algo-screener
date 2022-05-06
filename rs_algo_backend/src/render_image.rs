@@ -87,7 +87,7 @@ impl Backend {
 
         let _ema_a = &instrument.indicators.ema_a.data_a;
         let _ema_b = &instrument.indicators.ema_b.data_a;
-        let _ema_c = &instrument.indicators.ema_c.data_a;
+        let ema_c = &instrument.indicators.ema_c.data_a;
 
         let tema_a = &instrument.indicators.tema_a.data_a;
         let tema_b = &instrument.indicators.tema_b.data_a;
@@ -407,14 +407,14 @@ impl Backend {
         }
         */
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, tema_a[id])),
-                GREEN_LINE.mix(0.6),
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date, tema_a[id])),
+        //         GREEN_LINE.mix(0.6),
+        //     ))
+        //     .unwrap();
 
         // TEMAS
 
@@ -427,12 +427,21 @@ impl Backend {
         //     ))
         //     .unwrap();
 
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date, tema_b[id])),
+        //         RED_LINE.mix(0.6),
+        //     ))
+        //     .unwrap();
+
         chart
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, tema_b[id])),
-                RED_LINE.mix(0.6),
+                    .map(|(id, candle)| (candle.date, ema_c[id])),
+                GREEN_LINE.mix(0.6),
             ))
             .unwrap();
 

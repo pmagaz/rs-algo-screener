@@ -14,7 +14,7 @@ mod strategies;
 mod trade;
 
 use portfolio::PortFolio;
-use strategies::Strategy;
+use strategies::strategy::Strategy;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -36,7 +36,7 @@ async fn main() -> Result<()> {
         order_size: 1,
         commission: 0.,
         instruments: vec![],
-        strategy: strategies::macd::Macd::new().unwrap(),
+        strategy: strategies::ema::Ema::new().unwrap(),
     };
 
     portfolio.test(&instruments).await;

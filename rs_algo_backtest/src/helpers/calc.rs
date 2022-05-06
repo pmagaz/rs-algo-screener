@@ -31,7 +31,8 @@ pub fn calculate_runup_per(size: f64, price_in: f64, high: f64) -> f64 {
 }
 
 pub fn total_profit(trades_out: &Vec<TradeOut>) -> f64 {
-    trades_out.iter().map(|trade| trade.profit).sum()
+    let profit_sum: f64 = trades_out.iter().map(|trade| trade.profit).sum();
+    (profit_sum * trades_out.len() as f64) / 100.
 }
 
 pub fn total_drawdown(trades_out: &Vec<TradeOut>) -> f64 {
@@ -67,6 +68,9 @@ pub fn total_profit_factor(trades_out: &Vec<TradeOut>) -> f64 {
 
     let num_profitable: f64 = profitable.iter().sum();
     let num_no_profitable: f64 = non_profitable.iter().sum();
-    println!("1111 {:?} {:?}", num_profitable, num_no_profitable);
-    num_profitable.abs() / num_no_profitable.abs()
+    if num_no_profitable == 0. {
+        num_profitable.abs()
+    } else {
+        num_profitable.abs() / num_no_profitable.abs()
+    }
 }

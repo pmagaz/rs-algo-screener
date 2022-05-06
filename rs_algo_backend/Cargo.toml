@@ -26,7 +26,7 @@ openssl = { version = "0.10.38", features = ["vendored"] }
 ta = {version = "0.5.0", features = ["serde"] }
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
 
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "b14766b"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "927fb9e"}
 
 [dependencies.mongodb]
 version = "2.1.0"

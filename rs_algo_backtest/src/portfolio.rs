@@ -1,7 +1,7 @@
-use crate::strategies::Strategy;
+use crate::strategies::strategy::Strategy;
 use rs_algo_shared::error::RsAlgoError;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
-use rs_algo_shared::models::backtest_instrument::BackTestInstrument;
+use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::instrument::Instrument;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -22,11 +22,15 @@ impl<S: Strategy> PortFolio<S> {
             println!("[BackTest] {:?}", endpoint);
             let backtested_instrument = self.strategy.test(instrument);
 
-            let res = request(&endpoint, &backtested_instrument, HttpMethod::Put)
-                .await
-                .unwrap();
+            let backtest_result: BackTestResult =
+                request(&endpoint, &backtested_instrument, HttpMethod::Put)
+                    .await
+                    .unwrap()
+                    .json()
+                    .await
+                    .unwrap();
 
-            //println!("111 {:?}", res);
+            println!("111 {:?}", backtested_instrument);
         }
     }
 }
