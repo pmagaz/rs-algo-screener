@@ -64,7 +64,7 @@ pub async fn upsert(
     println!(
         "[BACKTEST INSTRUMENT] Received at {:?} in {:?}",
         Local::now(),
-        backtested_result
+        now
     );
 
     let now = Instant::now();

@@ -30,7 +30,7 @@ impl<S: Strategy> PortFolio<S> {
                     .await
                     .unwrap();
 
-            println!("111 {:?}", backtested_instrument);
+            println!("111 {:?}", backtest_result);
         }
     }
 }

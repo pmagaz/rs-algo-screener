@@ -1,5 +1,6 @@
 use crate::error::Result;
 use plotters::prelude::*;
+use rs_algo_shared::models::candle::Candle;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::PatternDirection;
 use std::env;
@@ -13,8 +14,25 @@ impl Backend {
     }
 
     pub fn render(&self, instrument: &Instrument) -> Result<()> {
-        let to_date = instrument.data.last().unwrap().date;
-        let from_date = instrument.data.first().unwrap().date;
+        let candles_to_render = env::var("CANDLES_TO_RENDER")
+            .unwrap()
+            .parse::<usize>()
+            .unwrap();
+
+        let selected_data: Vec<&Candle> = instrument
+            .data
+            .iter()
+            .rev()
+            .take(candles_to_render)
+            .rev()
+            .collect();
+
+        let data = instrument.data.clone();
+        let data = selected_data;
+        let total_len = data.len();
+
+        let from_date = data.first().unwrap().date;
+        let to_date = data.last().unwrap().date;
 
         let price_source = env::var("PRICE_SOURCE").unwrap();
 
@@ -41,7 +59,12 @@ impl Backend {
         let min_price = instrument.min_price;
         let max_price = instrument.max_price;
 
-        let data = instrument.data.clone();
+        let min_price = data.iter().map(|candle| candle.low).fold(0. / 0., f64::min);
+        let max_price = data
+            .iter()
+            .map(|candle| candle.high)
+            .fold(0. / 0., f64::max);
+
         let local_maxima = &instrument.peaks.local_maxima;
         let local_minima = &instrument.peaks.local_minima;
         let _extrema_maxima = &instrument.peaks.extrema_maxima;
@@ -63,8 +86,6 @@ impl Backend {
         //     .iter()
         //     .map(|x| x.active.index)
         //     .collect();
-
-        let total_len = instrument.data.len();
 
         //let BACKGROUND = &RGBColor(192, 200, 212);
         let BACKGROUND = &RGBColor(208, 213, 222);
