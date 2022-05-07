@@ -26,10 +26,10 @@ impl<'a> Strategy for Ema<'a> {
         let prev_price = &instrument.data.get(prev_index).unwrap().close;
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
-        let condition = current_price > current_ema_200;
+        let entry_condition = current_price > current_ema_200;
         let stop_loss = -1.;
 
-        resolve_trade_in(index, instrument, condition, stop_loss)
+        resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
 
     fn market_out_fn(
@@ -37,6 +37,7 @@ impl<'a> Strategy for Ema<'a> {
         index: usize,
         instrument: &Instrument,
         trade_in: &TradeIn,
+        stop_loss: f64,
     ) -> TradeResult {
         let prev_index = index - 1;
         let current_price = &instrument.data.get(index).unwrap().close;
@@ -44,8 +45,8 @@ impl<'a> Strategy for Ema<'a> {
         let prev_price = &instrument.data.get(prev_index).unwrap().close;
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
-        let condition = current_price < current_ema_200;
-        resolve_trade_out(index, instrument, trade_in, condition)
+        let exit_condition = current_price < current_ema_200;
+        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }
 
     fn backtest_result(
@@ -53,7 +54,8 @@ impl<'a> Strategy for Ema<'a> {
         instrument: &Instrument,
         trades_in: Vec<TradeIn>,
         trades_out: Vec<TradeOut>,
+        commission: f64,
     ) -> BackTestResult {
-        resolve_backtest(instrument, trades_in, trades_out, self.name)
+        resolve_backtest(instrument, trades_in, trades_out, self.name, commission)
     }
 }

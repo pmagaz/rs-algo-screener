@@ -9,6 +9,7 @@ use std::env;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PortFolio<S: Strategy> {
     pub order_size: i32,
+    pub stop_loss: f64,
     pub commission: f64,
     pub capital: f64,
     pub instruments: Vec<BackTestInstrument>,
@@ -21,7 +22,9 @@ impl<S: Strategy> PortFolio<S> {
 
         for instrument in instruments {
             println!("[BackTest] {:?}", endpoint);
-            let backtested_instrument = self.strategy.test(instrument);
+            let backtested_instrument =
+                self.strategy
+                    .test(instrument, self.commission, self.stop_loss);
 
             let backtest_result: BackTestResult =
                 request(&endpoint, &backtested_instrument, HttpMethod::Put)

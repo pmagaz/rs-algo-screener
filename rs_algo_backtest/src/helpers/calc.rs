@@ -57,9 +57,8 @@ pub fn calculate_runup_per(run_up: f64, price_in: f64) -> f64 {
     ((run_up / (price_in * 1.)) * 100.).abs()
 }
 
-pub fn total_profit(trades_out: &Vec<TradeOut>) -> f64 {
-    let profit_sum: f64 = trades_out.iter().map(|trade| trade.profit).sum();
-    (profit_sum * trades_out.len() as f64) / 100.
+pub fn total_gross(trades_out: &Vec<&TradeOut>) -> f64 {
+    trades_out.iter().map(|trade| trade.profit).sum()
 }
 
 pub fn total_drawdown(trades_out: &Vec<TradeOut>) -> f64 {
@@ -70,34 +69,14 @@ pub fn total_runup(trades_out: &Vec<TradeOut>) -> f64 {
     trades_out.iter().map(|trade| trade.run_up_per).sum()
 }
 
-pub fn total_profitable_trades(trades_out: &Vec<TradeOut>) -> f64 {
-    let total_trades = trades_out.len() as f64;
-    let wining_trades: Vec<&TradeOut> = trades_out
-        .iter()
-        .filter(|trade| trade.profit > 0.)
-        .collect();
-    let num_profitable = wining_trades.len() as f64;
-    (num_profitable / total_trades) * 100.
+pub fn total_commissions(num_trades: usize, commission: f64) -> f64 {
+    num_trades as f64 * commission
 }
 
-pub fn total_profit_factor(trades_out: &Vec<TradeOut>) -> f64 {
-    let profitable: Vec<f64> = trades_out
-        .iter()
-        .filter(|trade| trade.profit >= 0.)
-        .map(|trade| trade.profit)
-        .collect();
+pub fn total_profitable_trades(winning_trades: usize, total_trades: usize) -> f64 {
+    (winning_trades as f64 / total_trades as f64 * 100.).abs()
+}
 
-    let non_profitable: Vec<f64> = trades_out
-        .iter()
-        .filter(|trade| trade.profit < 0.)
-        .map(|trade| trade.profit)
-        .collect();
-
-    let num_profitable: f64 = profitable.iter().sum();
-    let num_no_profitable: f64 = non_profitable.iter().sum();
-    if num_no_profitable == 0. {
-        num_profitable.abs()
-    } else {
-        num_profitable.abs() / num_no_profitable.abs()
-    }
+pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
+    (gross_profits / gross_loses * 100.).abs()
 }

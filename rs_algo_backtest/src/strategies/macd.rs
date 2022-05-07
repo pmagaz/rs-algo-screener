@@ -23,10 +23,10 @@ impl<'a> Strategy for Macd<'a> {
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
-        let condition = current_macd_a > current_macd_b && prev_macd_b >= prev_macd_a;
+        let entry_condition = current_macd_a > current_macd_b && prev_macd_b >= prev_macd_a;
         let stop_loss = -1.;
 
-        resolve_trade_in(index, instrument, condition, stop_loss)
+        resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
 
     fn market_out_fn(
@@ -34,6 +34,7 @@ impl<'a> Strategy for Macd<'a> {
         index: usize,
         instrument: &Instrument,
         trade_in: &TradeIn,
+        stop_loss: f64,
     ) -> TradeResult {
         let prev_index = index - 1;
         let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();
@@ -41,9 +42,8 @@ impl<'a> Strategy for Macd<'a> {
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
-        let condition = current_macd_a < current_macd_b && prev_macd_a >= prev_macd_b;
-
-        resolve_trade_out(index, instrument, trade_in, condition)
+        let exit_condition = current_macd_a < current_macd_b && prev_macd_a >= prev_macd_b;
+        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }
 
     fn backtest_result(
@@ -51,7 +51,8 @@ impl<'a> Strategy for Macd<'a> {
         instrument: &Instrument,
         trades_in: Vec<TradeIn>,
         trades_out: Vec<TradeOut>,
+        commission: f64,
     ) -> BackTestResult {
-        resolve_backtest(instrument, trades_in, trades_out, self.name)
+        resolve_backtest(instrument, trades_in, trades_out, self.name, commission)
     }
 }

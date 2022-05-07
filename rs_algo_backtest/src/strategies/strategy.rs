@@ -10,7 +10,7 @@ pub trait Strategy {
     where
         Self: Sized;
 
-    fn test(&self, instrument: &Instrument) -> BackTestResult {
+    fn test(&self, instrument: &Instrument, commission: f64, stop_loss: f64) -> BackTestResult {
         let mut trades_in: Vec<TradeIn> = vec![];
         let mut trades_out: Vec<TradeOut> = vec![];
         let mut open_positions = false;
@@ -34,7 +34,8 @@ pub trait Strategy {
 
                 if open_positions {
                     let trade_in = trades_in.last().unwrap();
-                    let trade_out_result = self.market_out_fn(index, instrument, trade_in);
+                    let trade_out_result =
+                        self.market_out_fn(index, instrument, trade_in, stop_loss);
                     match trade_out_result {
                         TradeResult::TradeOut(trade_out) => {
                             trades_out.push(trade_out);
@@ -46,7 +47,7 @@ pub trait Strategy {
             }
         }
 
-        self.backtest_result(instrument, trades_in, trades_out)
+        self.backtest_result(instrument, trades_in, trades_out, commission)
     }
     fn market_in_fn(&self, index: usize, instrument: &Instrument) -> TradeResult;
     fn market_out_fn(
@@ -54,11 +55,13 @@ pub trait Strategy {
         index: usize,
         instrument: &Instrument,
         trade_in: &TradeIn,
+        stop_loss: f64,
     ) -> TradeResult;
     fn backtest_result(
         &self,
         instrument: &Instrument,
         trades_in: Vec<TradeIn>,
         trades_out: Vec<TradeOut>,
+        commision: f64,
     ) -> BackTestResult;
 }

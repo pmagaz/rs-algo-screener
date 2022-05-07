@@ -36,7 +36,8 @@ pub fn resolve_trade_out(
     index: usize,
     instrument: &Instrument,
     trade_in: &TradeIn,
-    result: bool,
+    exit_condition: bool,
+    stop_loss: f64,
 ) -> TradeResult {
     let size = 1.;
     let data = &instrument.data;
@@ -58,10 +59,14 @@ pub fn resolve_trade_out(
     let draw_down = calculate_drawdown(data, price_in, index_in, nex_day_index);
     let draw_down_per = calculate_drawdown_per(draw_down, price_in);
 
-    if result {
+    //FIXME CHECK STOP LOSS
+    let trade_type = TradeType::Exit(TradeDirection::Long);
+
+    if exit_condition {
         TradeResult::TradeOut(TradeOut {
             index_in: index_in,
             price_in: price_in,
+            trade_type,
             date_in: to_dbtime(date_in),
             index_out: index,
             price_out: current_price,
@@ -83,31 +88,33 @@ pub fn resolve_backtest(
     trades_in: Vec<TradeIn>,
     trades_out: Vec<TradeOut>,
     name: &str,
+    commission: f64,
 ) -> BackTestResult {
     let size = 1.;
     let data = &instrument.data;
     let date_start = trades_out[0].date_in;
     let date_end = trades_out.last().unwrap().date_out;
-    let wining_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
     let sessions: usize = trades_out.iter().fold(0, |mut acc, x| {
         acc += x.index_out - x.index_in;
         acc
     });
     let last_candle = data.last().unwrap();
     let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
-    let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
+    let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit < 0.).collect();
     let wining_trades = w_trades.len();
     let losing_trades = l_trades.len();
     let trades = wining_trades + losing_trades;
-    let profitable_per = total_profitable_trades(&trades_out);
-
-    let trades = trades_out.len();
-    let net_profit = total_profit(&trades_out);
-    let profit_factor = total_profit_factor(&trades_out);
+    let gross_profits = total_gross(&w_trades);
+    let gross_loses = total_gross(&l_trades);
+    let gross_profit = gross_profits - gross_loses;
+    let commissions = total_commissions(trades, commission);
+    let net_profit = gross_profit - commissions;
+    let net_profit_per = net_profit / 100.;
+    let profitable_trades = total_profitable_trades(wining_trades, trades);
+    let profit_factor = total_profit_factor(gross_profits, gross_loses);
     let max_drawdown = total_drawdown(&trades_out);
     let max_runup = total_runup(&trades_out);
     let buy_hold = calculate_profit(size, trades_in[0].price_in, last_candle.close);
-    let commission_paid = 100.;
     let annual_return = 100.;
 
     BackTestResult {
@@ -123,13 +130,15 @@ pub fn resolve_backtest(
         trades,
         wining_trades,
         losing_trades,
+        gross_profit,
+        commissions,
         net_profit,
-        profitable_per,
+        net_profit_per,
+        profitable_trades,
         profit_factor,
         max_runup,
         max_drawdown,
         buy_hold,
-        commission_paid,
         annual_return,
     }
 }
