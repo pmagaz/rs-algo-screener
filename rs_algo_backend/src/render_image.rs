@@ -28,7 +28,7 @@ impl Backend {
             .collect();
 
         let data = instrument.data.clone();
-        let data = selected_data;
+        //let data = selected_data;
         let total_len = data.len();
 
         let from_date = data.first().unwrap().date;

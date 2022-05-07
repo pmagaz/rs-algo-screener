@@ -34,7 +34,8 @@ async fn main() -> Result<()> {
 
     let portfolio = PortFolio {
         order_size: 1,
-        commission: 0.,
+        commission: 0.015,
+        capital: 10000.,
         instruments: vec![],
         strategy: strategies::ema::Ema::new().unwrap(),
     };

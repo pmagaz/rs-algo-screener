@@ -5,7 +5,7 @@ use crate::patterns::*;
 use crate::prices::{calculate_price_change, calculate_price_target};
 
 use rs_algo_shared::helpers::comp::percentage_change;
-use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Duration, Local};
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::pattern::*;
 use rs_algo_shared::models::status::Status;
 
@@ -432,7 +432,7 @@ impl Patterns {
                                 active: false,
                                 completed: true,
                                 status: Status::Default,
-                                date: DbDateTime::from_chrono(date),
+                                date: to_dbtime(date),
                                 target: 0.,
                                 change: 0.,
                                 index: 0,
@@ -533,7 +533,7 @@ impl Patterns {
                         pattern_type,
                         change,
                         index,
-                        date: DbDateTime::from_chrono(date),
+                        date: to_dbtime(date),
                         direction,
                         active,
                         pattern_size: pattern_size.clone(),
@@ -543,7 +543,7 @@ impl Patterns {
                         pattern_type,
                         change,
                         index,
-                        date: DbDateTime::from_chrono(date),
+                        date: to_dbtime(date),
                         direction,
                         active,
                         pattern_size: pattern_size.clone(),
@@ -596,7 +596,7 @@ pub fn pattern_active_result(
             completed: false,
             status: Status::Default,
             index: 0,
-            date: DbDateTime::from_chrono(fake_date),
+            date: to_dbtime(fake_date),
             price: 0.,
             change: 0.,
             target: 0.,

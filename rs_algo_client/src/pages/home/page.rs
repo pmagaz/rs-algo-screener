@@ -99,7 +99,7 @@ pub fn home() -> Html {
             let use_loading = use_loading.clone();
             use_loading.set(true);
 
-            let fake_date = DbDateTime::from_chrono(Local::now() - Duration::days(1000));
+            let fake_date = to_dbtime(Local::now() - Duration::days(1000));
             let watch_instrument = WatchInstrument {
                 symbol: inst.symbol.clone(),
                 alarm: Alarm {
@@ -127,7 +127,7 @@ pub fn home() -> Html {
         .filter(|x| {
             (x.patterns.local_patterns.len() > 0
                 && x.patterns.local_patterns.last().unwrap().active.date
-                    > DbDateTime::from_chrono(Local::now() - Duration::days(4)))
+                    > to_dbtime(Local::now() - Duration::days(4)))
         })
         .map(|x| x.clone())
         .collect();
@@ -137,7 +137,7 @@ pub fn home() -> Html {
         .filter(|x| {
             (x.patterns.local_patterns.len() > 0
                 && x.patterns.local_patterns.last().unwrap().date
-                    > DbDateTime::from_chrono(Local::now() - Duration::days(4))
+                    > to_dbtime(Local::now() - Duration::days(4))
                 && !x.patterns.local_patterns.last().unwrap().active.active)
         })
         .map(|x| x.clone())

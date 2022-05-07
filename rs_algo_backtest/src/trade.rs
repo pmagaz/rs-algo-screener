@@ -1,6 +1,7 @@
 use crate::helpers::calc::*;
 
 use rs_algo_shared::helpers::date::DbDateTime;
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::instrument::Instrument;
 
@@ -10,19 +11,20 @@ pub fn resolve_trade_in(
     result: bool,
     stop_loss: f64,
 ) -> TradeResult {
-    let current_candle = instrument.data.get(index);
+    let nex_day_index = index + 1;
+    let current_candle = instrument.data.get(nex_day_index);
     let current_price = match current_candle {
-        Some(candle) => candle.close,
+        Some(candle) => candle.open,
         None => -100.,
     };
     let current_date = current_candle.unwrap().date;
 
     if result {
         TradeResult::TradeIn(TradeIn {
-            index_in: index,
+            index_in: nex_day_index,
             price_in: current_price,
             stop_loss: stop_loss,
-            date_in: DbDateTime::from_chrono(current_date),
+            date_in: to_dbtime(current_date + Duration::hours(2)),
             trade_type: TradeType::Entry(TradeDirection::Long),
         })
     } else {
@@ -37,40 +39,39 @@ pub fn resolve_trade_out(
     result: bool,
 ) -> TradeResult {
     let size = 1.;
-    let current_candle = instrument.data.get(index);
-    let current_price = match current_candle {
-        Some(candle) => candle.close,
-        None => -100.,
-    };
-    let current_date = current_candle.unwrap().date;
+    let data = &instrument.data;
+    let nex_day_index = index + 1;
     let index_in = trade_in.index_in;
     let price_in = trade_in.price_in;
+    let current_candle = data.get(nex_day_index);
+    let current_price = match current_candle {
+        Some(candle) => candle.open,
+        None => -100.,
+    };
 
+    let date_in = instrument.data.get(index_in).unwrap().date;
+    let date_out = current_candle.unwrap().date;
     let profit = calculate_profit(size, price_in, current_price);
     let profit_per = calculate_profit_per(price_in, current_price);
-    let cum_profit = calculate_cum_profit_per(size, price_in, current_price);
-    //let cum_profit_per = calculate_cum_profit(size, price_in, current_price); //FIXME
-    let run_up = calculate_runup_per(size, price_in, current_candle.unwrap().high);
-    //let run_up_per = calculate_runup(size, price_in, current_candle.unwrap().high); //FIXME
-    let draw_down = calculate_drawdown_per(size, price_in, current_candle.unwrap().low);
-    //let draw_down_per = calculate_drawdown(size, price_in, current_candle.unwrap().low);
+    let run_up = calculate_runup(data, price_in, index_in, nex_day_index);
+    let run_up_per = calculate_runup_per(run_up, price_in);
+    let draw_down = calculate_drawdown(data, price_in, index_in, nex_day_index);
+    let draw_down_per = calculate_drawdown_per(draw_down, price_in);
 
     if result {
         TradeResult::TradeOut(TradeOut {
             index_in: index_in,
             price_in: price_in,
-            date_in: DbDateTime::from_chrono(current_date),
+            date_in: to_dbtime(date_in),
             index_out: index,
             price_out: current_price,
-            date_out: DbDateTime::from_chrono(current_date),
+            date_out: to_dbtime(date_out),
             profit,
             profit_per,
-            cum_profit,
-            //cum_profit_per,
             run_up,
-            //run_up_per,
+            run_up_per,
             draw_down,
-            //draw_down_per,
+            draw_down_per,
         })
     } else {
         TradeResult::None
@@ -84,14 +85,29 @@ pub fn resolve_backtest(
     name: &str,
 ) -> BackTestResult {
     let size = 1.;
-    let last_candle = instrument.data.last().unwrap();
+    let data = &instrument.data;
+    let date_start = trades_out[0].date_in;
+    let date_end = trades_out.last().unwrap().date_out;
+    let wining_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
+    let sessions: usize = trades_out.iter().fold(0, |mut acc, x| {
+        acc += x.index_out - x.index_in;
+        acc
+    });
+    let last_candle = data.last().unwrap();
+    let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
+    let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
+    let wining_trades = w_trades.len();
+    let losing_trades = l_trades.len();
+    let trades = wining_trades + losing_trades;
+    let profitable_per = total_profitable_trades(&trades_out);
+
     let trades = trades_out.len();
     let net_profit = total_profit(&trades_out);
-    let profitable_per = total_profitable_trades(&trades_out);
     let profit_factor = total_profit_factor(&trades_out);
     let max_drawdown = total_drawdown(&trades_out);
     let max_runup = total_runup(&trades_out);
     let buy_hold = calculate_profit(size, trades_in[0].price_in, last_candle.close);
+    let commission_paid = 100.;
     let annual_return = 100.;
 
     BackTestResult {
@@ -100,14 +116,20 @@ pub fn resolve_backtest(
             trades_in,
             trades_out,
         },
-        trades,
         strategy: name.to_owned(),
+        date_start,
+        date_end,
+        sessions,
+        trades,
+        wining_trades,
+        losing_trades,
         net_profit,
         profitable_per,
         profit_factor,
         max_runup,
         max_drawdown,
         buy_hold,
+        commission_paid,
         annual_return,
     }
 }

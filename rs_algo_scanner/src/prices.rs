@@ -2,8 +2,7 @@ use crate::candle::Candle;
 
 use crate::helpers::slope_intercept::slope_intercept;
 use rs_algo_shared::helpers::comp::percentage_change;
-
-use rs_algo_shared::helpers::date::{DbDateTime, Duration, Local};
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::pattern::{DataPoints, PatternType};
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
@@ -99,16 +98,11 @@ pub fn search_price_break(
                 let current_date = &candles[n].date();
 
                 if comparator(*current_price, next_price) {
-                    return (true, n, next_price, DbDateTime::from_chrono(*current_date));
+                    return (true, n, next_price, to_dbtime(*current_date));
                 }
             }
         }
     }
 
-    return (
-        false,
-        0,
-        0.,
-        DbDateTime::from_chrono(Local::now() - Duration::days(1000)),
-    );
+    return (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000)));
 }

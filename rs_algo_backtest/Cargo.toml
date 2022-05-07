@@ -18,4 +18,4 @@ round = "0.1.2"
 futures = "0.3.21"
 reqwest = { version = "0.11.10", features = ["json"] }
 
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "927fb9e"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "8368577"}

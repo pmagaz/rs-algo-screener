@@ -10,6 +10,7 @@ use std::env;
 pub struct PortFolio<S: Strategy> {
     pub order_size: i32,
     pub commission: f64,
+    pub capital: f64,
     pub instruments: Vec<BackTestInstrument>,
     pub strategy: S,
 }

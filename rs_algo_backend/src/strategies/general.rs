@@ -4,9 +4,7 @@ use bson::{doc, Document};
 use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::Cursor;
-use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Local};
 use rs_algo_shared::models::divergence::{Divergence, DivergenceType};
-use rs_algo_shared::models::indicator::IndicatorType;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::{DataPoints, Pattern, PatternType};
 use rs_algo_shared::models::status::Status;
@@ -16,7 +14,6 @@ use round::round;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::models::*;
 use std::env;
 
 pub struct General {
@@ -40,10 +37,8 @@ impl General {
 
         Ok(Self {
             query: doc! {},
-            max_pattern_date: DbDateTime::from_chrono(
-                Local::now() - Duration::days(max_pattern_days),
-            ),
-            max_activated_date: DbDateTime::from_chrono(
+            max_pattern_date: to_dbtime(Local::now() - Duration::days(max_pattern_days)),
+            max_activated_date: to_dbtime(
                 Local::now() - Duration::days(max_pattern_activated_days),
             ),
         })
@@ -154,7 +149,7 @@ impl General {
                         None => 0.,
                     };
 
-                    let fake_date = DbDateTime::from_chrono(Local::now() - Duration::days(1000));
+                    let fake_date = to_dbtime(Local::now() - Duration::days(1000));
 
                     let last_pattern_date = match last_pattern {
                         Some(val) => val.date,

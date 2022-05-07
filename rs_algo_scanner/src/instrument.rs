@@ -6,7 +6,7 @@ use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::Patterns;
 use crate::patterns::peaks::Peaks;
 
-use rs_algo_shared::helpers::date::{DateTime, DbDateTime, Duration, Local};
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::pattern::PatternSize;
 use rs_algo_shared::models::time_frame::TimeFrameType;
 
@@ -214,7 +214,7 @@ impl InstrumentBuilder {
                 symbol,
                 time_frame: time_frame,
                 current_price: 0.,
-                date: DbDateTime::from_chrono(Local::now() + Duration::hours(2)), //FIXME
+                date: to_dbtime(Local::now() + Duration::hours(2)), //FIXME
                 current_candle: CandleType::Default,
                 min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
                 max_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),

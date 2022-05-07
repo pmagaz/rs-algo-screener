@@ -2,7 +2,7 @@ use super::peaks::Peaks;
 
 use crate::error::Result;
 use rs_algo_shared::helpers::comp::is_same_band;
-use rs_algo_shared::helpers::date::{DbDateTime, Duration, Local};
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::horizontal_level::{HorizontalLevel, HorizontalLevelType};
 
 use serde::{Deserialize, Serialize};
@@ -89,7 +89,7 @@ impl HorizontalLevels {
                         HorizontalLevel {
                             price,
                             occurrences,
-                            date: DbDateTime::from_chrono(Local::now() + Duration::hours(2)),
+                            date: to_dbtime(Local::now() + Duration::hours(2)),
                             level_type,
                         },
                     );

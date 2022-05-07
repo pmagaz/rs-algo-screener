@@ -17,14 +17,13 @@ pub fn get_pattern_status(
         .parse::<i64>()
         .unwrap();
 
-    let max_pattern_date = DbDateTime::from_chrono(Local::now() - Duration::days(max_pattern_days));
+    let max_pattern_date = to_dbtime(Local::now() - Duration::days(max_pattern_days));
 
-    let max_activated_date =
-        DbDateTime::from_chrono(Local::now() - Duration::days(max_pattern_activated_days));
+    let max_activated_date = to_dbtime(Local::now() - Duration::days(max_pattern_activated_days));
 
-    let super_date = DbDateTime::from_chrono(Local::now() - Duration::days(35));
+    let super_date = to_dbtime(Local::now() - Duration::days(35));
 
-    let fake_date = DbDateTime::from_chrono(Local::now() - Duration::days(1000));
+    let fake_date = to_dbtime(Local::now() - Duration::days(1000));
 
     match pattern {
         Some(_pat) => {

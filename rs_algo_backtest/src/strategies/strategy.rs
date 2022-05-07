@@ -14,17 +14,13 @@ pub trait Strategy {
         let mut trades_in: Vec<TradeIn> = vec![];
         let mut trades_out: Vec<TradeOut> = vec![];
         let mut open_positions = false;
-        let start_date = instrument
-            .data
-            .iter()
-            .take(200)
-            .last()
-            .map(|x| x.date)
-            .unwrap();
+        let data = &instrument.data;
+        let len = data.len();
+        let start_date = data.iter().take(200).last().map(|x| x.date).unwrap();
 
         println!("[BACKTEST] Starting backtest from {:}?", start_date);
-        for (index, _candle) in instrument.data.iter().enumerate() {
-            if index > 200 {
+        for (index, _candle) in data.iter().enumerate() {
+            if index > 200 && index < len - 1 {
                 if !open_positions {
                     let trade_in_result = self.market_in_fn(index, instrument);
                     match trade_in_result {
