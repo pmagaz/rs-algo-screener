@@ -62,10 +62,19 @@ pub fn total_gross(trades_out: &Vec<&TradeOut>) -> f64 {
 }
 
 pub fn total_drawdown(trades_out: &Vec<TradeOut>) -> f64 {
-    trades_out.iter().map(|trade| trade.draw_down_per).sum()
+    let max_drawdown = trades_out
+        .iter()
+        .enumerate()
+        .map(|(_i, x)| x.draw_down_per)
+        .fold(0. / 0., f64::max);
+    max_drawdown
 }
 
 pub fn total_runup(trades_out: &Vec<TradeOut>) -> f64 {
+    trades_out.iter().map(|trade| trade.run_up_per).sum()
+}
+
+pub fn calculate_buy_hold(trades_out: &Vec<TradeOut>) -> f64 {
     trades_out.iter().map(|trade| trade.run_up_per).sum()
 }
 
@@ -74,9 +83,9 @@ pub fn total_commissions(num_trades: usize, commission: f64) -> f64 {
 }
 
 pub fn total_profitable_trades(winning_trades: usize, total_trades: usize) -> f64 {
-    (winning_trades as f64 / total_trades as f64 * 100.).abs()
+    ((winning_trades as f64 / total_trades as f64) * 100.).abs()
 }
 
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
-    (gross_profits / gross_loses * 100.).abs()
+    gross_profits.abs() / gross_loses.abs()
 }

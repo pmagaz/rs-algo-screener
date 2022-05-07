@@ -24,7 +24,7 @@ pub fn resolve_trade_in(
             index_in: nex_day_index,
             price_in: current_price,
             stop_loss: stop_loss,
-            date_in: to_dbtime(current_date + Duration::hours(2)),
+            date_in: to_dbtime(current_date),
             trade_type: TradeType::Entry(TradeDirection::Long),
         })
     } else {
@@ -112,9 +112,10 @@ pub fn resolve_backtest(
     let net_profit_per = net_profit / 100.;
     let profitable_trades = total_profitable_trades(wining_trades, trades);
     let profit_factor = total_profit_factor(gross_profits, gross_loses);
+    //FIX THIS
     let max_drawdown = total_drawdown(&trades_out);
     let max_runup = total_runup(&trades_out);
-    let buy_hold = calculate_profit(size, trades_in[0].price_in, last_candle.close);
+    let buy_hold = calculate_buy_hold(&trades_out);
     let annual_return = 100.;
 
     BackTestResult {

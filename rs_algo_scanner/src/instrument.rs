@@ -214,7 +214,7 @@ impl InstrumentBuilder {
                 symbol,
                 time_frame: time_frame,
                 current_price: 0.,
-                date: to_dbtime(Local::now() + Duration::hours(2)), //FIXME
+                date: to_dbtime(Local::now()), //FIXME
                 current_candle: CandleType::Default,
                 min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
                 max_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),

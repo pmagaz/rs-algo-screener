@@ -89,7 +89,7 @@ impl HorizontalLevels {
                         HorizontalLevel {
                             price,
                             occurrences,
-                            date: to_dbtime(Local::now() + Duration::hours(2)),
+                            date: to_dbtime(Local::now()),
                             level_type,
                         },
                     );
