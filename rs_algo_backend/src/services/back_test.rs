@@ -19,41 +19,16 @@ struct ApiResponse {
 pub async fn find_all(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    let back_test_symbols: Vec<Instrument> = db::back_test::find_all(&state).await.unwrap();
+    let backtest_instruments: Vec<Instrument> =
+        db::back_test::find_instruments(&state).await.unwrap();
 
     println!(
-        "[BACK TEST LIST] {:?} {:?} {:?}",
+        "[BACK TEST INSTRUMENTS] {:?} {:?}",
         Local::now(),
-        back_test_symbols,
         now.elapsed()
     );
 
-    Ok(HttpResponse::Ok().json(back_test_symbols))
-}
-
-pub async fn find_instruments(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
-    let now = Instant::now();
-    let back_test_symbols: Vec<String> = db::back_test::find_all(&state)
-        .await
-        .unwrap()
-        .into_iter()
-        .map(|x| x.symbol)
-        .collect();
-
-    let query = doc! {"symbol": { "$in": &back_test_symbols }};
-
-    let instruments = instrument::find_detail(query.to_string(), state)
-        .await
-        .unwrap();
-
-    println!(
-        "[BACK TEST INSTRUMENTS] {:?} {:?} {:?}",
-        Local::now(),
-        back_test_symbols,
-        now.elapsed()
-    );
-
-    Ok(instruments)
+    Ok(HttpResponse::Ok().json(backtest_instruments))
 }
 
 pub async fn upsert(

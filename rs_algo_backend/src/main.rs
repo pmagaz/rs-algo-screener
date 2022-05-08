@@ -85,12 +85,8 @@ async fn main() -> Result<()> {
                     )
                     .route("/watchlist", web::get().to(watch_list::find))
                     .route("/watchlist", web::put().to(watch_list::upsert))
-                    .route("/backtest", web::get().to(back_test::find_all))
                     .route("/backtest", web::put().to(back_test::upsert))
-                    .route(
-                        "/backtest/instruments",
-                        web::get().to(back_test::find_instruments),
-                    ),
+                    .route("/backtest/instruments", web::get().to(back_test::find_all)),
             )
     })
     .bind(["0.0.0.0:", &port].concat())

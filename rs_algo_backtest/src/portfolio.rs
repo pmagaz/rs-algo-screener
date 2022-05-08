@@ -20,7 +20,7 @@ impl<S: Strategy> PortFolio<S> {
         let endpoint = env::var("BACKEND_BACKTEST_ENDPOINT").unwrap().clone();
 
         for instrument in instruments {
-            //println!("333333333 {:?}", instrument.data.first().unwrap().date);
+            println!("333333333 {:?}", instrument.data.first().unwrap().date);
             let backtested_instrument =
                 self.strategy
                     .test(instrument, self.equity, self.commission, self.stop_loss);

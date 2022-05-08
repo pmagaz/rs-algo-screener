@@ -10,13 +10,13 @@ use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
 use rs_algo_shared::models::backtest_instrument::*;
 use std::env;
 
-pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
+pub async fn find_instruments(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
 
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
-        .find(None, FindOptions::builder().limit(20).build())
+        .find(None, FindOptions::builder().limit(25).build())
         .await
         .unwrap();
 
@@ -31,7 +31,7 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Er
     Ok(docs)
 }
 
-pub async fn find_instruments(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
+pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
 
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
