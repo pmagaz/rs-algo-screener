@@ -111,8 +111,9 @@ pub async fn upsert(
     doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
-    let collection = get_collection::<CompactInstrument>(&state.db_mem, collection_name).await;
+    let collection_name = env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
+
+    let collection = get_collection::<CompactInstrument>(&state.db_mem, &collection_name).await;
 
     collection
         .find_one_and_replace(
@@ -126,11 +127,17 @@ pub async fn upsert(
 }
 
 pub async fn insert_detail(
+    mode: &str,
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
-    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
+    let collection_name = match mode.as_ref() {
+        "daily" => env::var("DB_INSTRUMENTS_COLLECTION").unwrap(),
+        "backtest" => env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap(),
+        &_ => "".to_string(),
+    };
+
+    let collection = get_collection::<Instrument>(&state.db_mem, &collection_name).await;
 
     collection
         .find_one_and_replace(

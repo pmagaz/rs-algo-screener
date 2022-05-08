@@ -122,9 +122,18 @@ async fn main() -> Result<()> {
                         );
 
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
-                        let now = Instant::now();
+                        let backtest_mode = env::var("SCANNER_BACKTEST_MODE")
+                            .unwrap()
+                            .parse::<bool>()
+                            .unwrap();
 
-                        let res = request(&endpoint, &instrument, HttpMethod::Put)
+                        let url = match backtest_mode {
+                            true => [endpoint, "?mode=backtest".to_string()].concat(),
+                            false => [endpoint, "?mode=daily".to_string()].concat(),
+                        };
+
+                        let now = Instant::now();
+                        let res = request(&url, &instrument, HttpMethod::Put)
                             .await
                             .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 

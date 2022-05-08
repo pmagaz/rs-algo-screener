@@ -17,6 +17,11 @@ use std::env;
 use std::path::PathBuf;
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+pub struct Mode {
+    pub mode: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub struct SymbolQuery {
     pub symbol: String,
 }
@@ -116,14 +121,16 @@ pub async fn find_all(
 }
 
 pub async fn upsert(
+    query: web::Query<Mode>,
     instrument: String,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
+    let mode = &query.mode;
     println!(
-        "[INSTRUMENT] Received at {:?} in {:?}",
+        "[INSTRUMENT] Received at {:?} for mode {:?}",
         Local::now(),
-        now.elapsed()
+        mode
     );
 
     let now = Instant::now();
@@ -143,15 +150,15 @@ pub async fn upsert(
         instrument.symbol = symbol_str[0].to_owned();
     }
 
-    let insert_instruments_detail = env::var("INSERT_INSTRUMENTS_DETAIL")
+    let insert_compact_instruments_detail = env::var("INSERT_COMPACT_INSTRUMENTS_DETAIL")
         .unwrap()
         .parse::<bool>()
         .unwrap();
 
-    if insert_instruments_detail {
+    if insert_compact_instruments_detail {
         let now = Instant::now();
 
-        let _insert_result = db::instrument::insert_detail(&instrument, &state)
+        let _insert_result = db::instrument::insert_detail(mode, &instrument, &state)
             .await
             .unwrap();
 
@@ -163,12 +170,12 @@ pub async fn upsert(
         );
     }
 
-    let insert_instruments = env::var("INSERT_INSTRUMENTS")
+    let insert_compact_instruments = env::var("INSERT_COMPACT_INSTRUMENTS")
         .unwrap()
         .parse::<bool>()
         .unwrap();
 
-    if insert_instruments {
+    if insert_compact_instruments {
         let now = Instant::now();
         let _insert_compact =
             db::instrument::upsert(compact_instrument(instrument).unwrap(), &state)
