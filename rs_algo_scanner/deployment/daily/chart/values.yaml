@@ -4,7 +4,7 @@ jobs:
       repository: cluster.loc:5000/rs-algo-scanner
       tag: latest
       imagePullPolicy: Always
-    schedule: "0 */12,17 * * *"
+    schedule: "0 */12,18 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
@@ -13,9 +13,9 @@ jobs:
     envSecretName: rs-algo-screener-secrets
     resources:
       requests:
-        cpu: 300m
+        cpu: 400m
       limits:
-        cpu: 500m
+        cpu: 600m
         memory: 256Mi
     nodeSelector:
       nodeType: cpu
