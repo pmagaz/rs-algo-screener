@@ -19,18 +19,17 @@ impl Backend {
             .parse::<usize>()
             .unwrap();
 
-        let selected_data: Vec<&Candle> = instrument
-            .data
-            .iter()
-            .rev()
-            .take(candles_to_render)
-            .rev()
-            .collect();
+        // let selected_data: Vec<&Candle> = instrument
+        //     .data
+        //     .iter()
+        //     .rev()
+        //     .take(candles_to_render)
+        //     .rev()
+        //     .collect();
 
         let data = instrument.data.clone();
         //let data = selected_data;
         let total_len = data.len();
-
         let from_date = data.first().unwrap().date;
         let to_date = data.last().unwrap().date;
 
@@ -124,7 +123,7 @@ impl Backend {
         let mut chart = ChartBuilder::on(&upper)
             .x_label_area_size(40)
             .y_label_area_size(40)
-            .margin(5)
+            .margin(15)
             .caption(&instrument.symbol, (font.as_ref(), 14.0).into_font())
             .build_cartesian_2d(from_date..to_date, min_price..max_price)
             .unwrap();
@@ -457,14 +456,14 @@ impl Backend {
         //     ))
         //     .unwrap();
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, ema_c[id])),
-                GREEN_LINE.mix(0.6),
-            ))
-            .unwrap();
+        // chart
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date, ema_c[id])),
+        //         GREEN_LINE.mix(0.6),
+        //     ))
+        //     .unwrap();
 
         //STOCH PANNEL
 

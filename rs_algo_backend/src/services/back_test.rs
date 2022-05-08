@@ -2,12 +2,12 @@ use super::instrument;
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::models::backtest_instrument::{BackTestInstrument, BackTestResult};
+use crate::models::backtest_instrument::BackTestResult;
+use crate::models::instrument::Instrument;
 
 use actix_web::{web, HttpResponse};
 use bson::doc;
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::models::*;
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
 
@@ -19,7 +19,7 @@ struct ApiResponse {
 pub async fn find_all(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    let back_test_symbols: Vec<BackTestInstrument> = db::back_test::find_all(&state).await.unwrap();
+    let back_test_symbols: Vec<Instrument> = db::back_test::find_all(&state).await.unwrap();
 
     println!(
         "[BACK TEST LIST] {:?} {:?} {:?}",
