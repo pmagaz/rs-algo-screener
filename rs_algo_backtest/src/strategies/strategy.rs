@@ -22,9 +22,13 @@ pub trait Strategy {
         let mut open_positions = false;
         let data = &instrument.data;
         let len = data.len();
-        let start_date = data.iter().take(200).last().map(|x| x.date).unwrap();
+        let start_date = data.first().map(|x| x.date).unwrap();
+        //let start_date = data.iter().take(200).last().map(|x| x.date).unwrap();
 
-        println!("[BACKTEST] Starting backtest from {:}?", start_date);
+        println!(
+            "[BACKTEST] Starting {:?} backtest from {:}?",
+            &instrument.symbol, start_date
+        );
         for (index, _candle) in data.iter().enumerate() {
             if index > 200 && index < len - 1 {
                 if !open_positions {

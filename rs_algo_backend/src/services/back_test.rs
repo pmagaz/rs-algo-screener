@@ -2,7 +2,7 @@ use super::instrument;
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::models::backtest_instrument::BackTestResult;
+use crate::models::backtest_instrument::BackTestInstrumentResult;
 use crate::models::instrument::Instrument;
 
 use actix_web::{web, HttpResponse};
@@ -68,12 +68,13 @@ pub async fn upsert(
     );
 
     let now = Instant::now();
-    let backtested_result: BackTestResult = serde_json::from_str(&backtested_result).unwrap();
+    let backtested_result: BackTestInstrumentResult =
+        serde_json::from_str(&backtested_result).unwrap();
 
     let symbol = backtested_result.instrument.symbol.clone();
 
     let now = Instant::now();
-    let _upsert = db::back_test::upsert(backtested_result, &state)
+    let _upsert = db::back_test::upsert(&backtested_result, &state)
         .await
         .unwrap();
 
@@ -83,7 +84,5 @@ pub async fn upsert(
         Local::now(),
         now.elapsed()
     );
-    Ok(HttpResponse::Ok().json(ApiResponse {
-        result: "ok".to_owned(),
-    }))
+    Ok(HttpResponse::Ok().json(backtested_result))
 }

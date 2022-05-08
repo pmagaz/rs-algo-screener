@@ -16,7 +16,7 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Er
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
-        .find(None, FindOptions::builder().limit(100).build())
+        .find(None, FindOptions::builder().limit(20).build())
         .await
         .unwrap();
 
@@ -50,11 +50,12 @@ pub async fn find_instruments(state: &web::Data<AppState>) -> Result<Vec<Instrum
 }
 
 pub async fn upsert(
-    doc: BackTestResult,
+    doc: &BackTestInstrumentResult,
     state: &web::Data<AppState>,
-) -> Result<Option<BackTestResult>, Error> {
+) -> Result<Option<BackTestInstrumentResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_RESULT_COLLECTION").unwrap();
-    let collection = get_collection::<BackTestResult>(&state.db_mem, collection_name).await;
+    let collection =
+        get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
 
     collection
         .find_one_and_replace(

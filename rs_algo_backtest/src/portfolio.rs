@@ -1,5 +1,4 @@
 use crate::strategies::strategy::Strategy;
-use rs_algo_shared::error::RsAlgoError;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::instrument::Instrument;
@@ -12,7 +11,7 @@ pub struct PortFolio<S: Strategy> {
     pub stop_loss: f64,
     pub commission: f64,
     pub equity: f64,
-    pub instruments: Vec<BackTestInstrument>,
+    pub instruments: Vec<Instrument>,
     pub strategy: S,
 }
 
@@ -21,20 +20,24 @@ impl<S: Strategy> PortFolio<S> {
         let endpoint = env::var("BACKEND_BACKTEST_ENDPOINT").unwrap().clone();
 
         for instrument in instruments {
-            println!("[BackTest] {:?}", endpoint);
+            //println!("333333333 {:?}", instrument.data.first().unwrap().date);
             let backtested_instrument =
                 self.strategy
                     .test(instrument, self.equity, self.commission, self.stop_loss);
 
-            let backtest_result: BackTestResult =
-                request(&endpoint, &backtested_instrument, HttpMethod::Put)
-                    .await
-                    .unwrap()
-                    .json()
-                    .await
-                    .unwrap();
-
-            println!("111 {:?}", backtest_result);
+            match backtested_instrument {
+                BackTestResult::BackTestInstrumentResult(backtested_instrument) => {
+                    let leches: BackTestInstrumentResult =
+                        request(&endpoint, &backtested_instrument, HttpMethod::Put)
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
+                    //println!("111 {:?}", leches);
+                }
+                _ => (),
+            };
         }
     }
 }

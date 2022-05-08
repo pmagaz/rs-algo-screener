@@ -93,54 +93,61 @@ pub fn resolve_backtest(
 ) -> BackTestResult {
     let size = 1.;
     let data = &instrument.data;
-    let date_start = trades_out[0].date_in;
-    let date_end = trades_out.last().unwrap().date_out;
-    let sessions: usize = trades_out.iter().fold(0, |mut acc, x| {
-        acc += x.index_out - x.index_in;
-        acc
-    });
-    let current_candle = data.last().unwrap();
-    let current_price = current_candle.close;
-    let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
-    let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit < 0.).collect();
-    let wining_trades = w_trades.len();
-    let losing_trades = l_trades.len();
-    let trades = wining_trades + losing_trades;
-    let gross_profits = total_gross(&w_trades);
-    let gross_loses = total_gross(&l_trades);
-    let gross_profit = gross_profits - gross_loses;
-    let commissions = total_commissions(trades, commission);
-    let net_profit = gross_profit - commissions;
-    let net_profit_per = net_profit / 100.;
-    let profitable_trades = total_profitable_trades(wining_trades, trades);
-    let profit_factor = total_profit_factor(gross_profits, gross_loses);
-    let max_drawdown = total_drawdown(&trades_out, equity);
-    let max_runup = total_runup(&trades_out, equity);
-    let buy_hold = calculate_buy_hold(&trades_out, equity, current_price);
-    let annual_return = 100.;
-
-    BackTestResult {
-        instrument: BackTestInstrument {
-            symbol: instrument.symbol.to_owned(),
-            trades_in,
-            trades_out,
-        },
-        strategy: name.to_owned(),
-        date_start,
-        date_end,
-        sessions,
-        trades,
-        wining_trades,
-        losing_trades,
-        gross_profit,
-        commissions,
-        net_profit,
-        net_profit_per,
-        profitable_trades,
-        profit_factor,
-        max_runup,
-        max_drawdown,
-        buy_hold,
-        annual_return,
+    if trades_out.len() > 0 {
+        let date_start = trades_out[0].date_in;
+        let date_end = trades_out.last().unwrap().date_out;
+        let sessions: usize = trades_out.iter().fold(0, |mut acc, x| {
+            acc += x.index_out - x.index_in;
+            acc
+        });
+        let current_candle = data.last().unwrap();
+        let current_price = current_candle.close;
+        let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
+        let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit < 0.).collect();
+        let wining_trades = w_trades.len();
+        let losing_trades = l_trades.len();
+        let trades = wining_trades + losing_trades;
+        let gross_profits = total_gross(&w_trades);
+        let gross_loses = total_gross(&l_trades);
+        let gross_profit = gross_profits - gross_loses;
+        let commissions = total_commissions(trades, commission);
+        let net_profit = gross_profit - commissions;
+        let net_profit_per = net_profit / 100.;
+        let profitable_trades = total_profitable_trades(wining_trades, trades);
+        let profit_factor = total_profit_factor(gross_profits, gross_loses);
+        let max_drawdown = total_drawdown(&trades_out, equity);
+        let max_runup = total_runup(&trades_out, equity);
+        let buy_hold = calculate_buy_hold(&trades_out, equity, current_price);
+        let annual_return = 100.;
+        println!(
+            "[BACKTEST] {:} backtested for {:?}",
+            instrument.symbol, sessions
+        );
+        BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
+            instrument: BackTestInstrument {
+                symbol: instrument.symbol.to_owned(),
+                trades_in,
+                trades_out,
+            },
+            strategy: name.to_owned(),
+            date_start,
+            date_end,
+            sessions,
+            trades,
+            wining_trades,
+            losing_trades,
+            gross_profit,
+            commissions,
+            net_profit,
+            net_profit_per,
+            profitable_trades,
+            profit_factor,
+            max_runup,
+            max_drawdown,
+            buy_hold,
+            annual_return,
+        })
+    } else {
+        BackTestResult::None
     }
 }
