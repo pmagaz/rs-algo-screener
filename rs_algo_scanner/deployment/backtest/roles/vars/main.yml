@@ -1,4 +1,4 @@
 package_name: rs_algo_scanner
-release_name: rs-algo-scanner-backtest
+release_name: rs-algo-scanner-bt
 local_path: /home/dev/rs-algo-screener
 chart_path: deployment/backtest/chart
