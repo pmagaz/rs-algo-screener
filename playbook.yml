@@ -8,8 +8,8 @@
     #- { role: "deployment/kubernetes-dashboard/roles/" }
     #- { role: "deployment/docker-registry/roles/" }
     - { role: "rs_algo_backend/deployment/roles/" }
-    - { role: "rs_algo_scanner/deployment/roles/" }
-    - { role: "rs_algo_client/deployment/daily/roles/" }
-    - { role: "rs_algo_client/deployment/backtest/roles/" }
+    - { role: "rs_algo_scanner/deployment/daily/roles/" }
+    - { role: "rs_algo_scanner/deployment/backtest/roles/" }
+    - { role: "rs_algo_client/deployment/roles/" }
    
 
