@@ -11,7 +11,7 @@ pub struct PortFolio<S: Strategy> {
     pub order_size: i32,
     pub stop_loss: f64,
     pub commission: f64,
-    pub capital: f64,
+    pub equity: f64,
     pub instruments: Vec<BackTestInstrument>,
     pub strategy: S,
 }
@@ -24,7 +24,7 @@ impl<S: Strategy> PortFolio<S> {
             println!("[BackTest] {:?}", endpoint);
             let backtested_instrument =
                 self.strategy
-                    .test(instrument, self.commission, self.stop_loss);
+                    .test(instrument, self.equity, self.commission, self.stop_loss);
 
             let backtest_result: BackTestResult =
                 request(&endpoint, &backtested_instrument, HttpMethod::Put)

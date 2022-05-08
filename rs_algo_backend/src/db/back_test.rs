@@ -11,7 +11,7 @@ use mongodb::options::FindOneAndReplaceOptions;
 use std::env;
 
 pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<BackTestInstrument>, Error> {
-    let collection_name = &env::var("DB_BACKTEST_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
 
     let collection = get_collection::<BackTestInstrument>(&state.db_mem, collection_name).await;
 
@@ -31,7 +31,7 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<BackTestInstrum
 pub async fn find_instruments(
     state: &web::Data<AppState>,
 ) -> Result<Vec<BackTestInstrument>, Error> {
-    let collection_name = &env::var("DB_BACKTEST_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
 
     let collection = get_collection::<BackTestInstrument>(&state.db_mem, collection_name).await;
 

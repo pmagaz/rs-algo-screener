@@ -151,34 +151,4 @@ impl Peaks {
 
         Ok(())
     }
-
-    // fn maxima_minima(
-    //     &self,
-    //     data: &Vec<f64>,
-    //     min_prominence: f64,
-    //     min_distance: usize,
-    //     max_price: &f64,
-    // ) -> Result<Vec<(usize, f64)>> {
-    //     let prominence = max_price * min_prominence;
-    //     let mut result: Vec<(usize, f64)> = vec![];
-
-    //     let peaks = PeakFinder::new(&data)
-    //         .with_min_prominence(prominence)
-    //         //.with_min_distance(min_distance);
-    //         .find_peaks();
-
-    //     let mut x_values: Vec<f64> = vec![];
-    //     let mut y_values: Vec<f64> = vec![];
-
-    //     for peak in peaks {
-    //         let candle_id = peak.middle_position();
-    //         let price = self.close[candle_id];
-
-    //         x_values.push(candle_id as f64);
-    //         y_values.push(price);
-    //         result.push((candle_id, price.abs()));
-    //     }
-
-    //     Ok(result)
-    // }
 }

@@ -106,15 +106,21 @@ impl Indicators {
     pub fn calculate_indicators(&mut self, close: f64) -> Result<()> {
         self.macd.next(close).unwrap();
         self.stoch.next(close).unwrap();
-        self.atr.next(close).unwrap();
-        self.kc.next(close).unwrap();
-        self.rsi.next(close).unwrap();
-        self.ema_a.next(close).unwrap();
-        self.ema_b.next(close).unwrap();
-        self.ema_c.next(close).unwrap();
-        self.tema_a.next(close).unwrap();
-        self.tema_b.next(close).unwrap();
-        self.tema_c.next(close).unwrap();
+        let extended_indicators = env::var("EXTENDED_INDICATORS")
+            .unwrap()
+            .parse::<bool>()
+            .unwrap();
+        if extended_indicators {
+            self.atr.next(close).unwrap();
+            self.kc.next(close).unwrap();
+            self.rsi.next(close).unwrap();
+            self.ema_a.next(close).unwrap();
+            self.ema_b.next(close).unwrap();
+            self.ema_c.next(close).unwrap();
+            self.tema_a.next(close).unwrap();
+            self.tema_b.next(close).unwrap();
+            self.tema_c.next(close).unwrap();
+        }
         Ok(())
     }
 }

@@ -51,8 +51,11 @@ impl<'a> Strategy for Macd<'a> {
         instrument: &Instrument,
         trades_in: Vec<TradeIn>,
         trades_out: Vec<TradeOut>,
+        equity: f64,
         commission: f64,
     ) -> BackTestResult {
-        resolve_backtest(instrument, trades_in, trades_out, self.name, commission)
+        resolve_backtest(
+            instrument, trades_in, trades_out, self.name, equity, commission,
+        )
     }
 }

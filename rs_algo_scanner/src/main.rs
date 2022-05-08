@@ -103,16 +103,12 @@ async fn main() -> Result<()> {
     //     // },
     // ];
 
-    let ignore_list: Vec<String> = env::var("SYMBOL_IGNORE_LIST")
-        .unwrap()
-        .split('@')
-        .map(|x| x.to_owned())
-        .collect();
+    let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
 
     for s in symbols {
         let now = Instant::now();
         println!("[INSTRUMENT] {:?} processing...", &s.symbol);
-        if !ignore_list.contains(&s.symbol) {
+        if s.symbol.contains(&filter) {
             screener
                 .get_instrument_data(
                     &s.symbol,

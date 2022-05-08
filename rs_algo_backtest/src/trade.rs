@@ -88,6 +88,7 @@ pub fn resolve_backtest(
     trades_in: Vec<TradeIn>,
     trades_out: Vec<TradeOut>,
     name: &str,
+    equity: f64,
     commission: f64,
 ) -> BackTestResult {
     let size = 1.;
@@ -98,7 +99,8 @@ pub fn resolve_backtest(
         acc += x.index_out - x.index_in;
         acc
     });
-    let last_candle = data.last().unwrap();
+    let current_candle = data.last().unwrap();
+    let current_price = current_candle.close;
     let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
     let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit < 0.).collect();
     let wining_trades = w_trades.len();
@@ -112,10 +114,9 @@ pub fn resolve_backtest(
     let net_profit_per = net_profit / 100.;
     let profitable_trades = total_profitable_trades(wining_trades, trades);
     let profit_factor = total_profit_factor(gross_profits, gross_loses);
-    //FIX THIS
-    let max_drawdown = total_drawdown(&trades_out);
-    let max_runup = total_runup(&trades_out);
-    let buy_hold = calculate_buy_hold(&trades_out);
+    let max_drawdown = total_drawdown(&trades_out, equity);
+    let max_runup = total_runup(&trades_out, equity);
+    let buy_hold = calculate_buy_hold(&trades_out, equity, current_price);
     let annual_return = 100.;
 
     BackTestResult {

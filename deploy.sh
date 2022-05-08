@@ -30,6 +30,12 @@ do
             docker build -t cluster.loc:5000/rs-algo-scanner:latest rs_algo_scanner ; docker push cluster.loc:5000/rs-algo-scanner:latest ; ansible-playbook playbook.yml 
             break
             ;;
+
+        "build & deploy rs-algo-scanner-backtest")
+            echo "Deploying: $opt";
+            docker build -t cluster.loc:5000/rs-algo-scanner:latest rs_algo_scanner ; docker push cluster.loc:5000/rs-algo-scanner:latest ; ansible-playbook playbook.yml 
+            break
+            ;;
         "build & deploy rs-algo-client")
             echo "Deploying: $opt";
             docker build -t cluster.loc:5000/rs-algo-client:latest rs_algo_client ; docker push cluster.loc:5000/rs-algo-client:latest ; ansible-playbook playbook.yml 

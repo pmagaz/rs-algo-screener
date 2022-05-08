@@ -36,7 +36,7 @@ async fn main() -> Result<()> {
         order_size: 1,
         stop_loss: 15.,
         commission: 0.015,
-        capital: 10000.,
+        equity: 10000.,
         instruments: vec![],
         strategy: strategies::ema::Ema::new().unwrap(),
     };

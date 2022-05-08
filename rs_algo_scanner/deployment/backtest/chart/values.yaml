@@ -1,0 +1,31 @@
+jobs:
+  - name: backtest
+    image:
+      repository: cluster.loc:5000/rs-algo-scanner
+      tag: latest
+      imagePullPolicy: Always
+    schedule: "0 11 * * *"
+    failedJobsHistoryLimit: 0
+    successfulJobsHistoryLimit: 0
+    concurrencyPolicy: Forbid
+    restartPolicy: Never
+    activeDeadlineSeconds: 7200
+    envSecretName: rs-algo-screener-secrets
+    resources:
+      requests:
+        cpu: 900m
+      limits:
+        cpu: 1200m
+        memory: 256Mi
+    nodeSelector:
+      nodeType: cpu
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: nodeType
+              operator: In
+              values:
+              - cpu
+    

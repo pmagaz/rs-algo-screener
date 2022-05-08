@@ -16,7 +16,7 @@ pub async fn find_by_symbol(
     symbol: &str,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let instrument = collection
@@ -32,7 +32,7 @@ pub async fn find_by_params(
     params: String,
     strategy: General,
 ) -> Result<Vec<CompactInstrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
 
     println!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<CompactInstrument>(&state.db_mem, collection_name).await;
@@ -57,7 +57,7 @@ pub async fn find_detail_by_params(
     params: String,
     strategy: General,
 ) -> Result<Vec<Instrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
 
     println!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
@@ -86,7 +86,7 @@ pub async fn find_detail_by_params(
 }
 
 pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
 
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
@@ -111,7 +111,7 @@ pub async fn upsert(
     doc: CompactInstrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
     let collection = get_collection::<CompactInstrument>(&state.db_mem, collection_name).await;
 
     collection
@@ -129,7 +129,7 @@ pub async fn insert_detail(
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_DETAIL_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     collection

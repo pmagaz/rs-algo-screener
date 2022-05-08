@@ -61,21 +61,69 @@ pub fn total_gross(trades_out: &Vec<&TradeOut>) -> f64 {
     trades_out.iter().map(|trade| trade.profit).sum()
 }
 
-pub fn total_drawdown(trades_out: &Vec<TradeOut>) -> f64 {
+pub fn total_drawdown2(trades_out: &Vec<TradeOut>) -> f64 {
     let max_drawdown = trades_out
         .iter()
         .enumerate()
-        .map(|(_i, x)| x.draw_down_per)
+        .map(|(_i, x)| x.draw_down)
         .fold(0. / 0., f64::max);
     max_drawdown
 }
 
-pub fn total_runup(trades_out: &Vec<TradeOut>) -> f64 {
-    trades_out.iter().map(|trade| trade.run_up_per).sum()
+pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
+    let mut max_acc_equity = equity;
+    let mut min_acc_equity = equity;
+    let max_equity = trades_out
+        .iter()
+        .enumerate()
+        .map(|(_i, x)| {
+            max_acc_equity += x.profit;
+            max_acc_equity
+        })
+        .fold(0. / 0., f64::max);
+
+    let min_equity = trades_out
+        .iter()
+        .enumerate()
+        .map(|(_i, x)| {
+            min_acc_equity += x.profit;
+            min_acc_equity
+        })
+        .fold(0. / 0., f64::min);
+
+    ((min_equity - max_equity) / max_equity * 100.).abs()
 }
 
-pub fn calculate_buy_hold(trades_out: &Vec<TradeOut>) -> f64 {
-    trades_out.iter().map(|trade| trade.run_up_per).sum()
+pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
+    let mut max_acc_equity = equity;
+    let mut min_acc_equity = equity;
+    let max_equity = trades_out
+        .iter()
+        .enumerate()
+        .map(|(_i, x)| {
+            max_acc_equity += x.profit;
+            max_acc_equity
+        })
+        .fold(0. / 0., f64::max);
+
+    let min_equity = trades_out
+        .iter()
+        .enumerate()
+        .map(|(_i, x)| {
+            min_acc_equity += x.profit;
+            min_acc_equity
+        })
+        .fold(0. / 0., f64::min);
+
+    ((max_equity - min_equity) / min_equity * 100.).abs()
+}
+
+pub fn calculate_buy_hold(trades_out: &Vec<TradeOut>, equity: f64, current_price: f64) -> f64 {
+    let bought_at = trades_out.first().unwrap().price_in;
+    let size = equity / bought_at;
+    let sold_at = size * current_price;
+    let profit = sold_at - (equity);
+    (profit / equity) * 100.
 }
 
 pub fn total_commissions(num_trades: usize, commission: f64) -> f64 {

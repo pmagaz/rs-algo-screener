@@ -39,6 +39,13 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 prev_b: *doc.indicators.macd.data_b.get(second_last).unwrap(),
                 status: Status::Default,
             },
+            stoch: CompactIndicator {
+                current_a: *doc.indicators.stoch.data_a.last().unwrap(),
+                current_b: *doc.indicators.stoch.data_b.last().unwrap(),
+                prev_a: *doc.indicators.stoch.data_a.get(second_last).unwrap(),
+                prev_b: *doc.indicators.stoch.data_b.get(second_last).unwrap(),
+                status: Status::Default,
+            },
             atr: CompactIndicator {
                 current_a: *doc.indicators.atr.data_a.last().unwrap(),
                 prev_a: *doc.indicators.atr.data_a.get(second_last).unwrap(),
@@ -60,13 +67,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 prev_b: 0.,
                 status: Status::Default,
             },
-            stoch: CompactIndicator {
-                current_a: *doc.indicators.stoch.data_a.last().unwrap(),
-                current_b: *doc.indicators.stoch.data_b.last().unwrap(),
-                prev_a: *doc.indicators.stoch.data_a.get(second_last).unwrap(),
-                prev_b: *doc.indicators.stoch.data_b.get(second_last).unwrap(),
-                status: Status::Default,
-            },
+
             ema_a: CompactIndicator {
                 current_a: *doc.indicators.ema_a.data_a.last().unwrap(),
                 current_b: 0.,
