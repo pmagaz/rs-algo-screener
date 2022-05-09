@@ -16,7 +16,11 @@ impl<'a> Strategy for Macd<'a> {
         Ok(Self { name: "MACD" })
     }
 
-    fn market_in_fn(&self, index: usize, instrument: &Instrument) -> TradeResult {
+    fn name(&self) -> &str {
+        self.name
+    }
+
+    fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
         let prev_index = index - 1;
         let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();
         let current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
@@ -24,7 +28,6 @@ impl<'a> Strategy for Macd<'a> {
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
         let entry_condition = current_macd_a > current_macd_b && prev_macd_b >= prev_macd_a;
-        let stop_loss = -1.;
 
         resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
@@ -43,7 +46,8 @@ impl<'a> Strategy for Macd<'a> {
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
         let exit_condition = current_macd_a < current_macd_b && prev_macd_a >= prev_macd_b;
-        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
+
+        resolve_trade_out(index, instrument, trade_in, exit_condition)
     }
 
     fn backtest_result(

@@ -1,10 +1,10 @@
 jobs:
-  - name: backtest
+  - name: nightly
     image:
-      repository: cluster.loc:5000/rs-algo-scanner
+      repository: cluster.loc:5000/rs-algo-backtest
       tag: latest
       imagePullPolicy: Always
-    schedule: "0 3 * * *"
+    schedule: "0 5 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
@@ -13,7 +13,7 @@ jobs:
     envSecretName: rs-algo-screener-secrets
     resources:
       requests:
-        cpu: 900m
+        cpu: 800m
       limits:
         cpu: 1200m
         memory: 256Mi

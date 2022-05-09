@@ -26,13 +26,15 @@ pub trait Strategy {
         //let start_date = data.iter().take(200).last().map(|x| x.date).unwrap();
 
         println!(
-            "[BACKTEST] Starting {:?} backtest from {:}?",
-            &instrument.symbol, start_date
+            "[BACKTEST] Starting {:?} backtest for {:?}  from {:}?",
+            self.name(),
+            &instrument.symbol,
+            start_date
         );
         for (index, _candle) in data.iter().enumerate() {
             if index > 200 && index < len - 1 {
                 if !open_positions {
-                    let trade_in_result = self.market_in_fn(index, instrument);
+                    let trade_in_result = self.market_in_fn(index, instrument, stop_loss);
                     match trade_in_result {
                         TradeResult::TradeIn(trade_in) => {
                             trades_in.push(trade_in);
@@ -59,7 +61,8 @@ pub trait Strategy {
 
         self.backtest_result(instrument, trades_in, trades_out, equity, commission)
     }
-    fn market_in_fn(&self, index: usize, instrument: &Instrument) -> TradeResult;
+    fn name(&self) -> &str;
+    fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult;
     fn market_out_fn(
         &self,
         index: usize,

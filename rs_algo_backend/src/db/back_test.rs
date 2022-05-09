@@ -3,20 +3,23 @@ use crate::models::app_state::AppState;
 use crate::models::instrument::Instrument;
 
 use actix_web::web;
-use bson::doc;
+use bson::{doc, Document};
 use futures::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
 use rs_algo_shared::models::backtest_instrument::*;
 use std::env;
 
-pub async fn find_instruments(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
+pub async fn find_instruments(
+    query: Document,
+    state: &web::Data<AppState>,
+) -> Result<Vec<Instrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
 
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
-        .find(None, FindOptions::builder().limit(25).build())
+        .find(query, FindOptions::builder().limit(50).build())
         .await
         .unwrap();
 
@@ -31,23 +34,24 @@ pub async fn find_instruments(state: &web::Data<AppState>) -> Result<Vec<Instrum
     Ok(docs)
 }
 
-pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
+// pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
+//     let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
+//     println!("222222");
 
-    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
+//     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
-    let mut cursor = collection.find(None, None).await.unwrap();
+//     let mut cursor = collection.find(None, None).await.unwrap();
 
-    let mut docs: Vec<Instrument> = vec![];
+//     let mut docs: Vec<Instrument> = vec![];
 
-    while let Some(result) = cursor.next().await {
-        match result {
-            Ok(instrument) => docs.push(instrument),
-            _ => {}
-        }
-    }
-    Ok(docs)
-}
+//     while let Some(result) = cursor.next().await {
+//         match result {
+//             Ok(instrument) => docs.push(instrument),
+//             _ => {}
+//         }
+//     }
+//     Ok(docs)
+// }
 
 pub async fn upsert(
     doc: &BackTestInstrumentResult,

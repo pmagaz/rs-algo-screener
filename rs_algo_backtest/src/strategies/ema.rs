@@ -18,7 +18,11 @@ impl<'a> Strategy for Ema<'a> {
         Ok(Self { name: "EMA200" })
     }
 
-    fn market_in_fn(&self, index: usize, instrument: &Instrument) -> TradeResult {
+    fn name(&self) -> &str {
+        self.name
+    }
+
+    fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
         let prev_index = index - 1;
         let current_price = &instrument.data.get(index).unwrap().close;
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
@@ -27,7 +31,6 @@ impl<'a> Strategy for Ema<'a> {
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
         let entry_condition = current_price > current_ema_200;
-        let stop_loss = -1.;
 
         resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
@@ -46,7 +49,7 @@ impl<'a> Strategy for Ema<'a> {
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
         let exit_condition = current_price < current_ema_200;
-        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
+        resolve_trade_out(index, instrument, trade_in, exit_condition)
     }
 
     fn backtest_result(

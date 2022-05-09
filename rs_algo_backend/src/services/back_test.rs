@@ -9,6 +9,7 @@ use actix_web::{web, HttpResponse};
 use bson::doc;
 use rs_algo_shared::helpers::date::*;
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::time::Instant;
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
@@ -16,11 +17,22 @@ struct ApiResponse {
     result: String,
 }
 
-pub async fn find_all(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+pub async fn find_instruments(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    let backtest_instruments: Vec<Instrument> =
-        db::back_test::find_instruments(&state).await.unwrap();
+    println!("[BACK TEST INSTRUMENTS] Request at {:?}", Local::now());
+
+    let growth_srt = env::var("GROWTH_STOCK_SYMBOLS").unwrap();
+    let growth_symbols: Vec<&str> = growth_srt.split(",").collect();
+
+    let value_srt = env::var("VALUE_STOCK_SYMBOLS").unwrap();
+    let value_symbols: Vec<&str> = value_srt.split(",").collect();
+    let arr = [growth_symbols, value_symbols].concat();
+    let query = doc! {"symbol": { "$in": arr }};
+
+    let backtest_instruments: Vec<Instrument> = db::back_test::find_instruments(query, &state)
+        .await
+        .unwrap();
 
     println!(
         "[BACK TEST INSTRUMENTS] {:?} {:?}",

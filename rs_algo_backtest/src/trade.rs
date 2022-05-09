@@ -11,19 +11,19 @@ pub fn resolve_trade_in(
     result: bool,
     stop_loss: f64,
 ) -> TradeResult {
-    let nex_day_index = index + 1;
-    let current_candle = instrument.data.get(nex_day_index);
-    let current_price = match current_candle {
-        Some(candle) => candle.open,
-        None => -100.,
-    };
-    let current_date = current_candle.unwrap().date;
-
     if result {
+        let nex_day_index = index + 1;
+        let current_candle = instrument.data.get(nex_day_index);
+        let current_price = match current_candle {
+            Some(candle) => candle.open,
+            None => -100.,
+        };
+        let current_date = current_candle.unwrap().date;
+
         TradeResult::TradeIn(TradeIn {
             index_in: nex_day_index,
             price_in: current_price,
-            stop_loss: stop_loss,
+            stop_loss: calculate_stoploss(&instrument, index, stop_loss),
             date_in: to_dbtime(current_date),
             trade_type: TradeType::Entry(TradeDirection::Long),
         })
@@ -37,7 +37,6 @@ pub fn resolve_trade_out(
     instrument: &Instrument,
     trade_in: &TradeIn,
     exit_condition: bool,
-    stop_loss: f64,
 ) -> TradeResult {
     let size = 1.;
     let data = &instrument.data;
@@ -59,10 +58,14 @@ pub fn resolve_trade_out(
     let draw_down = calculate_drawdown(data, price_in, index_in, nex_day_index);
     let draw_down_per = calculate_drawdown_per(draw_down, price_in);
 
-    //FIXME CHECK STOP LOSS
-    let trade_type = TradeType::Exit(TradeDirection::Long);
+    let stoploss_activated = resolve_stoploss(current_price, trade_in);
 
-    if exit_condition {
+    let trade_type = match stoploss_activated {
+        true => TradeType::Exit(TradeDirection::Long),
+        false => TradeType::StopLoss(TradeDirection::Long),
+    };
+
+    if exit_condition || stoploss_activated {
         TradeResult::TradeOut(TradeOut {
             index_in: index_in,
             price_in: price_in,
@@ -120,7 +123,7 @@ pub fn resolve_backtest(
         let buy_hold = calculate_buy_hold(&trades_out, equity, current_price);
         let annual_return = 100.;
         println!(
-            "[BACKTEST] {:} backtested for {:?}",
+            "[BACKTEST] {:} backtested for {:?} sessions",
             instrument.symbol, sessions
         );
         BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
@@ -150,4 +153,16 @@ pub fn resolve_backtest(
     } else {
         BackTestResult::None
     }
+}
+
+pub fn calculate_stoploss(instrument: &Instrument, index: usize, stop_loss: f64) -> f64 {
+    let current_price = &instrument.data.get(index).unwrap().open;
+    let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * stop_loss;
+    current_price - atr_value
+}
+
+pub fn resolve_stoploss(current_price: f64, trade_in: &TradeIn) -> bool {
+    let stop_loss = trade_in.stop_loss;
+    //current_price <= stop_loss
+    false
 }

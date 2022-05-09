@@ -34,11 +34,14 @@ async fn main() -> Result<()> {
 
     let portfolio = PortFolio {
         order_size: 1,
-        stop_loss: 15.,
+        stop_loss: 2.,
         commission: 0.015,
         equity: 10000.,
         instruments: vec![],
-        strategy: strategies::ema::Ema::new().unwrap(),
+        strategies: vec![
+            Box::new(strategies::ema::Ema::new().unwrap()),
+            Box::new(strategies::macd::Macd::new().unwrap()),
+        ],
     };
 
     portfolio.test(&instruments).await;

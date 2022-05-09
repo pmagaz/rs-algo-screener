@@ -10,6 +10,7 @@
     - { role: "rs_algo_backend/deployment/roles/" }
     - { role: "rs_algo_scanner/deployment/daily/roles/" }
     - { role: "rs_algo_scanner/deployment/backtest/roles/" }
+    - { role: "rs_algo_backtest/deployment/roles/" }
     - { role: "rs_algo_client/deployment/roles/" }
    
 
