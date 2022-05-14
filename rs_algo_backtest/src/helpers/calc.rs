@@ -28,9 +28,11 @@ pub fn calculate_runup(
     let max_price = data
         .iter()
         .enumerate()
-        .filter(|(index, _x)| index >= &index_in && index < &index_out)
+        .filter(|(index, _x)| index >= &index_in && index <= &index_out)
+        //   .map(|(_i, x)| x.high)
+        .max_by(|a, b| a.1.high.partial_cmp(&b.1.high).unwrap())
         .map(|(_i, x)| x.high)
-        .fold(0. / 0., f64::max);
+        .unwrap();
     (max_price - price_in).abs()
 }
 
@@ -43,7 +45,7 @@ pub fn calculate_drawdown(
     let min_price = data
         .iter()
         .enumerate()
-        .filter(|(index, _x)| index >= &index_in && index < &index_out)
+        .filter(|(index, _x)| index >= &index_in && index <= &index_out)
         .map(|(_i, x)| x.low)
         .fold(0. / 0., f64::min);
     (min_price - price_in).abs()

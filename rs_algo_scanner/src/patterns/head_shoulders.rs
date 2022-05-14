@@ -10,8 +10,8 @@ pub fn is_hs(data: &DataPoints) -> bool {
     if data[0].1 > data[1].1
         && data[2].1 > data[1].1
         && data[2].1 > data[4].1
-        && (data[0].1 - data[4].1).abs() <= 0.03 * average(&[data[0].1, data[4].1])
-        && (data[1].1 - data[3].1).abs() <= 0.03 * average(&[data[0].1, data[4].1])
+        && (data[0].1 - data[4].1).abs() <= 0.03 * average_f64([data[0].1, data[4].1].to_vec())
+        && (data[1].1 - data[3].1).abs() <= 0.03 * average_f64([data[0].1, data[4].1].to_vec())
         && has_minimum_bars(data)
         && has_minimum_target(data)
     {
@@ -25,8 +25,8 @@ pub fn is_inverse(data: &DataPoints) -> bool {
     if data[0].1 < data[1].1
         && data[2].1 < data[1].1
         && data[2].1 < data[4].1
-        && (data[0].1 - data[4].1).abs() <= 0.03 * average(&[data[0].1, data[4].1])
-        && (data[1].1 - data[3].1).abs() <= 0.03 * average(&[data[0].1, data[4].1])
+        && (data[0].1 - data[4].1).abs() <= 0.03 * average_f64([data[0].1, data[4].1].to_vec())
+        && (data[1].1 - data[3].1).abs() <= 0.03 * average_f64([data[0].1, data[4].1].to_vec())
         && has_minimum_bars(data)
         && has_minimum_target(data)
     {

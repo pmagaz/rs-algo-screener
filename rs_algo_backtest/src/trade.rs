@@ -25,7 +25,7 @@ pub fn resolve_trade_in(
             price_in: current_price,
             stop_loss: calculate_stoploss(&instrument, index, stop_loss),
             date_in: to_dbtime(current_date),
-            trade_type: TradeType::Entry(TradeDirection::Long),
+            trade_type: TradeType::EntryLong,
         })
     } else {
         TradeResult::None
@@ -61,8 +61,8 @@ pub fn resolve_trade_out(
     let stoploss_activated = resolve_stoploss(current_price, trade_in);
 
     let trade_type = match stoploss_activated {
-        true => TradeType::Exit(TradeDirection::Long),
-        false => TradeType::StopLoss(TradeDirection::Long),
+        true => TradeType::StopLoss,
+        false => TradeType::ExitLong,
     };
 
     if exit_condition || stoploss_activated {
@@ -71,7 +71,7 @@ pub fn resolve_trade_out(
             price_in: price_in,
             trade_type,
             date_in: to_dbtime(date_in),
-            index_out: index,
+            index_out: nex_day_index,
             price_out: current_price,
             date_out: to_dbtime(date_out),
             profit,
@@ -105,11 +105,16 @@ pub fn resolve_backtest(
         });
         let current_candle = data.last().unwrap();
         let current_price = current_candle.close;
+
         let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
         let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit < 0.).collect();
         let wining_trades = w_trades.len();
         let losing_trades = l_trades.len();
         let trades = wining_trades + losing_trades;
+        let stop_losses = trades_out
+            .iter()
+            .filter(|x| x.trade_type == TradeType::StopLoss)
+            .count();
         let gross_profits = total_gross(&w_trades);
         let gross_loses = total_gross(&l_trades);
         let gross_profit = gross_profits - gross_loses;
@@ -122,10 +127,12 @@ pub fn resolve_backtest(
         let max_runup = total_runup(&trades_out, equity);
         let buy_hold = calculate_buy_hold(&trades_out, equity, current_price);
         let annual_return = 100.;
+
         println!(
             "[BACKTEST] {:} backtested for {:?} sessions",
             instrument.symbol, sessions
         );
+
         BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
             instrument: BackTestInstrument {
                 symbol: instrument.symbol.to_owned(),
@@ -139,6 +146,7 @@ pub fn resolve_backtest(
             trades,
             wining_trades,
             losing_trades,
+            stop_losses,
             gross_profit,
             commissions,
             net_profit,
@@ -163,6 +171,6 @@ pub fn calculate_stoploss(instrument: &Instrument, index: usize, stop_loss: f64)
 
 pub fn resolve_stoploss(current_price: f64, trade_in: &TradeIn) -> bool {
     let stop_loss = trade_in.stop_loss;
-    //current_price <= stop_loss
-    false
+    current_price <= stop_loss
+    //false
 }

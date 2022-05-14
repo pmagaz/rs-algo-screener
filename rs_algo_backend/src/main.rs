@@ -89,6 +89,14 @@ async fn main() -> Result<()> {
                     .route(
                         "/backtest/instruments",
                         web::get().to(back_test::find_instruments),
+                    )
+                    .route(
+                        "/backtest/instruments/result",
+                        web::get().to(back_test::find_strategies),
+                    )
+                    .route(
+                        "/backtest/strategies",
+                        web::put().to(back_test::upsert_strategies),
                     ),
             )
     })
