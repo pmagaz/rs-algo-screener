@@ -6,8 +6,6 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::instrument::Instrument;
 
-use std::cmp::Ordering;
-
 pub struct Ema<'a> {
     name: &'a str,
 }
