@@ -36,9 +36,6 @@ impl Component for App {
 
 fn main() {
     dotenv().ok();
-    //let port = env::var("RENDER_TO_IMAGE").expect("RENDER_TO_IMAGE not found");
-    // log::info!("[aaaaaaa] Loading app... {}", port);
-
     wasm_logger::init(wasm_logger::Config::new(log::Level::Trace));
     yew::start_app::<App>();
 }

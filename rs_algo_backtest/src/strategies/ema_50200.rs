@@ -13,7 +13,7 @@ pub struct Ema<'a> {
 #[async_trait]
 impl<'a> Strategy for Ema<'a> {
     fn new() -> Result<Self> {
-        Ok(Self { name: "EMA200" })
+        Ok(Self { name: "EMA_50_200" })
     }
 
     fn name(&self) -> &str {
@@ -22,13 +22,13 @@ impl<'a> Strategy for Ema<'a> {
 
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
         let prev_index = index - 1;
-        let current_price = &instrument.data.get(index).unwrap().close;
+        let current_ema_50 = instrument.indicators.ema_a.data_a.get(index).unwrap();
+        let prev_ema_50 = instrument.indicators.ema_a.data_a.get(prev_index).unwrap();
+
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
-        let prev_price = &instrument.data.get(prev_index).unwrap().close;
-        let prev_price = &instrument.data.get(prev_index).unwrap().close;
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
-        let entry_condition = current_price > current_ema_200;
+        let entry_condition = current_ema_50 > current_ema_200 && prev_ema_50 <= prev_ema_200;
 
         resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
@@ -40,12 +40,14 @@ impl<'a> Strategy for Ema<'a> {
         trade_in: &TradeIn,
     ) -> TradeResult {
         let prev_index = index - 1;
-        let current_price = &instrument.data.get(index).unwrap().close;
+        let current_ema_50 = instrument.indicators.ema_a.data_a.get(index).unwrap();
+        let prev_ema_50 = instrument.indicators.ema_a.data_a.get(prev_index).unwrap();
+
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
-        let prev_price = &instrument.data.get(prev_index).unwrap().close;
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
-        let exit_condition = current_price < current_ema_200;
+        let exit_condition = current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200;
+
         resolve_trade_out(index, instrument, trade_in, exit_condition)
     }
 

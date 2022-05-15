@@ -163,7 +163,7 @@ pub async fn upsert(
             .unwrap();
 
         println!(
-            "[INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
+            "[COMPACT INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
             symbol,
             Local::now(),
             now.elapsed()
@@ -183,7 +183,7 @@ pub async fn upsert(
                 .unwrap();
 
         println!(
-            "[INSTRUMENT DETAIL UPSERTED] {:?} at {:?} in {:?}",
+            "[INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
             symbol,
             Local::now(),
             now.elapsed()

@@ -22,7 +22,7 @@ MONGO_MEM_DB_URI: "@mongodb-mem:27017/screener-db?authSource=admin&readPreferenc
 DB_INSTRUMENTS_COMPACT_COLLECTION: "instruments_compact"
 DB_INSTRUMENTS_COLLECTION: "instruments"
 DB_INSTRUMENTS_BACKTEST_COLLECTION: "instruments_backtest"
-DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION: "backtest_instruments_results"
+DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION: "backtest_instruments_result"
 DB_BACKTEST_STRATEGY_RESULT_COLLECTION: "backtest_strategy_result"
 DB_POSITIONS_COLLECTION: "positions"
 

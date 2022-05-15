@@ -60,26 +60,36 @@ pub async fn find_backtest_instruments_result(
     Ok(docs)
 }
 
-// pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Error> {
-//     let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
-//     println!("222222");
+pub async fn find_strategies_result(
+    query: Document,
+    state: &web::Data<AppState>,
+) -> Result<Vec<BackTestStrategyResult>, Error> {
+    let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
 
-//     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
+    let collection = get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
 
-//     let mut cursor = collection.find(None, None).await.unwrap();
+    let mut cursor = collection
+        .find(
+            query,
+            FindOptions::builder()
+                .sort(doc! {"avg_profit_factor":-1})
+                .build(),
+        )
+        .await
+        .unwrap();
 
-//     let mut docs: Vec<Instrument> = vec![];
+    let mut docs: Vec<BackTestStrategyResult> = vec![];
 
-//     while let Some(result) = cursor.next().await {
-//         match result {
-//             Ok(instrument) => docs.push(instrument),
-//             _ => {}
-//         }
-//     }
-//     Ok(docs)
-// }
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(instrument) => docs.push(instrument),
+            _ => {}
+        }
+    }
+    Ok(docs)
+}
 
-pub async fn upsert(
+pub async fn upsert_instruments_result(
     doc: &BackTestInstrumentResult,
     state: &web::Data<AppState>,
 ) -> Result<Option<BackTestInstrumentResult>, Error> {
@@ -98,7 +108,7 @@ pub async fn upsert(
         .await
 }
 
-pub async fn upsert_strategies(
+pub async fn upsert_strategies_result(
     doc: &BackTestStrategyResult,
     state: &web::Data<AppState>,
 ) -> Result<Option<BackTestStrategyResult>, Error> {

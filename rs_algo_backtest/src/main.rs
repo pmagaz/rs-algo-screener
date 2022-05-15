@@ -39,7 +39,10 @@ async fn main() -> Result<()> {
         equity: 100000.,
         instruments: vec![],
         strategies: vec![
-            Box::new(strategies::ema::Ema::new().unwrap()),
+            Box::new(strategies::ema_200::Ema::new().unwrap()),
+            Box::new(strategies::ema_50200::Ema::new().unwrap()),
+            Box::new(strategies::stoch::Stoch::new().unwrap()),
+            //Box::new(strategies::mean_reversion::MeanReversion::new().unwrap()),
             Box::new(strategies::macd::Macd::new().unwrap()),
         ],
     };

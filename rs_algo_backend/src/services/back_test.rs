@@ -45,7 +45,9 @@ pub async fn find_instruments(state: web::Data<AppState>) -> Result<HttpResponse
     Ok(HttpResponse::Ok().json(backtest_instruments))
 }
 
-pub async fn find_strategies(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+pub async fn find_instruments_result(
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
     println!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
@@ -64,7 +66,7 @@ pub async fn find_strategies(state: web::Data<AppState>) -> Result<HttpResponse,
     Ok(HttpResponse::Ok().json(backtest_instruments_result))
 }
 
-pub async fn upsert(
+pub async fn upsert_instruments_result(
     //backtested_result: String,
     backtested_result: web::Json<BackTestInstrumentResult>,
     state: web::Data<AppState>,
@@ -83,7 +85,7 @@ pub async fn upsert(
     let symbol = backtested_result.instrument.symbol.clone();
 
     let now = Instant::now();
-    let _upsert = db::back_test::upsert(&backtested_result, &state)
+    let _upsert = db::back_test::upsert_instruments_result(&backtested_result, &state)
         .await
         .unwrap();
 
@@ -96,7 +98,7 @@ pub async fn upsert(
     Ok(HttpResponse::Ok().json(backtested_result))
 }
 
-pub async fn upsert_strategies(
+pub async fn upsert_strategies_result(
     backtested_strategy_result: web::Json<BackTestStrategyResult>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
@@ -114,7 +116,7 @@ pub async fn upsert_strategies(
     //let symbol = backtested_strategy_result.instrument.symbol.clone();
 
     let now = Instant::now();
-    let _upsert = db::back_test::upsert_strategies(&backtested_strategy_result, &state)
+    let _upsert = db::back_test::upsert_strategies_result(&backtested_strategy_result, &state)
         .await
         .unwrap();
 
@@ -125,4 +127,27 @@ pub async fn upsert_strategies(
         now.elapsed()
     );
     Ok(HttpResponse::Ok().json(backtested_strategy_result))
+}
+
+pub async fn find_strategies_result(
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+
+    println!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
+
+    let query = doc! {};
+
+    let backtest_instruments: Vec<BackTestStrategyResult> =
+        db::back_test::find_strategies_result(query, &state)
+            .await
+            .unwrap();
+
+    println!(
+        "[BACK TEST STRATEGIES] {:?} {:?}",
+        Local::now(),
+        now.elapsed()
+    );
+
+    Ok(HttpResponse::Ok().json(backtest_instruments))
 }

@@ -40,7 +40,7 @@ impl Indicator for Mfi {
     }
 
     fn next(&mut self, value: f64) -> Result<()> {
-        let a = self.mfi.next(&value);
+        let a = self.mfi.next(value);
         self.data_a.push(a);
         Ok(())
     }

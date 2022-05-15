@@ -85,18 +85,25 @@ async fn main() -> Result<()> {
                     )
                     .route("/watchlist", web::get().to(watch_list::find))
                     .route("/watchlist", web::put().to(watch_list::upsert))
-                    .route("/backtest", web::put().to(back_test::upsert))
+                    .route(
+                        "/backtest",
+                        web::put().to(back_test::upsert_instruments_result),
+                    )
                     .route(
                         "/backtest/instruments",
                         web::get().to(back_test::find_instruments),
                     )
                     .route(
                         "/backtest/instruments/result",
-                        web::get().to(back_test::find_strategies),
+                        web::get().to(back_test::find_instruments_result),
                     )
                     .route(
                         "/backtest/strategies",
-                        web::put().to(back_test::upsert_strategies),
+                        web::get().to(back_test::find_strategies_result),
+                    )
+                    .route(
+                        "/backtest/strategies",
+                        web::put().to(back_test::upsert_strategies_result),
                     ),
             )
     })

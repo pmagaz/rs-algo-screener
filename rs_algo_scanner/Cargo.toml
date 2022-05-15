@@ -24,4 +24,4 @@ openssl = { version = "0.10.38", features = ["vendored"] }
 tungstenite = {version = "0.17.2", features = ["native-tls"]}
 
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "ad0b6e5"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "a951b46"}
