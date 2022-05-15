@@ -38,7 +38,6 @@ impl<'a> Strategy for Ema<'a> {
         index: usize,
         instrument: &Instrument,
         trade_in: &TradeIn,
-        stop_loss: f64,
     ) -> TradeResult {
         let prev_index = index - 1;
         let current_price = &instrument.data.get(index).unwrap().close;

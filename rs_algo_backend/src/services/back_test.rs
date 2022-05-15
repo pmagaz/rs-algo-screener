@@ -30,6 +30,7 @@ pub async fn find_instruments(state: web::Data<AppState>) -> Result<HttpResponse
     let value_symbols: Vec<&str> = value_srt.split(",").collect();
     let arr = [growth_symbols, value_symbols].concat();
     let query = doc! {"symbol": { "$in": arr }};
+    //let query = doc! {};
 
     let backtest_instruments: Vec<Instrument> = db::back_test::find_instruments(query, &state)
         .await

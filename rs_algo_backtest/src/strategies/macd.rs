@@ -37,7 +37,6 @@ impl<'a> Strategy for Macd<'a> {
         index: usize,
         instrument: &Instrument,
         trade_in: &TradeIn,
-        stop_loss: f64,
     ) -> TradeResult {
         let prev_index = index - 1;
         let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();

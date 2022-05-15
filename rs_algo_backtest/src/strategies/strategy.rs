@@ -23,7 +23,6 @@ pub trait Strategy {
         let data = &instrument.data;
         let len = data.len();
         let start_date = data.first().map(|x| x.date).unwrap();
-        //let start_date = data.iter().take(200).last().map(|x| x.date).unwrap();
 
         println!(
             "[BACKTEST] Starting {:?} backtest for {:?}  from {:}?",
@@ -46,8 +45,7 @@ pub trait Strategy {
 
                 if open_positions {
                     let trade_in = trades_in.last().unwrap();
-                    let trade_out_result =
-                        self.market_out_fn(index, instrument, trade_in, stop_loss);
+                    let trade_out_result = self.market_out_fn(index, instrument, trade_in);
                     match trade_out_result {
                         TradeResult::TradeOut(trade_out) => {
                             trades_out.push(trade_out);
@@ -68,7 +66,6 @@ pub trait Strategy {
         index: usize,
         instrument: &Instrument,
         trade_in: &TradeIn,
-        stop_loss: f64,
     ) -> TradeResult;
     fn backtest_result(
         &self,

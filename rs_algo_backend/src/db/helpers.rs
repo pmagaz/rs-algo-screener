@@ -54,11 +54,18 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 prev_b: 0.,
                 status: Status::Default,
             },
-            kc: CompactIndicator {
-                current_a: *doc.indicators.kc.data_a.last().unwrap(),
-                current_b: *doc.indicators.kc.data_b.last().unwrap(),
-                prev_a: *doc.indicators.kc.data_a.get(second_last).unwrap(),
-                prev_b: *doc.indicators.kc.data_b.get(second_last).unwrap(),
+            sd: CompactIndicator {
+                current_a: *doc.indicators.sd.data_a.last().unwrap(),
+                prev_a: *doc.indicators.sd.data_a.get(second_last).unwrap(),
+                current_b: 0.,
+                prev_b: 0.,
+                status: Status::Default,
+            },
+            bb: CompactIndicator {
+                current_a: *doc.indicators.bb.data_a.last().unwrap(),
+                current_b: *doc.indicators.bb.data_b.last().unwrap(),
+                prev_a: *doc.indicators.bb.data_a.get(second_last).unwrap(),
+                prev_b: *doc.indicators.bb.data_b.get(second_last).unwrap(),
                 status: Status::Default,
             },
             rsi: CompactIndicator {

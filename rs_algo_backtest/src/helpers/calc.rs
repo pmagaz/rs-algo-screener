@@ -33,7 +33,7 @@ pub fn calculate_runup(
         .max_by(|a, b| a.1.high.partial_cmp(&b.1.high).unwrap())
         .map(|(_i, x)| x.high)
         .unwrap();
-    (max_price - price_in).abs()
+    (max_price - price_in).abs() * 100.
 }
 
 pub fn calculate_drawdown(
@@ -48,7 +48,7 @@ pub fn calculate_drawdown(
         .filter(|(index, _x)| index >= &index_in && index <= &index_out)
         .map(|(_i, x)| x.low)
         .fold(0. / 0., f64::min);
-    (min_price - price_in).abs()
+    (min_price - price_in).abs() * 100.
 }
 
 pub fn calculate_drawdown_per(draw_down: f64, price_in: f64) -> f64 {
@@ -61,15 +61,6 @@ pub fn calculate_runup_per(run_up: f64, price_in: f64) -> f64 {
 
 pub fn total_gross(trades_out: &Vec<&TradeOut>) -> f64 {
     trades_out.iter().map(|trade| trade.profit).sum()
-}
-
-pub fn total_drawdown2(trades_out: &Vec<TradeOut>) -> f64 {
-    let max_drawdown = trades_out
-        .iter()
-        .enumerate()
-        .map(|(_i, x)| x.draw_down)
-        .fold(0. / 0., f64::max);
-    max_drawdown
 }
 
 pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
@@ -93,7 +84,7 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
         })
         .fold(0. / 0., f64::min);
 
-    ((min_equity - max_equity) / max_equity * 100.).abs()
+    ((min_equity - max_equity) / max_equity).abs() * 100.
 }
 
 pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
@@ -117,7 +108,7 @@ pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
         })
         .fold(0. / 0., f64::min);
 
-    ((max_equity - min_equity) / min_equity * 100.).abs()
+    ((max_equity - min_equity) / min_equity).abs() * 100.
 }
 
 pub fn calculate_buy_hold(trades_out: &Vec<TradeOut>, equity: f64, current_price: f64) -> f64 {

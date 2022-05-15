@@ -1,17 +1,21 @@
 pub mod atr;
+pub mod bb;
 pub mod ema;
 pub mod kc;
 pub mod macd;
 pub mod rsi;
+pub mod sd;
 pub mod stoch;
 pub mod tema;
 
 use crate::error::Result;
 use crate::indicators::atr::Atr;
+use crate::indicators::bb::BollingerB;
 use crate::indicators::ema::Ema;
 use crate::indicators::kc::KeltnerC;
 use crate::indicators::macd::Macd;
 use crate::indicators::rsi::Rsi;
+use crate::indicators::sd::StandardD;
 use crate::indicators::stoch::Stoch;
 use crate::indicators::tema::Tema;
 
@@ -32,13 +36,16 @@ pub trait Indicator {
     //fn get_status(&self, current_price: f64) -> Status;
 }
 
+//FIXME ARRAY OF INDICATORS
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Indicators {
     pub macd: Macd,
     pub stoch: Stoch,
     pub atr: Atr,
+    pub sd: StandardD,
     pub rsi: Rsi,
-    pub kc: KeltnerC,
+    //pub kc: KeltnerC,
+    pub bb: BollingerB,
     pub ema_a: Ema,
     pub ema_b: Ema,
     pub ema_c: Ema,
@@ -60,7 +67,9 @@ impl Indicators {
             macd: Macd::new().unwrap(),
             stoch: Stoch::new().unwrap(),
             atr: Atr::new().unwrap(),
-            kc: KeltnerC::new().unwrap(),
+            sd: StandardD::new().unwrap(),
+            bb: BollingerB::new().unwrap(),
+            //kc: KeltnerC::new().unwrap(),
             rsi: Rsi::new().unwrap(),
             ema_a: Ema::new_ema(*ema_a).unwrap(),
             ema_b: Ema::new_ema(*ema_b).unwrap(),
@@ -75,8 +84,12 @@ impl Indicators {
         &self.atr
     }
 
-    pub fn kc(&self) -> &KeltnerC {
-        &self.kc
+    // pub fn kc(&self) -> &KeltnerC {
+    //     &self.kc
+    // }
+
+    pub fn bb(&self) -> &BollingerB {
+        &self.bb
     }
 
     pub fn macd(&self) -> &Macd {
@@ -112,7 +125,9 @@ impl Indicators {
             .unwrap();
         if extended_indicators {
             self.atr.next(close).unwrap();
-            self.kc.next(close).unwrap();
+            self.sd.next(close).unwrap();
+            self.bb.next(close).unwrap();
+            //self.kc.next(close).unwrap();
             self.rsi.next(close).unwrap();
             self.ema_a.next(close).unwrap();
             self.ema_b.next(close).unwrap();
