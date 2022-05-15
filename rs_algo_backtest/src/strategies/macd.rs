@@ -22,8 +22,10 @@ impl<'a> Strategy for Macd<'a> {
 
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
         let prev_index = index - 1;
+
         let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();
         let current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
+
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
@@ -39,8 +41,10 @@ impl<'a> Strategy for Macd<'a> {
         trade_in: &TradeIn,
     ) -> TradeResult {
         let prev_index = index - 1;
+
         let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();
         let current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
+
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 

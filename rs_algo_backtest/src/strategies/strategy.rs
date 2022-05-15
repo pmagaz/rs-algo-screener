@@ -31,7 +31,7 @@ pub trait Strategy {
             start_date
         );
         for (index, _candle) in data.iter().enumerate() {
-            if index > 200 && index < len - 1 {
+            if index > 10 && index < len - 1 {
                 if !open_positions {
                     let trade_in_result = self.market_in_fn(index, instrument, stop_loss);
                     match trade_in_result {

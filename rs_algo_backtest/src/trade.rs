@@ -119,7 +119,7 @@ pub fn resolve_backtest(
         let gross_profit = gross_profits - gross_loses;
         let commissions = total_commissions(trades, commission);
         let net_profit = gross_profit - commissions;
-        let net_profit_per = net_profit / 100.;
+        let net_profit_per = total_profit_per(&trades_out, equity);
         let profitable_trades = total_profitable_trades(wining_trades, trades);
         let profit_factor = total_profit_factor(gross_profits, gross_loses);
         let max_drawdown = total_drawdown(&trades_out, equity);
@@ -170,6 +170,6 @@ pub fn calculate_stoploss(instrument: &Instrument, index: usize, stop_loss: f64)
 
 pub fn resolve_stoploss(current_price: f64, trade_in: &TradeIn) -> bool {
     let stop_loss = trade_in.stop_loss;
-    current_price <= stop_loss
-    //false
+    //current_price <= stop_loss
+    false
 }
