@@ -42,6 +42,8 @@ async fn main() -> Result<()> {
             Box::new(strategies::ema_200::Ema::new().unwrap()),
             Box::new(strategies::ema_50200::Ema::new().unwrap()),
             Box::new(strategies::stoch::Stoch::new().unwrap()),
+            Box::new(strategies::tema_821::Tema::new().unwrap()),
+            Box::new(strategies::bollinger_bands::BollingerBands::new().unwrap()),
             //Box::new(strategies::mean_reversion::MeanReversion::new().unwrap()),
             Box::new(strategies::macd::Macd::new().unwrap()),
         ],

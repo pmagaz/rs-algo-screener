@@ -68,8 +68,7 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut min_acc_equity = equity;
     let max_equity = trades_out
         .iter()
-        .enumerate()
-        .map(|(_i, x)| {
+        .map(|x| {
             max_acc_equity += x.profit;
             max_acc_equity
         })
@@ -77,13 +76,12 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
 
     let min_equity = trades_out
         .iter()
-        .enumerate()
-        .map(|(_i, x)| {
-            min_acc_equity += x.profit;
+        .map(|x| {
+            let profit = x.profit;
+            min_acc_equity -= x.profit;
             min_acc_equity
         })
         .fold(0. / 0., f64::min);
-
     ((min_equity - max_equity) / max_equity * 100.).abs() * 100.
 }
 
