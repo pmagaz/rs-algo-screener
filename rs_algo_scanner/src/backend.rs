@@ -70,6 +70,8 @@ impl Backend {
         let CANDLE_BULLISH = &RGBColor(255, 255, 255);
         let RED_LINE = &RGBColor(235, 69, 125);
         let BLUE_LINE = &RGBColor(71, 113, 181);
+        let BLUE_LINE2 = &RGBColor(42, 98, 255);
+        let ORANGE_LINE = &RGBColor(245, 127, 22);
         let GREEN_LINE = &RGBColor(56, 142, 59);
 
         let stoch = instrument.indicators().stoch();
@@ -82,9 +84,9 @@ impl Backend {
 
         let rsi = instrument.indicators().rsi().get_data_a();
 
-        let tema_a = instrument.indicators().tema_a.get_data_a();
-        let tema_b = instrument.indicators().tema_b.get_data_a();
-        let tema_c = instrument.indicators().tema_c.get_data_a();
+        let bb_a = instrument.indicators().bb.get_data_a();
+        let bb_b = instrument.indicators().bb.get_data_b();
+        let bb_c = instrument.indicators().bb.get_data_c();
 
         let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
         //let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
@@ -382,22 +384,6 @@ impl Backend {
                 }
             }))
             .unwrap();
-        // chart
-        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
-        //         if extrema_pattern_breaks.contains(&(i)) {
-        //             return TriangleMarker::new(
-        //                 (
-        //                     candle.date(),
-        //                     candle.low() + (candle.low() * (extrema_peaks_marker_pos + 0.2)),
-        //                 ),
-        //                 -4,
-        //                 BLACK.mix(0.4),
-        //             );
-        //         } else {
-        //             return TriangleMarker::new((candle.date(), candle.close()), 0, &TRANSPARENT);
-        //         }
-        //     }))
-        //     .unwrap();
 
         for x in instrument.peaks().smooth_highs().iter() {
             chart
@@ -447,280 +433,32 @@ impl Backend {
                 .unwrap();
         }
 
-        // for x in instrument.peaks().smooth_lows().iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(instrument.peaks().smooth_lows().iter())
-        //                 .map(|(_k, highs)| {
-        //                     let idx = highs.0;
-        //                     let value = highs.1;
-        //                     let date = data[idx].date();
-        //                     (date, value)
-        //                 }),
-        //             MAGENTA.mix(0.014),
-        //         ))
-        //         .unwrap();
-        // }
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date(), bb_a[id])),
+                &BLUE_LINE2.mix(0.4),
+            ))
+            .unwrap();
 
-        //     for x in instrument.peaks().smooth_lows().iter() {
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(instrument.peaks().smooth_lows().iter())
-        //             .map(|(_k, highs)| {
-        //                 let idx = highs.0;
-        //                 let value = highs.1;
-        //                 let date = data[idx].date();
-        //                 (date, value)
-        //             }),
-        //         BLACK.mix(0.018),
-        //     ))
-        //     .unwrap();
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date(), bb_b[id])),
+                &BLUE_LINE2.mix(0.4),
+            ))
+            .unwrap();
 
-        // for x in instrument.peaks().smooth_close().iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(instrument.peaks().smooth_close().iter())
-        //                 .map(|(_k, highs)| {
-        //                     let idx = highs.0;
-        //                     let value = highs.1;
-        //                     let date = data[idx].date();
-        //                     (date, value)
-        //                 }),
-        //             &TRANSPARENT,
-        //         ))
-        //         .unwrap();
-        // }
-
-        // for x in local_maxima.iter() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..).zip(local_maxima.iter()).map(|(_k, highs)| {
-        //                 let idx = highs.0;
-        //                 let value = highs.1;
-        //                 let date = data[idx].date();
-        //                 (date, value)
-        //             }),
-        //             &BLUE,
-        //         ))
-        //         .unwrap();
-        // }
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..).zip(upper_channel.lower_band()[2].iter()).map(|(_k, highs)| {
-        //       let idx = highs.0;
-        //       let value = highs.1;
-        //       let date = data[idx].date();
-        //       (date, value)
-        //     }),
-        //     &RED,
-        //   ))
-        //   .unwrap();
-
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..)
-        //       .zip(upper_channel.lower_band()[0].iter())
-        //       .map(|(key, value)| {
-        //         let date = data[value.0].date();
-        //         (date, value.1)
-        //       }),
-        //     &RED,
-        //   ))
-        //   .unwrap();
-        // // }
-
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..)
-        //       .zip(upper_channel.lower_band().iter())
-        //       .map(|(key, value)| {
-        //         let date = data[value.0].date();
-        //         //println!("222222, {:?}, {:?}", date, value);
-        //         (date, value.1)
-        //       }),
-        //     &RED,
-        //   ))
-        //   .unwrap();
-
-        // HORIZONTAL LEVELS
-        /*
-        for x in horizontal_levels.iter() {
-            let color = match x.1.level_type() {
-                HorizontalLevelType::Support => BLUE.filled(),
-                HorizontalLevelType::Resistance => RED.filled(),
-                _ => TRANSPARENT.filled(),
-            };
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .map(|(_id, candle)| (candle.date(), *x.1.price())),
-                    color,
-                ))
-                .unwrap();
-        }
-        */
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..).zip(data.iter()).map(|(_id, candle)| {
-        //       let date = candle.date();
-        //       //let value = tema_a.next(candle.close());
-        //       (date, value)
-        //     }),
-        //     &BLUE,
-        //   ))
-        //   .unwrap();
-
-        //         chart
-        //   .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date(), tema_a[id])),
-        //         &RED,
-        //     ))
-        //     .unwrap();
-
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..).zip(data.iter()).map(|(_id, candle)| {
-        //       let date = candle.date();
-        //       let value = tema_b.next(candle.close());
-        //       (date, value)
-        //     }),
-        //     &RED,
-        //   ))
-        //   .unwrap();
-
-        // chart
-        //   .draw_series(LineSeries::new(
-        //     (0..).zip(data.iter()).map(|(_id, candle)| {
-        //       let date = candle.date();
-        //       let value = tema_a.next(candle.close());
-        //       (date, value)
-        //     }),
-        //     &YELLOW,
-        //   ))
-        //   .unwrap();
-
-        // PEAKS
-
-        // chart
-        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
-        //         if local_maxima.contains(&(i, candle.high())) {
-        //             return TriangleMarker::new(
-        //                 (
-        //                     candle.date(),
-        //                     candle.high() + candle.high() / local_peaks_marker_pos,
-        //                 ),
-        //                 -4,
-        //                 BLUE.mix(0.4),
-        //             );
-        //         } else {
-        //             return TriangleMarker::new((candle.date(), candle.high()), 0, &TRANSPARENT);
-        //         }
-        //     }))
-        //     .unwrap();
-
-        // chart
-        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
-        //         if local_minima.contains(&(i, candle.low())) {
-        //             return TriangleMarker::new(
-        //                 (
-        //                     candle.date(),
-        //                     candle.low() - candle.low() / local_peaks_marker_pos,
-        //                 ),
-        //                 4,
-        //                 BLUE.mix(0.4),
-        //             );
-        //         } else {
-        //             return TriangleMarker::new((candle.date(), candle.low()), 0, &TRANSPARENT);
-        //         }
-        //     }))
-        //     .unwrap();
-
-        // chart
-        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
-        //         if extrema_maxima.contains(&(i, candle.high())) {
-        //             return TriangleMarker::new(
-        //                 (
-        //                     candle.date(),
-        //                     candle.low() - candle.low() / extrema_peaks_marker_pos,
-        //                 ),
-        //                 -4,
-        //                 RED.mix(0.4),
-        //             );
-        //         } else {
-        //             return TriangleMarker::new((candle.date(), candle.low()), 0, &TRANSPARENT);
-        //         }
-        //     }))
-        //     .unwrap();
-
-        // chart
-        //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
-        //         if extrema_minima.contains(&(i, candle.low())) {
-        //             return TriangleMarker::new(
-        //                 (
-        //                     candle.date(),
-        //                     candle.low() - candle.low() / local_peaks_marker_pos - 25.,
-        //                 ),
-        //                 4,
-        //                 RED.mix(0.4),
-        //             );
-        //         } else {
-        //             return TriangleMarker::new((candle.date(), candle.low()), 0, &TRANSPARENT);
-        //         }
-        //     }))
-        //     .unwrap();
-
-        // let mut rsi_pannel = ChartBuilder::on(&lower_1)
-        //     .x_label_area_size(40)
-        //     .y_label_area_size(40)
-        //     //.margin(2)
-        //     //.caption("RSI", ("sans-serif", 8.0).into_font())
-        //     .build_cartesian_2d(from_date..to_date, -0f64..100f64)
-        //     .unwrap();
-
-        // INDICATORS
-
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date(), tema_a[id])),
-        //         GREEN_LINE,
-        //     ))
-        //     .unwrap();
-
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date(), ema_b[id])),
-        //         &MAGENTA.mix(0.5),
-        //     ))
-        //     .unwrap();
-
-        // chart
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             //.filter(|(id, candle)| tema_a[*id] > tema_b[*id])
-        //             .map(|(id, candle)| ({ (candle.date(), tema_b[id]) })),
-        //         RED_LINE.mix(0.8),
-        //     ))
-        //     .unwrap();
-
-        // rsi_pannel
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date(), rsi[id])),
-        //         &RED,
-        //     ))
-        //     .unwrap();
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date(), bb_c[id])),
+                &ORANGE_LINE.mix(0.4),
+            ))
+            .unwrap();
 
         let mut stoch_pannel = ChartBuilder::on(&indicator_1)
             .x_label_area_size(40)

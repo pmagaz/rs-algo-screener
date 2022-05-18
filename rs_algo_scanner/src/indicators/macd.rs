@@ -43,6 +43,15 @@ impl Indicator for Macd {
         &self.data_b[max]
     }
 
+    fn get_data_c(&self) -> &Vec<f64> {
+        &self.data_a
+    }
+
+    fn get_current_c(&self) -> &f64 {
+        let max = self.data_a.len() - 1;
+        &self.data_a[max]
+    }
+
     fn next(&mut self, value: f64) -> Result<()> {
         let a = self.ema12.next(value) - self.ema26.next(value);
         let b = self.ema9.next(a);

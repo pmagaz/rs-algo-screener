@@ -77,30 +77,30 @@ async fn main() -> Result<()> {
     //         description: "".to_owned(),
     //         currency: "".to_owned(),
     //     },
-    //     // Symbol {
-    //     //     symbol: "OKE.US_4".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "NET.US".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "TSLA.US_4".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "OIL".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
+    //     Symbol {
+    //         symbol: "OKE.US_4".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "NET.US".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "TSLA.US_4".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     Symbol {
+    //         symbol: "OIL".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
     // ];
 
     let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();

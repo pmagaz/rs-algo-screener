@@ -5,4 +5,3 @@ pub mod macd;
 pub mod mean_reversion;
 pub mod stoch;
 pub mod strategy;
-pub mod tema_821;

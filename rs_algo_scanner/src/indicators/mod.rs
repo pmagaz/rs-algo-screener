@@ -33,7 +33,8 @@ pub trait Indicator {
     fn get_current_a(&self) -> &f64;
     fn get_current_b(&self) -> &f64;
     fn get_data_b(&self) -> &Vec<f64>;
-    //fn get_status(&self, current_price: f64) -> Status;
+    fn get_current_c(&self) -> &f64;
+    fn get_data_c(&self) -> &Vec<f64>;
 }
 
 //FIXME ARRAY OF INDICATORS
@@ -42,16 +43,11 @@ pub struct Indicators {
     pub macd: Macd,
     pub stoch: Stoch,
     pub atr: Atr,
-    pub sd: StandardD,
     pub rsi: Rsi,
-    //pub kc: KeltnerC,
     pub bb: BollingerB,
     pub ema_a: Ema,
     pub ema_b: Ema,
     pub ema_c: Ema,
-    pub tema_a: Tema,
-    pub tema_b: Tema,
-    pub tema_c: Tema,
 }
 
 impl Indicators {
@@ -59,24 +55,17 @@ impl Indicators {
         let ema_a = &env::var("EMA_A").unwrap().parse::<usize>().unwrap();
         let ema_b = &env::var("EMA_B").unwrap().parse::<usize>().unwrap();
         let ema_c = &env::var("EMA_C").unwrap().parse::<usize>().unwrap();
-        let tema_a = &env::var("TEMA_A").unwrap().parse::<usize>().unwrap();
-        let tema_b = &env::var("TEMA_B").unwrap().parse::<usize>().unwrap();
-        let tema_c = &env::var("TEMA_C").unwrap().parse::<usize>().unwrap();
 
         Ok(Self {
             macd: Macd::new().unwrap(),
             stoch: Stoch::new().unwrap(),
             atr: Atr::new().unwrap(),
-            sd: StandardD::new().unwrap(),
             bb: BollingerB::new().unwrap(),
             //kc: KeltnerC::new().unwrap(),
             rsi: Rsi::new().unwrap(),
             ema_a: Ema::new_ema(*ema_a).unwrap(),
             ema_b: Ema::new_ema(*ema_b).unwrap(),
             ema_c: Ema::new_ema(*ema_c).unwrap(),
-            tema_a: Tema::new_tema(*tema_a).unwrap(),
-            tema_b: Tema::new_tema(*tema_b).unwrap(),
-            tema_c: Tema::new_tema(*tema_c).unwrap(),
         })
     }
 
@@ -125,16 +114,11 @@ impl Indicators {
             .unwrap();
         if extended_indicators {
             self.atr.next(close).unwrap();
-            self.sd.next(close).unwrap();
             self.bb.next(close).unwrap();
-            //self.kc.next(close).unwrap();
             self.rsi.next(close).unwrap();
             self.ema_a.next(close).unwrap();
             self.ema_b.next(close).unwrap();
             self.ema_c.next(close).unwrap();
-            self.tema_a.next(close).unwrap();
-            self.tema_b.next(close).unwrap();
-            self.tema_c.next(close).unwrap();
         }
         Ok(())
     }

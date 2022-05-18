@@ -92,10 +92,10 @@ impl General {
                 ]
             },
         //     {"$and": [
-        //         {"$expr": {"$gte": ["$indicators.tema_a.current_a","$indicators.tema_b.current_a"]}},
-        //         //{"$expr": {"$lte": ["$indicators.tema_a.current_a","$indicators.tema_b.prev_a"]}},
-        //         {"$expr": {"$lt": ["$indicators.tema_a.prev_a","$indicators.tema_b.prev_a"]}},
-        //         //{"$expr": {"$gte": ["$indicators.tema_b.current_a","$indicators.ema_c.current_a"]}},
+        //         {"$expr": {"$gte": ["$indicators.bb_a.current_a","$indicators.bb_b.current_a"]}},
+        //         //{"$expr": {"$lte": ["$indicators.bb_a.current_a","$indicators.bb_b.prev_a"]}},
+        //         {"$expr": {"$lt": ["$indicators.bb_a.prev_a","$indicators.bb_b.prev_a"]}},
+        //         //{"$expr": {"$gte": ["$indicators.bb_b.current_a","$indicators.ema_c.current_a"]}},
         //    ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
             { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
@@ -117,7 +117,7 @@ impl General {
         println!("[STRATEGY] Formating ");
         let mut docs: Vec<CompactInstrument> = vec![];
 
-        let tema_crossover_th = env::var("TEMA_CROSSOVER_THRESHOLD")
+        let bb_crossover_th = env::var("bb_cROSSOVER_THRESHOLD")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -134,9 +134,7 @@ impl General {
                     let stoch = instrument.indicators.stoch.clone();
                     let macd = instrument.indicators.macd.clone();
                     let rsi = instrument.indicators.rsi.clone();
-                    let tema_a = instrument.indicators.tema_a.clone(); //8
-                    let tema_b = instrument.indicators.tema_b.clone(); //21
-                    let tema_c = instrument.indicators.tema_c.clone(); //50
+                    let bb = instrument.indicators.bb.clone(); //8
 
                     //let ema_c = instrument.indicators.ema_c.clone(); //55
                     let len = instrument.patterns.local_patterns.len();
@@ -246,28 +244,12 @@ impl General {
                         _ => Status::Neutral,
                     };
 
-                    let tema_status = match tema_a {
-                        _x if round(tema_a.current_a, 2) > round(tema_b.current_a, 2) => {
-                            Status::Bullish
-                        }
-                        _x if round(tema_a.current_a, 2) < round(tema_b.current_a, 2) => {
-                            Status::Neutral
-                        }
-                        _x if percentage_change(tema_a.prev_a, tema_b.prev_a)
-                            <= tema_crossover_th =>
-                        {
-                            Status::Neutral
-                        }
-                        _x if round(tema_a.current_a, 2) < round(tema_b.current_a, 2) => {
-                            Status::Bearish
-                        }
-                        _ => Status::Neutral,
-                    };
+                    let bb_status = Status::Neutral;
 
                     instrument.indicators.stoch.status = stoch_status.clone();
                     instrument.indicators.macd.status = macd_status.clone();
                     instrument.indicators.rsi.status = rsi_status.clone();
-                    instrument.indicators.tema_a.status = tema_status.clone();
+                    instrument.indicators.bb.status = bb_status.clone();
 
                     docs.push(instrument);
                 }

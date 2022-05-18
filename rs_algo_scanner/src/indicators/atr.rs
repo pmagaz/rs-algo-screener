@@ -31,10 +31,19 @@ impl Indicator for Atr {
     }
 
     fn get_data_b(&self) -> &Vec<f64> {
-        &self.data_a
+        &self.data_b
     }
 
     fn get_current_b(&self) -> &f64 {
+        let max = self.data_a.len() - 1;
+        &self.data_b[max]
+    }
+
+    fn get_data_c(&self) -> &Vec<f64> {
+        &self.data_a
+    }
+
+    fn get_current_c(&self) -> &f64 {
         let max = self.data_a.len() - 1;
         &self.data_a[max]
     }

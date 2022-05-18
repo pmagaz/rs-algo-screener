@@ -153,12 +153,12 @@ pub fn instrument_list(props: &Props
             let macd = instrument.indicators.macd.clone();
             let stoch = instrument.indicators.stoch.clone();
             let rsi = instrument.indicators.rsi.clone();
-            let tema_a = instrument.indicators.tema_a.clone(); //9
+            let bb = instrument.indicators.bb.clone(); //9
             let date = instrument.date.to_chrono();
 
 
 
-            let ema_style: (&str, &str, &str) = match tema_a.status {
+            let ema_style: (&str, &str, &str) = match bb.status {
                Status::Bullish => ("has-text-primary","has-text-primary","has-text-primary"), 
                Status::Neutral=> ("has-text-warning","has-text-primary","has-text-primary"),
                Status::Bearish => ("has-text-warning","has-text-primary","has-text-primary"),
@@ -224,7 +224,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    <td class={get_status_class(&tema_a.status)}> {format!("{:?} / {:?}", round(instrument.indicators.tema_a.current_a, 1), round(instrument.indicators.tema_b.current_a, 1))}</td>
+                    <td class={get_status_class(&bb.status)}> {format!("{:?} / {:?}", round(instrument.indicators.bb.current_a, 1), round(instrument.indicators.bb.current_b, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
                     <td> {format!("{}", date.format("%R"))}</td>
                     <td  onclick={ on_watch_select }><a href={"javascript:void(0);"}>{ "x" }</a></td>
@@ -248,10 +248,10 @@ pub fn instrument_list(props: &Props
                 <th><abbr>{ "Activated" }</abbr></th>
                 // <th><abbr>{ "E. Target" }</abbr></th>
                 // <th><abbr>{ "E. Activated" }</abbr></th>
+                <th><abbr>{ "BB" }</abbr></th>
                 <th><abbr>{ "Stoch" }</abbr></th>
                 <th><abbr>{ "MacD" }</abbr></th>
                 <th><abbr>{ "Rsi" }</abbr></th>
-                <th><abbr>{ "Tema (8 / 21)" }</abbr></th>
                 <th><abbr>{ "Divergence" }</abbr></th>
                 <th><abbr>{ "Updated" }</abbr></th>
                 <th><abbr>{ "W" }</abbr></th>

@@ -46,6 +46,15 @@ impl Indicator for Stoch {
         &self.data_b[max]
     }
 
+    fn get_data_c(&self) -> &Vec<f64> {
+        &self.data_a
+    }
+
+    fn get_current_c(&self) -> &f64 {
+        let max = self.data_a.len() - 1;
+        &self.data_a[max]
+    }
+
     fn next(&mut self, value: f64) -> Result<()> {
         let a = self.stoch.next(value);
         let b = self.ema.next(a);
