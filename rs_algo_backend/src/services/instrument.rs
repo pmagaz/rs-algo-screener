@@ -6,6 +6,7 @@ use crate::render_image::Backend;
 use crate::strategies::general::General;
 
 use rs_algo_shared::models::api::*;
+use rs_algo_shared::models::backtest_instrument::TradeOut;
 use rs_algo_shared::models::instrument::*;
 use std::time::Instant;
 
@@ -59,20 +60,23 @@ pub async fn chart(
         .unwrap()
         .unwrap();
 
+    let output_file = [
+        &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap(),
+        &instrument.symbol,
+        ".png",
+    ]
+    .concat();
+
     let backend = Backend::new();
-    let _output = backend.render(&instrument);
+    backend.render(&instrument, &vec![], &output_file);
 
-    let image_folder = &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap();
     let mut image_path = PathBuf::new();
-    image_path.push(image_folder);
-    image_path.push([&symbol, ".png"].concat());
-
-    println!("[PATH] {:?}", image_path.to_str());
+    image_path.push(output_file);
 
     let file = fs::NamedFile::open(image_path).unwrap();
 
     println!(
-        "[RENDER] {:?} {:?} {:?}",
+        "[CHART RENDER] {:?} {:?} {:?}",
         symbol,
         Local::now(),
         now.elapsed()

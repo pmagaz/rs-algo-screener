@@ -1,7 +1,6 @@
-use crate::trade::*;
-use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::candle::Candle;
+use std::cmp::Ordering;
 
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
     size * (price_out - price_in)
@@ -132,5 +131,13 @@ pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {
         0.0 => 0.,
         _ => (gross_profits / gross_loses).abs(),
+    }
+}
+
+pub fn get_prev_index(index: usize) -> usize {
+    match index.cmp(&0) {
+        Ordering::Greater => index - 1,
+        Ordering::Equal => 0,
+        Ordering::Less => 0,
     }
 }

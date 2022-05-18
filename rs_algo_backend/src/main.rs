@@ -51,7 +51,7 @@ async fn main() -> Result<()> {
             .unwrap();
 
     println!(
-        "[Server] Launching {:} on port {:?}",
+        "[BACKEND] Launching {:} on port {:?}",
         app_name,
         port.clone()
     );
@@ -59,7 +59,6 @@ async fn main() -> Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(cors_middleware())
-            //.wrap(Cors::permissive())
             .data(AppState {
                 app_name: String::from(&app_name),
                 db_mem: Db {
@@ -104,11 +103,15 @@ async fn main() -> Result<()> {
                     .route(
                         "/backtest/strategies",
                         web::put().to(back_test::upsert_strategies_result),
+                    )
+                    .route(
+                        "/backtest/strategies/{strategy}",
+                        web::get().to(back_test::chart),
                     ),
             )
     })
     .bind(["0.0.0.0:", &port].concat())
-    .expect("[Error] Can't launch server!")
+    .expect("[BACKEND ERROR] Can't launch server!")
     .run()
     .await
 }

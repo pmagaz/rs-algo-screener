@@ -5,17 +5,26 @@ use crate::models::app_state::AppState;
 use crate::models::backtest_instrument::BackTestInstrumentResult;
 use crate::models::backtest_strategy::BackTestStrategyResult;
 use crate::models::instrument::Instrument;
+use crate::render_image::Backend;
 
+use actix_files as fs;
 use actix_web::{web, HttpResponse};
 use bson::doc;
 use rs_algo_shared::helpers::date::*;
+use rs_algo_shared::models::backtest_instrument::TradeOut;
 use serde::{Deserialize, Serialize};
 use std::env;
+use std::path::PathBuf;
 use std::time::Instant;
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 struct ApiResponse {
     result: String,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+pub struct SymbolQuery {
+    pub symbol: String,
 }
 
 pub async fn find_instruments(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
@@ -150,4 +159,60 @@ pub async fn find_strategies_result(
     );
 
     Ok(HttpResponse::Ok().json(backtest_instruments))
+}
+
+pub async fn chart(
+    strategy: web::Path<String>,
+    query: web::Query<SymbolQuery>,
+    state: web::Data<AppState>,
+) -> Result<fs::NamedFile, RsAlgoError> {
+    let now = Instant::now();
+    let symbol = &query.symbol;
+
+    println!(
+        "[BACKTEST CHART] for {:?} / {:?} at {:?}",
+        strategy,
+        symbol,
+        Local::now(),
+    );
+
+    let strategy_result: BackTestInstrumentResult =
+        db::back_test::find_strategy_instrument_result(&*strategy, &*symbol, &state)
+            .await
+            .unwrap()
+            .unwrap();
+
+    let trades: Vec<TradeOut> = strategy_result.instrument.trades_out;
+
+    let instrument = db::back_test::find_backtest_instrument_by_symbol(&*symbol, &state)
+        .await
+        .unwrap()
+        .unwrap();
+
+    let output_file = [
+        &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap(),
+        strategy.as_ref(),
+        "_",
+        symbol,
+        ".png",
+    ]
+    .concat();
+
+    let backend = Backend::new();
+    let _output = backend.render(&instrument, &trades, &output_file);
+
+    let image_folder = &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap();
+    let mut image_path = PathBuf::new();
+    image_path.push(output_file.to_string());
+
+    let file = fs::NamedFile::open(image_path).unwrap();
+
+    println!(
+        "[BACKTEST CHART RENDER] {:?} {:?} {:?}",
+        strategy,
+        Local::now(),
+        now.elapsed()
+    );
+
+    Ok(file.use_last_modified(true))
 }

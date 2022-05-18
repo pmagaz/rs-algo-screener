@@ -1,5 +1,6 @@
 use super::strategy::Strategy;
 
+use crate::helpers::calc::*;
 use crate::trade::*;
 use async_trait::async_trait;
 use rs_algo_shared::error::Result;
@@ -21,7 +22,7 @@ impl<'a> Strategy for Ema<'a> {
     }
 
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
-        let prev_index = index - 1;
+        let prev_index = get_prev_index(index);
 
         let current_ema_50 = instrument.indicators.ema_a.data_a.get(index).unwrap();
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
@@ -40,7 +41,7 @@ impl<'a> Strategy for Ema<'a> {
         instrument: &Instrument,
         trade_in: &TradeIn,
     ) -> TradeResult {
-        let prev_index = index - 1;
+        let prev_index = get_prev_index(index);
 
         let current_ema_50 = instrument.indicators.ema_a.data_a.get(index).unwrap();
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();

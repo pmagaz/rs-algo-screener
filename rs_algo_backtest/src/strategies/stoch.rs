@@ -1,5 +1,6 @@
 use super::strategy::Strategy;
 
+use crate::helpers::calc::*;
 use crate::trade::*;
 use async_trait::async_trait;
 use rs_algo_shared::error::Result;
@@ -21,7 +22,8 @@ impl<'a> Strategy for Stoch<'a> {
     }
 
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
-        let prev_index = index - 1;
+        let prev_index = get_prev_index(index);
+
         let current_stoch_a = instrument.indicators.stoch.data_a.get(index).unwrap();
         let prev_stoch_a = instrument.indicators.stoch.data_a.get(prev_index).unwrap();
 
@@ -41,7 +43,8 @@ impl<'a> Strategy for Stoch<'a> {
         instrument: &Instrument,
         trade_in: &TradeIn,
     ) -> TradeResult {
-        let prev_index = index - 1;
+        let prev_index = get_prev_index(index);
+
         let current_stoch_a = instrument.indicators.stoch.data_a.get(index).unwrap();
         let prev_stoch_a = instrument.indicators.stoch.data_a.get(prev_index).unwrap();
 

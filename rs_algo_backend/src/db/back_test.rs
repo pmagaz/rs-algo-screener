@@ -35,6 +35,26 @@ pub async fn find_instruments(
     Ok(docs)
 }
 
+pub async fn find_strategy_instrument_result(
+    strategy: &str,
+    symbol: &str,
+    state: &web::Data<AppState>,
+) -> Result<Option<BackTestInstrumentResult>, Error> {
+    let collection_name = &env::var("DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION").unwrap();
+    let collection =
+        get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
+
+    let instrument = collection
+        .find_one(
+            doc! { "strategy": strategy, "instrument.symbol": symbol},
+            FindOneOptions::builder().build(),
+        )
+        .await
+        .unwrap();
+
+    Ok(instrument)
+}
+
 pub async fn find_backtest_instruments_result(
     query: Document,
     state: &web::Data<AppState>,
@@ -124,4 +144,19 @@ pub async fn upsert_strategies_result(
                 .build(),
         )
         .await
+}
+
+pub async fn find_backtest_instrument_by_symbol(
+    symbol: &str,
+    state: &web::Data<AppState>,
+) -> Result<Option<Instrument>, Error> {
+    let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
+    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
+
+    let instrument = collection
+        .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
+        .await
+        .unwrap();
+
+    Ok(instrument)
 }
