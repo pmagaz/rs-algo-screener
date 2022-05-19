@@ -21,11 +21,12 @@
     }
   </style>
   <script language="JavaScript">
+    const get_base_url = () => window.location.href; 
+
     const get_query_value = () => {
       let query_box = document.getElementById("query_box");
       return query_box ? query_box.value : ""
     }
-    const get_base_url = () => window.location.href; 
 
      const open_modal = () => {
         console.log("open modal");
@@ -39,7 +40,8 @@
           $target.classList.remove('is-active');
         }
 
-      const setListeners = () => {
+    window.addEventListener('load', (event) => {
+      console.log("Page loaded");
       let elem = document.getElementById('modal-background');
       elem.addEventListener('click', () => close_modal());
 
@@ -47,8 +49,7 @@
         const e = event || window.event;
         if (e.keyCode === 27) close_modal();
       });
-    }
-    setTimeout(setListeners, 1500);
+    });
   </script>
 </head>
 

@@ -106,6 +106,10 @@ async fn main() -> Result<()> {
                     )
                     .route(
                         "/backtest/strategies/{strategy}",
+                        web::get().to(back_test::find_instruments_result_by_strategy),
+                    )
+                    .route(
+                        "/backtest/strategies/chart/{strategy}",
                         web::get().to(back_test::chart),
                     ),
             )

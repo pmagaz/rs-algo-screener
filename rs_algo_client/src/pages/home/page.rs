@@ -24,12 +24,10 @@ extern "C" {
 pub fn home() -> Html {
     let base_url = get_base_url();
     let instruments_url = [base_url.as_str(), "api/instruments"].concat();
-    let plotter_url = [base_url.as_str(), "api/instruments"].concat();
     let watch_list_url = [base_url.as_str(), "api/watchlist"].concat();
     let use_instruments = use_state(|| vec![]);
     let use_watch_instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
-    let use_query = use_state(|| String::from(""));
     let use_instruments_url = use_state(|| String::from(""));
 
     {

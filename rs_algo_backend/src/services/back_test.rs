@@ -62,7 +62,31 @@ pub async fn find_instruments_result(
     println!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
     let query = doc! {};
     let backtest_instruments_result: Vec<BackTestInstrumentResult> =
-        db::back_test::find_backtest_instruments_result(query, &state)
+        db::back_test::find_backtest_instruments_result(query, 50, &state)
+            .await
+            .unwrap();
+
+    println!(
+        "[BACK TEST INSTRUMENTS] {:?} {:?}",
+        Local::now(),
+        now.elapsed()
+    );
+
+    Ok(HttpResponse::Ok().json(backtest_instruments_result))
+}
+
+pub async fn find_instruments_result_by_strategy(
+    strategy: web::Path<String>,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+
+    println!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
+
+    let query = doc! {"strategy": strategy.to_string()};
+
+    let backtest_instruments_result: Vec<BackTestInstrumentResult> =
+        db::back_test::find_backtest_instruments_result(query, 500, &state)
             .await
             .unwrap();
 

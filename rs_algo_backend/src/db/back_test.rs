@@ -57,6 +57,7 @@ pub async fn find_strategy_instrument_result(
 
 pub async fn find_backtest_instruments_result(
     query: Document,
+    limit: i64,
     state: &web::Data<AppState>,
 ) -> Result<Vec<BackTestInstrumentResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION").unwrap();
@@ -65,7 +66,13 @@ pub async fn find_backtest_instruments_result(
         get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
-        .find(query, FindOptions::builder().limit(50).build())
+        .find(
+            query,
+            FindOptions::builder()
+                .limit(limit)
+                .sort(doc! {"profitable_trades":-1})
+                .build(),
+        )
         .await
         .unwrap();
 

@@ -22,6 +22,7 @@ impl PortFolio {
             let mut avg_sessions = vec![];
             let mut avg_trades = vec![];
             let mut avg_wining_trades = vec![];
+            let mut avg_win_per_trade = vec![];
             let mut avg_losing_trades = vec![];
             let mut avg_stop_losses = vec![];
             let mut avg_gross_profit = vec![];
@@ -52,6 +53,7 @@ impl PortFolio {
                         avg_sessions.push(result.sessions);
                         avg_trades.push(result.trades);
                         avg_wining_trades.push(result.wining_trades);
+                        avg_win_per_trade.push(result.net_profit_per);
                         avg_losing_trades.push(result.losing_trades);
                         avg_stop_losses.push(result.stop_losses);
                         avg_gross_profit.push(result.gross_profit);
@@ -74,6 +76,7 @@ impl PortFolio {
                 avg_sessions: average_usize(avg_sessions),
                 avg_trades: average_usize(avg_trades),
                 avg_wining_trades: average_usize(avg_wining_trades),
+                avg_win_per_trade: average_f64(avg_win_per_trade),
                 avg_losing_trades: average_usize(avg_losing_trades),
                 avg_stop_losses: average_usize(avg_stop_losses),
                 avg_gross_profit: average_f64(avg_gross_profit),

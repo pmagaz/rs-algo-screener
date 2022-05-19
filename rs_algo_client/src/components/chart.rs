@@ -15,7 +15,7 @@ pub fn chart(props: &Props) -> Html {
       <div class="modal-content">
           <img src={format!("{}", url)} width="1024" height="768"/>
       </div>
-      <button class="modal-close is-large" aria-label="close"></button>
+      <button class="modal-close is-large" aria-label="close" onClick={"javascript:close_modal();"}></button>
     </div>
         }
 }

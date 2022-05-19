@@ -6,8 +6,6 @@ use crate::components::chart::Chart;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use wasm_bindgen::prelude::*;
 
-use rs_algo_shared::helpers::date::*;
-
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
 #[wasm_bindgen]
 extern "C" {
@@ -29,7 +27,6 @@ pub fn strategies() -> Html {
     .concat();
     let use_strategies = use_state(|| vec![]);
     let use_loading = use_state(|| true);
-    let use_query = use_state(|| String::from(""));
     let use_strategies_url = use_state(|| String::from(""));
 
     {
@@ -78,7 +75,7 @@ pub fn strategies() -> Html {
             <Chart url={(*use_strategies_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid ">
-                    <StrategiesList on_strategy_click={ on_strategy_click.clone()} strategies={(*use_strategies).clone()} />
+                    <StrategiesList strategies={(*use_strategies).clone()} />
 
             </div>
             </div>

@@ -1,8 +1,10 @@
+use crate::routes::Route;
 use round::round;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::models::status::Status;
 use wasm_bindgen::prelude::*;
 use yew::{function_component, html, Callback, Html, Properties};
+use yew_router::prelude::*;
 
 #[wasm_bindgen]
 extern "C" {
@@ -16,17 +18,11 @@ extern "C" {
 #[derive(Clone, Properties, PartialEq)]
 pub struct Props {
     pub strategies: Vec<BackTestStrategyResult>,
-    pub on_strategy_click: Callback<String>,
 }
 
 #[function_component(StrategiesList)]
 pub fn strategy_list(props: &Props) -> Html {
-    let Props {
-        strategies,
-        on_strategy_click,
-    } = props;
-    let base_url = get_base_url();
-    let url = [base_url.as_str(), "api/strategies/chart/"].concat();
+    let Props { strategies } = props;
 
     fn get_status_class<'a>(status: &Status) -> &'a str {
         let class = match status {
@@ -42,13 +38,6 @@ pub fn strategy_list(props: &Props) -> Html {
     let strategy_list: Html = strategies
         .iter()
         .map(|strategy| {
-
-            let on_strategy_click = {
-                let on_strategy_click = on_strategy_click.clone();
-                let strategy = strategy.strategy.clone();
-                let url = [url.clone(),strategy].concat();
-                Callback::from(move |_| on_strategy_click.emit(url.clone()))
-            };
 
             let profit_factor = strategy.avg_profit_factor;
             let profit_factor_status = match profit_factor {
@@ -84,10 +73,11 @@ pub fn strategy_list(props: &Props) -> Html {
                 _ => Status::Neutral,
             };
 
-
             html! {
                 <tr>
-                    <td  onclick={ on_strategy_click }><a href={format!("javascript:void(0);")}>{format!("{}", strategy.strategy)}</a></td>
+                    <td>
+                    <Link<Route> to={Route::Strategy { id: strategy.strategy.clone() }}>{ strategy.strategy.clone() }</Link<Route>>
+                    </td>
                     <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}> { format!("{}%", round(max_drawdown,2))}</td>
@@ -110,8 +100,8 @@ pub fn strategy_list(props: &Props) -> Html {
                 <th><abbr>{ "Avg. Win rate" }</abbr></th>
                 <th><abbr>{ "Avg. Max Drawdown" }</abbr></th>
                 <th><abbr>{ "Avg. Num trades" }</abbr></th>
-                <th><abbr>{ "Avg. Stop losses" }</abbr></th>
-                <th><abbr>{ "Avg. Anual return" }</abbr></th>
+                <th><abbr>{ "Avg. Stops" }</abbr></th>
+                <th><abbr>{ "Avg. Anmual return" }</abbr></th>
                 <th><abbr>{ "Avg. Profit" }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
                 </tr>

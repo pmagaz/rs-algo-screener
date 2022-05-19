@@ -1,5 +1,6 @@
 use crate::pages::home::page::Home;
 use crate::pages::strategies::page::Strategies;
+use crate::pages::strategy::page::Strategy;
 
 use yew::{html, Html};
 use yew_router::prelude::*;
@@ -10,6 +11,8 @@ pub enum Route {
     Home,
     #[at("/strategies")]
     Strategies,
+    #[at("/strategy/:id")]
+    Strategy { id: String },
 }
 
 pub fn switch(routes: &Route) -> Html {
@@ -19,6 +22,9 @@ pub fn switch(routes: &Route) -> Html {
         }
         Route::Strategies => {
             html! { <Strategies /> }
+        }
+        Route::Strategy { id } => {
+            html! { <Strategy id={ id }/> }
         }
     }
 }
