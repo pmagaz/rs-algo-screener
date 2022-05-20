@@ -17,6 +17,11 @@ pub trait Strategy {
         commission: f64,
         stop_loss: f64,
     ) -> BackTestResult {
+        println!(
+            "[BACKTEST] Starting {:?} backtest for {:?}",
+            self.name(),
+            &instrument.symbol
+        );
         let mut trades_in: Vec<TradeIn> = vec![];
         let mut trades_out: Vec<TradeOut> = vec![];
         let mut open_positions = false;
@@ -24,12 +29,8 @@ pub trait Strategy {
         let len = data.len();
         let start_date = data.first().map(|x| x.date).unwrap();
 
-        println!(
-            "[BACKTEST] Starting {:?} backtest for {:?}  from {:}?",
-            self.name(),
-            &instrument.symbol,
-            start_date
-        );
+        println!("[BACKTEST] from {:}...", start_date);
+
         for (index, _candle) in data.iter().enumerate() {
             if index < len - 1 {
                 if !open_positions {

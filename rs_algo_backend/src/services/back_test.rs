@@ -42,6 +42,7 @@ pub async fn find_instruments(
     println!("[BACK TEST INSTRUMENTS] Request at {:?}", Local::now());
     let offset = query.offset;
     let limit = query.limit;
+    let query = doc! {"symbol": "ROL.US"};
     let query = doc! {};
 
     let backtest_instruments: Vec<Instrument> =
