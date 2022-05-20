@@ -1,3 +1,4 @@
+pub mod sp500;
 pub mod xtb;
 use crate::error::Result;
 use crate::helpers::websocket::MessageType;

@@ -39,13 +39,12 @@ async fn main() -> Result<()> {
         equity: 100000.,
         instruments: vec![],
         strategies: vec![
-            Box::new(strategies::ema_200::Ema::new().unwrap()),
-            Box::new(strategies::ema_50200::Ema::new().unwrap()),
-            Box::new(strategies::stoch::Stoch::new().unwrap()),
-            //Box::new(strategies::tema_821::Tema::new().unwrap()),
-            Box::new(strategies::bollinger_bands::BollingerBands::new().unwrap()),
-            //Box::new(strategies::mean_reversion::MeanReversion::new().unwrap()),
-            Box::new(strategies::macd::Macd::new().unwrap()),
+            Box::new(strategies::bollinger_bands_riding_bands::BollingerBands::new().unwrap()),
+            //  Box::new(strategies::bollinger_bands_reversal::BollingerBands::new().unwrap()),
+            // Box::new(strategies::ema_200::Ema::new().unwrap()),
+            // Box::new(strategies::ema_50200::Ema::new().unwrap()),
+            // Box::new(strategies::stoch::Stoch::new().unwrap()),
+            // Box::new(strategies::macd::Macd::new().unwrap()),
         ],
     };
 

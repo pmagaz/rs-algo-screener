@@ -16,7 +16,8 @@ pub fn maxima_minima(
         .map(|peak| {
             let x = peak.middle_position();
             let y = y_values[x];
-            return (x, y);
+            return (x, y.exp());
+            //return (x, y);
         })
         .collect();
     Ok(result)

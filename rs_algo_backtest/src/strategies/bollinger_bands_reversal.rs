@@ -15,7 +15,7 @@ pub struct BollingerBands<'a> {
 impl<'a> Strategy for BollingerBands<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
-            name: "BollingerBands",
+            name: "Bollinger_Bands_Reversals",
         })
     }
 
@@ -26,13 +26,13 @@ impl<'a> Strategy for BollingerBands<'a> {
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
         let prev_index = get_prev_index(index);
 
-        let current_price = &instrument.data.get(index).unwrap().close;
-        let prev_price = &instrument.data.get(prev_index).unwrap().close;
+        let close_price = &instrument.data.get(index).unwrap().close;
+        let prev_close = &instrument.data.get(prev_index).unwrap().close;
 
-        let lower_band = instrument.indicators.bb.data_b.get(index).unwrap();
-        let prev_lower_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+        let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
+        let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
-        let entry_condition = current_price < lower_band && prev_price >= prev_lower_band;
+        let entry_condition = close_price < low_band && prev_close >= prev_low_band;
 
         resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
@@ -45,13 +45,13 @@ impl<'a> Strategy for BollingerBands<'a> {
     ) -> TradeResult {
         let prev_index = get_prev_index(index);
 
-        let current_price = &instrument.data.get(index).unwrap().close;
-        let prev_price = &instrument.data.get(prev_index).unwrap().close;
+        let close_price = &instrument.data.get(index).unwrap().close;
+        let prev_close = &instrument.data.get(prev_index).unwrap().close;
 
-        let upper_band = instrument.indicators.bb.data_a.get(index).unwrap();
-        let prev_upper_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
+        let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
+        let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
-        let exit_condition = current_price > upper_band && prev_price <= prev_upper_band;
+        let exit_condition = close_price > top_band && prev_close <= prev_top_band;
 
         resolve_trade_out(index, instrument, trade_in, exit_condition)
     }

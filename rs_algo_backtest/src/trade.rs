@@ -7,10 +7,11 @@ use rs_algo_shared::models::instrument::Instrument;
 pub fn resolve_trade_in(
     index: usize,
     instrument: &Instrument,
-    result: bool,
+    entry_condition: bool,
     stop_loss: f64,
 ) -> TradeResult {
-    if result {
+    if entry_condition {
+        println!("77777777777");
         let nex_day_index = index + 1;
         let current_candle = instrument.data.get(nex_day_index);
         let current_price = match current_candle {
@@ -158,7 +159,33 @@ pub fn resolve_backtest(
             annual_return,
         })
     } else {
-        BackTestResult::None
+        // /BackTestResult::None
+        let fake_date = to_dbtime(Local::now() - Duration::days(1000));
+        BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
+            instrument: BackTestInstrument {
+                symbol: instrument.symbol.to_owned(),
+                trades_in: vec![],
+                trades_out: vec![],
+            },
+            strategy: name.to_owned(),
+            date_start: fake_date,
+            date_end: fake_date,
+            sessions: 0,
+            trades: 0,
+            wining_trades: 0,
+            losing_trades: 0,
+            stop_losses: 0,
+            gross_profit: 0.,
+            commissions: 0.,
+            net_profit: 0.,
+            net_profit_per: 0.,
+            profitable_trades: 0.,
+            profit_factor: 0.,
+            max_runup: 0.,
+            max_drawdown: 0.,
+            buy_hold: 0.,
+            annual_return: 0.,
+        })
     }
 }
 

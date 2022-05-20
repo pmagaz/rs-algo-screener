@@ -55,6 +55,7 @@ where
             .time_frame(time_frame)
             .build()
             .unwrap();
+
         instrument.set_data(res.data).unwrap();
 
         let render_to_image = env::var("RENDER_TO_IMAGE")
@@ -67,6 +68,7 @@ where
         }
 
         tokio::spawn(callback(instrument));
+
         Ok(())
     }
 }

@@ -99,15 +99,14 @@ impl Instrument {
             .enumerate()
             .map(|(id, x)| {
                 let date = x.0;
-                let open = x.1;
-                let high = x.2;
-                let low = x.3;
-                let close = x.4;
+                let open = x.1.ln();
+                let high = x.2.ln();
+                let low = x.3.ln();
+                let close = x.4.ln();
                 let volume = x.4;
                 if self.min_price == -100. {
                     self.min_price = low;
                 }
-
                 if low < self.min_price {
                     self.min_price = low;
                 }
@@ -130,7 +129,7 @@ impl Instrument {
                     _ => id - 1,
                 };
 
-                self.indicators.calculate_indicators(close).unwrap();
+                self.indicators.calculate_indicators(close.exp()).unwrap();
 
                 Candle::new()
                     .date(date)
@@ -146,8 +145,6 @@ impl Instrument {
             .collect();
 
         if candles.len() > 0 {
-            self.set_current_price(candles.last().unwrap().close());
-
             self.peaks
                 .calculate_peaks(&self.max_price, &self.min_price)
                 .unwrap();
@@ -178,7 +175,27 @@ impl Instrument {
             self.divergences
                 .calculate(&self.indicators, &self.patterns.local_patterns, &candles);
 
-            self.data = candles;
+            self.data = candles
+                .into_iter()
+                .map(|candle| {
+                    let data = candle.to_exp_values();
+                    if self.min_price == -100. {
+                        self.min_price = data.low();
+                    }
+                    if data.low() < self.min_price {
+                        self.min_price = data.low();
+                    }
+                    if self.max_price == -100. {
+                        self.max_price = data.low();
+                    }
+                    if data.high() > self.max_price {
+                        self.max_price = data.high();
+                    }
+                    data
+                })
+                .collect();
+
+            self.set_current_price(self.data.last().unwrap().close());
 
             self.current_candle = self.current_candle().candle_type().clone();
         }

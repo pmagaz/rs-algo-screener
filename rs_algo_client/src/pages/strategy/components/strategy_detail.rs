@@ -60,8 +60,8 @@ pub fn strategy_detail(props: &Props) -> Html {
 
              let profitable_trades = backtest_instrument.profitable_trades;
             let profitable_trades_status = match profitable_trades {
-                _x if profitable_trades <= 30. => Status::Bearish,
-                _x if profitable_trades > 30. && profitable_trades < 50. => Status::Neutral,
+                _x if profitable_trades <= 40. => Status::Bearish,
+                _x if profitable_trades > 40. && profitable_trades < 50. => Status::Neutral,
                 _x if profitable_trades > 50. => Status::Bullish,
                 _ => Status::Neutral,
             };

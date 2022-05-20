@@ -24,13 +24,13 @@ impl<'a> Strategy for MeanReversion<'a> {
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
         let prev_index = get_prev_index(index);
 
-        let current_price = &instrument.data.get(index).unwrap().close;
+        let close_price = &instrument.data.get(index).unwrap().close;
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
-        let prev_price = &instrument.data.get(prev_index).unwrap().close;
-        let prev_price = &instrument.data.get(prev_index).unwrap().close;
+        let prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let prev_close = &instrument.data.get(prev_index).unwrap().close;
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
-        let entry_condition = current_price > current_ema_200;
+        let entry_condition = close_price > current_ema_200;
 
         resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
@@ -43,12 +43,12 @@ impl<'a> Strategy for MeanReversion<'a> {
     ) -> TradeResult {
         let prev_index = get_prev_index(index);
 
-        let current_price = &instrument.data.get(index).unwrap().close;
+        let close_price = &instrument.data.get(index).unwrap().close;
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
-        let prev_price = &instrument.data.get(prev_index).unwrap().close;
+        let prev_close = &instrument.data.get(prev_index).unwrap().close;
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
-        let exit_condition = current_price < current_ema_200;
+        let exit_condition = close_price < current_ema_200;
         resolve_trade_out(index, instrument, trade_in, exit_condition)
     }
 

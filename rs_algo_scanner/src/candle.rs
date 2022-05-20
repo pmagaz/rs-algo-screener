@@ -69,6 +69,18 @@ impl Candle {
     pub fn candle_type(&self) -> &CandleType {
         &self.candle_type
     }
+
+    pub fn to_exp_values(&self) -> Self {
+        Self {
+            date: self.date,
+            open: self.open.exp(),
+            high: self.high.exp(),
+            low: self.low.exp(),
+            close: self.close.exp(),
+            volume: self.volume,
+            candle_type: self.candle_type.clone(),
+        }
+    }
 }
 
 pub struct CandleBuilder {

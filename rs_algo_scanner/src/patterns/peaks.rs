@@ -99,9 +99,9 @@ impl Peaks {
         let mut smooth_lows: Vec<f64> = vec![];
         let mut smooth_close: Vec<f64> = vec![];
 
-        kernel_bandwidth = (max_price - min_price) * kernel_bandwidth;
-        local_prominence = (max_price - min_price) * local_prominence;
-        extrema_prominence = (max_price - min_price) * extrema_prominence;
+        let price_diff = max_price - min_price;
+        kernel_bandwidth = kernel_bandwidth * price_diff;
+        local_prominence = local_prominence * price_diff;
 
         let mut candle_id = 0;
         for x in &self.close {
@@ -128,7 +128,7 @@ impl Peaks {
         };
 
         let minima_smooth: Vec<f64> = source.2.iter().map(|x| -x).collect();
-        //ISSUE!
+
         self.local_maxima =
             maxima_minima(source.0, source.1, local_prominence, local_min_distance)?;
 
@@ -138,97 +138,6 @@ impl Peaks {
             local_prominence,
             local_min_distance,
         )?;
-
-        self.extrema_maxima =
-            maxima_minima(source.0, source.2, extrema_prominence, extrema_min_distance)?;
-
-        self.extrema_minima = maxima_minima(
-            &minima_smooth,
-            source.3,
-            extrema_prominence,
-            extrema_min_distance,
-        )?;
-
-        // let data = &self.close;
-        // let mut iter = self.highs.chunks(500);
-        // let mut local_maxima: Vec<(usize, f64)> = vec![];
-        // let mut local_minima: Vec<(usize, f64)> = vec![];
-        // let leches: Vec<(usize, f64)> = vec![];
-        // let mut iterating = true;
-        // while iterating {
-        //     match iter.next() {
-        //         Some(window) => {
-        //             let data_points = window.to_vec();
-        //             let max_price = max_number(&data_points);
-        //             let min_price = min_number(&data_points);
-        //             println!(
-        //                 "11111 {:?} {:?}, {:?}",
-        //                 self.highs.len(),
-        //                 min_price,
-        //                 max_price
-        //             );
-        //             kernel_bandwidth = (max_price - min_price) * kernel_bandwidth;
-        //             local_prominence = (max_price - min_price) * local_prominence;
-        //             //extrema_prominence = (max_price - min_price) * extrema_prominence;
-        //             //println!("11111 {:?} {:?}", min_price, max_price);
-
-        //             let mut candle_id = 0;
-        //             for x in &data_points {
-        //                 if kernel_source == "highs_lows" {
-        //                     let smoothed_high =
-        //                         kernel_regression(kernel_bandwidth, *x, &data_points);
-        //                     let smoothed_low =
-        //                         kernel_regression(kernel_bandwidth, *x, &data_points);
-        //                     smooth_highs.push(smoothed_high.abs());
-        //                     smooth_lows.push(smoothed_low.abs());
-        //                     self.smooth_highs.push((candle_id, smoothed_high.abs()));
-        //                     self.smooth_lows.push((candle_id, smoothed_low.abs()));
-        //                 } else {
-        //                     let smoothed_close =
-        //                         kernel_regression(kernel_bandwidth, *x, &data_points);
-        //                     smooth_close.push(smoothed_close.abs());
-        //                     self.smooth_close.push((candle_id, smoothed_close.abs()));
-        //                 }
-
-        //                 candle_id += 1;
-        //             }
-
-        //             let source = match kernel_source.as_ref() {
-        //                 "highs_lows" => (&smooth_highs, &self.highs, &smooth_lows, &self.lows),
-        //                 "close" => (&smooth_close, &data_points, &smooth_close, &data_points),
-        //                 &_ => (&smooth_close, &smooth_close, &self.close, &self.close),
-        //             };
-
-        //             let minima_smooth: Vec<f64> = source.2.iter().map(|x| -x).collect();
-
-        //             let mut max =
-        //                 maxima_minima(source.0, source.1, local_prominence, local_min_distance)
-        //                     .unwrap();
-        //             let mut min = maxima_minima(
-        //                 &minima_smooth,
-        //                 source.3,
-        //                 local_prominence,
-        //                 local_min_distance,
-        //             )
-        //             .unwrap();
-        //             local_maxima.append(&mut max);
-        //             local_minima.append(&mut min);
-        //             println!("2222222 {:?}", max.len());
-
-        //             // [local_maxima.clone(), max].concat();
-        //             // [local_minima.clone(), min].concat();
-        //         }
-        //         None => {
-        //             iterating = false;
-        //         }
-        //     }
-        // }
-        // println!("4444444");
-        // iterating = false;
-
-        // self.local_maxima = local_maxima;
-        // self.local_minima = local_minima;
-        // println!("88888 {:?}", self.local_maxima().len());
 
         Ok(())
     }

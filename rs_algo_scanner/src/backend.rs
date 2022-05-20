@@ -396,7 +396,7 @@ impl Backend {
                             let date = data[idx].date();
                             (date, value)
                         }),
-                    &GREEN_LINE.mix(0.014),
+                    &GREEN_LINE.mix(0.314),
                 ))
                 .unwrap();
         }

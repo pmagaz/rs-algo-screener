@@ -29,30 +29,6 @@ use std::{thread, time};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // fn slope(x1: f64, y1: f64, x2: f64, y2: f64) -> (f64, f64) {
-    //     let y = y2 - y1;
-    //     let x = x2 - x1;
-    //     let slope = y / x;
-    //     let y_intercept = y1 - slope * x1;
-    //     let q = y2 - (slope * x2);
-
-    //     let hypo = hypotenuse(x, y);
-
-    //     let new_x1 = x2 + hypo;
-    //     let new_y1 = (slope * new_x1) + q;
-
-    //     println!("foooo {:?}", (new_x1, new_y1));
-    //     return (slope, y_intercept);
-    // }
-
-    // fn hypotenuse(x: f64, y: f64) -> f64 {
-    //     println!("x y {:?} {:?}", x, y);
-
-    //     let num = x.powi(2) + y.powi(2);
-    //     num.powf(0.5)
-    // }
-
-    //println!("slope {:?}", slope(0., 86.19, 1., 96.25));
     dotenv().ok();
     let start = Instant::now();
     let username = &env::var("BROKER_USERNAME").unwrap();
@@ -69,7 +45,7 @@ async fn main() -> Result<()> {
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
     let symbols = screener.get_symbols().await.unwrap().symbols;
-
+    let sp500_symbols = broker::sp500::get_symbols();
     // let symbols = [
     //     Symbol {
     //         symbol: "BITCOIN".to_owned(),
@@ -77,38 +53,51 @@ async fn main() -> Result<()> {
     //         description: "".to_owned(),
     //         currency: "".to_owned(),
     //     },
-    //     Symbol {
-    //         symbol: "OKE.US_4".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "NET.US".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "TSLA.US_4".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
+    //     // Symbol {
+    //     //     symbol: "GOLD.US_9".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
     //     Symbol {
     //         symbol: "OIL".to_owned(),
     //         category: "".to_owned(),
     //         description: "".to_owned(),
     //         currency: "".to_owned(),
     //     },
+    //     Symbol {
+    //         symbol: "GOOGL.US_9".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     },
+    //     // Symbol {
+    //     //     symbol: "TSLA.US_4".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
+    //     // Symbol {
+    //     //     symbol: "OIL".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
     // ];
 
     let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
+    let backtest_mode = env::var("SCANNER_BACKTEST_MODE")
+        .unwrap()
+        .parse::<bool>()
+        .unwrap();
 
     for s in symbols {
         let now = Instant::now();
-        println!("[INSTRUMENT] {:?} processing...", &s.symbol);
-        if s.symbol.contains(&filter) {
+        if !backtest_mode
+            || (backtest_mode && broker::sp500::is_in_sp500(&s.symbol, &sp500_symbols))
+        {
+            println!("[INSTRUMENT] {:?} processing...", &s.symbol);
+
             screener
                 .get_instrument_data(
                     &s.symbol,
@@ -120,12 +109,7 @@ async fn main() -> Result<()> {
                             now.elapsed(),
                             &instrument.date()
                         );
-
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
-                        let backtest_mode = env::var("SCANNER_BACKTEST_MODE")
-                            .unwrap()
-                            .parse::<bool>()
-                            .unwrap();
 
                         let url = match backtest_mode {
                             true => [endpoint, "?mode=backtest".to_string()].concat(),
