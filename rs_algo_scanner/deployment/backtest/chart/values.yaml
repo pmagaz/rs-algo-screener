@@ -4,8 +4,8 @@ jobs:
       repository: cluster.loc:5000/rs-algo-scanner
       tag: latest
       imagePullPolicy: Always
-    #schedule: "0 0 * * 1,5"
-    schedule: "30 12 * * *"
+    schedule: "0 2 * * 2,6"
+    #schedule: "30 12 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid

@@ -105,17 +105,17 @@ impl Instrument {
                 let volume = x.4;
                 let low = match x.3 {
                     _x if x.3 > 0. => x.3.ln(),
-                    _x if x.3 <= 0. => 0.1,
+                    _x if x.3 <= 0. => 0.01,
                     _ => x.3.ln(),
                 };
 
-                if self.min_price == -10. {
+                if self.min_price == -100. {
                     self.min_price = low;
                 }
                 if low < self.min_price {
                     self.min_price = low;
                 }
-                if self.max_price == -10. {
+                if self.max_price == -100. {
                     self.max_price = high;
                 }
                 if high > self.max_price {
