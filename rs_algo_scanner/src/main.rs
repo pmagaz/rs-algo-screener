@@ -53,30 +53,24 @@ async fn main() -> Result<()> {
             description: "".to_owned(),
             currency: "".to_owned(),
         },
-        // Symbol {
-        //     symbol: "GOLD.US_9".to_owned(),
-        //     category: "".to_owned(),
-        //     description: "".to_owned(),
-        //     currency: "".to_owned(),
-        // },
-        // Symbol {
-        //     symbol: "OIL".to_owned(),
-        //     category: "".to_owned(),
-        //     description: "".to_owned(),
-        //     currency: "".to_owned(),
-        // },
-        // Symbol {
-        //     symbol: "GOOGL.US_9".to_owned(),
-        //     category: "".to_owned(),
-        //     description: "".to_owned(),
-        //     currency: "".to_owned(),
-        // },
-        // Symbol {
-        //     symbol: "TSLA.US_4".to_owned(),
-        //     category: "".to_owned(),
-        //     description: "".to_owned(),
-        //     currency: "".to_owned(),
-        // },
+        Symbol {
+            symbol: "GOLD.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        Symbol {
+            symbol: "GOOGL.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        Symbol {
+            symbol: "BITCOIN".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
         // Symbol {
         //     symbol: "OIL".to_owned(),
         //     category: "".to_owned(),

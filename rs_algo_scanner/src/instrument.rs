@@ -101,17 +101,21 @@ impl Instrument {
                 let date = x.0;
                 let open = x.1.ln();
                 let high = x.2.ln();
-                let low = x.3.ln();
                 let close = x.4.ln();
                 let volume = x.4;
+                let low = match x.3 {
+                    _x if x.3 > 0. => x.3.ln(),
+                    _x if x.3 <= 0. => 0.1,
+                    _ => x.3.ln(),
+                };
 
-                if self.min_price == -100. {
+                if self.min_price == -10. {
                     self.min_price = low;
                 }
                 if low < self.min_price {
                     self.min_price = low;
                 }
-                if self.max_price == -100. {
+                if self.max_price == -10. {
                     self.max_price = high;
                 }
                 if high > self.max_price {

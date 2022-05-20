@@ -392,7 +392,7 @@ impl Backend {
                         .zip(instrument.peaks().smooth_highs().iter())
                         .map(|(_k, highs)| {
                             let idx = highs.0;
-                            let value = highs.1;
+                            let value = highs.1.exp();
                             let date = data[idx].date();
                             (date, value)
                         }),
@@ -408,7 +408,7 @@ impl Backend {
                         .zip(instrument.peaks().smooth_lows().iter())
                         .map(|(_k, highs)| {
                             let idx = highs.0;
-                            let value = highs.1;
+                            let value = highs.1.exp();
                             let date = data[idx].date();
                             (date, value)
                         }),
@@ -424,7 +424,7 @@ impl Backend {
                         .zip(instrument.peaks().smooth_close().iter())
                         .map(|(_k, highs)| {
                             let idx = highs.0;
-                            let value = highs.1;
+                            let value = highs.1.exp();
                             let date = data[idx].date();
                             (date, value)
                         }),
