@@ -141,13 +141,6 @@ pub async fn upsert(
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
 
-    println!(
-        "[INSTRUMENT] Parsed {:?} at {:?} in {:?}",
-        symbol,
-        Local::now(),
-        now.elapsed()
-    );
-
     //FOR XTB
     if symbol.contains('_') {
         let symbol_str: Vec<&str> = symbol.split('_').collect();
@@ -167,7 +160,12 @@ pub async fn upsert(
             .unwrap();
 
         println!(
-            "[COMPACT INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
+            "{} {:?} at {:?} in {:?}",
+            match mode.as_ref() {
+                "daily" => "[INSTRUMENT UPSERTED]",
+                "backtest" => "[BACKTEST INSTRUMENT UPSERTED]",
+                &_ => "",
+            },
             symbol,
             Local::now(),
             now.elapsed()
@@ -179,7 +177,7 @@ pub async fn upsert(
         .parse::<bool>()
         .unwrap();
 
-    if insert_compact_instruments {
+    if mode != "backtest" && insert_compact_instruments {
         let now = Instant::now();
         let _insert_compact =
             db::instrument::upsert(compact_instrument(instrument).unwrap(), &state)
@@ -187,7 +185,7 @@ pub async fn upsert(
                 .unwrap();
 
         println!(
-            "[INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
+            "[COMPACT INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
             symbol,
             Local::now(),
             now.elapsed()

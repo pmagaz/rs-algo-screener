@@ -165,79 +165,79 @@ impl Backend {
             .unwrap();
 
         // PATTERN NAME
-        if points_mode == PointsMode::MaximaMinima {
-            for (_x, pattern) in patterns.iter().enumerate() {
-                chart
-                    .draw_series(PointSeries::of_element(
-                        (0..)
-                            .zip(pattern.data_points.iter())
-                            .filter(|(_i, highs)| highs.0 < total_len)
-                            .map(|(i, highs)| {
-                                let idx = highs.0;
-                                let value = highs.1;
-                                let date = data[idx].date;
-                                (date, value, i)
-                            }),
-                        0,
-                        ShapeStyle::from(&RED).filled(),
-                        &|coord, _size: i32, _style| {
-                            let new_coord = (coord.0, coord.1);
-                            let pattern_name;
-                            if coord.2 == 0 {
-                                pattern_name = Text::new(
-                                    format!("{:?}", pattern.pattern_type),
-                                    (0, 0),
-                                    (font.as_ref(), 12),
-                                )
-                            } else {
-                                pattern_name =
-                                    Text::new(format!("{:?}", ""), (0, 12), (font.as_ref(), 0))
-                            }
+        //if points_mode == PointsMode::MaximaMinima {
+        for (_x, pattern) in patterns.iter().enumerate() {
+            chart
+                .draw_series(PointSeries::of_element(
+                    (0..)
+                        .zip(pattern.data_points.iter())
+                        .filter(|(_i, highs)| highs.0 < total_len)
+                        .map(|(i, highs)| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date;
+                            (date, value, i)
+                        }),
+                    0,
+                    ShapeStyle::from(&RED).filled(),
+                    &|coord, _size: i32, _style| {
+                        let new_coord = (coord.0, coord.1);
+                        let pattern_name;
+                        if coord.2 == 0 {
+                            pattern_name = Text::new(
+                                format!("{:?}", pattern.pattern_type),
+                                (0, 0),
+                                (font.as_ref(), 12),
+                            )
+                        } else {
+                            pattern_name =
+                                Text::new(format!("{:?}", ""), (0, 12), (font.as_ref(), 0))
+                        }
 
-                            EmptyElement::at(new_coord) + pattern_name
-                        },
-                    ))
-                    .unwrap();
-            }
+                        EmptyElement::at(new_coord) + pattern_name
+                    },
+                ))
+                .unwrap();
+        }
 
-            // PATTERN LINE
-            for (_x, pattern) in local_patterns.iter().enumerate() {
-                chart
-                    .draw_series(LineSeries::new(
-                        (0..)
-                            .zip(pattern.data_points.iter())
-                            .enumerate()
-                            .filter(|(key, (_i, highs))| highs.0 < total_len && key % 2 == 0)
-                            .map(|(_key, (_i, highs))| {
-                                let idx = highs.0;
-                                let value = highs.1;
-                                let date = data[idx].date;
-                                (date, value)
-                            }),
-                        RED_LINE.mix(0.3),
-                    ))
-                    .unwrap()
-                    .label(format!("{:?}", pattern.pattern_type));
-            }
+        // PATTERN LINE
+        for (_x, pattern) in local_patterns.iter().enumerate() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(pattern.data_points.iter())
+                        .enumerate()
+                        .filter(|(key, (_i, highs))| highs.0 < total_len && key % 2 == 0)
+                        .map(|(_key, (_i, highs))| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date;
+                            (date, value)
+                        }),
+                    RED_LINE.mix(0.3),
+                ))
+                .unwrap()
+                .label(format!("{:?}", pattern.pattern_type));
+        }
 
-            for (_x, pattern) in local_patterns.iter().enumerate() {
-                chart
-                    .draw_series(LineSeries::new(
-                        (0..)
-                            .zip(pattern.data_points.iter())
-                            .enumerate()
-                            .filter(|(key, (_i, highs))| highs.0 < total_len && key % 2 != 0)
-                            .map(|(_key, (_i, highs))| {
-                                let idx = highs.0;
-                                let value = highs.1;
-                                let date = data[idx].date;
-                                (date, value)
-                            }),
-                        RED_LINE.mix(0.3),
-                    ))
-                    .unwrap()
-                    .label(format!("{:?}", pattern.pattern_type));
-            }
+        for (_x, pattern) in local_patterns.iter().enumerate() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(pattern.data_points.iter())
+                        .enumerate()
+                        .filter(|(key, (_i, highs))| highs.0 < total_len && key % 2 != 0)
+                        .map(|(_key, (_i, highs))| {
+                            let idx = highs.0;
+                            let value = highs.1;
+                            let date = data[idx].date;
+                            (date, value)
+                        }),
+                    RED_LINE.mix(0.3),
+                ))
+                .unwrap()
+                .label(format!("{:?}", pattern.pattern_type));
+            //    }
         }
 
         // LOCAL MAXIMA MINIMA

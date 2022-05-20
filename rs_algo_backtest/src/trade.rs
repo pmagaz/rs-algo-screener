@@ -11,7 +11,6 @@ pub fn resolve_trade_in(
     stop_loss: f64,
 ) -> TradeResult {
     if entry_condition {
-        println!("77777777777");
         let nex_day_index = index + 1;
         let current_candle = instrument.data.get(nex_day_index);
         let current_price = match current_candle {

@@ -22,28 +22,32 @@ struct ApiResponse {
     result: String,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct SymbolQuery {
     pub symbol: String,
 }
 
-pub async fn find_instruments(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct Params {
+    pub offset: u64,
+    pub limit: i64,
+}
+
+pub async fn find_instruments(
+    query: web::Query<Params>,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
     println!("[BACK TEST INSTRUMENTS] Request at {:?}", Local::now());
+    let offset = query.offset;
+    let limit = query.limit;
+    let query = doc! {};
 
-    let growth_srt = env::var("GROWTH_STOCK_SYMBOLS").unwrap();
-    let growth_symbols: Vec<&str> = growth_srt.split(",").collect();
-
-    let value_srt = env::var("VALUE_STOCK_SYMBOLS").unwrap();
-    let value_symbols: Vec<&str> = value_srt.split(",").collect();
-    let arr = [growth_symbols, value_symbols].concat();
-    let query = doc! {"symbol": { "$in": arr }};
-    //let query = doc! {};
-
-    let backtest_instruments: Vec<Instrument> = db::back_test::find_instruments(query, &state)
-        .await
-        .unwrap();
+    let backtest_instruments: Vec<Instrument> =
+        db::back_test::find_instruments(query, offset, limit, &state)
+            .await
+            .unwrap();
 
     println!(
         "[BACK TEST INSTRUMENTS] {:?} {:?}",

@@ -13,18 +13,19 @@ use std::env;
 
 pub async fn find_instruments(
     query: Document,
+    offset: u64,
+    limit: i64,
     state: &web::Data<AppState>,
 ) -> Result<Vec<Instrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
-    let limit = env::var("BACkTEST_LIMIT_INSTRUMENTS")
-        .unwrap()
-        .parse::<i64>()
-        .unwrap();
 
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
-        .find(query, FindOptions::builder().limit(limit).build())
+        .find(
+            query,
+            FindOptions::builder().skip(offset).limit(limit).build(),
+        )
         .await
         .unwrap();
 

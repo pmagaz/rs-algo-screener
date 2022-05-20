@@ -46,44 +46,44 @@ async fn main() -> Result<()> {
     screener.login(username, password).await?;
     let symbols = screener.get_symbols().await.unwrap().symbols;
     let sp500_symbols = broker::sp500::get_symbols();
-    // let symbols = [
-    //     Symbol {
-    //         symbol: "BITCOIN".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     // Symbol {
-    //     //     symbol: "GOLD.US_9".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     Symbol {
-    //         symbol: "OIL".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "GOOGL.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     // Symbol {
-    //     //     symbol: "TSLA.US_4".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "OIL".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    // ];
+    let symbols = [
+        Symbol {
+            symbol: "OIL".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        // Symbol {
+        //     symbol: "GOLD.US_9".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "OIL".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "GOOGL.US_9".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "TSLA.US_4".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+        // Symbol {
+        //     symbol: "OIL".to_owned(),
+        //     category: "".to_owned(),
+        //     description: "".to_owned(),
+        //     currency: "".to_owned(),
+        // },
+    ];
 
     let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
     let backtest_mode = env::var("SCANNER_BACKTEST_MODE")

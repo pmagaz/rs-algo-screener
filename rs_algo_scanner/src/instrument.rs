@@ -104,6 +104,7 @@ impl Instrument {
                 let low = x.3.ln();
                 let close = x.4.ln();
                 let volume = x.4;
+
                 if self.min_price == -100. {
                     self.min_price = low;
                 }
@@ -116,6 +117,7 @@ impl Instrument {
                 if high > self.max_price {
                     self.max_price = high;
                 }
+
                 self.peaks.highs.push(high);
                 self.peaks.lows.push(low);
                 self.peaks.close.push(close);

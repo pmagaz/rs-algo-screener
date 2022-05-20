@@ -2553,9 +2553,15 @@ pub fn get_symbols() -> Vec<String> {
 pub fn is_in_sp500(symbol: &str, sp_symbols: &Vec<String>) -> bool {
     let mut result = false;
     for sp_symbol in sp_symbols {
-        let s: Vec<&str> = symbol.split("_").collect();
-        if s[0] == sp_symbol {
-            println!("1111 {:?} {:?}", s[0], sp_symbol);
+        let mut compare: &str;
+        if symbol.contains("_") {
+            let arr: Vec<&str> = symbol.split("_").collect();
+            compare = arr[0];
+        } else {
+            compare = symbol;
+        }
+
+        if compare == sp_symbol {
             result = true;
             break;
         }
