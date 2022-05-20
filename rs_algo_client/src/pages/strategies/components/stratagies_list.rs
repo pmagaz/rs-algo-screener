@@ -81,6 +81,7 @@ pub fn strategy_list(props: &Props) -> Html {
                     <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}> { format!("{}%", round(max_drawdown,2))}</td>
+                    <td>{ round(strategy.avg_win_per_trade,2)}</td>
                     <td>{ strategy.avg_trades}</td>
                     <td>{ strategy.avg_stop_losses}</td>
                     <td>{ round(strategy.avg_annual_return,2)}</td>
@@ -99,6 +100,7 @@ pub fn strategy_list(props: &Props) -> Html {
                 <th><abbr>{ "Avg. Profit Factor" }</abbr></th>
                 <th><abbr>{ "Avg. Win rate" }</abbr></th>
                 <th><abbr>{ "Avg. Max Drawdown" }</abbr></th>
+                <th><abbr>{ "Avg. Win per trade" }</abbr></th>
                 <th><abbr>{ "Avg. Num trades" }</abbr></th>
                 <th><abbr>{ "Avg. Stops" }</abbr></th>
                 <th><abbr>{ "Avg. Anmual return" }</abbr></th>
