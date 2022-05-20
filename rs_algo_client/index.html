@@ -41,14 +41,21 @@
         }
 
     window.addEventListener('load', (event) => {
+      
       console.log("Page loaded");
-      let elem = document.getElementById('modal-background');
-      elem.addEventListener('click', () => close_modal());
+        const setListeners = () => {
 
-      document.addEventListener('keydown', (event) => {
-        const e = event || window.event;
-        if (e.keyCode === 27) close_modal();
-      });
+        let elem = document.getElementById('modal-background');
+        elem.addEventListener('click', () => close_modal());
+
+        document.addEventListener('keydown', (event) => {
+          const e = event || window.event;
+          if (e.keyCode === 27) close_modal();
+        });
+      }
+      
+      setTimeout(setListeners, 1000);
+
     });
   </script>
 </head>

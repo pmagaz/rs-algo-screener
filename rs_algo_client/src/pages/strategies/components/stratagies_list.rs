@@ -41,17 +41,17 @@ pub fn strategy_list(props: &Props) -> Html {
 
             let profit_factor = strategy.avg_profit_factor;
             let profit_factor_status = match profit_factor {
-                _x if profit_factor <= 1.0 => Status::Bearish,
-                _x if profit_factor > 1.0 && profit_factor < 1.8 => Status::Neutral,
-                _x if profit_factor > 1.8 => Status::Bullish,
+                _x if profit_factor <= 2. => Status::Bearish,
+                _x if profit_factor > 2.0 && profit_factor <= 2.5 => Status::Neutral,
+                _x if profit_factor > 2.5 => Status::Bullish,
                 _ => Status::Neutral,
             };
 
 
             let profitable_trades = strategy.avg_profitable_trades;
             let profitable_trades_status = match profitable_trades {
-                _x if profitable_trades <= 30. => Status::Bearish,
-                _x if profitable_trades > 30. && profitable_trades < 50. => Status::Neutral,
+                _x if profitable_trades <= 40. => Status::Bearish,
+                _x if profitable_trades > 40. && profitable_trades <= 50. => Status::Neutral,
                 _x if profitable_trades > 50. => Status::Bullish,
                 _ => Status::Neutral,
             };
