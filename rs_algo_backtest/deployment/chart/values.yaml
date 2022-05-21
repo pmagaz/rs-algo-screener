@@ -1,5 +1,5 @@
 jobs:
-  - name: nightly
+  - name: sp500
     image:
       repository: cluster.loc:5000/rs-algo-backtest
       tag: latest

@@ -10,13 +10,16 @@ pub fn header() -> Html {
 
     html! {
     <nav class="navbar is-link" role="navigation" aria-label="main navigation">
+
       <div class="navbar-brand">
-          <h1 class="navbar-item is-size-3">{ "RS SCREENER" }</h1>
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
+
+      <div class="img">
+            <Link<Route> classes={classes!("navbar-item")} to={Route::Home}>
+              <img src="img/rust-logo.png" width="45px" height="45px" alt="rust image"/>
+            </Link<Route>>
+
+          </div>
+          <h1 class="navbar-item is-family-sans-serif has-text-white is-size-5">{ "RS SCREENER" }</h1>
       </div>
 
       <div id="navbarBasicExample" class="navbar-menu">
