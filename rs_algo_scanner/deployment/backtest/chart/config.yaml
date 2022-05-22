@@ -1,3 +1,4 @@
+ENV: "production"
 SCANNER_BACKTEST_MODE: "true"
 RENDER_TO_IMAGE: "false"
 SLEEP_TIME: "0"
