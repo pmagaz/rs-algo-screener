@@ -98,7 +98,7 @@ pub async fn find_strategies_result(
 ) -> Result<Vec<BackTestStrategyResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
 
-    let collection = get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
+    let collection = get_collection::<BackTestStrategyResult>(&state.db_hdd, collection_name).await;
 
     let mut cursor = collection
         .find(
@@ -145,7 +145,7 @@ pub async fn upsert_strategies_result(
     state: &web::Data<AppState>,
 ) -> Result<Option<BackTestStrategyResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
-    let collection = get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
+    let collection = get_collection::<BackTestStrategyResult>(&state.db_hdd, collection_name).await;
 
     collection
         .find_one_and_replace(

@@ -87,6 +87,7 @@ pub fn strategy_list(props: &Props) -> Html {
                     <td>{ round(strategy.avg_annual_return,2)}</td>
                     <td> { format!("{}%", round(strategy.avg_net_profit_per,2))}</td>
                     <td>{ round(strategy.avg_buy_hold,2)}</td>
+                    <td>{ strategy.date }</td>
                 </tr>
             }
         })
@@ -106,6 +107,7 @@ pub fn strategy_list(props: &Props) -> Html {
                 <th><abbr>{ "Avg. Anmual return" }</abbr></th>
                 <th><abbr>{ "Avg. Profit" }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
+                <th><abbr>{ "Date" }</abbr></th>
                 </tr>
             </thead>
             <tbody>

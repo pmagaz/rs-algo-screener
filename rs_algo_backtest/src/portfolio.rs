@@ -1,5 +1,6 @@
 use crate::strategies::strategy::Strategy;
 use rs_algo_shared::helpers::comp::*;
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
@@ -101,6 +102,7 @@ impl PortFolio {
 
                 let strategy_result = BackTestStrategyResult {
                     strategy: strategy.name().to_owned(),
+                    date: to_dbtime(Local::now()),
                     avg_sessions: average_usize(avg_sessions),
                     avg_trades: average_usize(avg_trades),
                     avg_wining_trades: average_usize(avg_wining_trades),
