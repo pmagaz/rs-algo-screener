@@ -125,11 +125,8 @@ impl PortFolio {
                     .unwrap()
                     .clone();
 
-                let _send_strategy_results: BackTestStrategyResult =
+                let _send_strategy_results =
                     request(&strategy_result_endpoint, &strategy_result, HttpMethod::Put)
-                        .await
-                        .unwrap()
-                        .json()
                         .await
                         .unwrap();
             }
