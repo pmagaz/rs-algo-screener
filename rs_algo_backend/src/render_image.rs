@@ -1,6 +1,6 @@
 use crate::error::Result;
 use plotters::prelude::*;
-use rs_algo_shared::models::backtest_instrument::TradeOut;
+use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::PatternDirection;
 use std::cmp::Ordering;
@@ -17,7 +17,7 @@ impl Backend {
     pub fn render(
         &self,
         instrument: &Instrument,
-        trades: &Vec<TradeOut>,
+        trades: &(&Vec<TradeIn>, &Vec<TradeOut>),
         output_file: &str,
     ) -> Result<()> {
         let data = instrument.data.clone();
@@ -45,7 +45,10 @@ impl Backend {
             Trades,
         }
 
-        let points_mode = match trades.len().cmp(&0) {
+        let trades_in: &Vec<TradeIn> = trades.0;
+        let trades_out: &Vec<TradeOut> = trades.1;
+
+        let points_mode = match trades_out.len().cmp(&0) {
             Ordering::Greater => PointsMode::Trades,
             Ordering::Equal => PointsMode::MaximaMinima,
             Ordering::Less => PointsMode::MaximaMinima,
@@ -71,9 +74,12 @@ impl Backend {
         let mut top_points_set: Vec<(usize, f64)>;
         let mut low_points_set: Vec<(usize, f64)>;
 
-        if trades.len() > 0 {
-            low_points_set = trades.iter().map(|x| (x.index_in, x.price_in)).collect();
-            top_points_set = trades.iter().map(|x| (x.index_out, x.price_out)).collect();
+        if trades_out.len() > 0 {
+            low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
+            top_points_set = trades_out
+                .iter()
+                .map(|x| (x.index_out, x.price_out))
+                .collect();
         } else {
             top_points_set = instrument.peaks.local_maxima.clone();
             low_points_set = instrument.peaks.local_minima.clone();
@@ -258,7 +264,7 @@ impl Backend {
                 if top_points_set.contains(&(i, price)) {
                     TriangleMarker::new(
                         (candle.date, price + (price * local_peaks_marker_pos)),
-                        -5,
+                        -6,
                         top_point_color,
                     )
                 } else {
@@ -283,7 +289,7 @@ impl Backend {
                 if low_points_set.contains(&(i, price)) {
                     TriangleMarker::new(
                         (candle.date, price - (price * local_peaks_marker_pos)),
-                        5,
+                        6,
                         bottom_point_color,
                     )
                 } else {

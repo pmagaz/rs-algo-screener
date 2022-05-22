@@ -67,8 +67,7 @@ pub async fn chart(
     ]
     .concat();
 
-    let backend = Backend::new();
-    backend.render(&instrument, &vec![], &output_file);
+    Backend::new().render(&instrument, &(&vec![], &vec![]), &output_file);
 
     let mut image_path = PathBuf::new();
     image_path.push(output_file);

@@ -5,7 +5,7 @@ use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::Instrument;
 use std::env;
-use std::ops::{Add, Div};
+
 pub struct PortFolio {
     pub order_size: i32,
     pub stop_loss: f64,

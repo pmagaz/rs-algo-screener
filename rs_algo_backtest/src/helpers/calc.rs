@@ -1,5 +1,6 @@
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::candle::Candle;
+use rs_algo_shared::models::pattern::*;
 use std::cmp::Ordering;
 
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
@@ -139,5 +140,13 @@ pub fn get_prev_index(index: usize) -> usize {
         Ordering::Greater => index - 1,
         Ordering::Equal => 0,
         Ordering::Less => 0,
+    }
+}
+
+pub fn get_current_pattern(index: usize, patterns: &Vec<Pattern>) -> PatternType {
+    let last_pattern = patterns.iter().filter(|pat| pat.index < index).last();
+    match last_pattern {
+        Some(pattern) => pattern.pattern_type.clone(),
+        None => PatternType::None,
     }
 }

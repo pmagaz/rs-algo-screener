@@ -11,7 +11,7 @@ use actix_files as fs;
 use actix_web::{web, HttpResponse};
 use bson::doc;
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::models::backtest_instrument::TradeOut;
+use rs_algo_shared::models::backtest_instrument::*;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
@@ -38,12 +38,16 @@ pub async fn find_instruments(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
+    let env = env::var("ENV").unwrap();
 
-    println!("[BACK TEST INSTRUMENTS] Request at {:?}", Local::now());
+    println!("[BACK TEST INSTRUMENTS] Request at {:?}", env);
     let offset = query.offset;
     let limit = query.limit;
-    let query = doc! {"symbol": "ROL.US"};
-    let query = doc! {};
+
+    let query = match env.as_ref() {
+        "development" => doc! {"symbol": "MSFT.US"},
+        _ => doc! {},
+    };
 
     let backtest_instruments: Vec<Instrument> =
         db::back_test::find_instruments(query, offset, limit, &state)
@@ -105,7 +109,6 @@ pub async fn find_instruments_result_by_strategy(
 }
 
 pub async fn upsert_instruments_result(
-    //backtested_result: String,
     backtested_result: web::Json<BackTestInstrumentResult>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
@@ -117,9 +120,6 @@ pub async fn upsert_instruments_result(
     );
 
     let now = Instant::now();
-    // let backtested_result: BackTestInstrumentResult =
-    //     serde_json::from_str(&backtested_result).unwrap();
-
     let symbol = backtested_result.instrument.symbol.clone();
 
     let now = Instant::now();
@@ -146,12 +146,6 @@ pub async fn upsert_strategies_result(
         Local::now(),
         now
     );
-
-    let now = Instant::now();
-    // let backtested_result: BackTestInstrumentResult =
-    //     serde_json::from_str(&backtested_result).unwrap();
-
-    //let symbol = backtested_strategy_result.instrument.symbol.clone();
 
     let now = Instant::now();
     let _upsert = db::back_test::upsert_strategies_result(&backtested_strategy_result, &state)
@@ -205,13 +199,15 @@ pub async fn chart(
         Local::now(),
     );
 
-    let strategy_result: BackTestInstrumentResult =
+    let backtest_result: BackTestInstrumentResult =
         db::back_test::find_strategy_instrument_result(&*strategy, &*symbol, &state)
             .await
             .unwrap()
             .unwrap();
 
-    let trades: Vec<TradeOut> = strategy_result.instrument.trades_out;
+    let trades_in: Vec<TradeIn> = backtest_result.instrument.trades_in;
+    let trades_out: Vec<TradeOut> = backtest_result.instrument.trades_out;
+    let trades = &(&trades_in, &trades_out);
 
     let instrument = db::back_test::find_backtest_instrument_by_symbol(&*symbol, &state)
         .await
@@ -227,10 +223,8 @@ pub async fn chart(
     ]
     .concat();
 
-    let backend = Backend::new();
-    let _output = backend.render(&instrument, &trades, &output_file);
+    Backend::new().render(&instrument, &trades, &output_file);
 
-    let image_folder = &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap();
     let mut image_path = PathBuf::new();
     image_path.push(output_file.to_string());
 

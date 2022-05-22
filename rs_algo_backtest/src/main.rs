@@ -4,7 +4,6 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::date::Local;
 
 use dotenv::dotenv;
-use std::env;
 
 mod helpers;
 mod portfolio;
@@ -27,12 +26,14 @@ async fn main() -> Result<()> {
         equity: 100000.,
         instruments: vec![],
         strategies: vec![
-            //Box::new(strategies::bollinger_bands_riding_bands::BollingerBands::new().unwrap()),
-            Box::new(strategies::bollinger_bands_reversal::BollingerBands::new().unwrap()),
-            Box::new(strategies::ema_200::Ema::new().unwrap()),
-            Box::new(strategies::ema_50200::Ema::new().unwrap()),
-            Box::new(strategies::stoch::Stoch::new().unwrap()),
-            Box::new(strategies::macd::Macd::new().unwrap()),
+            Box::new(
+                strategies::bollinger_bands_reversal_continuation::BollingerBands::new().unwrap(),
+            ),
+            // Box::new(strategies::bollinger_bands_reversal::BollingerBands::new().unwrap()),
+            // Box::new(strategies::ema_200::Ema::new().unwrap()),
+            // Box::new(strategies::ema_50200::Ema::new().unwrap()),
+            // Box::new(strategies::stoch::Stoch::new().unwrap()),
+            // Box::new(strategies::macd::Macd::new().unwrap()),
         ],
     };
 
