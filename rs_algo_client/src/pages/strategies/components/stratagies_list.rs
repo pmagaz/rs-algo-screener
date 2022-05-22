@@ -97,17 +97,17 @@ pub fn strategy_list(props: &Props) -> Html {
         <table class="table is-bordered">
             <thead class="has-background-grey-lighter">
                 <tr>
-                <th><abbr>{ "Strategy" }</abbr></th>
-                <th><abbr>{ "Avg. Profit Factor" }</abbr></th>
-                <th><abbr>{ "Avg. Win rate" }</abbr></th>
-                <th><abbr>{ "Avg. Max Drawdown" }</abbr></th>
-                <th><abbr>{ "Avg. Win per trade" }</abbr></th>
-                <th><abbr>{ "Avg. Num trades" }</abbr></th>
-                <th><abbr>{ "Avg. Stops" }</abbr></th>
-                <th><abbr>{ "Avg. Anmual return" }</abbr></th>
-                <th><abbr>{ "Avg. Profit" }</abbr></th>
+                <th><abbr>{ "Strategy (Avg)" }</abbr></th>
+                <th><abbr>{ "Profit Factor" }</abbr></th>
+                <th><abbr>{ "Win Rate" }</abbr></th>
+                <th><abbr>{ "Drawdown" }</abbr></th>
+                <th><abbr>{ "Win per trade" }</abbr></th>
+                <th><abbr>{ "Num trades" }</abbr></th>
+                <th><abbr>{ "Stops" }</abbr></th>
+                <th><abbr>{ "Annual return" }</abbr></th>
+                <th><abbr>{ "Profit" }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
-                <th><abbr>{ "Date" }</abbr></th>
+                <th><abbr>{ "Updated" }</abbr></th>
                 </tr>
             </thead>
             <tbody>
