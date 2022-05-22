@@ -34,6 +34,7 @@ async fn main() -> Result<()> {
             Box::new(strategies::ema_50200::Ema::new().unwrap()),
             Box::new(strategies::stoch::Stoch::new().unwrap()),
             Box::new(strategies::macd::Macd::new().unwrap()),
+            Box::new(strategies::macd_over_zero::Macd::new().unwrap()),
         ],
     };
 
