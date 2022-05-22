@@ -5,7 +5,7 @@ jobs:
       tag: latest
       imagePullPolicy: Always
     #schedule: "0 2 * * 2,4,6"
-    schedule: "01 16 * * *"
+    schedule: "20 16 * * *"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
