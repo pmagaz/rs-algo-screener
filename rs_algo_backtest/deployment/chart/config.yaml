@@ -1,4 +1,4 @@
-BACkTEST_LIMIT_INSTRUMENTS: "20"
+BACkTEST_LIMIT_INSTRUMENTS: "10"
 BACKEND_INSTRUMENTS_ENDPOINT: "http://rs-algo-backend/api/instruments"
 BACKEND_BACKTEST_ENDPOINT: "http://rs-algo-backend/api/backtest"
 BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT: "http://rs-algo-backend/api/backtest/instruments"

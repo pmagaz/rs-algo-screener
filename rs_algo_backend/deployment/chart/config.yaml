@@ -16,7 +16,7 @@ MIN_HORIZONTAL_LEVELS_OCCURENCES: "2"
 bb_cROSSOVER_THRESHOLD: "0.1"
 MAX_PATTERN_DAYS: "3"
 MAX_PATTERN_ACTIVATED_DAYS: "3"
-BACkTEST_LIMIT_INSTRUMENTS: "20"
+BACkTEST_LIMIT_INSTRUMENTS: "10"
 
 MONGO_MEM_DB_NAME: "screener-db"
 MONGO_MEM_DB_URI: "@mongodb-mem:27017/screener-db?authSource=admin&readPreference=primary&retryWrites=true&directConnection=true&ssl=false"
