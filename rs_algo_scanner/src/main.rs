@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
 
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
-    let symbols = screener.get_symbols().await.unwrap().symbols;
+    let mut symbols = screener.get_symbols().await.unwrap().symbols;
     let sp500_symbols = broker::sp500::get_symbols();
     // let symbols = [
     //     Symbol {
@@ -80,6 +80,17 @@ async fn main() -> Result<()> {
     // ];
 
     let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
+    let env = env::var("ENV").unwrap();
+
+    if env == "development" {
+        symbols = vec![Symbol {
+            symbol: "MSFT.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        }]
+    };
+
     let backtest_mode = env::var("SCANNER_BACKTEST_MODE")
         .unwrap()
         .parse::<bool>()
@@ -99,9 +110,10 @@ async fn main() -> Result<()> {
                     from,
                     |instrument: Instrument| async move {
                         println!(
-                            "[INSTRUMENT] processed in {:?} at {:?}",
+                            "[INSTRUMENT] data from {:?} to {:?} in {:?}",
+                            &instrument.data().first().unwrap().date(),
+                            &instrument.date(),
                             now.elapsed(),
-                            &instrument.date()
                         );
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
 

@@ -39,13 +39,14 @@ pub async fn find_instruments(
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
     let env = env::var("ENV").unwrap();
+    let dev_symbol = env::var("DEV_SYMBOL").unwrap();
 
     println!("[BACK TEST INSTRUMENTS] Request at {:?}", env);
     let offset = query.offset;
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "development" => doc! {"symbol": "MSFT.US"},
+        "development" => doc! {"symbol": dev_symbol},
         _ => doc! {},
     };
 
