@@ -87,7 +87,7 @@ pub fn strategy_list(props: &Props) -> Html {
                     <td>{ round(strategy.avg_annual_return,2)}</td>
                     <td> { format!("{}%", round(strategy.avg_net_profit_per,2))}</td>
                     <td>{ round(strategy.avg_buy_hold,2)}</td>
-                    <td>{ strategy.date }</td>
+                    <td> {format!("{}", strategy.date.to_chrono().format("%d-%m %H:%M"))}</td>
                 </tr>
             }
         })

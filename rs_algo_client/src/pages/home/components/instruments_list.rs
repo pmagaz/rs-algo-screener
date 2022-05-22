@@ -226,7 +226,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
                     <td class={get_status_class(&bb.status)}> {format!("{:?} / {:?}", round(instrument.indicators.bb.current_a, 1), round(instrument.indicators.bb.current_b, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
-                    <td> {format!("{}", date.format("%R"))}</td>
+                    <td> {format!("{}", date.format("%d-%m %H:%M"))}</td>
                     <td  onclick={ on_watch_select }><a href={"javascript:void(0);"}>{ "x" }</a></td>
                 </tr>
             }
