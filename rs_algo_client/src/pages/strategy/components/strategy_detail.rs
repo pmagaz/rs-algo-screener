@@ -58,6 +58,16 @@ pub fn strategy_detail(props: &Props) -> Html {
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
             };
 
+
+            let profit_factor = backtest_instrument.profit_factor;
+            let profit_factor_status = match profit_factor {
+                _x if profit_factor <= 2. => Status::Bearish,
+                _x if profit_factor > 2.0 && profit_factor <= 2.5 => Status::Neutral,
+                _x if profit_factor > 2.5 => Status::Bullish,
+                _ => Status::Neutral,
+            };
+
+
              let profitable_trades = backtest_instrument.profitable_trades;
             let profitable_trades_status = match profitable_trades {
                 _x if profitable_trades <= 40. => Status::Bearish,
@@ -86,9 +96,10 @@ pub fn strategy_detail(props: &Props) -> Html {
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.instrument.symbol.clone()}</a></td>
+                    <td class={get_status_class(&profit_factor_status)}> { format!("{}%", round(backtest_instrument.profit_factor,2))}</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(backtest_instrument.profitable_trades,2))}</td>
-                    <td class={get_status_class(&profit_status)}> { format!("{}%", round(backtest_instrument.net_profit_per,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}>{ format!("{}%", round(backtest_instrument.max_drawdown,2))}</td>
+                    <td class={get_status_class(&profit_status)}> { format!("{}%", round(backtest_instrument.net_profit_per,2))}</td>
                     <td>{ backtest_instrument.trades}</td>
                     <td>{ backtest_instrument.wining_trades}</td>
                     <td>{ backtest_instrument.losing_trades}</td>
@@ -105,9 +116,10 @@ pub fn strategy_detail(props: &Props) -> Html {
             <thead class="has-background-grey-lighter">
                 <tr>
                 <th><abbr>{ "Instrument" }</abbr></th>
-                <th><abbr>{ "Profitable trades" }</abbr></th>
-                <th><abbr>{ "Net Profit" }</abbr></th>
+                <th><abbr>{ "Profit Factor" }</abbr></th>
+                <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
+                <th><abbr>{ "Net Profit" }</abbr></th>
                 <th><abbr>{ "Total trades" }</abbr></th>
                 <th><abbr>{ "Win trades" }</abbr></th>
                 <th><abbr>{ "Lose trades" }</abbr></th>
