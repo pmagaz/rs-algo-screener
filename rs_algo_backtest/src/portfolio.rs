@@ -26,6 +26,23 @@ impl PortFolio {
 
         let endpoint = env::var("BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT").unwrap();
 
+        let mut avg_sessions = vec![];
+        let mut avg_trades = vec![];
+        let mut avg_wining_trades = vec![];
+        let mut avg_win_per_trade = vec![];
+        let mut avg_losing_trades = vec![];
+        let mut avg_stop_losses = vec![];
+        let mut avg_gross_profit = vec![];
+        let mut avg_commissions = vec![];
+        let mut avg_net_profit = vec![];
+        let mut avg_net_profit_per = vec![];
+        let mut avg_profitable_trades = vec![];
+        let mut avg_profit_factor = vec![];
+        let mut avg_max_runup = vec![];
+        let mut avg_max_drawdown = vec![];
+        let mut avg_buy_hold = vec![];
+        let mut avg_annual_return = vec![];
+
         for _key in 0..500 / limit {
             let url = [
                 &endpoint,
@@ -48,23 +65,6 @@ impl PortFolio {
 
             let instrument_result_endpoint = env::var("BACKEND_BACKTEST_ENDPOINT").unwrap().clone();
             for strategy in &self.strategies {
-                let mut avg_sessions = vec![];
-                let mut avg_trades = vec![];
-                let mut avg_wining_trades = vec![];
-                let mut avg_win_per_trade = vec![];
-                let mut avg_losing_trades = vec![];
-                let mut avg_stop_losses = vec![];
-                let mut avg_gross_profit = vec![];
-                let mut avg_commissions = vec![];
-                let mut avg_net_profit = vec![];
-                let mut avg_net_profit_per = vec![];
-                let mut avg_profitable_trades = vec![];
-                let mut avg_profit_factor = vec![];
-                let mut avg_max_runup = vec![];
-                let mut avg_max_drawdown = vec![];
-                let mut avg_buy_hold = vec![];
-                let mut avg_annual_return = vec![];
-
                 for instrument in &instruments_to_test {
                     let backtest_result =
                         strategy.test(&instrument, self.equity, self.commission, self.stop_loss);
@@ -103,22 +103,22 @@ impl PortFolio {
                 let strategy_result = BackTestStrategyResult {
                     strategy: strategy.name().to_owned(),
                     date: to_dbtime(Local::now()),
-                    avg_sessions: average_usize(avg_sessions),
-                    avg_trades: average_usize(avg_trades),
-                    avg_wining_trades: average_usize(avg_wining_trades),
-                    avg_win_per_trade: average_f64(avg_win_per_trade),
-                    avg_losing_trades: average_usize(avg_losing_trades),
-                    avg_stop_losses: average_usize(avg_stop_losses),
-                    avg_gross_profit: average_f64(avg_gross_profit),
-                    avg_commissions: average_f64(avg_commissions),
-                    avg_net_profit: average_f64(avg_net_profit),
-                    avg_net_profit_per: average_f64(avg_net_profit_per),
-                    avg_profitable_trades: average_f64(avg_profitable_trades),
-                    avg_profit_factor: average_f64(avg_profit_factor),
-                    avg_max_runup: average_f64(avg_max_runup),
-                    avg_max_drawdown: average_f64(avg_max_drawdown),
-                    avg_buy_hold: average_f64(avg_buy_hold),
-                    avg_annual_return: average_f64(avg_annual_return),
+                    avg_sessions: average_usize(&avg_sessions),
+                    avg_trades: average_usize(&avg_trades),
+                    avg_wining_trades: average_usize(&avg_wining_trades),
+                    avg_win_per_trade: average_f64(&avg_win_per_trade),
+                    avg_losing_trades: average_usize(&avg_losing_trades),
+                    avg_stop_losses: average_usize(&avg_stop_losses),
+                    avg_gross_profit: average_f64(&avg_gross_profit),
+                    avg_commissions: average_f64(&avg_commissions),
+                    avg_net_profit: average_f64(&avg_net_profit),
+                    avg_net_profit_per: average_f64(&avg_net_profit_per),
+                    avg_profitable_trades: average_f64(&avg_profitable_trades),
+                    avg_profit_factor: average_f64(&avg_profit_factor),
+                    avg_max_runup: average_f64(&avg_max_runup),
+                    avg_max_drawdown: average_f64(&avg_max_drawdown),
+                    avg_buy_hold: average_f64(&avg_buy_hold),
+                    avg_annual_return: average_f64(&avg_annual_return),
                 };
 
                 let strategy_result_endpoint = env::var("BACKEND_BACKTEST_STRATEGIES_ENDPOINT")

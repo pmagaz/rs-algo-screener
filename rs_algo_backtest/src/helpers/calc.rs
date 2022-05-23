@@ -109,6 +109,19 @@ pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     ((max_equity - min_equity) / min_equity * 100.).abs() * 100.
 }
 
+// pub fn calculate_annual_return(
+//     trades_out: &Vec<TradeOut>,
+//     profit_factor: f64,
+//     profitable_trades: usize,
+//     max_drawdown: f64,
+// ) -> f64 {
+//     let bought_at = trades_out.first().unwrap().price_in;
+//     let size = equity / bought_at;
+//     let sold_at = size * current_price;
+//     let profit = sold_at - (equity);
+//     (profit / equity) * 100.
+// }
+
 pub fn calculate_buy_hold(trades_out: &Vec<TradeOut>, equity: f64, current_price: f64) -> f64 {
     let bought_at = trades_out.first().unwrap().price_in;
     let size = equity / bought_at;
