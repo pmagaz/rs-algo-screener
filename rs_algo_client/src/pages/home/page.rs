@@ -120,6 +120,17 @@ pub fn home() -> Html {
         })
     };
 
+    let suggested: Vec<CompactInstrument> = use_instruments
+        .iter()
+        .filter(|x| {
+            (x.patterns.local_patterns.len() > 0
+                && x.patterns.local_patterns.last().unwrap().date
+                    > to_dbtime(Local::now() - Duration::days(4))
+                && !x.patterns.local_patterns.last().unwrap().active.active)
+        })
+        .map(|x| x.clone())
+        .collect();
+
     let activated: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
@@ -130,13 +141,11 @@ pub fn home() -> Html {
         .map(|x| x.clone())
         .collect();
 
-    let suggested: Vec<CompactInstrument> = use_instruments
+    let strategy: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
-            (x.patterns.local_patterns.len() > 0
-                && x.patterns.local_patterns.last().unwrap().date
-                    > to_dbtime(Local::now() - Duration::days(4))
-                && !x.patterns.local_patterns.last().unwrap().active.active)
+            x.current_price <= x.indicators.bb.current_b
+                && x.current_price >= x.indicators.bb.prev_b
         })
         .map(|x| x.clone())
         .collect();
@@ -184,10 +193,12 @@ pub fn home() -> Html {
                 <div class="notification is-fluid ">
                     <h2 class="navbar-item is-size-3">{ "Watch List" }</h2>
                     <InstrumentsList on_symbol_click={ on_symbol_click.clone()} on_watch_click={ on_watch_click.clone()} instruments={(*use_watch_instruments).clone()} />
-                    <h2 class="navbar-item is-size-3">{ "Pattern activated" }</h2>
-                    <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={activated} />
+                    <h2 class="navbar-item is-size-3">{ "Strategy" }</h2>
+                    <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={strategy} />
                     <h2 class="navbar-item is-size-3">{ "New patterns" }</h2>
                     <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={suggested} />
+                      <h2 class="navbar-item is-size-3">{ "Pattern activated" }</h2>
+                    <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={activated} />
                     <h2 class="navbar-item is-size-3">{ "Commodities " }</h2>
                     <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={commodities} />
                      <h2 class="navbar-item is-size-3">{ "Crypto" }</h2>

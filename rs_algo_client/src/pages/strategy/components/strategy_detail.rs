@@ -79,8 +79,8 @@ pub fn strategy_detail(props: &Props) -> Html {
             let max_drawdown = backtest_instrument.max_drawdown;
             let max_drawdown_status = match max_drawdown {
                 _x if max_drawdown > 25. => Status::Bearish,
-                _x if max_drawdown > 20. && max_drawdown < 25. => Status::Neutral,
-                _x if max_drawdown <= 20. => Status::Bullish,
+                _x if max_drawdown > 15. && max_drawdown < 25. => Status::Neutral,
+                _x if max_drawdown <= 15. => Status::Bullish,
                 _ => Status::Neutral,
             };
 

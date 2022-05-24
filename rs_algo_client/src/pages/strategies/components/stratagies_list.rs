@@ -68,8 +68,8 @@ pub fn strategy_list(props: &Props) -> Html {
             let max_drawdown = strategy.avg_max_drawdown;
             let max_drawdown_status = match max_drawdown {
                 _x if max_drawdown > 25. => Status::Bearish,
-                _x if max_drawdown > 20. && max_drawdown < 25. => Status::Neutral,
-                _x if max_drawdown <= 20. => Status::Bullish,
+                _x if max_drawdown > 15. && max_drawdown < 25. => Status::Neutral,
+                _x if max_drawdown <= 15. => Status::Bullish,
                 _ => Status::Neutral,
             };
 
@@ -84,7 +84,6 @@ pub fn strategy_list(props: &Props) -> Html {
                     <td> { format!("{}%", round(strategy.avg_win_per_trade,2))}</td>
                     <td>{ strategy.avg_trades}</td>
                     <td>{ strategy.avg_stop_losses}</td>
-                    <td>{ round(strategy.avg_annual_return,2)}</td>
                     <td> { format!("{}%", round(strategy.avg_net_profit_per,2))}</td>
                     <td>{ round(strategy.avg_buy_hold,2)}</td>
                     <td> {format!("{}", strategy.date.to_chrono().format("%d-%m %H:%M"))}</td>
@@ -101,10 +100,9 @@ pub fn strategy_list(props: &Props) -> Html {
                 <th><abbr>{ "Profit Factor" }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
-                <th><abbr>{ "Win per trade" }</abbr></th>
+                <th><abbr>{ "Won per trade" }</abbr></th>
                 <th><abbr>{ "Num trades" }</abbr></th>
                 <th><abbr>{ "Stops" }</abbr></th>
-                <th><abbr>{ "Annual return" }</abbr></th>
                 <th><abbr>{ "Profit" }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
                 <th><abbr>{ "Updated" }</abbr></th>

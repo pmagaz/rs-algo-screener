@@ -75,7 +75,7 @@ pub async fn find_backtest_instruments_result(
             query,
             FindOptions::builder()
                 .limit(limit)
-                .sort(doc! {"profitable_trades":-1})
+                .sort(doc! {"profit_factor":-1})
                 .build(),
         )
         .await

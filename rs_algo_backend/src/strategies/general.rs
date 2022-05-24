@@ -71,42 +71,14 @@ impl General {
                     "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                     }}}
                 ]},
-                // {"$and": [
-                //     {"divergences.data": {"$elemMatch" : {
-                //         //"date": { "$gte" : self.max_pattern_date },
-                //         "divergence_type": { "$in": ["Bullish","Bearish"] } ,
-                //     }}}
-                // ]},
-                // {"$and": [
-                //     {"patterns.extrema_patterns": {"$elemMatch" : {
-                //     "active.target":{"$gte": minimum_pattern_target },
-                //     "date": { "$gte" : self.max_pattern_date },
-                //     }}}
-                // ]},
-                // {"$and": [
-                //     {"patterns.extrema_patterns": {"$elemMatch" : {
-                //     "active.target":{"$gte": minimum_pattern_target },
-                //     "active.date": { "$gte" : self.max_activated_date }
-                //     }}}
-                // ]},
                 ]
             },
-        //     {"$and": [
-        //         {"$expr": {"$gte": ["$indicators.bb_a.current_a","$indicators.bb_b.current_a"]}},
-        //         //{"$expr": {"$lte": ["$indicators.bb_a.current_a","$indicators.bb_b.prev_a"]}},
-        //         {"$expr": {"$lt": ["$indicators.bb_a.prev_a","$indicators.bb_b.prev_a"]}},
-        //         //{"$expr": {"$gte": ["$indicators.bb_b.current_a","$indicators.ema_c.current_a"]}},
-        //    ]},
+            {"$and": [
+                {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
+                {"$expr": {"$gte": ["$current_price","$indicators.bb.prev_b"]}},
+           ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
             { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
-            //{ "current_candle": { "$in": ["Karakasa","BullishGap","MorningStar"] } },
-            // {"$and": [
-            //  {
-            //     "horizontal_levels.lows": {"$elemMatch" : {
-            //    // "price":{"$gte": "$current_price" },
-            //     "occurrences":{"$gte": min_horizontal_level_ocurrences },
-            //     }}},
-            // ]},
         ]}
     }
 
@@ -116,16 +88,6 @@ impl General {
     ) -> Vec<CompactInstrument> {
         println!("[STRATEGY] Formating ");
         let mut docs: Vec<CompactInstrument> = vec![];
-
-        let bb_crossover_th = env::var("bb_cROSSOVER_THRESHOLD")
-            .unwrap()
-            .parse::<f64>()
-            .unwrap();
-
-        // let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
-        //     .unwrap()
-        //     .parse::<f64>()
-        //     .unwrap();
 
         while let Some(result) = instruments.next().await {
             match result {
@@ -188,18 +150,6 @@ impl General {
                         instrument.patterns.local_patterns[len - 1].active.status =
                             last_pattern_status.clone();
                     }
-
-                    // let extrema_pattern = instrument.patterns.extrema_patterns.last();
-                    // let extrema_pattern_target = match extrema_pattern {
-                    //     Some(val) => round(val.active.change, 0),
-                    //     None => 0.,
-                    // };
-                    // let extrema_pattern_status = get_pattern_status(extrema_pattern);
-                    // if extrema_pattern_status != Status::Default {
-                    //     let len = instrument.patterns.extrema_patterns.len();
-                    //     instrument.patterns.extrema_patterns[len - 1].active.status =
-                    //         extrema_pattern_status.clone();
-                    // }
 
                     let stoch_status = match stoch {
                         _x if stoch.current_a > stoch.current_b

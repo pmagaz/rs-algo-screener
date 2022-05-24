@@ -143,7 +143,7 @@ pub fn total_profit_per(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
 }
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {
-        0.0 => 0.,
+        0.0 => gross_loses,
         _ => (gross_profits / gross_loses).abs(),
     }
 }
