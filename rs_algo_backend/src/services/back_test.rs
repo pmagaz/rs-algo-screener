@@ -1,4 +1,3 @@
-use super::instrument;
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;

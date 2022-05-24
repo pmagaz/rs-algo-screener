@@ -194,7 +194,19 @@ impl General {
                         _ => Status::Neutral,
                     };
 
-                    let bb_status = Status::Neutral;
+                    let bb_status = match bb {
+                        _x if instrument.current_price <= bb.current_b
+                            && instrument.current_price >= bb.prev_b =>
+                        {
+                            Status::Bullish
+                        }
+                        _x if instrument.current_price >= bb.current_a
+                            && instrument.current_price <= bb.prev_a =>
+                        {
+                            Status::Bearish
+                        }
+                        _ => Status::Neutral,
+                    };
 
                     instrument.indicators.stoch.status = stoch_status.clone();
                     instrument.indicators.macd.status = macd_status.clone();

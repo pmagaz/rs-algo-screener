@@ -58,6 +58,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         let mut exit_condition: bool = false;
 
         if current_pattern == PatternType::ChannelUp {
+            //} || current_pattern == PatternType::TriangleUp {
             exit_condition = false;
         } else {
             exit_condition = close_price > top_band && prev_close <= prev_top_band;

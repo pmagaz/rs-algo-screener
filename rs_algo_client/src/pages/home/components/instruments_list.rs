@@ -4,9 +4,10 @@ use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::status::Status;
 use rs_algo_shared::models::divergence::*;
 use rs_algo_shared::models::candle::*;
+
 use rs_algo_shared::models::horizontal_level::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
-use rs_algo_shared::helpers::comp::{price_change, is_equal};
+use rs_algo_shared::helpers::comp::*;
 use yew::{function_component, html, Callback, Properties, Html};
 use wasm_bindgen::prelude::*;
 
@@ -207,6 +208,7 @@ pub fn instrument_list(props: &Props
                 _ => Status::Neutral 
             };
 
+            let bb_size = percentage_change(instrument.indicators.bb.current_b, instrument.indicators.bb.current_a);
 
             html! {
                 <tr>
@@ -217,14 +219,11 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.1}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.2}</td>
-                    <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.3}</td>
-                    // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.0)}</td>
-                    // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.2)}</td>
-                    // <td class={get_status_class(&extrema_pattern.status)}> {format!("{}", extrema_pattern.info.3)}</td>
+                    <td> {local_pattern.info.3}</td>
+                    <td class={get_status_class(&bb.status)}> {format!("{:?}%", round(bb_size, 1))}</td>
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
-                    <td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
+                    //<td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    <td class={get_status_class(&bb.status)}> {format!("{:?} / {:?}", round(instrument.indicators.bb.current_a, 1), round(instrument.indicators.bb.current_b, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
                     <td> {format!("{}", date.format("%d-%m %H:%M"))}</td>
                     <td  onclick={ on_watch_select }><a href={"javascript:void(0);"}>{ "x" }</a></td>
@@ -246,11 +245,9 @@ pub fn instrument_list(props: &Props
                 <th><abbr>{ "Band" }</abbr></th>
                 <th><abbr>{ "Target" }</abbr></th>
                 <th><abbr>{ "Activated" }</abbr></th>
-                // <th><abbr>{ "E. Target" }</abbr></th>
-                // <th><abbr>{ "E. Activated" }</abbr></th>
-                <th><abbr>{ "BB" }</abbr></th>
+                <th><abbr>{ "B.Bands" }</abbr></th>
                 <th><abbr>{ "Stoch" }</abbr></th>
-                <th><abbr>{ "MacD" }</abbr></th>
+                //<th><abbr>{ "MacD" }</abbr></th>
                 <th><abbr>{ "Rsi" }</abbr></th>
                 <th><abbr>{ "Divergence" }</abbr></th>
                 <th><abbr>{ "Updated" }</abbr></th>
