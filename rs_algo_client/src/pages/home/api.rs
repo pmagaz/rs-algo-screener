@@ -59,3 +59,36 @@ where
 
     Ok(res)
 }
+
+pub async fn get_portfolio_instruments(url: &str) -> Result<Vec<CompactInstrument>>
+where
+{
+    log::info!("[CLIENT] Request get portfolio instruments");
+
+    let res = Client::builder()
+        .build()
+        .unwrap()
+        .get(url)
+        .send()
+        .await
+        .unwrap()
+        .json()
+        .await
+        .unwrap();
+    Ok(res)
+}
+
+pub async fn upsert_portfolio_instrument(url: &str, data: WatchInstrument) -> Result<ApiResponse>
+where
+{
+    log::info!("[CLIENT] Request with {}", data);
+
+    let res: ApiResponse = request::<WatchInstrument>(&url, &data, HttpMethod::Put)
+        .await
+        .unwrap()
+        .json()
+        .await
+        .map_err(|_e| RsAlgoError::RequestError)?;
+
+    Ok(res)
+}

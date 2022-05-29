@@ -25,17 +25,21 @@ pub fn home() -> Html {
     let base_url = get_base_url();
     let instruments_url = [base_url.as_str(), "api/instruments"].concat();
     let watch_list_url = [base_url.as_str(), "api/watchlist"].concat();
+    let portfolio_url = [base_url.as_str(), "api/portfolio"].concat();
     let use_instruments = use_state(|| vec![]);
     let use_watch_instruments = use_state(|| vec![]);
+    let use_portfolio_instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_instruments_url = use_state(|| String::from(""));
 
     {
         let use_instruments = use_instruments.clone();
         let use_watch_instruments = use_watch_instruments.clone();
+        let use_portfolio_instruments = use_portfolio_instruments.clone();
         let use_loading = use_loading.clone();
         let instruments_url = instruments_url.clone();
         let watch_list_url = watch_list_url.clone();
+        let portfolio_url = portfolio_url.clone();
         use_effect_with_deps(
             move |_| {
                 log::info!("[CLIENT] API call...");
@@ -44,10 +48,17 @@ pub fn home() -> Html {
                     let query = get_query_value();
                     //use_instruments.set(api::get_instruments(&instruments_url, query).await.unwrap());
                     let instruments = api::get_instruments(&instruments_url, query).await.unwrap();
+                    use_instruments.set(instruments);
+
                     let watch_instruments =
                         api::get_watch_instruments(&watch_list_url).await.unwrap();
-                    use_instruments.set(instruments);
                     use_watch_instruments.set(watch_instruments);
+
+                    let portfolio_instruments = api::get_portfolio_instruments(&portfolio_url)
+                        .await
+                        .unwrap();
+                    use_portfolio_instruments.set(portfolio_instruments);
+
                     use_loading.set(false);
                 });
                 || ()
@@ -89,10 +100,12 @@ pub fn home() -> Html {
 
     let on_watch_click = {
         let use_watch_instruments = use_watch_instruments.clone();
+        let use_portfolio_instruments = use_portfolio_instruments.clone();
         let use_loading = use_loading.clone();
 
         Callback::from(move |inst: CompactInstrument| {
             let use_watch_instruments = use_watch_instruments.clone();
+            let use_portfolio_instruments = use_portfolio_instruments.clone();
             let watch_list_url = watch_list_url.clone();
             let use_loading = use_loading.clone();
             use_loading.set(true);
@@ -180,7 +193,7 @@ pub fn home() -> Html {
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
                         //<label class="label">{ "Query" }</label>
-                     <h1 class="navbar-item is-size-2">{ "Screener" }</h1>
+                     <h1 class="navbar-item is-size-2">{ "RS Screener" }</h1>
 
                         //<textarea id="query_box" class="textarea is-link is-invisible" placeholder="Textarea" cols="60" rows="0" value={ {format!("{}", *use_query)}}></textarea>
                         // <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
@@ -191,6 +204,8 @@ pub fn home() -> Html {
             <Chart url={(*use_instruments_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid ">
+                    <h2 class="navbar-item is-size-3">{ "Portfolio" }</h2>
+                    <InstrumentsList on_symbol_click={ on_symbol_click.clone()} on_watch_click={ on_watch_click.clone()} instruments={(*use_portfolio_instruments).clone()} />
                     <h2 class="navbar-item is-size-3">{ "Watch List" }</h2>
                     <InstrumentsList on_symbol_click={ on_symbol_click.clone()} on_watch_click={ on_watch_click.clone()} instruments={(*use_watch_instruments).clone()} />
                     <h2 class="navbar-item is-size-3">{ "Strategy" }</h2>

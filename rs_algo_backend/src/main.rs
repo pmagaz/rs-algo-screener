@@ -19,6 +19,7 @@ use models::db::Db;
 use services::back_test;
 use services::index::index;
 use services::instrument;
+use services::portfolio;
 use services::watch_list;
 use std::env;
 
@@ -84,6 +85,8 @@ async fn main() -> Result<()> {
                     )
                     .route("/watchlist", web::get().to(watch_list::find))
                     .route("/watchlist", web::put().to(watch_list::upsert))
+                    .route("/portfolio", web::get().to(portfolio::find))
+                    .route("/portfolio", web::put().to(portfolio::upsert))
                     .route(
                         "/backtest",
                         web::put().to(back_test::upsert_instruments_result),
