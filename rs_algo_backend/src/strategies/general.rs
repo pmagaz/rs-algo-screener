@@ -205,7 +205,14 @@ impl General {
                         {
                             Status::Bearish
                         }
-                        _ => Status::Neutral,
+                        _x if (instrument.current_price >= bb.current_c
+                            && instrument.current_price <= bb.prev_c)
+                            || (instrument.current_price <= bb.current_c
+                                && instrument.current_price >= bb.prev_c) =>
+                        {
+                            Status::Bearish
+                        }
+                        _ => Status::Default,
                     };
 
                     instrument.indicators.stoch.status = stoch_status.clone();

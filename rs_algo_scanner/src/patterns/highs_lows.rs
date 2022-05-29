@@ -5,6 +5,38 @@ use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::models::pattern::DataPoints;
 use std::env;
 
+pub fn is_higher_highs_higher_lows_top(data: &DataPoints) -> bool {
+    if is_higher_highs_top(data) && is_higher_lows_bottom(data) {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_higher_highs_higher_lows_bottom(data: &DataPoints) -> bool {
+    if is_higher_highs_bottom(data) && is_higher_lows_top(data) {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_lower_highs_lower_lows_top(data: &DataPoints) -> bool {
+    if is_lower_highs_top(data) && is_lower_lows_bottom(data) {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn is_lower_highs_lower_lows_bottom(data: &DataPoints) -> bool {
+    if is_lower_highs_bottom(data) && is_lower_lows_top(data) {
+        true
+    } else {
+        false
+    }
+}
+
 pub fn is_higher_highs_top(data: &DataPoints) -> bool {
     if data[0].1 < data[2].1 {
         true

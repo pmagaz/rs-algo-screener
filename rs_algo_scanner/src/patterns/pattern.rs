@@ -385,38 +385,102 @@ impl Patterns {
                                 ),
                             );
                             not_founded = true;
-                            // } else if head_shoulders::is_hs(&data_points) {
-                            //     data_points = add_next_top_points(data_points);
-                            //     self.set_pattern(
-                            //         PatternType::HeadShoulders,
-                            //         PatternDirection::Bottom,
-                            //         &pattern_size,
-                            //         data_points.to_owned(),
-                            //         change,
-                            //         candle_date,
-                            //         head_shoulders::hs_active(
-                            //             &data_points,
-                            //             candles,
-                            //             PatternType::HeadShoulders,
-                            //         ),
-                            //     );
-                            //     not_founded = true;
-                            // } else if head_shoulders::is_inverse(&data_points) {
-                            //     data_points = add_next_top_points(data_points);
-                            //     self.set_pattern(
-                            //         PatternType::HeadShoulders,
-                            //         PatternDirection::Top,
-                            //         &pattern_size,
-                            //         data_points.to_owned(),
-                            //         change,
-                            //         candle_date,
-                            //         head_shoulders::hs_active(
-                            //             &data_points,
-                            //             candles,
-                            //             PatternType::HeadShoulders,
-                            //         ),
-                            //     );
+                        } else if highs_lows::is_higher_highs_higher_lows_top(&data_points) {
+                            data_points = add_next_top_points(data_points);
+                            self.set_pattern(
+                                PatternType::HigherHighsHigherLows,
+                                PatternDirection::Top,
+                                &pattern_size,
+                                data_points.to_owned(),
+                                change,
+                                candle_date,
+                                channel::channel_descendant_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::ChannelDown,
+                                ),
+                            );
+                            not_founded = true;
+                        } else if highs_lows::is_higher_highs_higher_lows_bottom(&data_points) {
+                            data_points = add_next_top_points(data_points);
+                            self.set_pattern(
+                                PatternType::HigherHighsHigherLows,
+                                PatternDirection::Top,
+                                &pattern_size,
+                                data_points.to_owned(),
+                                change,
+                                candle_date,
+                                channel::channel_descendant_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::ChannelDown,
+                                ),
+                            );
+                            not_founded = true;
+                        } else if highs_lows::is_lower_highs_lower_lows_top(&data_points) {
+                            data_points = add_next_top_points(data_points);
+                            self.set_pattern(
+                                PatternType::LowerHighsLowerLows,
+                                PatternDirection::Top,
+                                &pattern_size,
+                                data_points.to_owned(),
+                                change,
+                                candle_date,
+                                channel::channel_descendant_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::ChannelDown,
+                                ),
+                            );
+                            not_founded = true;
+                        } else if highs_lows::is_lower_highs_lower_lows_bottom(&data_points) {
+                            data_points = add_next_top_points(data_points);
+                            self.set_pattern(
+                                PatternType::LowerHighsLowerLows,
+                                PatternDirection::Top,
+                                &pattern_size,
+                                data_points.to_owned(),
+                                change,
+                                candle_date,
+                                channel::channel_descendant_top_active(
+                                    &data_points,
+                                    candles,
+                                    PatternType::ChannelDown,
+                                ),
+                            );
+                            not_founded = true;
                         }
+                        // } else if head_shoulders::is_hs(&data_points) {
+                        //     data_points = add_next_top_points(data_points);
+                        //     self.set_pattern(
+                        //         PatternType::HeadShoulders,
+                        //         PatternDirection::Bottom,
+                        //         &pattern_size,
+                        //         data_points.to_owned(),
+                        //         change,
+                        //         candle_date,
+                        //         head_shoulders::hs_active(
+                        //             &data_points,
+                        //             candles,
+                        //             PatternType::HeadShoulders,
+                        //         ),
+                        //     );
+                        //     not_founded = true;
+                        // } else if head_shoulders::is_inverse(&data_points) {
+                        //     data_points = add_next_top_points(data_points);
+                        //     self.set_pattern(
+                        //         PatternType::HeadShoulders,
+                        //         PatternDirection::Top,
+                        //         &pattern_size,
+                        //         data_points.to_owned(),
+                        //         change,
+                        //         candle_date,
+                        //         head_shoulders::hs_active(
+                        //             &data_points,
+                        //             candles,
+                        //             PatternType::HeadShoulders,
+                        //         ),
+                        //     );
                         not_founded = true;
                     }
                     None => {
