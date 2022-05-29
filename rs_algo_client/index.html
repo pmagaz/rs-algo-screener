@@ -37,6 +37,39 @@
       padding-bottom: 10px; /* 1:1 Aspect Ratio */
       position: relative; /* If you want text inside of it */
   }
+
+  body {
+  animation: fadeIn ease-in  0.2s;
+  -webkit-animation: fadeIn ease-in  0.2s;
+  -moz-animation: fadeIn ease-in  0.2s;
+  -o-animation: fadeIn ease-in  0.2s;
+  -ms-animation: fadeIn ease-in  0.2s;
+}
+
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
   </style>
   <script language="JavaScript">
     const get_base_url = () => window.location.href; 

@@ -46,18 +46,18 @@ pub fn home() -> Html {
                 let use_loading = use_loading.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let query = get_query_value();
-                    //use_instruments.set(api::get_instruments(&instruments_url, query).await.unwrap());
-                    let instruments = api::get_instruments(&instruments_url, query).await.unwrap();
-                    use_instruments.set(instruments);
 
-                    let watch_instruments =
-                        api::get_watch_instruments(&watch_list_url).await.unwrap();
-                    use_watch_instruments.set(watch_instruments);
+                    use_portfolio_instruments.set(
+                        api::get_portfolio_instruments(&portfolio_url)
+                            .await
+                            .unwrap(),
+                    );
 
-                    let portfolio_instruments = api::get_portfolio_instruments(&portfolio_url)
-                        .await
-                        .unwrap();
-                    use_portfolio_instruments.set(portfolio_instruments);
+                    use_watch_instruments
+                        .set(api::get_watch_instruments(&watch_list_url).await.unwrap());
+
+                    use_instruments
+                        .set(api::get_instruments(&instruments_url, query).await.unwrap());
 
                     use_loading.set(false);
                 });
