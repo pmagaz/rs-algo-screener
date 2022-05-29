@@ -1,14 +1,14 @@
 {
-    "name": "RS Screener",
-    "short_name": "RS-Screener",
+    "name": "RS Stock",
+    "short_name": "RS Stock",
     "icons": [{
       "src": "./img/rust-logo.png",
         "sizes": "256x256",
         "type": "image/png"
       }],
     "lang": "en-US",
-    "start_url": "./index.html",
+    "start_url": "http://rs-screener.ddns.net/",
     "display": "standalone",
-    "background_color": "white",
-    "theme_color": "white"
+    "background_color": "#3273DC",
+    "theme_color": "#3273DC"
   }
