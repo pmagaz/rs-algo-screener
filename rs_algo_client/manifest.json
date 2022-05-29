@@ -1,0 +1,14 @@
+{
+    "name": "RS Screener",
+    "short_name": "RS-Screener",
+    "icons": [{
+      "src": "./img/rust-logo.png",
+        "sizes": "256x256",
+        "type": "image/png"
+      }],
+    "lang": "en-US",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "white",
+    "theme_color": "white"
+  }
