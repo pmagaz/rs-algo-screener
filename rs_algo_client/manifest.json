@@ -2,7 +2,7 @@
     "name": "RS Stock",
     "short_name": "RS Stock",
     "icons": [{
-      "src": "./img/rust-logo.png",
+      "src": "./img/pwa-logo.png",
         "sizes": "256x256",
         "type": "image/png"
       }],
