@@ -27,6 +27,10 @@ pub fn get_pattern_status(
 
     match pattern {
         Some(_pat) => {
+            let pattern_type = match pattern {
+                Some(pat) => pat.pattern_type.clone(),
+                None => PatternType::None,
+            };
             let pattern_active = match pattern {
                 Some(pat) => pat.active.active,
                 None => false,
@@ -48,17 +52,39 @@ pub fn get_pattern_status(
             };
 
             match pattern {
+                _x if pattern_type == PatternType::ChannelUp
+                    || pattern_type == PatternType::HigherHighsHigherLows
+                    || pattern_type == PatternType::TriangleUp =>
+                {
+                    Status::Bullish
+                }
+                _x if pattern_type == PatternType::ChannelDown
+                    || pattern_type == PatternType::LowerHighsLowerLows
+                    || pattern_type == PatternType::TriangleDown =>
+                {
+                    Status::Bearish
+                }
+                _x if pattern_type == PatternType::Broadening
+                    || pattern_type == PatternType::Rectangle
+                    || pattern_type == PatternType::TriangleSym =>
+                {
+                    Status::Neutral
+                }
+
                 _x if pattern_active && pattern_active_date > max_activated_date => Status::Bullish,
-                _x if second_last_pattern_type == &PatternType::ChannelDown
+                _x if (second_last_pattern_type == &PatternType::ChannelDown
+                    || second_last_pattern_type == &PatternType::LowerHighsLowerLows)
                     && &pattern_type != second_last_pattern_type =>
                 {
                     Status::Bullish
                 }
-                _x if second_last_pattern_type == &PatternType::ChannelDown
+                _x if (second_last_pattern_type == &PatternType::ChannelDown
+                    || second_last_pattern_type == &PatternType::LowerHighsLowerLows)
                     && &pattern_type == second_last_pattern_type =>
                 {
                     Status::Bearish
                 }
+
                 _x if pattern_date > max_pattern_date => Status::Neutral,
                 _x if pattern_date > super_date => Status::Neutral,
                 _x if pattern_type == PatternType::None => Status::Default,

@@ -74,6 +74,7 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
             let info: (String, String, String, String) = match date {
                 _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
                 _x if status == Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), active_date.format("%d/%m/%Y").to_string()),
+                _x if status == Status::Bearish => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), active_date.format("%d/%m/%Y").to_string()),
                 _x if status == Status::Neutral => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), ("").to_string()),
                 _x if status == Status::Default =>  ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
                 _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
@@ -217,8 +218,8 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&price_change_status)}> {format!("{}%", price_display)}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
-                    <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.1}</td>
-                    <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.2}</td>
+                    <td> {local_pattern.info.1}</td>
+                    <td> {local_pattern.info.2}</td>
                     <td> {local_pattern.info.3}</td>
                     <td class={get_status_class(&bb.status)}> {format!("{:?}%", round(bb_size, 1))}</td>
                     <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
