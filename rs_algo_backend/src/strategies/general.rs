@@ -159,10 +159,9 @@ impl General {
                             Status::Bullish
                         }
                         _x if stoch.current_a < stoch.current_b => Status::Bearish,
-                        _x if stoch.current_a > 70. => Status::Bearish,
-                        _x if stoch.current_a > stoch.current_b && stoch.current_a > 40. => {
-                            Status::Neutral
-                        }
+                        _x if stoch.current_a >= 70. => Status::Bearish,
+                        _x if stoch.current_a > 40. && stoch.current_a < 60. => Status::Default,
+                        _x if stoch.current_a > 60. && stoch.current_a < 70. => Status::Neutral,
                         _ => Status::Neutral,
                     };
 
@@ -184,33 +183,38 @@ impl General {
                             Status::Neutral
                         }
                         //_x if macd.current_a < macd.current_b => Status::Bearish,
-                        _ => Status::Neutral,
+                        _ => Status::Default,
                     };
 
                     let rsi_status = match rsi {
                         _x if rsi.current_a < 30. => Status::Bullish,
-                        _x if rsi.current_a > 60. => Status::Bearish,
-                        _x if rsi.current_a > 40. && rsi.current_a < 60. => Status::Neutral,
+                        _x if rsi.current_a >= 70. => Status::Bearish,
+                        _x if rsi.current_a >= 40. && rsi.current_a < 70. => Status::Default,
                         _ => Status::Neutral,
                     };
 
+                    println!(
+                        "{} {} {} {}",
+                        instrument.symbol, instrument.current_price, bb.current_a, bb.prev_a
+                    );
+
                     let bb_status = match bb {
                         _x if instrument.current_price <= bb.current_b
-                            && instrument.current_price >= bb.prev_b =>
+                            && instrument.prev_price >= bb.prev_b =>
                         {
                             Status::Bullish
                         }
                         _x if instrument.current_price >= bb.current_a
-                            && instrument.current_price <= bb.prev_a =>
+                            && instrument.prev_price <= bb.prev_a =>
                         {
                             Status::Bearish
                         }
                         _x if (instrument.current_price >= bb.current_c
-                            && instrument.current_price <= bb.prev_c)
+                            && instrument.prev_price <= bb.prev_c)
                             || (instrument.current_price <= bb.current_c
-                                && instrument.current_price >= bb.prev_c) =>
+                                && instrument.prev_price >= bb.prev_c) =>
                         {
-                            Status::Bearish
+                            Status::Neutral
                         }
                         _ => Status::Default,
                     };
