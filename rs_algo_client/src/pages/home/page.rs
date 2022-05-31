@@ -157,8 +157,7 @@ pub fn home() -> Html {
     let strategy: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
-            x.current_price <= x.indicators.bb.current_b
-                && x.current_price >= x.indicators.bb.prev_b
+            x.current_price <= x.indicators.bb.current_b && x.prev_price >= x.indicators.bb.prev_b
         })
         .map(|x| x.clone())
         .collect();

@@ -75,7 +75,7 @@ impl General {
             },
             {"$and": [
                 {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
-                {"$expr": {"$gte": ["$current_price","$indicators.bb.prev_b"]}},
+                {"$expr": {"$gte": ["$prev_price","$indicators.bb.prev_b"]}},
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
             { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
