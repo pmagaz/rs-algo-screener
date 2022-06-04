@@ -48,29 +48,29 @@ async fn main() -> Result<()> {
     let sp500_symbols = broker::sp500::get_symbols();
     // let symbols = [
     //     Symbol {
-    //         symbol: "OIL".to_owned(),
+    //         symbol: "ETSY.US_9".to_owned(),
     //         category: "".to_owned(),
     //         description: "".to_owned(),
     //         currency: "".to_owned(),
     //     },
-    //     Symbol {
-    //         symbol: "GOLD.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "GOOGL.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "BITCOIN".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
+    //     // Symbol {
+    //     //     symbol: "GOLD.US_9".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
+    //     // Symbol {
+    //     //     symbol: "GOOGL.US_9".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
+    //     // Symbol {
+    //     //     symbol: "BITCOIN".to_owned(),
+    //     //     category: "".to_owned(),
+    //     //     description: "".to_owned(),
+    //     //     currency: "".to_owned(),
+    //     // },
     //     // Symbol {
     //     //     symbol: "OIL".to_owned(),
     //     //     category: "".to_owned(),

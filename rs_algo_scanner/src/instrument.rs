@@ -135,7 +135,9 @@ impl Instrument {
                     _ => id - 1,
                 };
 
-                self.indicators.calculate_indicators(close.exp()).unwrap();
+                let OHLC = (open.exp(), high.exp(), low.exp(), close.exp());
+
+                self.indicators.calculate_indicators(OHLC).unwrap();
 
                 Candle::new()
                     .date(date)

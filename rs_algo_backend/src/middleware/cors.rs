@@ -13,9 +13,12 @@ pub fn cors_middleware() -> Cors {
         &_ => Cors::default(),
     };
 
-    cors.allowed_origin("http://rs-screener.ddns.net")
+    cors.allowed_origin("http://rs-screener.ddns.net/")
         .allowed_methods(vec!["GET", "PUT", "POST"])
-        .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-        .allowed_header(http::header::CONTENT_TYPE)
+        .allowed_headers(vec![
+            http::header::AUTHORIZATION,
+            http::header::ACCEPT,
+            http::header::CONTENT_TYPE,
+        ])
         .max_age(3600)
 }

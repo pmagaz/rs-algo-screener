@@ -12,12 +12,9 @@ use crate::error::Result;
 use crate::indicators::atr::Atr;
 use crate::indicators::bb::BollingerB;
 use crate::indicators::ema::Ema;
-use crate::indicators::kc::KeltnerC;
 use crate::indicators::macd::Macd;
 use crate::indicators::rsi::Rsi;
-use crate::indicators::sd::StandardD;
 use crate::indicators::stoch::Stoch;
-use crate::indicators::tema::Tema;
 
 use rs_algo_shared::models::*;
 use serde::{Deserialize, Serialize};
@@ -29,6 +26,7 @@ pub trait Indicator {
     where
         Self: Sized;
     fn next(&mut self, value: f64) -> Result<()>;
+    fn next_OHLC(&mut self, OHLC: (f64, f64, f64, f64)) -> Result<()>;
     fn get_data_a(&self) -> &Vec<f64>;
     fn get_current_a(&self) -> &f64;
     fn get_current_b(&self) -> &f64;
@@ -105,7 +103,8 @@ impl Indicators {
         &self.ema_c
     }
 
-    pub fn calculate_indicators(&mut self, close: f64) -> Result<()> {
+    pub fn calculate_indicators(&mut self, OHLC: (f64, f64, f64, f64)) -> Result<()> {
+        let close = OHLC.3;
         self.macd.next(close).unwrap();
         self.stoch.next(close).unwrap();
         let extended_indicators = env::var("EXTENDED_INDICATORS")
@@ -113,7 +112,7 @@ impl Indicators {
             .parse::<bool>()
             .unwrap();
         if extended_indicators {
-            self.atr.next(close).unwrap();
+            self.atr.next_OHLC(OHLC).unwrap();
             self.bb.next(close).unwrap();
             self.rsi.next(close).unwrap();
             self.ema_a.next(close).unwrap();

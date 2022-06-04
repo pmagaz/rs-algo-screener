@@ -73,4 +73,7 @@ impl Indicator for Tema {
         self.data_a.push(tema);
         Ok(())
     }
+    fn next_OHLC(&mut self, OHLC: (f64, f64, f64, f64)) -> Result<()> {
+        Ok(())
+    }
 }

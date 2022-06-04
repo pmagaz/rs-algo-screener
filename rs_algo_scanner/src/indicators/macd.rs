@@ -59,4 +59,7 @@ impl Indicator for Macd {
         self.data_b.push(b);
         Ok(())
     }
+    fn next_OHLC(&mut self, OHLC: (f64, f64, f64, f64)) -> Result<()> {
+        Ok(())
+    }
 }

@@ -14,7 +14,6 @@ serde_qs = "0.9.1"
 dotenv = "0.15.0"
 find_peaks = "0.1.5"
 polyfit-rs="0.2.0"
-ta = {version = "0.5.0", features = ["serde"] }
 chrono = {version = "0.4.19",  features = ["serde"] }
 async-trait = "0.1.52"
 round = "0.1.2"
@@ -23,5 +22,7 @@ reqwest = { version = "0.11.10", features = ["json"] }
 openssl = { version = "0.10.38", features = ["vendored"] }
 tungstenite = {version = "0.17.2", features = ["native-tls"]}
 
+ta = {git = "https://github.com/pmagaz/ta-rs", features = ["serde"]}
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
+
 rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "8ec27ff"}

@@ -62,4 +62,7 @@ impl Indicator for Ema {
         self.data_a.push(a);
         Ok(())
     }
+    fn next_OHLC(&mut self, OHLC: (f64, f64, f64, f64)) -> Result<()> {
+        Ok(())
+    }
 }

@@ -57,4 +57,7 @@ impl Indicator for BollingerB {
         self.data_c.push(a.average);
         Ok(())
     }
+    fn next_OHLC(&mut self, OHLC: (f64, f64, f64, f64)) -> Result<()> {
+        Ok(())
+    }
 }
