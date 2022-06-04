@@ -131,7 +131,7 @@ pub async fn insert_detail(
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = match mode.as_ref() {
+    let collection_name = match mode {
         "daily" => env::var("DB_INSTRUMENTS_COLLECTION").unwrap(),
         "backtest" => env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap(),
         &_ => "".to_string(),

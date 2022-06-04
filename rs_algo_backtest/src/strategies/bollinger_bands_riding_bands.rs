@@ -27,22 +27,22 @@ impl<'a> Strategy for BollingerBands<'a> {
         let prev_index = get_prev_index(index);
 
         let current_close = instrument.data.get(index).unwrap().close;
-        let high_price = instrument.data.get(index).unwrap().high;
+        let _high_price = instrument.data.get(index).unwrap().high;
 
-        let prev_close = instrument.data.get(prev_index).unwrap().close;
-        let prev_high = instrument.data.get(prev_index).unwrap().high;
+        let _prev_close = instrument.data.get(prev_index).unwrap().close;
+        let _prev_high = instrument.data.get(prev_index).unwrap().high;
 
-        let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
-        let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
+        let _low_band = instrument.indicators.bb.data_b.get(index).unwrap();
+        let _top_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let mid_band = instrument.indicators.bb.data_c.get(index).unwrap();
-        let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
-        let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
+        let _prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+        let _prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
         let max = 5;
         let mut last_prices = vec![];
         let mut top_occurrences: usize = 0;
         let mut low_occurrences: usize = 0;
-        let mut price_change: f64 = 0.;
+        let _price_change: f64 = 0.;
 
         #[derive(Debug, PartialEq)]
         enum Direction {
@@ -81,11 +81,6 @@ impl<'a> Strategy for BollingerBands<'a> {
             _ => Direction::Side,
         };
 
-        println!(
-            "1111 {} {} {}",
-            top_occurrences, low_occurrences, max_price_change
-        );
-
         let entry_condition = direction == Direction::Up && top_occurrences >= max;
         //let entry_condition = close_price < low_band && prev_close >= prev_low_band;
 
@@ -105,8 +100,8 @@ impl<'a> Strategy for BollingerBands<'a> {
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
-        let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
-        let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
+        let _top_band = instrument.indicators.bb.data_a.get(index).unwrap();
+        let _prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
         let exit_condition = close_price < low_band && prev_close >= prev_low_band;
 

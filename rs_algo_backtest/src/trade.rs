@@ -18,11 +18,10 @@ pub fn resolve_trade_in(
             None => -100.,
         };
         let current_date = current_candle.unwrap().date;
-
         TradeResult::TradeIn(TradeIn {
             index_in: nex_day_index,
             price_in: current_price,
-            stop_loss: calculate_stoploss(&instrument, index, stop_loss),
+            stop_loss: calculate_stoploss(instrument, nex_day_index, stop_loss),
             date_in: to_dbtime(current_date),
             trade_type: TradeType::EntryLong,
         })
@@ -56,18 +55,17 @@ pub fn resolve_trade_out(
     let run_up_per = calculate_runup_per(run_up, price_in);
     let draw_down = calculate_drawdown(data, price_in, index_in, nex_day_index);
     let draw_down_per = calculate_drawdown_per(draw_down, price_in);
+    let stop_loss_activated = resolve_stoploss(current_price, trade_in);
 
-    let stoploss_activated = resolve_stoploss(current_price, trade_in);
-
-    let trade_type = match stoploss_activated {
+    let trade_type = match stop_loss_activated {
         true => TradeType::StopLoss,
         false => TradeType::ExitLong,
     };
 
-    if exit_condition || stoploss_activated {
+    if index > trade_in.index_in && (exit_condition || stop_loss_activated) {
         TradeResult::TradeOut(TradeOut {
-            index_in: index_in,
-            price_in: price_in,
+            index_in,
+            price_in,
             trade_type,
             date_in: to_dbtime(date_in),
             index_out: nex_day_index,
@@ -93,9 +91,9 @@ pub fn resolve_backtest(
     equity: f64,
     commission: f64,
 ) -> BackTestResult {
-    let size = 1.;
+    let _size = 1.;
     let data = &instrument.data;
-    if trades_out.len() > 0 {
+    if !trades_out.is_empty() {
         let date_start = trades_out[0].date_in;
         let date_end = trades_out.last().unwrap().date_out;
         let sessions: usize = trades_out.iter().fold(0, |mut acc, x| {
@@ -196,6 +194,6 @@ pub fn calculate_stoploss(instrument: &Instrument, index: usize, stop_loss: f64)
 
 pub fn resolve_stoploss(current_price: f64, trade_in: &TradeIn) -> bool {
     let stop_loss = trade_in.stop_loss;
-    //current_price <= stop_loss
-    false
+    current_price <= stop_loss
+    //false
 }

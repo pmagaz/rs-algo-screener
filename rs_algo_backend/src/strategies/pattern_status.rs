@@ -27,7 +27,7 @@ pub fn get_pattern_status(
 
     match pattern {
         Some(_pat) => {
-            let pattern_type = match pattern {
+            let _pattern_type = match pattern {
                 Some(pat) => pat.pattern_type.clone(),
                 None => PatternType::None,
             };

@@ -27,10 +27,10 @@ impl<'a> Strategy for Macd<'a> {
         let prev_index = get_prev_index(index);
 
         let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();
-        let current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
+        let _current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
 
-        let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
-        let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
+        let _prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
+        let _prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
         let entry_condition = current_macd_a > &0.;
 
@@ -46,10 +46,10 @@ impl<'a> Strategy for Macd<'a> {
         let prev_index = get_prev_index(index);
 
         let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();
-        let current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
+        let _current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
 
-        let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
-        let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
+        let _prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
+        let _prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
         let exit_condition = current_macd_a < &0.;
 

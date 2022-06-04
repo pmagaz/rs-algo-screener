@@ -118,7 +118,7 @@ pub async fn upsert_instruments_result(
         now
     );
 
-    let now = Instant::now();
+    let _now = Instant::now();
     let symbol = backtested_result.instrument.symbol.clone();
 
     let now = Instant::now();
@@ -222,10 +222,10 @@ pub async fn chart(
     ]
     .concat();
 
-    Backend::new().render(&instrument, &trades, &output_file);
+    Backend::new().render(&instrument, trades, &output_file);
 
     let mut image_path = PathBuf::new();
-    image_path.push(output_file.to_string());
+    image_path.push(output_file);
 
     let file = fs::NamedFile::open(image_path).unwrap();
 

@@ -26,9 +26,9 @@ impl<'a> Strategy for MeanReversion<'a> {
 
         let close_price = &instrument.data.get(index).unwrap().close;
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
-        let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
+        let _prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let _prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let _prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
         let entry_condition = close_price > current_ema_200;
 
@@ -45,8 +45,8 @@ impl<'a> Strategy for MeanReversion<'a> {
 
         let close_price = &instrument.data.get(index).unwrap().close;
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
-        let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
+        let _prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let _prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
         let exit_condition = close_price < current_ema_200;
         resolve_trade_out(index, instrument, trade_in, exit_condition)

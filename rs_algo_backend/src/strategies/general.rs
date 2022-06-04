@@ -1,18 +1,18 @@
 use super::pattern_status::get_pattern_status;
-use async_trait::async_trait;
+
 use bson::{doc, Document};
 use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::Cursor;
-use rs_algo_shared::models::divergence::{Divergence, DivergenceType};
+use rs_algo_shared::models::divergence::{DivergenceType};
 use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::pattern::{DataPoints, Pattern, PatternType};
+use rs_algo_shared::models::pattern::{PatternType};
 use rs_algo_shared::models::status::Status;
 use std::cmp::Ordering;
 
 use round::round;
 use rs_algo_shared::error::Result;
-use rs_algo_shared::helpers::comp::*;
+
 use rs_algo_shared::helpers::date::*;
 use std::env;
 
@@ -50,7 +50,7 @@ impl General {
             .parse::<f64>()
             .unwrap();
 
-        let min_horizontal_level_ocurrences = env::var("MIN_HORIZONTAL_LEVELS_OCCURENCES")
+        let _min_horizontal_level_ocurrences = env::var("MIN_HORIZONTAL_LEVELS_OCCURENCES")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -104,19 +104,19 @@ impl General {
 
                     let last_divergence = instrument.divergences.data.last();
 
-                    let last_pattern_target = match last_pattern {
+                    let _last_pattern_target = match last_pattern {
                         Some(val) => round(val.active.change, 0),
                         None => 0.,
                     };
 
                     let fake_date = to_dbtime(Local::now() - Duration::days(1000));
 
-                    let last_pattern_date = match last_pattern {
+                    let _last_pattern_date = match last_pattern {
                         Some(val) => val.date,
                         None => fake_date,
                     };
 
-                    let last_divergence_type = match last_divergence {
+                    let _last_divergence_type = match last_divergence {
                         Some(val) => &val.divergence_type,
                         None => &DivergenceType::None,
                     };

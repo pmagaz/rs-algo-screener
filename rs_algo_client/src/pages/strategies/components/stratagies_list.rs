@@ -78,8 +78,8 @@ pub fn strategy_list(props: &Props) -> Html {
                     <td>
                     <Link<Route> to={Route::Strategy { id: strategy.strategy.clone() }}>{ strategy.strategy.clone() }</Link<Route>>
                     </td>
-                    <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
+                    <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
                     <td class={get_status_class(&max_drawdown_status)}> { format!("{}%", round(max_drawdown,2))}</td>
                     <td> { format!("{}%", round(strategy.avg_win_per_trade,2))}</td>
                     <td>{ strategy.avg_trades}</td>
@@ -97,8 +97,8 @@ pub fn strategy_list(props: &Props) -> Html {
             <thead class="has-background-grey-lighter">
                 <tr>
                 <th><abbr>{ "Strategy (Avg)" }</abbr></th>
-                <th><abbr>{ "Profit Factor" }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>
+                <th><abbr>{ "Profit Factor" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
                 <th><abbr>{ "Won per trade" }</abbr></th>
                 <th><abbr>{ "Num trades" }</abbr></th>

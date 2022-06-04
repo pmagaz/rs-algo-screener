@@ -77,7 +77,7 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let min_equity = trades_out
         .iter()
         .map(|x| {
-            let profit = x.profit;
+            let _profit = x.profit;
             min_acc_equity -= x.profit;
             min_acc_equity
         })
@@ -138,12 +138,12 @@ pub fn total_profitable_trades(winning_trades: usize, total_trades: usize) -> f6
     ((winning_trades as f64 / total_trades as f64) * 100.).abs()
 }
 
-pub fn total_profit_per(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
+pub fn total_profit_per(trades_out: &Vec<TradeOut>, _equity: f64) -> f64 {
     trades_out.iter().map(|trade| trade.profit_per).sum()
 }
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {
-        0.0 => gross_loses,
+        0.0 => (gross_profits / 0.1).abs(),
         _ => (gross_profits / gross_loses).abs(),
     }
 }

@@ -6,7 +6,7 @@ use crate::render_image::Backend;
 use crate::strategies::general::General;
 
 use rs_algo_shared::models::api::*;
-use rs_algo_shared::models::backtest_instrument::TradeOut;
+
 use rs_algo_shared::models::instrument::*;
 use std::time::Instant;
 
@@ -112,7 +112,7 @@ pub async fn find_detail(
 }
 
 pub async fn find_all(
-    params: String,
+    _params: String,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
@@ -128,7 +128,7 @@ pub async fn upsert(
     instrument: String,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
-    let now = Instant::now();
+    let _now = Instant::now();
     let mode = &query.mode;
     println!(
         "[INSTRUMENT] Received at {:?} for mode {:?}",
@@ -136,7 +136,7 @@ pub async fn upsert(
         mode
     );
 
-    let now = Instant::now();
+    let _now = Instant::now();
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
 

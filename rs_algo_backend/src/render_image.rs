@@ -47,6 +47,7 @@ impl Backend {
 
         let trades_in: &Vec<TradeIn> = trades.0;
         let trades_out: &Vec<TradeOut> = trades.1;
+        let mut stop_loss: Vec<(usize, f64)> = vec![];
 
         let points_mode = match trades_out.len().cmp(&0) {
             Ordering::Greater => PointsMode::Trades,
@@ -71,13 +72,20 @@ impl Backend {
             .map(|x| x.active.index)
             .collect();
 
-        let mut top_points_set: Vec<(usize, f64)>;
-        let mut low_points_set: Vec<(usize, f64)>;
+        let top_points_set: Vec<(usize, f64)>;
+        let low_points_set: Vec<(usize, f64)>;
 
-        if trades_out.len() > 0 {
+        if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
+
             top_points_set = trades_out
                 .iter()
+                .map(|x| (x.index_out, x.price_out))
+                .collect();
+
+            stop_loss = trades_out
+                .iter()
+                .filter(|x| x.trade_type == TradeType::StopLoss)
                 .map(|x| (x.index_out, x.price_out))
                 .collect();
         } else {
@@ -92,7 +100,7 @@ impl Backend {
         let BLUE_LINE = &RGBColor(71, 113, 181);
         let BLUE_LINE2 = &RGBColor(42, 98, 255);
         let ORANGE_LINE = &RGBColor(245, 127, 22);
-        let GREEN_LINE = &RGBColor(56, 142, 59);
+        let _GREEN_LINE = &RGBColor(56, 142, 59);
 
         let bottom_point_color = match points_mode {
             PointsMode::MaximaMinima => BLUE.mix(0.2),
@@ -104,6 +112,8 @@ impl Backend {
             PointsMode::Trades => RED_LINE.mix(1.),
         };
 
+        let stop_loss_color = MAGENTA.mix(0.8);
+
         let rsi = &instrument.indicators.rsi.data_a;
 
         let patterns = local_patterns;
@@ -112,8 +122,8 @@ impl Backend {
         let stoch_b = &stoch.data_b;
 
         let macd = &instrument.indicators.macd;
-        let macd_a = &macd.data_a;
-        let macd_b = &macd.data_b;
+        let _macd_a = &macd.data_a;
+        let _macd_b = &macd.data_b;
 
         let _rsi = &instrument.indicators.rsi.data_a;
 
@@ -252,7 +262,7 @@ impl Backend {
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                let mut price;
+                let price;
                 if points_mode == PointsMode::MaximaMinima {
                     price = match price_source.as_ref() {
                         "highs_lows" => candle.high,
@@ -264,11 +274,19 @@ impl Backend {
                 }
 
                 if top_points_set.contains(&(i, price)) {
-                    TriangleMarker::new(
-                        (candle.date, price + (price * local_peaks_marker_pos)),
-                        -6,
-                        top_point_color,
-                    )
+                    if stop_loss.contains(&(i, price)) {
+                        TriangleMarker::new(
+                            (candle.date, price + (price * local_peaks_marker_pos)),
+                            -6,
+                            stop_loss_color,
+                        )
+                    } else {
+                        TriangleMarker::new(
+                            (candle.date, price + (price * local_peaks_marker_pos)),
+                            -6,
+                            top_point_color,
+                        )
+                    }
                 } else {
                     TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
                 }
@@ -277,7 +295,7 @@ impl Backend {
 
         chart
             .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                let mut price;
+                let price;
                 if points_mode == PointsMode::MaximaMinima {
                     price = match price_source.as_ref() {
                         "highs_lows" => candle.low,

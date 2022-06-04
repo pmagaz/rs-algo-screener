@@ -53,8 +53,8 @@ impl<'a> Strategy for BollingerBands<'a> {
 
         let patterns = &instrument.patterns.local_patterns;
         let current_pattern = get_current_pattern(index, patterns);
-        let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
-        let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+        let _low_band = instrument.indicators.bb.data_b.get(index).unwrap();
+        let _prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
         let mut exit_condition: bool = false;
 
         if current_pattern == PatternType::ChannelUp
