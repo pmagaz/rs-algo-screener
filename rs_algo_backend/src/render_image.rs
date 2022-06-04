@@ -104,6 +104,8 @@ impl Backend {
             PointsMode::Trades => RED_LINE.mix(1.),
         };
 
+        let rsi = &instrument.indicators.rsi.data_a;
+
         let patterns = local_patterns;
         let stoch = &instrument.indicators.stoch;
         let stoch_a = &stoch.data_a;
@@ -361,9 +363,24 @@ impl Backend {
             ))
             .unwrap();
 
+        let mut rsi_pannel = ChartBuilder::on(&indicator_1)
+            .x_label_area_size(40)
+            .y_label_area_size(40)
+            .build_cartesian_2d(from_date..to_date, -0f64..100f64)
+            .unwrap();
+
+        rsi_pannel
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date, rsi[id])),
+                RED_LINE,
+            ))
+            .unwrap();
+
         //STOCH PANNEL
 
-        let mut stoch_pannel = ChartBuilder::on(&indicator_1)
+        let mut stoch_pannel = ChartBuilder::on(&indicator_2)
             .x_label_area_size(40)
             .y_label_area_size(40)
             // .margin(2)
@@ -385,32 +402,6 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date, stoch_b[id])),
-                RED_LINE,
-            ))
-            .unwrap();
-
-        let min = macd_a.iter().map(|x| *x as usize).min().unwrap() as f64;
-        let max = macd_a.iter().map(|x| *x as usize).max().unwrap() as f64;
-        let mut macd_pannel = ChartBuilder::on(&indicator_2)
-            .x_label_area_size(40)
-            .y_label_area_size(40)
-            .build_cartesian_2d(from_date..to_date, min..max)
-            .unwrap();
-
-        macd_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, macd_a[id])),
-                BLUE_LINE,
-            ))
-            .unwrap();
-
-        macd_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, macd_b[id])),
                 RED_LINE,
             ))
             .unwrap();

@@ -2,8 +2,8 @@ use super::Indicator;
 use crate::error::Result;
 
 use serde::{Deserialize, Serialize};
-use ta::data_item::DataItem;
 use ta::indicators::AverageTrueRange;
+use ta::test_helper::Bar;
 use ta::Next;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -56,14 +56,8 @@ impl Indicator for Atr {
     }
     //FIXME MONEKY PATCHING
     fn next_OHLC(&mut self, OHLC: (f64, f64, f64, f64)) -> Result<()> {
-        let bar = DataItem::builder()
-            .open(OHLC.0)
-            .high(OHLC.1)
-            .low(OHLC.2)
-            .close(OHLC.3)
-            .volume(OHLC.3)
-            .build()
-            .unwrap();
+        let bar = Bar::new().high(OHLC.1).low(OHLC.2).close(OHLC.3);
+
         let a = self.atr.next(&bar);
         self.data_a.push(a);
         Ok(())
