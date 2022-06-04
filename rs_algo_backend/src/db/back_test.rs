@@ -96,7 +96,6 @@ pub async fn find_strategies_result(
     state: &web::Data<AppState>,
 ) -> Result<Vec<BackTestStrategyResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
-    println!("aaaaa");
     let collection = get_collection::<BackTestStrategyResult>(&state.db_hdd, collection_name).await;
 
     let mut cursor = collection
