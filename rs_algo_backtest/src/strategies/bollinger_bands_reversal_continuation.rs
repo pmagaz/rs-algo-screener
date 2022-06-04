@@ -57,7 +57,9 @@ impl<'a> Strategy for BollingerBands<'a> {
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
         let mut exit_condition: bool = false;
 
-        if current_pattern == PatternType::ChannelUp {
+        if current_pattern == PatternType::ChannelUp
+            || current_pattern == PatternType::HigherHighsHigherLows
+        {
             //} || current_pattern == PatternType::TriangleUp {
             exit_condition = false;
         } else {
