@@ -21,6 +21,7 @@ round = "0.1.2"
 async-trait = "0.1.53"
 mongodb = "2.1.0"
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
+openssl = { version = "0.10.38", features = ["vendored"] }
 
 rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "5c79e4b"} 
 
