@@ -13,16 +13,12 @@ anyhow = "1.0.57"
 thiserror = "1.0.30"
 serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.79"
-serde_qs ="0.9.1"
 chrono = {version = "0.4.19",  features = ["serde"] }
 dotenv = "0.15.0"
-lazy_static = "1.4"
 bson = "2.2.0"
 futures = "0.3.21"
 round = "0.1.2"
 async-trait = "0.1.53"
-reqwest = { version = "0.11.9", features = ["json"] }
-openssl = { version = "0.10.38", features = ["vendored"] }
 
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
 rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "e0585e4"}
