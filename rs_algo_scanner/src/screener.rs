@@ -1,8 +1,8 @@
 use crate::backend::Backend;
-use crate::broker::{Broker, Response, VEC_DOHLC};
 use crate::error::Result;
 use crate::instrument::Instrument;
 
+use rs_algo_shared::broker::{Broker, Response, VEC_DOHLC};
 use rs_algo_shared::models::time_frame::TimeFrameType;
 use std::env;
 use std::future::Future;
@@ -25,12 +25,12 @@ where
     }
 
     pub async fn login(&mut self, username: &str, password: &str) -> Result<()> {
-        let result = self.broker.login(username, password).await?;
+        let result = self.broker.login(username, password).await.unwrap();
         Ok(result)
     }
 
     pub async fn get_symbols(&mut self) -> Result<Response<VEC_DOHLC>> {
-        let symbols = self.broker.get_symbols().await?;
+        let symbols = self.broker.get_symbols().await.unwrap();
         Ok(symbols)
     }
 
@@ -48,7 +48,8 @@ where
         let res = self
             .broker
             .get_instrument_data(symbol, time_frame.value(), start_date)
-            .await?;
+            .await
+            .unwrap();
 
         let mut instrument = Instrument::new()
             .symbol(&res.symbol)

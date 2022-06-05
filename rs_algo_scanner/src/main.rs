@@ -3,15 +3,16 @@ use crate::error::Result;
 use error::RsAlgoErrorKind;
 use std::time::Instant;
 
-use broker::xtb::*;
+//use broker::xtb::*;
 use instrument::Instrument;
+use rs_algo_shared::broker;
+use rs_algo_shared::broker::xtb::*;
 use rs_algo_shared::helpers::date;
 use rs_algo_shared::helpers::date::Local;
 use rs_algo_shared::models::time_frame::TimeFrame;
 use screener::Screener;
 
 mod backend;
-mod broker;
 mod candle;
 mod error;
 mod helpers;
