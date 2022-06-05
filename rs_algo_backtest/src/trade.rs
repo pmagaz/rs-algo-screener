@@ -161,35 +161,35 @@ pub fn resolve_backtest(
             annual_return,
         })
     } else {
-        BackTestResult::None
-        // let fake_date = to_dbtime(Local::now() - Duration::days(1000));
-        // BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
-        //     instrument: BackTestInstrument {
-        //         symbol: instrument.symbol.to_owned(),
-        //         trades_in: vec![],
-        //         trades_out: vec![],
-        //     },
-        //     strategy: name.to_owned(),
-        //     date_start: fake_date,
-        //     date_end: fake_date,
-        //     sessions: 0,
-        //     trades: 0,
-        //     wining_trades: 0,
-        //     losing_trades: 0,
-        //     won_per_trade_per: 0,
-        //     won_per_trade_per: 0,
-        //     stop_losses: 0,
-        //     gross_profit: 0.,
-        //     commissions: 0.,
-        //     net_profit: 0.,
-        //     net_profit_per: 0.,
-        //     profitable_trades: 0.,
-        //     profit_factor: 0.,
-        //     max_runup: 0.,
-        //     max_drawdown: 0.,
-        //     buy_hold: 0.,
-        //     annual_return: 0.,
-        // })
+        //BackTestResult::None
+        let fake_date = to_dbtime(Local::now() - Duration::days(1000));
+        BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
+            instrument: BackTestInstrument {
+                symbol: instrument.symbol.to_owned(),
+                trades_in: vec![],
+                trades_out: vec![],
+            },
+            strategy: name.to_owned(),
+            date_start: fake_date,
+            date_end: fake_date,
+            sessions: 0,
+            trades: 0,
+            wining_trades: 0,
+            losing_trades: 0,
+            won_per_trade_per: 0,
+            won_per_trade_per: 0,
+            stop_losses: 0,
+            gross_profit: 0.,
+            commissions: 0.,
+            net_profit: 0.,
+            net_profit_per: 0.,
+            profitable_trades: 0.,
+            profit_factor: 0.,
+            max_runup: 0.,
+            max_drawdown: 0.,
+            buy_hold: 0.,
+            annual_return: 0.,
+        })
     }
 }
 
