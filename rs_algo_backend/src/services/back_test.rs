@@ -39,12 +39,12 @@ pub async fn find_instruments(
     let now = Instant::now();
     let env = env::var("ENV").unwrap();
 
-    println!("[BACK TEST INSTRUMENTS] Request at {:?}", env);
+    println!("[BACK TEST INSTRUMENTS] Request for {:?}", env);
     let offset = query.offset;
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "development" => doc! {"symbol": "MSFT.US"},
+        "development" => doc! {"symbol": "LKQ.US"},
         _ => doc! {},
     };
 
@@ -54,7 +54,8 @@ pub async fn find_instruments(
             .unwrap();
 
     println!(
-        "[BACK TEST INSTRUMENTS] {:?} {:?}",
+        "[BACK TEST INSTRUMENTS] {:?} instruments returned at {:?} {:?}",
+        backtest_instruments.len(),
         Local::now(),
         now.elapsed()
     );

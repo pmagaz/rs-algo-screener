@@ -63,6 +63,11 @@ pub fn total_gross(trades_out: &Vec<&TradeOut>) -> f64 {
     trades_out.iter().map(|trade| trade.profit).sum()
 }
 
+pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
+    let profit_per_trade: f64 = trades_out.iter().map(|trade| trade.profit_per).sum();
+    profit_per_trade / trades_out.len() as f64
+}
+
 pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut max_acc_equity = equity;
     let mut min_acc_equity = equity;

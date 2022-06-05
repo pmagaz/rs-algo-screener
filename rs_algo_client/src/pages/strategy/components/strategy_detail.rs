@@ -92,6 +92,22 @@ pub fn strategy_detail(props: &Props) -> Html {
                 _ => Status::Neutral,
             };
 
+            let won_per_trade = backtest_instrument.won_per_trade_per; 
+            let avg_won_status = match won_per_trade {
+                _x if won_per_trade > 15. => Status::Bullish,
+                _x if won_per_trade > 10. && won_per_trade < 15. => Status::Neutral,
+                _x if won_per_trade <= 10. => Status::Bullish,
+                _ => Status::Neutral,
+            };
+
+
+            let lost_per_trade = backtest_instrument.lost_per_trade_per;
+            let avg_lost_status = match lost_per_trade {
+                _x if lost_per_trade > -5. => Status::Bullish,
+                _x if lost_per_trade < -5. && lost_per_trade > -10.  => Status::Neutral,
+                _x if lost_per_trade <= -10. => Status::Bearish,
+                _ => Status::Neutral,
+            };
 
             html! {
                 <tr>
@@ -99,12 +115,12 @@ pub fn strategy_detail(props: &Props) -> Html {
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(backtest_instrument.profitable_trades,2))}</td>
                     <td class={get_status_class(&profit_factor_status)}> { format!("{}%", round(backtest_instrument.profit_factor,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}>{ format!("{}%", round(backtest_instrument.max_drawdown,2))}</td>
-                    <td class={get_status_class(&profit_status)}> { format!("{}%", round(backtest_instrument.net_profit_per,2))}</td>
                     <td>{ backtest_instrument.trades}</td>
-                    <td>{ backtest_instrument.wining_trades}</td>
-                    <td>{ backtest_instrument.losing_trades}</td>
+                    <td>{ format!("{} / {}", backtest_instrument.wining_trades, backtest_instrument.losing_trades)} </td>
+                    <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(backtest_instrument.won_per_trade_per,2))}</td>
+                    <td class={get_status_class(&avg_lost_status)}>{ format!("{}%", round(backtest_instrument.lost_per_trade_per,2))}</td>
                     <td>{ backtest_instrument.stop_losses}</td>
-                    <td>{ format!("{}%", round(backtest_instrument.commissions,2))}</td>
+                    <td>{ format!("{}%", round(backtest_instrument.net_profit_per,2))}</td>
                     <td>{ format!("{}%", round(backtest_instrument.buy_hold,2))}</td>
                 </tr>
             }
@@ -119,12 +135,12 @@ pub fn strategy_detail(props: &Props) -> Html {
                 <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Profit Factor" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
-                <th><abbr>{ "Net Profit" }</abbr></th>
-                <th><abbr>{ "Total trades" }</abbr></th>
-                <th><abbr>{ "Win trades" }</abbr></th>
-                <th><abbr>{ "Lose trades" }</abbr></th>
+                <th><abbr>{ "Trades" }</abbr></th>
+                <th><abbr>{ "Won / Lost" }</abbr></th>
+                <th><abbr>{ "Won p trade" }</abbr></th>
+                <th><abbr>{ "Lost p trade" }</abbr></th>
                 <th><abbr>{ "Stops " }</abbr></th>
-                <th><abbr>{ "Commisions" }</abbr></th>
+                <th><abbr>{ "Net Profit" }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
                 </tr>
             </thead>

@@ -26,6 +26,7 @@ async fn main() -> Result<()> {
         equity: 100000.,
         instruments: vec![],
         strategies: vec![
+            Box::new(strategies::bollinger_bands_reversal_riding::BollingerBands::new().unwrap()),
             Box::new(
                 strategies::bollinger_bands_reversal_continuation::BollingerBands::new().unwrap(),
             ),

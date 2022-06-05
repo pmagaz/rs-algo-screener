@@ -18,6 +18,7 @@ pub fn resolve_trade_in(
             None => -100.,
         };
         let current_date = current_candle.unwrap().date;
+
         TradeResult::TradeIn(TradeIn {
             index_in: nex_day_index,
             price_in: current_price,
@@ -108,6 +109,8 @@ pub fn resolve_backtest(
         let wining_trades = w_trades.len();
         let losing_trades = l_trades.len();
         let trades = wining_trades + losing_trades;
+        let won_per_trade_per = avg_per_trade(&w_trades);
+        let lost_per_trade_per = avg_per_trade(&l_trades);
         let stop_losses = trades_out
             .iter()
             .filter(|x| x.trade_type == TradeType::StopLoss)
@@ -143,6 +146,8 @@ pub fn resolve_backtest(
             trades,
             wining_trades,
             losing_trades,
+            won_per_trade_per,
+            lost_per_trade_per,
             stop_losses,
             gross_profit,
             commissions,
@@ -171,6 +176,8 @@ pub fn resolve_backtest(
         //     trades: 0,
         //     wining_trades: 0,
         //     losing_trades: 0,
+        //     won_per_trade_per: 0,
+        //     won_per_trade_per: 0,
         //     stop_losses: 0,
         //     gross_profit: 0.,
         //     commissions: 0.,

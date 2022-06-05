@@ -238,21 +238,21 @@ pub fn instrument_list(props: &Props
         <table class="table is-bordered">
             <thead class="has-background-grey-lighter">
                 <tr>
-                <th><abbr>{ "Symbol" }</abbr></th>
-                <th><abbr>{ "Price" }</abbr></th>
-                <th><abbr>{ "Chg%" }</abbr></th>
-                <th><abbr>{ "Candle" }</abbr></th>
-                <th><abbr>{ "Pattern" }</abbr></th>
-                <th><abbr>{ "Band" }</abbr></th>
-                <th><abbr>{ "Target" }</abbr></th>
-                <th><abbr>{ "Activated" }</abbr></th>
-                <th><abbr>{ "B.Bands" }</abbr></th>
-                <th><abbr>{ "Stoch" }</abbr></th>
-                //<th><abbr>{ "MacD" }</abbr></th>
-                <th><abbr>{ "Rsi" }</abbr></th>
-                <th><abbr>{ "Divergence" }</abbr></th>
-                <th><abbr>{ "Updated" }</abbr></th>
-                <th><abbr>{ "W" }</abbr></th>
+                <th>{ "Symbol" }</th>
+                <th>{ "Price" }</th>
+                <th>{ "Chg%" }</th>
+                <th>{ "Candle" }</th>
+                <th>{ "Pattern" }</th>
+                <th>{ "Band" }</th>
+                <th>{ "Target" }</th>
+                <th>{ "Activated" }</th>
+                <th>{ "B.Bands" }</th>
+                <th>{ "Stoch" }</th>
+                //<th>{ "MacD" }</th>
+                <th>{ "Rsi" }</th>
+                <th>{ "Divergence" }</th>
+                <th>{ "Updated" }</th>
+                <th>{ "W" }</th>
                 </tr>
             </thead>
             <tbody>

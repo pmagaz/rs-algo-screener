@@ -1,6 +1,6 @@
 pub mod bollinger_bands_reversal;
 pub mod bollinger_bands_reversal_continuation;
-pub mod bollinger_bands_riding_bands;
+pub mod bollinger_bands_reversal_riding;
 pub mod ema_200;
 pub mod ema_50;
 pub mod ema_50200;
