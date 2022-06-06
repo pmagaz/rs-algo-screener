@@ -36,6 +36,7 @@ pub fn resolve_trade_out(
     instrument: &Instrument,
     trade_in: &TradeIn,
     exit_condition: bool,
+    stop_loss: bool,
 ) -> TradeResult {
     let size = 1.;
     let data = &instrument.data;
@@ -56,7 +57,11 @@ pub fn resolve_trade_out(
     let run_up_per = calculate_runup_per(run_up, price_in);
     let draw_down = calculate_drawdown(data, price_in, index_in, nex_day_index);
     let draw_down_per = calculate_drawdown_per(draw_down, price_in);
-    let stop_loss_activated = resolve_stoploss(current_price, trade_in);
+
+    let stop_loss_activated = match stop_loss {
+        true => resolve_stoploss(current_price, trade_in),
+        false => false,
+    };
 
     let trade_type = match stop_loss_activated {
         true => TradeType::StopLoss,

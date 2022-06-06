@@ -94,7 +94,7 @@ impl<'a> Strategy for BollingerBands<'a> {
             //&& (close_price > top_band && prev_close <= prev_top_band ))
             || (hits_over_low_band >= 3 );
 
-        resolve_trade_out(index, instrument, trade_in, exit_condition)
+        resolve_trade_out(index, instrument, trade_in, exit_condition, false)
     }
 
     fn backtest_result(

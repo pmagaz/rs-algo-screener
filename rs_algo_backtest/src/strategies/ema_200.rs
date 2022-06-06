@@ -49,7 +49,7 @@ impl<'a> Strategy for Ema<'a> {
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
         let exit_condition = close_price < current_ema_200 && prev_close >= prev_ema_200;
-        resolve_trade_out(index, instrument, trade_in, exit_condition)
+        resolve_trade_out(index, instrument, trade_in, exit_condition, true)
     }
 
     fn backtest_result(

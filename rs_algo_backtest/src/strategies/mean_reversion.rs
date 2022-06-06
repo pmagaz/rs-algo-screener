@@ -49,7 +49,7 @@ impl<'a> Strategy for MeanReversion<'a> {
         let _prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
         let exit_condition = close_price < current_ema_200;
-        resolve_trade_out(index, instrument, trade_in, exit_condition)
+        resolve_trade_out(index, instrument, trade_in, exit_condition, true)
     }
 
     fn backtest_result(
