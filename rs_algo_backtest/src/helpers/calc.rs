@@ -64,8 +64,12 @@ pub fn total_gross(trades_out: &Vec<&TradeOut>) -> f64 {
 }
 
 pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
-    let profit_per_trade: f64 = trades_out.iter().map(|trade| trade.profit_per).sum();
-    profit_per_trade / trades_out.len() as f64
+    if trades_out.len() < 1 {
+        return 0.01;
+    } else {
+        let profit_per_trade: f64 = trades_out.iter().map(|trade| trade.profit_per).sum();
+        profit_per_trade / trades_out.len() as f64
+    }
 }
 
 pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
@@ -148,7 +152,7 @@ pub fn total_profit_per(trades_out: &Vec<TradeOut>, _equity: f64) -> f64 {
 }
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {
-        0.0 => (gross_profits / 0.1).abs(),
+        0.0 => 0.,
         _ => (gross_profits / gross_loses).abs(),
     }
 }

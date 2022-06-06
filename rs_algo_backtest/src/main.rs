@@ -21,12 +21,13 @@ async fn main() -> Result<()> {
 
     let portfolio = PortFolio {
         order_size: 1,
-        stop_loss: 2.5,
+        stop_loss: 2.,
         commission: 0.012,
         equity: 100000.,
         instruments: vec![],
         strategies: vec![
             Box::new(strategies::bollinger_bands_reversal_riding::BollingerBands::new().unwrap()),
+            Box::new(strategies::bollinger_bands_reversal_filter::BollingerBands::new().unwrap()),
             Box::new(
                 strategies::bollinger_bands_reversal_continuation::BollingerBands::new().unwrap(),
             ),

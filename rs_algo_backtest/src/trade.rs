@@ -64,6 +64,7 @@ pub fn resolve_trade_out(
     };
 
     if index > trade_in.index_in && (exit_condition || stop_loss_activated) {
+        //println!("1111111 {:?} {:?}", date_in, date_out);
         TradeResult::TradeOut(TradeOut {
             index_in,
             price_in,
@@ -201,6 +202,6 @@ pub fn calculate_stoploss(instrument: &Instrument, index: usize, stop_loss: f64)
 
 pub fn resolve_stoploss(current_price: f64, trade_in: &TradeIn) -> bool {
     let stop_loss = trade_in.stop_loss;
-    current_price <= stop_loss
-    //false
+    //current_price <= stop_loss
+    false
 }

@@ -14,7 +14,7 @@ pub fn cors_middleware() -> Cors {
     };
 
     cors.allowed_origin("http://rs-screener.ddns.net")
-        .allowed_methods(vec!["GET", "PUT", "POST"])
+        .allowed_methods(vec!["GET", "PUT", "DELETE", "POST"])
         .allowed_headers(vec![
             http::header::AUTHORIZATION,
             http::header::ACCEPT,

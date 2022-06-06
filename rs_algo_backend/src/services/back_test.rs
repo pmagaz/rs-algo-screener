@@ -108,6 +108,7 @@ pub async fn find_instruments_result_by_strategy(
     Ok(HttpResponse::Ok().json(backtest_instruments_result))
 }
 
+//FIXME IMPROVE ERROR HANDLING
 pub async fn upsert_instruments_result(
     backtested_result: web::Json<BackTestInstrumentResult>,
     state: web::Data<AppState>,
@@ -119,7 +120,6 @@ pub async fn upsert_instruments_result(
         now
     );
 
-    let _now = Instant::now();
     let symbol = backtested_result.instrument.symbol.clone();
 
     let now = Instant::now();

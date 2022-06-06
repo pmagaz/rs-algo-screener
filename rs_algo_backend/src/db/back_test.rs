@@ -102,7 +102,7 @@ pub async fn find_strategies_result(
         .find(
             query,
             FindOptions::builder()
-                .sort(doc! {"avg_profitable_trades":-1})
+                .sort(doc! {"avg_profitable_trades":-1, "avg_profit_factor":-1})
                 .build(),
         )
         .await

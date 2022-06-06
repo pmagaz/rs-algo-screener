@@ -61,9 +61,9 @@ pub fn strategy_detail(props: &Props) -> Html {
 
             let profit_factor = backtest_instrument.profit_factor;
             let profit_factor_status = match profit_factor {
-                _x if profit_factor <= 2. => Status::Bearish,
-                _x if profit_factor > 2.0 && profit_factor <= 2.5 => Status::Neutral,
-                _x if profit_factor > 2.5 => Status::Bullish,
+                _x if profit_factor < 1.4 => Status::Bearish,
+                _x if profit_factor >= 1.4 && profit_factor < 1.75 => Status::Neutral,
+                _x if profit_factor >= 1.75 => Status::Bullish,
                 _ => Status::Neutral,
             };
 
@@ -113,7 +113,7 @@ pub fn strategy_detail(props: &Props) -> Html {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.instrument.symbol.clone()}</a></td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(backtest_instrument.profitable_trades,2))}</td>
-                    <td class={get_status_class(&profit_factor_status)}> { format!("{}%", round(backtest_instrument.profit_factor,2))}</td>
+                    <td class={get_status_class(&profit_factor_status)}> { round(backtest_instrument.profit_factor,2) }</td>
                     <td class={get_status_class(&max_drawdown_status)}>{ format!("{}%", round(backtest_instrument.max_drawdown,2))}</td>
                     <td>{ backtest_instrument.trades}</td>
                     <td>{ format!("{} / {}", backtest_instrument.wining_trades, backtest_instrument.losing_trades)} </td>

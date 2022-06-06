@@ -27,8 +27,8 @@ impl<'a> Strategy for Ema<'a> {
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
 
-        let current_ema_50 = instrument.indicators.ema_a.data_a.get(index).unwrap();
-        let prev_ema_50 = instrument.indicators.ema_a.data_a.get(prev_index).unwrap();
+        let current_ema_50 = instrument.indicators.ema_b.data_a.get(index).unwrap();
+        let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
         let entry_condition = close_price > current_ema_50 && prev_close <= prev_ema_50;
 
@@ -46,8 +46,8 @@ impl<'a> Strategy for Ema<'a> {
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
 
-        let current_ema_50 = instrument.indicators.ema_a.data_a.get(index).unwrap();
-        let prev_ema_50 = instrument.indicators.ema_a.data_a.get(prev_index).unwrap();
+        let current_ema_50 = instrument.indicators.ema_b.data_a.get(index).unwrap();
+        let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
         let exit_condition = close_price < current_ema_50 && prev_close >= prev_ema_50;
 

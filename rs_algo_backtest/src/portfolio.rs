@@ -79,8 +79,11 @@ impl PortFolio {
 
                     match backtest_result {
                         BackTestResult::BackTestInstrumentResult(result) => {
-                            let _send_instrument_result =
+                            let _send_instrument_result: BackTestInstrumentResult =
                                 request(&instrument_result_endpoint, &result, HttpMethod::Put)
+                                    .await
+                                    .unwrap()
+                                    .json()
                                     .await
                                     .unwrap();
 

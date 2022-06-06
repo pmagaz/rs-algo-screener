@@ -8,6 +8,7 @@ use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::candle::*;
 use rs_algo_shared::models::instrument::Instrument;
 use rs_algo_shared::models::pattern::*;
+use rs_algo_shared::models::status::*;
 
 pub struct BollingerBands<'a> {
     name: &'a str,
@@ -17,7 +18,7 @@ pub struct BollingerBands<'a> {
 impl<'a> Strategy for BollingerBands<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
-            name: "Bollinger_Bands_Reversal_Riding",
+            name: "Bollinger_Bands_Reversal_Filter",
         })
     }
 
@@ -36,8 +37,19 @@ impl<'a> Strategy for BollingerBands<'a> {
 
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+        let ema_8 = instrument.indicators.ema_a.data_a.get(index).unwrap();
+        let ema_20 = instrument.indicators.bb.data_c.get(index).unwrap();
+        let ema_50 = instrument.indicators.ema_c.data_a.get(index).unwrap();
 
-        let entry_condition = current_pattern != PatternType::ChannelDown
+        let market_filter = match ema_8 {
+            _x if ema_8 > ema_50 && ema_50 > ema_50 => Status::Bullish,
+            _x if ema_8 < ema_50 && ema_50 > ema_50 => Status::Neutral,
+            _x if ema_8 < ema_50 && ema_50 < ema_50 => Status::Bearish,
+            _ => Status::Neutral,
+        };
+
+        let entry_condition = market_filter != Status::Bearish
+            && current_pattern != PatternType::ChannelDown
             && current_pattern != PatternType::LowerHighsLowerLows
             && close_price < low_band
             && prev_close >= prev_low_band;
@@ -88,11 +100,22 @@ impl<'a> Strategy for BollingerBands<'a> {
             }
         }
 
-        let exit_condition = (current_pattern != PatternType::ChannelUp
-            && current_pattern != PatternType::HigherHighsHigherLows
-            && (hits_over_top_band <= 5 && hits_above_mid_band > 5))
-            //&& (close_price > top_band && prev_close <= prev_top_band ))
-            || (hits_over_low_band >= 3 );
+        let ema_8 = instrument.indicators.ema_a.data_a.get(index).unwrap();
+        let ema_50 = instrument.indicators.ema_b.data_a.get(index).unwrap();
+        let ema_80 = instrument.indicators.ema_c.data_a.get(index).unwrap();
+
+        let market_filter = match ema_8 {
+            _x if ema_8 > ema_50 && ema_50 > ema_80 => Status::Bullish,
+            _x if ema_8 < ema_50 && ema_50 > ema_80 => Status::Neutral,
+            _x if ema_8 < ema_50 && ema_50 < ema_80 => Status::Bearish,
+            _ => Status::Neutral,
+        };
+
+        let exit_condition = (market_filter == Status::Bearish)
+            || (current_pattern != PatternType::ChannelUp
+                && current_pattern != PatternType::HigherHighsHigherLows
+                && (close_price > top_band && prev_close <= prev_top_band))
+            || (hits_over_low_band >= 3 && hits_above_mid_band >= 5);
 
         resolve_trade_out(index, instrument, trade_in, exit_condition)
     }

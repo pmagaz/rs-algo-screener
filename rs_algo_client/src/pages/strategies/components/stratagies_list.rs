@@ -41,9 +41,9 @@ pub fn strategy_list(props: &Props) -> Html {
 
             let profit_factor = strategy.avg_profit_factor;
             let profit_factor_status = match profit_factor {
-                _x if profit_factor <= 1.3 => Status::Bearish,
-                _x if profit_factor > 1.3 && profit_factor <= 1.8 => Status::Neutral,
-                _x if profit_factor > 1.8 => Status::Bullish,
+                _x if profit_factor < 1.4 => Status::Bearish,
+                _x if profit_factor >= 1.4 && profit_factor < 1.75 => Status::Neutral,
+                _x if profit_factor >= 1.75 => Status::Bullish,
                 _ => Status::Neutral,
             };
 

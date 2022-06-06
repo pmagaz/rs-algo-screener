@@ -24,11 +24,11 @@ impl<'a> Strategy for Ema<'a> {
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
         let prev_index = get_prev_index(index);
 
-        let current_ema_50 = instrument.indicators.ema_a.data_a.get(index).unwrap();
+        let current_ema_50 = instrument.indicators.ema_b.data_a.get(index).unwrap();
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
 
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
-        let prev_ema_50 = instrument.indicators.ema_a.data_a.get(prev_index).unwrap();
+        let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
         let entry_condition = current_ema_50 > current_ema_200 && prev_ema_50 <= prev_ema_200;
 
@@ -43,11 +43,11 @@ impl<'a> Strategy for Ema<'a> {
     ) -> TradeResult {
         let prev_index = get_prev_index(index);
 
-        let current_ema_50 = instrument.indicators.ema_a.data_a.get(index).unwrap();
+        let current_ema_50 = instrument.indicators.ema_b.data_a.get(index).unwrap();
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
 
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
-        let prev_ema_50 = instrument.indicators.ema_a.data_a.get(prev_index).unwrap();
+        let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
         let exit_condition = current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200;
 
