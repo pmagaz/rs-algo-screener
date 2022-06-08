@@ -1,3 +1,4 @@
+use rs_algo_shared::helpers::status::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::status::Status;
 use wasm_bindgen::prelude::*;
@@ -58,56 +59,12 @@ pub fn strategy_detail(props: &Props) -> Html {
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
             };
 
-
-            let profit_factor = backtest_instrument.profit_factor;
-            let profit_factor_status = match profit_factor {
-                _x if profit_factor < 1.4 => Status::Bearish,
-                _x if profit_factor >= 1.4 && profit_factor < 1.75 => Status::Neutral,
-                _x if profit_factor >= 1.75 => Status::Bullish,
-                _ => Status::Neutral,
-            };
-
-
-             let profitable_trades = backtest_instrument.profitable_trades;
-            let profitable_trades_status = match profitable_trades {
-                _x if profitable_trades <= 40. => Status::Bearish,
-                _x if profitable_trades > 40. && profitable_trades < 50. => Status::Neutral,
-                _x if profitable_trades > 50. => Status::Bullish,
-                _ => Status::Neutral,
-            };
-
-            let max_drawdown = backtest_instrument.max_drawdown;
-            let max_drawdown_status = match max_drawdown {
-                _x if max_drawdown > 25. => Status::Bearish,
-                _x if max_drawdown > 15. && max_drawdown < 25. => Status::Neutral,
-                _x if max_drawdown <= 15. => Status::Bullish,
-                _ => Status::Neutral,
-            };
-
-            let profit = backtest_instrument.net_profit_per;
-            let profit_status = match profit {
-                _x if profit <= 10. => Status::Bearish,
-                _x if profit > 10. && profitable_trades < 12. => Status::Neutral,
-                _x if profit >= 15. => Status::Bullish,
-                _ => Status::Neutral,
-            };
-
-            let won_per_trade = backtest_instrument.won_per_trade_per; 
-            let avg_won_status = match won_per_trade {
-                _x if won_per_trade > 15. => Status::Bullish,
-                _x if won_per_trade > 10. && won_per_trade < 15. => Status::Neutral,
-                _x if won_per_trade <= 10. => Status::Bullish,
-                _ => Status::Neutral,
-            };
-
-
-            let lost_per_trade = backtest_instrument.lost_per_trade_per;
-            let avg_lost_status = match lost_per_trade {
-                _x if lost_per_trade > -5. => Status::Bullish,
-                _x if lost_per_trade < -5. && lost_per_trade > -10.  => Status::Neutral,
-                _x if lost_per_trade <= -10. => Status::Bearish,
-                _ => Status::Neutral,
-            };
+            let profit_factor_status = get_profit_factor_status(backtest_instrument.profit_factor);
+            let profitable_trades_status = get_profitable_trades_status(backtest_instrument.profitable_trades);
+            let profit_status = get_profit_status(backtest_instrument.net_profit_per, backtest_instrument.profitable_trades);
+            let max_drawdown_status = get_max_drawdown_status(backtest_instrument.profitable_trades);
+            let avg_won_status = get_won_per_trade_status(backtest_instrument.won_per_trade_per); 
+            let avg_lost_status = get_lost_per_trade_status(backtest_instrument.lost_per_trade_per);
 
             html! {
                 <tr>

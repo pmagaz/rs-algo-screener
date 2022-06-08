@@ -3,7 +3,7 @@ use rs_algo_shared::models::pattern::{Pattern, PatternType};
 use rs_algo_shared::models::status::Status;
 use std::env;
 
-pub fn get_pattern_status(
+pub fn get_pattern_status2(
     pattern: Option<&Pattern>,
     second_last_pattern_type: &PatternType,
 ) -> Status {

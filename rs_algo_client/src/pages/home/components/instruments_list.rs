@@ -8,6 +8,8 @@ use rs_algo_shared::models::candle::*;
 use rs_algo_shared::models::horizontal_level::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
 use rs_algo_shared::helpers::comp::*;
+use rs_algo_shared::helpers::status::*;
+
 use yew::{function_component, html, Callback, Properties, Html};
 use wasm_bindgen::prelude::*;
 
@@ -138,19 +140,6 @@ pub fn instrument_list(props: &Props
             };
             
             let local_pattern = pattern_info(instrument.patterns.local_patterns.last()); 
-            //let extrema_pattern = pattern_info(instrument.patterns.extrema_patterns.last()); 
-           
-            let candle_status = match instrument.current_candle {
-                CandleType::Karakasa => Status::Bullish,
-                CandleType::MorningStar => Status::Bullish,
-                CandleType::BullishGap => Status::Bullish,
-                CandleType::BearishKarakasa => Status::Bearish,
-                CandleType::BearishGap => Status::Bearish,
-                CandleType::BearishStar => Status::Bearish,
-                _ => Status::Default,
-            };
-
-
 
             let macd = instrument.indicators.macd.clone();
             let stoch = instrument.indicators.stoch.clone();
@@ -158,38 +147,34 @@ pub fn instrument_list(props: &Props
             let bb = instrument.indicators.bb.clone(); //9
             let date = instrument.date.to_chrono();
 
+            let candle_status = get_candle_status(&instrument.current_candle);
+
+            // let ema_style: (&str, &str, &str) = match bb.status {
+            //    Status::Bullish => ("has-text-primary","has-text-primary","has-text-primary"), 
+            //    Status::Neutral=> ("has-text-warning","has-text-primary","has-text-primary"),
+            //    Status::Bearish => ("has-text-warning","has-text-primary","has-text-primary"),
+            //    Status::Default=> ("has-text-danger","has-text-danger","has-text-dangery") 
+            // };
 
 
-            let ema_style: (&str, &str, &str) = match bb.status {
-               Status::Bullish => ("has-text-primary","has-text-primary","has-text-primary"), 
-               Status::Neutral=> ("has-text-warning","has-text-primary","has-text-primary"),
-               Status::Bearish => ("has-text-warning","has-text-primary","has-text-primary"),
-               Status::Default=> ("has-text-danger","has-text-danger","has-text-dangery") 
-            };
-
-
-            let horizontal_lows: Vec<&HorizontalLevel> =  instrument.horizontal_levels.lows.iter().filter(|h| h.occurrences >= 3 && is_equal(h.price, instrument.current_price,1.5)).map(|x| x).collect();
+            // let horizontal_lows: Vec<&HorizontalLevel> =  instrument.horizontal_levels.lows.iter().filter(|h| h.occurrences >= 3 && is_equal(h.price, instrument.current_price,1.5)).map(|x| x).collect();
             
-            let horizontal_info = match horizontal_lows.get(0) {
-                Some(val) => val.occurrences.to_string(),
-                None   => "".to_string(),
-            };
+            // // let horizontal_info = match horizontal_lows.get(0) {
+            // //     Some(val) => val.occurrences.to_string(),
+            // //     None   => "".to_string(),
+            // // };
             
-              let horizontal_status = match horizontal_lows.get(0) {
-                Some(_val) => Status::Bullish,
-                None   => Status::Default 
-            };
+            // //   let horizontal_status = match horizontal_lows.get(0) {
+            // //     Some(_val) => Status::Bullish,
+            // //     None   => Status::Default 
+            // // };
             
             let divergence_type = match instrument.divergences.data.last() {
                 Some(val) => &val.divergence_type,
                 None   => &DivergenceType::None
             }; 
 
-            let divergence_status = match divergence_type {
-                DivergenceType::Bullish => Status::Bullish,
-                DivergenceType::Bearish => Status::Bearish,
-                DivergenceType::None => Status::Default,
-            };
+            let divergence_status = get_divergence_status(divergence_type);
 
             let divergence_str = match divergence_type {
                 DivergenceType::Bullish => divergence_type.to_string(),
@@ -199,15 +184,7 @@ pub fn instrument_list(props: &Props
           
             let price_display = round(price_change(instrument.prev_price, instrument.current_price),2);
 
-            let price_change_status = match price_display {
-                   _x if price_display >= 0.0 => {
-                    Status::Bullish
-                }
-                _x if price_display < 0.0 => {
-                    Status::Bearish
-                }
-                _ => Status::Neutral 
-            };
+            let price_change_status = get_price_change_status(price_display);
 
             let bb_size = percentage_change(instrument.indicators.bb.current_b, instrument.indicators.bb.current_a);
 
@@ -222,7 +199,6 @@ pub fn instrument_list(props: &Props
                     <td> {local_pattern.info.2}</td>
                     <td> {local_pattern.info.3}</td>
                     <td class={get_status_class(&bb.status)}> {format!("{:?}%", round(bb_size, 1))}</td>
-                    <td class={get_status_class(&stoch.status)}> {format!("{:?} / {:?}", round(instrument.indicators.stoch.current_a, 1), round(instrument.indicators.stoch.current_b, 1))}</td>
                     //<td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
@@ -247,8 +223,7 @@ pub fn instrument_list(props: &Props
                 <th>{ "Target" }</th>
                 <th>{ "Activated" }</th>
                 <th>{ "B.Bands" }</th>
-                <th>{ "Stoch" }</th>
-                //<th>{ "MacD" }</th>
+               // <th>{ "Stoch" }</th>
                 <th>{ "Rsi" }</th>
                 <th>{ "Divergence" }</th>
                 <th>{ "Updated" }</th>

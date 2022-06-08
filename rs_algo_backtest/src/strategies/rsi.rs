@@ -45,7 +45,8 @@ impl<'a> Strategy for Rsi<'a> {
 
         let exit_condition = current_rsi >= &70. && prev_rsi <= &70.;
 
-        resolve_trade_out(index, instrument, trade_in, exit_condition, true)
+        let stop_loss = true;
+        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }
 
     fn backtest_result(

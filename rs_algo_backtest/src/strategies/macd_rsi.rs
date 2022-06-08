@@ -58,8 +58,8 @@ impl<'a> Strategy for Macd<'a> {
 
         let exit_condition =
             current_rsi >= &70. && current_macd_a < current_macd_b && prev_macd_a >= prev_macd_b;
-
-        resolve_trade_out(index, instrument, trade_in, exit_condition, true)
+        let stop_loss = true;
+        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }
 
     fn backtest_result(

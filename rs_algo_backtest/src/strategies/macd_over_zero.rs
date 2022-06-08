@@ -53,7 +53,8 @@ impl<'a> Strategy for Macd<'a> {
 
         let exit_condition = current_macd_a < &0.;
 
-        resolve_trade_out(index, instrument, trade_in, exit_condition, true)
+        let stop_loss = true;
+        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }
 
     fn backtest_result(

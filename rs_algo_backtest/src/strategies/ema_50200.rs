@@ -51,7 +51,8 @@ impl<'a> Strategy for Ema<'a> {
 
         let exit_condition = current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200;
 
-        resolve_trade_out(index, instrument, trade_in, exit_condition, true)
+        let stop_loss = true;
+        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }
 
     fn backtest_result(

@@ -66,7 +66,8 @@ impl<'a> Strategy for BollingerBands<'a> {
             exit_condition = close_price > top_band && prev_close <= prev_top_band;
         }
 
-        resolve_trade_out(index, instrument, trade_in, exit_condition, true)
+        let stop_loss = true;
+        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }
 
     fn backtest_result(

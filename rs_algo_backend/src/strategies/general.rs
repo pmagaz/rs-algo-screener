@@ -1,13 +1,13 @@
-use super::pattern_status::get_pattern_status;
-
 use bson::{doc, Document};
 use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::Cursor;
-use rs_algo_shared::models::divergence::{DivergenceType};
+use rs_algo_shared::helpers::status::*;
+use rs_algo_shared::models::divergence::DivergenceType;
 use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::pattern::{PatternType};
+use rs_algo_shared::models::pattern::PatternType;
 use rs_algo_shared::models::status::Status;
+
 use std::cmp::Ordering;
 
 use round::round;
@@ -76,6 +76,8 @@ impl General {
             {"$and": [
                 {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
                 {"$expr": {"$gte": ["$prev_price","$indicators.bb.prev_b"]}},
+                {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
+                {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
             { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
@@ -92,13 +94,11 @@ impl General {
         while let Some(result) = instruments.next().await {
             match result {
                 Ok(mut instrument) => {
-                    //MOVE THIS TO SHARED
                     let stoch = instrument.indicators.stoch.clone();
                     let macd = instrument.indicators.macd.clone();
                     let rsi = instrument.indicators.rsi.clone();
-                    let bb = instrument.indicators.bb.clone(); //8
+                    let bb = instrument.indicators.bb.clone();
 
-                    //let ema_c = instrument.indicators.ema_c.clone(); //55
                     let len = instrument.patterns.local_patterns.len();
                     let last_pattern = instrument.patterns.local_patterns.last();
 
@@ -141,8 +141,13 @@ impl General {
                         }
                     };
 
+                    let max_days = env::var("MAX_PATTERN_DAYS")
+                        .unwrap()
+                        .parse::<i64>()
+                        .unwrap();
+
                     let last_pattern_status =
-                        get_pattern_status(last_pattern, second_last_pattern_type);
+                        get_pattern_status(last_pattern, second_last_pattern_type, max_days);
                     //let second_last_pattern_status = get_pattern_status(second_last_pattern);
 
                     if last_pattern_status != Status::Default {
@@ -151,78 +156,10 @@ impl General {
                             last_pattern_status.clone();
                     }
 
-                    let stoch_status = match stoch {
-                        _x if stoch.current_a > stoch.current_b
-                            && stoch.current_a > 20.
-                            && stoch.current_a < 30. =>
-                        {
-                            Status::Bullish
-                        }
-                        _x if stoch.current_a < stoch.current_b => Status::Bearish,
-                        _x if stoch.current_a >= 70. => Status::Bearish,
-                        _x if stoch.current_a > 40. && stoch.current_a < 60. => Status::Default,
-                        _x if stoch.current_a > 60. && stoch.current_a < 70. => Status::Neutral,
-                        _ => Status::Neutral,
-                    };
-
-                    let macd_status = match macd {
-                        _x if round(macd.current_a, 2) > round(macd.current_b, 2)
-                            && macd.current_a > 0. =>
-                        {
-                            Status::Bullish
-                        }
-                        _x if round(macd.clone().current_a, 2)
-                            < round(macd.clone().current_b, 2)
-                            && round(macd.current_a, 2) < 0. =>
-                        {
-                            Status::Bearish
-                        }
-                        _x if round(macd.current_a, 1) >= round(macd.current_b, 1)
-                            && round(macd.current_a, 1) <= 0. =>
-                        {
-                            Status::Neutral
-                        }
-                        //_x if macd.current_a < macd.current_b => Status::Bearish,
-                        _ => Status::Default,
-                    };
-
-                    let rsi_status = match rsi {
-                        _x if rsi.current_a < 30. => Status::Bullish,
-                        _x if rsi.current_a >= 70. => Status::Bearish,
-                        _x if rsi.current_a >= 40. && rsi.current_a < 70. => Status::Default,
-                        _ => Status::Neutral,
-                    };
-
-                    println!(
-                        "{} {} {} {}",
-                        instrument.symbol, instrument.current_price, bb.current_a, bb.prev_a
-                    );
-
-                    let bb_status = match bb {
-                        _x if instrument.current_price <= bb.current_b
-                            && instrument.prev_price >= bb.prev_b =>
-                        {
-                            Status::Bullish
-                        }
-                        _x if instrument.current_price >= bb.current_a
-                            && instrument.prev_price <= bb.prev_a =>
-                        {
-                            Status::Bearish
-                        }
-                        _x if (instrument.current_price >= bb.current_c
-                            && instrument.prev_price <= bb.prev_c)
-                            || (instrument.current_price <= bb.current_c
-                                && instrument.prev_price >= bb.prev_c) =>
-                        {
-                            Status::Neutral
-                        }
-                        _ => Status::Default,
-                    };
-
-                    instrument.indicators.stoch.status = stoch_status.clone();
-                    instrument.indicators.macd.status = macd_status.clone();
-                    instrument.indicators.rsi.status = rsi_status.clone();
-                    instrument.indicators.bb.status = bb_status.clone();
+                    instrument.indicators.stoch.status = get_stoch_status(&stoch);
+                    instrument.indicators.macd.status = get_macd_status(&macd);
+                    instrument.indicators.rsi.status = get_rsi_status(&rsi);
+                    instrument.indicators.bb.status = get_bb_status(&bb, &instrument);
 
                     docs.push(instrument);
                 }

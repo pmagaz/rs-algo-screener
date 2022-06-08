@@ -55,7 +55,8 @@ impl<'a> Strategy for Stoch<'a> {
             && current_stoch_a < current_stoch_b
             && prev_stoch_a >= prev_stoch_b;
 
-        resolve_trade_out(index, instrument, trade_in, exit_condition, true)
+        let stop_loss = true;
+        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }
 
     fn backtest_result(

@@ -207,6 +207,6 @@ pub fn calculate_stoploss(instrument: &Instrument, index: usize, stop_loss: f64)
 
 pub fn resolve_stoploss(current_price: f64, trade_in: &TradeIn) -> bool {
     let stop_loss = trade_in.stop_loss;
-    //current_price <= stop_loss
-    false
+    current_price <= stop_loss
+    //false
 }
