@@ -167,6 +167,10 @@ pub fn resolve_backtest(
             annual_return,
         })
     } else {
+        println!(
+            "[BACKTEST] Error! backtesing {}",
+            instrument.symbol.to_owned()
+        );
         //BackTestResult::None
         let fake_date = to_dbtime(Local::now() - Duration::days(1000));
         BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {

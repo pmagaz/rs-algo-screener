@@ -44,7 +44,7 @@ pub async fn find_instruments(
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "development" => doc! {"symbol": "LKQ.US"},
+        "development" => doc! {"symbol": "HOLX.US"},
         _ => doc! {},
     };
 
@@ -114,13 +114,15 @@ pub async fn upsert_instruments_result(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
+
+    let symbol = backtested_result.instrument.symbol.clone();
+
     println!(
-        "[BACKTEST INSTRUMENT] Received at {:?} in {:?}",
+        "[BACKTEST INSTRUMENT] instrument {} received at {:?} in {:?}",
+        &symbol,
         Local::now(),
         now
     );
-
-    let symbol = backtested_result.instrument.symbol.clone();
 
     let now = Instant::now();
     let _upsert = db::back_test::upsert_instruments_result(&backtested_result, &state)
@@ -128,7 +130,7 @@ pub async fn upsert_instruments_result(
         .unwrap();
 
     println!(
-        "[BACKTEST RESULT UPSERTED] {:?} at {:?} in {:?}",
+        "[BACKTEST RESULT UPSERTED] instrument {} at {:?} in {:?}",
         symbol,
         Local::now(),
         now.elapsed()

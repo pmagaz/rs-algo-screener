@@ -1,13 +1,13 @@
 {
-    "name": "RS Stocks",
-    "short_name": "RS Stocks",
+    "name": "RS Algo Platform",
+    "short_name": "RS Algo",
     "icons": [{
-      "src": "./img/pwa-logo.png",
+      "src": "./img/pwa-logo-round.png",
         "sizes": "256x256",
         "type": "image/png"
       }],
     "lang": "en-US",
-    "start_url": "http://rs-stocks.ddns.net/",
+    "start_url": "http://rs-algo.ddns.net/",
     "display": "standalone",
     "background_color": "#3273DC",
     "theme_color": "#3273DC"

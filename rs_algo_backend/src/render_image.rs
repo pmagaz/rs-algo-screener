@@ -29,6 +29,8 @@ impl Backend {
 
         let font = env::var("PLOTTER_FONT").unwrap();
 
+        let display_points = env::var("DISPLAY_POINTS").unwrap().parse::<bool>().unwrap();
+
         let local_peaks_marker_pos = env::var("LOCAL_PEAKS_MARKERS_POS")
             .unwrap()
             .parse::<f64>()
@@ -259,100 +261,101 @@ impl Backend {
         }
 
         // LOCAL MAXIMA MINIMA
+        if display_points {
+            chart
+                .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                    let price;
+                    if points_mode == PointsMode::MaximaMinima {
+                        price = match price_source.as_ref() {
+                            "highs_lows" => candle.high,
+                            "close" => candle.close,
+                            &_ => candle.close,
+                        };
+                    } else {
+                        price = candle.open;
+                    }
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                let price;
-                if points_mode == PointsMode::MaximaMinima {
-                    price = match price_source.as_ref() {
-                        "highs_lows" => candle.high,
-                        "close" => candle.close,
-                        &_ => candle.close,
-                    };
-                } else {
-                    price = candle.open;
-                }
+                    if top_points_set.contains(&(i, price)) {
+                        if stop_loss.contains(&(i, price)) {
+                            TriangleMarker::new(
+                                (candle.date, price + (price * local_peaks_marker_pos)),
+                                -6,
+                                stop_loss_color,
+                            )
+                        } else {
+                            TriangleMarker::new(
+                                (candle.date, price + (price * local_peaks_marker_pos)),
+                                -6,
+                                top_point_color,
+                            )
+                        }
+                    } else {
+                        TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
+                    }
+                }))
+                .unwrap();
 
-                if top_points_set.contains(&(i, price)) {
-                    if stop_loss.contains(&(i, price)) {
+            chart
+                .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                    let price;
+                    if points_mode == PointsMode::MaximaMinima {
+                        price = match price_source.as_ref() {
+                            "highs_lows" => candle.low,
+                            "close" => candle.close,
+                            &_ => candle.close,
+                        };
+                    } else {
+                        price = candle.open;
+                    }
+
+                    if low_points_set.contains(&(i, price)) {
                         TriangleMarker::new(
-                            (candle.date, price + (price * local_peaks_marker_pos)),
-                            -6,
-                            stop_loss_color,
+                            (candle.date, price - (price * local_peaks_marker_pos)),
+                            6,
+                            bottom_point_color,
                         )
                     } else {
-                        TriangleMarker::new(
-                            (candle.date, price + (price * local_peaks_marker_pos)),
-                            -6,
-                            top_point_color,
-                        )
+                        TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
                     }
-                } else {
-                    TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
-                }
-            }))
-            .unwrap();
+                }))
+                .unwrap();
 
-        chart
-            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                let price;
-                if points_mode == PointsMode::MaximaMinima {
-                    price = match price_source.as_ref() {
-                        "highs_lows" => candle.low,
-                        "close" => candle.close,
-                        &_ => candle.close,
-                    };
-                } else {
-                    price = candle.open;
-                }
+            if points_mode == PointsMode::MaximaMinima {
+                chart
+                    .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                        if local_pattern_breaks.contains(&(i)) {
+                            let mut direction: (i32, f64) = (0, 0.);
 
-                if low_points_set.contains(&(i, price)) {
-                    TriangleMarker::new(
-                        (candle.date, price - (price * local_peaks_marker_pos)),
-                        6,
-                        bottom_point_color,
-                    )
-                } else {
-                    TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
-                }
-            }))
-            .unwrap();
+                            for n in instrument.patterns.local_patterns.iter() {
+                                if n.active.index == i {
+                                    let pos = match n.active.break_direction {
+                                        PatternDirection::Bottom => (4, candle.low),
+                                        PatternDirection::Top => (-4, candle.high),
+                                        PatternDirection::None => (4, candle.close),
+                                    };
+                                    direction = pos;
+                                }
+                            }
+
+                            TriangleMarker::new(
+                                (
+                                    candle.date,
+                                    direction.1 - (direction.1 * local_peaks_marker_pos - 2.),
+                                ),
+                                direction.0,
+                                RED_LINE,
+                            )
+                        } else {
+                            TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT)
+                        }
+                    }))
+                    .unwrap();
+            }
+        }
 
         // EXTREMA MAXIMA MINIMA
 
         //BREAKS MAXIMA MINIMA
-
-        if points_mode == PointsMode::MaximaMinima {
-            chart
-                .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                    if local_pattern_breaks.contains(&(i)) {
-                        let mut direction: (i32, f64) = (0, 0.);
-
-                        for n in instrument.patterns.local_patterns.iter() {
-                            if n.active.index == i {
-                                let pos = match n.active.break_direction {
-                                    PatternDirection::Bottom => (4, candle.low),
-                                    PatternDirection::Top => (-4, candle.high),
-                                    PatternDirection::None => (4, candle.close),
-                                };
-                                direction = pos;
-                            }
-                        }
-
-                        TriangleMarker::new(
-                            (
-                                candle.date,
-                                direction.1 - (direction.1 * local_peaks_marker_pos - 2.),
-                            ),
-                            direction.0,
-                            RED_LINE,
-                        )
-                    } else {
-                        TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT)
-                    }
-                }))
-                .unwrap();
-        }
 
         chart
             .draw_series(LineSeries::new(

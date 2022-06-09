@@ -23,5 +23,5 @@ mongodb = "2.1.0"
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
 openssl = { version = "0.10.38", features = ["vendored"] }
 
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "434c6ee"} 
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "21bc896"} 
 

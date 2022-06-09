@@ -13,7 +13,7 @@ pub fn cors_middleware() -> Cors {
         &_ => Cors::default(),
     };
 
-    cors.allowed_origin("http://rs-stocks.ddns.net")
+    cors.allowed_origin("http://rs-algo.ddns.net")
         .allowed_methods(vec!["GET", "PUT", "DELETE", "POST"])
         .allowed_headers(vec![
             http::header::AUTHORIZATION,
