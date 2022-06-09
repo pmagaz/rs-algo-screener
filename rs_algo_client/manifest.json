@@ -2,7 +2,7 @@
     "name": "RS Algo Platform",
     "short_name": "RS Algo",
     "icons": [{
-      "src": "./img/pwa-logo-round.png",
+      "src": "./img/pwa-logo.png",
         "sizes": "256x256",
         "type": "image/png"
       }],
