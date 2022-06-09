@@ -1,13 +1,13 @@
 {
-    "name": "RS Stock",
-    "short_name": "RS Stock",
+    "name": "RS Stocks",
+    "short_name": "RS Stocks",
     "icons": [{
       "src": "./img/pwa-logo.png",
         "sizes": "256x256",
         "type": "image/png"
       }],
     "lang": "en-US",
-    "start_url": "http://rs-screener.ddns.net/",
+    "start_url": "http://rs-stocks.ddns.net/",
     "display": "standalone",
     "background_color": "#3273DC",
     "theme_color": "#3273DC"
