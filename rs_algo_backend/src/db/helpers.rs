@@ -2,7 +2,6 @@ use crate::error::Result;
 
 use crate::models::db::Db;
 
-
 use mongodb::Collection;
 use rs_algo_shared::models::divergence::*;
 use rs_algo_shared::models::indicator::*;
@@ -29,6 +28,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
         date: doc.date,
         time_frame: doc.time_frame,
         current_price: doc.current_price,
+        avg_volume: doc.avg_volume,
         prev_price: doc.data.get(second_last).unwrap().close,
         current_candle: doc.current_candle,
         prev_candle: doc.data.get(second_last).unwrap().candle_type.clone(),

@@ -2,12 +2,12 @@ use bson::{doc, Document};
 use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::Cursor;
+use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::status::*;
 use rs_algo_shared::models::divergence::DivergenceType;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::PatternType;
 use rs_algo_shared::models::status::Status;
-
 use std::cmp::Ordering;
 
 use round::round;
@@ -55,15 +55,27 @@ impl General {
             .parse::<f64>()
             .unwrap();
 
+        let min_volume = env::var("MIN_VOLUME").unwrap().parse::<f64>().unwrap();
+
         doc! {
         "$or": [
-            {"$or": [
+            {"$and": [
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
                     "date": { "$gte" : self.max_pattern_date },
                     "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                     }}}
                 ]},
+              //  {"or": [
+
+                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelUp"] }},
+                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "TriangleUp"] }},
+                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "Rectangle"] }},
+                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "BroadeningUp"] }},
+                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "DoubleBottom"] }},
+                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HeadShoulders"] }},
+
+              //  ]},
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
                     "active.target":{"$gte": minimum_pattern_target },
@@ -74,11 +86,24 @@ impl General {
                 ]
             },
             {"$and": [
+                {"$or": [
+                    {"symbol": {"$regex" : ".*.US.*"}},
+                    {"symbol": {"$regex" : ".*.DK.*"}},
+                    {"symbol": {"$regex" : ".*.DE.*"}},
+                    {"symbol": {"$regex" : ".*.ES.*"}},
+                    {"symbol": {"$regex" : ".*.CH.*"}},
+                ]},
+                {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
                 {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
                 {"$expr": {"$gte": ["$prev_price","$indicators.bb.prev_b"]}},
                 {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
                 {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
-           ]},
+                {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
+                {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                {"$and": [
+                    {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelDown"] }},
+                ]},
+            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
             { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
         ]}
@@ -111,12 +136,17 @@ impl General {
 
                     let fake_date = to_dbtime(Local::now() - Duration::days(1000));
 
+                    // let last_pattern_type = match last_divergence {
+                    //     Some(val) => &val.pattern_type,
+                    //     None => &DivergenceType::None,
+                    // };
+
                     let _last_pattern_date = match last_pattern {
                         Some(val) => val.date,
                         None => fake_date,
                     };
 
-                    let _last_divergence_type = match last_divergence {
+                    let last_divergence_type = match last_divergence {
                         Some(val) => &val.divergence_type,
                         None => &DivergenceType::None,
                     };
@@ -160,12 +190,16 @@ impl General {
                     instrument.indicators.macd.status = get_macd_status(&macd);
                     instrument.indicators.rsi.status = get_rsi_status(&rsi);
                     instrument.indicators.bb.status = get_bb_status(&bb, &instrument);
-
                     docs.push(instrument);
                 }
                 _ => {}
             }
         }
+        docs.sort_by(|a, b| {
+            let a_band = percentage_change(a.indicators.bb.current_b, a.indicators.bb.current_a);
+            let b_band = percentage_change(b.indicators.bb.current_b, b.indicators.bb.current_a);
+            b_band.partial_cmp(&a_band).unwrap()
+        });
         docs
     }
 }

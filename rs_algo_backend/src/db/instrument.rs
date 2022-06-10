@@ -44,7 +44,12 @@ pub async fn find_by_params(
     };
 
     let cursor = collection
-        .find(query, FindOptions::builder().build())
+        .find(
+            query,
+            FindOptions::builder()
+                //.sort(doc! {"avg_volume":-1, })
+                .build(),
+        )
         .await
         .unwrap();
 

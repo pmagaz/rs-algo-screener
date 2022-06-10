@@ -6,6 +6,7 @@ use crate::patterns::horizontal_levels::HorizontalLevels;
 use crate::patterns::pattern::Patterns;
 use crate::patterns::peaks::Peaks;
 
+use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::pattern::PatternSize;
 use rs_algo_shared::models::time_frame::TimeFrameType;
@@ -23,6 +24,7 @@ pub struct Instrument {
     date: DbDateTime,
     min_price: f64,
     max_price: f64,
+    avg_volume: f64,
     peaks: Peaks,
     horizontal_levels: HorizontalLevels,
     patterns: Patterns,
@@ -94,6 +96,7 @@ impl Instrument {
         &mut self,
         data: Vec<(DateTime<Local>, f64, f64, f64, f64, f64)>,
     ) -> Result<()> {
+        let mut avg_volume = vec![];
         let candles: Vec<Candle> = data
             .iter()
             .enumerate()
@@ -102,7 +105,8 @@ impl Instrument {
                 let open = x.1.ln();
                 let high = x.2.ln();
                 let close = x.4.ln();
-                let volume = x.4;
+                let volume = x.5;
+
                 let low = match x.3 {
                     _x if x.3 > 0. => x.3.ln(),
                     _x if x.3 <= 0. => 0.01,
@@ -122,6 +126,7 @@ impl Instrument {
                     self.max_price = high;
                 }
 
+                avg_volume.push(volume);
                 self.peaks.highs.push(high);
                 self.peaks.lows.push(low);
                 self.peaks.close.push(close);
@@ -206,6 +211,7 @@ impl Instrument {
             self.set_current_price(self.data.last().unwrap().close());
 
             self.current_candle = self.current_candle().candle_type().clone();
+            self.avg_volume = average_f64(&avg_volume);
         }
         Ok(())
     }
@@ -243,6 +249,7 @@ impl InstrumentBuilder {
                 current_candle: CandleType::Default,
                 min_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
                 max_price: env::var("MIN_PRICE").unwrap().parse::<f64>().unwrap(),
+                avg_volume: 0.,
                 data: vec![],
                 peaks: Peaks::new(),
                 horizontal_levels: HorizontalLevels::new(),
