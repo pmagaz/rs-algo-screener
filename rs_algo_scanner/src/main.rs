@@ -111,7 +111,7 @@ async fn main() -> Result<()> {
                     from,
                     |instrument: Instrument| async move {
                         println!(
-                            "[INSTRUMENT] data from {:?} to {:?} in {:?}",
+                            "[INSTRUMENT] data from {} to {} in {:?}",
                             &instrument.data().first().unwrap().date(),
                             &instrument.date(),
                             now.elapsed(),

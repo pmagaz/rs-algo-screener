@@ -96,8 +96,8 @@ impl Backend {
         }
 
         let BACKGROUND = &RGBColor(208, 213, 222);
-        let CANDLE_BEARISH = &RGBColor(71, 113, 181).mix(0.9);
-        let CANDLE_BULLISH = &RGBColor(255, 255, 255).mix(0.9);
+        let CANDLE_BEARISH = &RGBColor(71, 113, 181).mix(0.95);
+        let CANDLE_BULLISH = &RGBColor(255, 255, 255).mix(0.95);
         let RED_LINE = &RGBColor(235, 69, 125).mix(0.8);
         let BLUE_LINE = &RGBColor(71, 113, 181).mix(0.3);
         let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.3);

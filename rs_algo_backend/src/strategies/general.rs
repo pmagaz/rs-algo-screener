@@ -88,10 +88,10 @@ impl General {
             {"$and": [
                 {"$or": [
                     {"symbol": {"$regex" : ".*.US.*"}},
-                    {"symbol": {"$regex" : ".*.DK.*"}},
-                    {"symbol": {"$regex" : ".*.DE.*"}},
-                    {"symbol": {"$regex" : ".*.ES.*"}},
-                    {"symbol": {"$regex" : ".*.CH.*"}},
+                   // {"symbol": {"$regex" : ".*.DK.*"}},
+                   // {"symbol": {"$regex" : ".*.DE.*"}},
+                   // {"symbol": {"$regex" : ".*.ES.*"}},
+                   // {"symbol": {"$regex" : ".*.CH.*"}},
                 ]},
                 {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
                 {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
