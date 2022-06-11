@@ -100,7 +100,7 @@ impl Backend {
         let CANDLE_BULLISH = &RGBColor(255, 255, 255).mix(0.9);
         let RED_LINE = &RGBColor(235, 69, 125).mix(0.8);
         let BLUE_LINE = &RGBColor(71, 113, 181).mix(0.3);
-        let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.30);
+        let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.3);
         let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
         let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.25);
         let _GREEN_LINE = &RGBColor(56, 142, 59);
@@ -249,7 +249,7 @@ impl Backend {
                             let date = data[idx].date;
                             (date, value)
                         }),
-                    RED_LINE.mix(0.35),
+                    RED_LINE.mix(0.40),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
