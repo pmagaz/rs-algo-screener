@@ -346,8 +346,6 @@ impl CandleBuilder {
             CandleType::Marubozu
         } else if self.is_engulfing() {
             CandleType::Engulfing
-        } else if self.is_doji() {
-            CandleType::Doji
         } else if self.is_bearish_karakasa() {
             CandleType::BearishKarakasa
         } else if self.is_bearish_star() {
@@ -366,6 +364,8 @@ impl CandleBuilder {
             CandleType::Harami
         } else if self.is_bearish_harami() {
             CandleType::BearishHarami
+        } else if self.is_doji() {
+            CandleType::Doji
         } else {
             CandleType::Default
         }
