@@ -31,10 +31,9 @@ impl<'a> Strategy for Macd<'a> {
         let current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
 
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
-        let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
+        let prev_macd_b = instrument.indicators.macd.data_b.get(prev_index).unwrap();
 
-        let entry_condition =
-            current_rsi <= &30. && current_macd_a > current_macd_b && prev_macd_b >= prev_macd_a;
+        let entry_condition = current_rsi <= &30. && current_macd_a > current_macd_b;
 
         resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
@@ -54,10 +53,9 @@ impl<'a> Strategy for Macd<'a> {
         let current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
 
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
-        let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
+        let prev_macd_b = instrument.indicators.macd.data_b.get(prev_index).unwrap();
 
-        let exit_condition =
-            current_rsi >= &70. && current_macd_a < current_macd_b && prev_macd_a >= prev_macd_b;
+        let exit_condition = current_rsi >= &70. && current_macd_a < current_macd_b;
         let stop_loss = true;
         resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
     }

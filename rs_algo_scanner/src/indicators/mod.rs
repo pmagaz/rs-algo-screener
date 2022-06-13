@@ -1,7 +1,7 @@
 pub mod atr;
 pub mod bb;
+pub mod bbw;
 pub mod ema;
-pub mod kc;
 pub mod macd;
 pub mod rsi;
 pub mod sd;
@@ -11,6 +11,7 @@ pub mod tema;
 use crate::error::Result;
 use crate::indicators::atr::Atr;
 use crate::indicators::bb::BollingerB;
+use crate::indicators::bbw::BollingerBW;
 use crate::indicators::ema::Ema;
 use crate::indicators::macd::Macd;
 use crate::indicators::rsi::Rsi;
@@ -35,7 +36,7 @@ pub trait Indicator {
     fn get_data_c(&self) -> &Vec<f64>;
 }
 
-//FIXME ARRAY OF INDICATORS
+//FIXME ARRAY OF TRAIT INDICATORS
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Indicators {
     pub macd: Macd,
@@ -43,6 +44,7 @@ pub struct Indicators {
     pub atr: Atr,
     pub rsi: Rsi,
     pub bb: BollingerB,
+    pub bbw: BollingerBW,
     pub ema_a: Ema,
     pub ema_b: Ema,
     pub ema_c: Ema,
@@ -56,11 +58,11 @@ impl Indicators {
 
         Ok(Self {
             macd: Macd::new().unwrap(),
+            rsi: Rsi::new().unwrap(),
             stoch: Stoch::new().unwrap(),
             atr: Atr::new().unwrap(),
             bb: BollingerB::new().unwrap(),
-            //kc: KeltnerC::new().unwrap(),
-            rsi: Rsi::new().unwrap(),
+            bbw: BollingerBW::new().unwrap(),
             ema_a: Ema::new_ema(*ema_a).unwrap(),
             ema_b: Ema::new_ema(*ema_b).unwrap(),
             ema_c: Ema::new_ema(*ema_c).unwrap(),
@@ -114,6 +116,7 @@ impl Indicators {
         if extended_indicators {
             self.atr.next_OHLC(OHLC).unwrap();
             self.bb.next(close).unwrap();
+            self.bbw.next(close).unwrap();
             self.rsi.next(close).unwrap();
             self.ema_a.next(close).unwrap();
             self.ema_b.next(close).unwrap();

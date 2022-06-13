@@ -71,16 +71,13 @@ impl Backend {
         let RED_LINE = &RGBColor(235, 69, 125);
         let BLUE_LINE = &RGBColor(71, 113, 181);
         let BLUE_LINE2 = &RGBColor(42, 98, 255);
+        let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
         let ORANGE_LINE = &RGBColor(245, 127, 22);
         let GREEN_LINE = &RGBColor(56, 142, 59);
 
         let stoch = instrument.indicators().stoch();
         let stoch_a = stoch.get_data_a();
         let stoch_b = stoch.get_data_b();
-
-        let macd = instrument.indicators().macd();
-        let macd_a = macd.get_data_a();
-        let macd_b = macd.get_data_b();
 
         let rsi = instrument.indicators().rsi().get_data_a();
 
@@ -460,11 +457,28 @@ impl Backend {
             ))
             .unwrap();
 
-        let mut stoch_pannel = ChartBuilder::on(&indicator_1)
+        let mut rsi_pannel = ChartBuilder::on(&indicator_1)
+            .x_label_area_size(40)
+            .y_label_area_size(40)
+            .build_cartesian_2d(from_date..to_date, -0f64..100f64)
+            .unwrap();
+
+        rsi_pannel
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date(), rsi[id])),
+                RED_LINE,
+            ))
+            .unwrap();
+
+        //STOCH PANNEL
+
+        let mut stoch_pannel = ChartBuilder::on(&indicator_2)
             .x_label_area_size(40)
             .y_label_area_size(40)
             // .margin(2)
-            //.caption("MACD", ("sans-serif", 8.0).into_font())
+            //.caption("MACD", (font.as_ref(), 8.0).into_font())
             .build_cartesian_2d(from_date..to_date, -0f64..100f64)
             .unwrap();
         //stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
@@ -473,7 +487,7 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), stoch_a[id])),
-                &BLUE_LINE,
+                BLUE_LINE3,
             ))
             .unwrap();
 
@@ -482,38 +496,11 @@ impl Backend {
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| (candle.date(), stoch_b[id])),
-                &RED_LINE,
+                RED_LINE,
             ))
             .unwrap();
 
-        let min = macd_a.iter().map(|x| *x as usize).min().unwrap() as f64;
-        let max = macd_a.iter().map(|x| *x as usize).max().unwrap() as f64;
-        let mut macd_pannel = ChartBuilder::on(&indicator_2)
-            .x_label_area_size(40)
-            .y_label_area_size(40)
-            .build_cartesian_2d(from_date..to_date, min..max)
-            .unwrap();
-
-        macd_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), macd_a[id])),
-                &BLUE_LINE,
-            ))
-            .unwrap();
-
-        macd_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), macd_b[id])),
-                &RED_LINE,
-            ))
-            .unwrap();
-
-        root.present().expect("Unable to write result to file, please make sure 'plotters-doc-data' dir exists under current dir");
-        println!("[BACKEND] File saved in {}", output_file);
+        root.present().expect("[BACKEND] Error. Can't save file!");
         Ok(())
     }
 }

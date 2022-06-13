@@ -32,6 +32,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
         prev_price: doc.data.get(second_last).unwrap().close,
         current_candle: doc.current_candle,
         prev_candle: doc.data.get(second_last).unwrap().candle_type.clone(),
+        //FIXME ADD ARRAY
         indicators: CompactIndicators {
             macd: CompactIndicator {
                 current_a: *doc.indicators.macd.data_a.last().unwrap(),
@@ -67,6 +68,15 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 prev_a: *doc.indicators.bb.data_a.get(second_last).unwrap(),
                 prev_b: *doc.indicators.bb.data_b.get(second_last).unwrap(),
                 prev_c: *doc.indicators.bb.data_c.get(second_last).unwrap(),
+                status: Status::Default,
+            },
+            bbw: CompactIndicator {
+                current_a: *doc.indicators.bbw.data_a.last().unwrap(),
+                current_b: 0.,
+                prev_a: *doc.indicators.bbw.data_a.get(second_last).unwrap(),
+                prev_b: 0.,
+                current_c: 0.,
+                prev_c: 0.,
                 status: Status::Default,
             },
             rsi: CompactIndicator {

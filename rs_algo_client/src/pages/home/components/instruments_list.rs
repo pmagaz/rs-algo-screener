@@ -187,6 +187,7 @@ pub fn instrument_list(props: &Props
             let price_change_status = get_price_change_status(price_display);
 
             let bb_size = percentage_change(instrument.indicators.bb.current_b, instrument.indicators.bb.current_a);
+            let bb_width = (instrument.indicators.bb.current_a - instrument.indicators.bb.current_b) / instrument.indicators.bb.current_c;
 
             html! {
                 <tr>
@@ -198,7 +199,7 @@ pub fn instrument_list(props: &Props
                     <td> {local_pattern.info.1}</td>
                     <td> {local_pattern.info.2}</td>
                     <td> {local_pattern.info.3}</td>
-                    <td class={get_status_class(&bb.status)}> {format!("{:?}%", round(bb_size, 1))}</td>
+                    <td class={get_status_class(&bb.status)}> {format!("{} / {}%", round(bb_width,2), round(bb_size, 1))}</td>
                     //<td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
