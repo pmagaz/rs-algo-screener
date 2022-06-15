@@ -1,3 +1,0 @@
-release_name: kubernetes-dashboard
-local_path: /home/dev/rs-algo-screener
-chart_path: deployment/kubernetes-dashboard/chart
