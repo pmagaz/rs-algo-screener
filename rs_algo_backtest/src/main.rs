@@ -21,7 +21,7 @@ async fn main() -> Result<()> {
 
     let portfolio = PortFolio {
         order_size: 1,
-        stop_loss: 2,
+        stop_loss: 2.,
         commission: 0.012,
         equity: 100000.,
         instruments: vec![],
