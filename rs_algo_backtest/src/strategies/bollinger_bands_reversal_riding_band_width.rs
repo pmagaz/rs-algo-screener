@@ -17,7 +17,7 @@ pub struct BollingerBands<'a> {
 impl<'a> Strategy for BollingerBands<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
-            name: "Bollinger_Bands_Reversal_Riding",
+            name: "Bollinger_Bands_Reversal_Riding_BandWidth",
         })
     }
 
@@ -35,12 +35,15 @@ impl<'a> Strategy for BollingerBands<'a> {
         let current_pattern = get_current_pattern(index, patterns);
 
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
+        let up_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+        let bbw = instrument.indicators.bbw.data_a.get(index).unwrap();
+        let prev_bbw = instrument.indicators.bbw.data_a.get(prev_index).unwrap();
 
         let entry_condition = current_pattern != PatternType::ChannelDown
             && current_pattern != PatternType::LowerHighsLowerLows
-            && close_price < low_band
-            && prev_close >= prev_low_band;
+            && (prev_bbw < &20. && bbw >= &20. && close_price > up_band
+                || (close_price < low_band && prev_close >= prev_low_band));
 
         resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }

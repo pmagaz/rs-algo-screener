@@ -29,8 +29,11 @@ async fn main() -> Result<()> {
             Box::new(
                 strategies::bollinger_bands_reversal_riding_rsi::BollingerBands::new().unwrap(),
             ),
+            Box::new(
+                strategies::bollinger_bands_reversal_riding_band_width::BollingerBands::new()
+                    .unwrap(),
+            ),
             Box::new(strategies::bollinger_bands_reversal_riding::BollingerBands::new().unwrap()),
-            //Box::new(strategies::bollinger_bands_reversal_width::BollingerBands::new().unwrap()),
             Box::new(
                 strategies::bollinger_bands_reversal_continuation::BollingerBands::new().unwrap(),
             ),
