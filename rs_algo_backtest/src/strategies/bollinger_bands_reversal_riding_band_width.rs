@@ -67,6 +67,8 @@ impl<'a> Strategy for BollingerBands<'a> {
         let current_pattern = get_current_pattern(index, patterns);
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let bbw = instrument.indicators.bbw.data_a.get(index).unwrap();
+        let prev_bbw = instrument.indicators.bbw.data_a.get(prev_index).unwrap();
 
         let backwards_candles = 5;
         let max_band_hits = 3;
