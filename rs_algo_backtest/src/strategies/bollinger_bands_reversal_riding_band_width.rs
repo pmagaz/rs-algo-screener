@@ -34,16 +34,41 @@ impl<'a> Strategy for BollingerBands<'a> {
         let patterns = &instrument.patterns.local_patterns;
         let current_pattern = get_current_pattern(index, patterns);
 
+        let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
+        let mid_band = instrument.indicators.bb.data_c.get(index).unwrap();
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
-        let up_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
-        let bbw = instrument.indicators.bbw.data_a.get(index).unwrap();
-        let prev_bbw = instrument.indicators.bbw.data_a.get(prev_index).unwrap();
+
+        let backwards_candles = 5;
+        let max_band_hits = 3;
+        let mut hits_over_top_band: usize = 0;
+        let mut hits_over_low_band: usize = 0;
+        let mut hits_above_mid_band: usize = 0;
+
+        if index >= 5 {
+            for x in (index - backwards_candles..index).rev() {
+                let highest_price = instrument.data.get(x).unwrap().high;
+                if highest_price > *top_band {
+                    hits_over_top_band += 1;
+                }
+
+                let mid_price = instrument.data.get(x).unwrap().close;
+                if mid_price < *mid_band {
+                    hits_above_mid_band += 1;
+                }
+
+                let lowest_price = instrument.data.get(x).unwrap().low;
+                if lowest_price < *low_band {
+                    hits_over_low_band += 1;
+                }
+            }
+        }
 
         let entry_condition = current_pattern != PatternType::ChannelDown
             && current_pattern != PatternType::LowerHighsLowerLows
-            && (prev_bbw < &20. && bbw >= &20. && close_price > up_band
-                || (close_price < low_band && prev_close >= prev_low_band));
+          //  && (prev_bbw < &20. && bbw >= &20. && close_price > up_band
+                || (close_price > low_band && prev_close <= prev_low_band);
+        //|| (close_price < low_band && prev_close >= prev_low_band));
 
         resolve_trade_in(index, instrument, entry_condition, stop_loss)
     }
@@ -76,20 +101,22 @@ impl<'a> Strategy for BollingerBands<'a> {
         let mut hits_over_low_band: usize = 0;
         let mut hits_above_mid_band: usize = 0;
 
-        for x in (index - backwards_candles..index).rev() {
-            let highest_price = instrument.data.get(x).unwrap().high;
-            if highest_price > *top_band {
-                hits_over_top_band += 1;
-            }
+        if index >= 5 {
+            for x in (index - backwards_candles..index).rev() {
+                let highest_price = instrument.data.get(x).unwrap().high;
+                if highest_price > *top_band {
+                    hits_over_top_band += 1;
+                }
 
-            let mid_price = instrument.data.get(x).unwrap().close;
-            if mid_price < *mid_band {
-                hits_above_mid_band += 1;
-            }
+                let mid_price = instrument.data.get(x).unwrap().close;
+                if mid_price < *mid_band {
+                    hits_above_mid_band += 1;
+                }
 
-            let lowest_price = instrument.data.get(x).unwrap().low;
-            if lowest_price < *low_band {
-                hits_over_low_band += 1;
+                let lowest_price = instrument.data.get(x).unwrap().low;
+                if lowest_price < *low_band {
+                    hits_over_low_band += 1;
+                }
             }
         }
 
