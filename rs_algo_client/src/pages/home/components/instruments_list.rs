@@ -9,7 +9,7 @@ use rs_algo_shared::models::horizontal_level::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::status::*;
-
+use std::env;
 use yew::{function_component, html, Callback, Properties, Html};
 use wasm_bindgen::prelude::*;
 
@@ -37,7 +37,12 @@ pub struct PatternInfo {
 }
 
 pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
-        
+    
+            // let max_pattern_days = env::var("MAX_PATTERN_DAYS")
+            // .unwrap()
+            // .parse::<i64>()
+            // .unwrap();
+    
             let break_direction = match pattern {
                 Some(val) => val.active.break_direction.clone(),
                 None   => PatternDirection::None,
@@ -75,6 +80,7 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
 
             let info: (String, String, String, String) = match date {
                 _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if date < Local::now() - Duration::days(20) => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
                 _x if status == Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), active_date.format("%d/%m/%Y").to_string()),
                 _x if status == Status::Bearish => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), active_date.format("%d/%m/%Y").to_string()),
                 _x if status == Status::Neutral => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), ("").to_string()),
@@ -138,7 +144,7 @@ pub fn instrument_list(props: &Props
                 let on_watch_click = on_watch_click.clone();
                 Callback::from(move |_| on_watch_click.emit(instrument.clone()))
             };
-            
+           
             let local_pattern = pattern_info(instrument.patterns.local_patterns.last()); 
 
             let macd = instrument.indicators.macd.clone();
@@ -203,7 +209,7 @@ pub fn instrument_list(props: &Props
                     //<td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
-                    <td> {format!("{}", date.format("%d-%m %H:%M"))}</td>
+                    <td> {format!("{}", date.format("%d/%m %H:%M"))}</td>
                     <td  onclick={ on_watch_select }><a href={"javascript:void(0);"}>{ "x" }</a></td>
                 </tr>
             }

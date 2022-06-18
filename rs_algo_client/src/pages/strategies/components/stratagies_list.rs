@@ -63,7 +63,7 @@ pub fn strategy_list(props: &Props) -> Html {
                     //<td class={get_status_class(&avg_lost_status)}>{ format!("{}%", round(strategy.avg_lost_per_trade,2))}</td>
                     <td>{ strategy.avg_stop_losses}</td>
                     <td>{ format!("{}%", round(strategy.avg_buy_hold,2))}</td>
-                    <td> {format!("{}", strategy.date.to_chrono().format("%d-%m %H:%M"))}</td>
+                    <td> {format!("{}", strategy.date.to_chrono().format("%d/%m %H:%M"))}</td>
                 </tr>
             }
         })
