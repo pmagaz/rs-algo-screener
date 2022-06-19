@@ -16,7 +16,7 @@ pub fn get_status_class2<'a>(status: &Status) -> &'a str {
 pub fn get_status_class<'a>(status: &Status) -> &'a str {
     let class = match status {
         Status::Default => "",
-        Status::Neutral => "",
+        Status::Neutral => "has-background-warning-light",
         //Status::Neutral => "",
         Status::Bullish => "has-background-primary-light",
         Status::Bearish => "has-background-danger-light",
