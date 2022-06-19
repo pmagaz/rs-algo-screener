@@ -627,7 +627,7 @@ pub fn pattern_active_result(
     let (top_result, top_id, top_price, top_date) = top;
     let (bottom_result, bottom_id, bottom_price, bottom_date) = bottom;
     let price_change = calculate_price_change(&data);
-    //FIXME
+    //FIXME pattern direction
     let price_target = calculate_price_target(&data);
     let fake_date = Local::now() - Duration::days(10000);
     if top_result {

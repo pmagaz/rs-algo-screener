@@ -182,7 +182,13 @@ pub fn instrument_list(props: &Props
                 DivergenceType::Bullish => divergence_type.to_string(),
                 DivergenceType::Bearish => divergence_type.to_string(),
                 DivergenceType::None   => "".to_owned() 
-            }; 
+            };
+            
+            let band_direction_status = match local_pattern.pattern_direction {
+                PatternDirection::Top => Status::Default,
+                PatternDirection::Bottom => Status::Default,
+                _ => Status::Default,
+            };
           
             let price_display = round(price_change(instrument.prev_price, instrument.current_price),2);
 
@@ -198,7 +204,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&price_change_status)}> {format!("{}%", price_display)}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
-                    <td> {local_pattern.info.1}</td>
+                    <td class={get_status_class(&band_direction_status)}> {local_pattern.info.1}</td>
                     <td> {local_pattern.info.2}</td>
                     <td> {local_pattern.info.3}</td>
                     <td class={get_status_class(&bb.status)}> {format!("{} / {}%", round(bb_width,2), round(bb_size, 1))}</td>
