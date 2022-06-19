@@ -1,3 +1,5 @@
+use crate::helpers::status::*;
+
 use round::{round};
 use rs_algo_shared::models::pattern::*;
 use rs_algo_shared::models::instrument::*;
@@ -32,7 +34,7 @@ pub struct PatternInfo {
    active_date: DateTime<Utc>,
    status: Status,
    change: f64,
-   break_direction: PatternDirection,
+   pattern_direction: PatternDirection,
    info: (String, String, String, String)
 }
 
@@ -42,9 +44,12 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
             // .unwrap()
             // .parse::<i64>()
             // .unwrap();
-    
-            let break_direction = match pattern {
-                Some(val) => val.active.break_direction.clone(),
+   
+            let max_pattern_days = 20;
+            
+            let pattern_direction = match pattern {
+                //Some(val) => val.active.pattern_direction.clone(),
+                Some(val) => val.direction.clone(),
                 None   => PatternDirection::None,
             };
             
@@ -78,13 +83,17 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
                 None   => Status::Default 
             };
 
+            let activate_string = match active_date {
+                _x if active_date < Local::now() - Duration::days(max_pattern_days) => "".to_string(),
+                _ =>  active_date.format("%d/%m/%y").to_string()
+            };
+
             let info: (String, String, String, String) = match date {
-                _x if pattern_type == PatternType::None  => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
-                _x if date < Local::now() - Duration::days(20) => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
-                _x if status == Status::Bullish => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), active_date.format("%d/%m/%Y").to_string()),
-                _x if status == Status::Bearish => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), active_date.format("%d/%m/%Y").to_string()),
-                _x if status == Status::Neutral => (pattern_type.to_string(), break_direction.to_string(), [change.to_string(),"%".to_string()].concat(), ("").to_string()),
-                _x if status == Status::Default =>  ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if active_date < Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string), 
+                _x if date < Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if status == Status::Bullish => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string),
+                _x if status == Status::Bearish => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string),
+                _x if status == Status::ChangeUp || status == Status::ChangeDown => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), ("").to_string()),
                 _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
@@ -95,7 +104,7 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
                 active_date,
                 status,
                 change,
-                break_direction,
+                pattern_direction,
                 info
             }
         }
@@ -114,19 +123,6 @@ pub fn instrument_list(props: &Props
     let Props { instruments, on_symbol_click, on_watch_click } = props;
     let base_url = get_base_url();
     let url = [base_url.as_str(), "api/instruments/chart/"].concat();
-
-      
-    fn get_status_class<'a>(status: &Status) -> &'a str {
-        let class = match status {
-            Status::Default => "", 
-            //Status::Neutral => "", 
-            Status::Bullish => "has-background-primary-light", 
-            Status::Bearish => "has-background-danger-light", 
-            Status::Neutral => "has-background-warning-light", 
-        };
-        class
-    }
-
 
     let instrument_list: Html = instruments
         .iter()

@@ -1,4 +1,6 @@
 use crate::routes::Route;
+use crate::helpers::status::*;
+
 use round::round;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::models::status::Status;
@@ -25,17 +27,6 @@ pub struct Props {
 #[function_component(StrategiesList)]
 pub fn strategy_list(props: &Props) -> Html {
     let Props { strategies } = props;
-
-    fn get_status_class<'a>(status: &Status) -> &'a str {
-        let class = match status {
-            Status::Default => "",
-            //Status::Neutral => "",
-            Status::Bullish => "has-background-primary-light",
-            Status::Bearish => "has-background-danger-light",
-            Status::Neutral => "has-background-warning-light",
-        };
-        class
-    }
 
     let strategy_list: Html = strategies
         .iter()

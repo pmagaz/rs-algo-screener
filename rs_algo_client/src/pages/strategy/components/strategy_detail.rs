@@ -1,3 +1,5 @@
+use crate::helpers::status::*;
+
 use rs_algo_shared::helpers::status::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::status::Status;
@@ -28,17 +30,6 @@ pub fn strategy_detail(props: &Props) -> Html {
         on_symbol_click,
     } = props;
     let base_url = get_base_url();
-
-    fn get_status_class<'a>(status: &Status) -> &'a str {
-        let class = match status {
-            Status::Default => "",
-            //Status::Neutral => "",
-            Status::Bullish => "has-background-primary-light",
-            Status::Bearish => "has-background-danger-light",
-            Status::Neutral => "has-background-warning-light",
-        };
-        class
-    }
 
     let backtest_instruments: Html = backtested_instruments
         .iter()

@@ -2,8 +2,10 @@ use dotenv::dotenv;
 use yew::prelude::*;
 use yew_router::prelude::*;
 mod components;
+mod helpers;
 mod pages;
 mod routes;
+
 use components::footer::Footer;
 use components::header::Header;
 use routes::{switch, Route};
