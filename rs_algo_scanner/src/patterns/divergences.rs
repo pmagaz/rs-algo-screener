@@ -1,6 +1,6 @@
 use crate::candle::Candle;
 use crate::error::Result;
-use crate::helpers::maxima_minima::maxima_minima;
+use crate::helpers::maxima_minima::*;
 use crate::indicators::{Indicator, Indicators};
 use crate::patterns::highs_lows::*;
 
@@ -8,8 +8,8 @@ use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::divergence::{Divergence, DivergenceType};
 use rs_algo_shared::models::indicator::IndicatorType;
 use rs_algo_shared::models::pattern::{DataPoints, Pattern, PatternType};
-
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::env;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -27,6 +27,7 @@ impl Divergences {
         indicators: &Indicators,
         patterns: &Vec<Pattern>,
         candles: &Vec<Candle>,
+        maxima_minima: &Vec<(usize, f64)>,
     ) {
         let prominence = env::var("DIVERGENCE_MIN_PROMINENCE")
             .unwrap()
@@ -38,66 +39,63 @@ impl Divergences {
             .parse::<usize>()
             .unwrap();
 
-        let data_indicators: [(IndicatorType, &Vec<f64>); 1] =
-            [(IndicatorType::Stoch, indicators.stoch().get_data_a())];
+        let data_indicators: [(IndicatorType, &Vec<f64>); 2] = [
+            (IndicatorType::Rsi, indicators.rsi().get_data_a()),
+            (IndicatorType::Stoch, indicators.stoch().get_data_a()),
+        ];
 
-        for (indicator_type, price) in data_indicators {
-            let maxima = maxima_minima(&price, &price, prominence, min_distance).unwrap();
-            let minima = maxima_minima(
-                &price.iter().map(|x| -x).collect(),
-                &price,
+        for (indicator_type, indicator_value) in data_indicators {
+            let mut maxima =
+                maxima_minima_exp(&indicator_value, &indicator_value, prominence, min_distance)
+                    .unwrap();
+            maxima.sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
+
+            let minima = maxima_minima_exp(
+                &indicator_value.iter().map(|x| -x).collect(),
+                &indicator_value,
                 prominence,
                 min_distance,
             )
             .unwrap();
-
             //FIXME too many arguments
-            self.detect_pattern(&maxima, &minima, &indicator_type, &patterns, &candles);
+            self.compare_with_price(
+                &maxima,
+                &minima,
+                &indicator_type,
+                &patterns,
+                &candles,
+                &maxima_minima,
+            );
         }
     }
 
-    pub fn detect_pattern(
+    pub fn compare_with_price(
         &mut self,
         maxima: &Vec<(usize, f64)>,
         minima: &Vec<(usize, f64)>,
         indicator_type: &IndicatorType,
         patterns: &Vec<Pattern>,
         candles: &Vec<Candle>,
+        maxima_minima: &Vec<(usize, f64)>,
     ) {
         let local_max_points = env::var("PATTERNS_MAX_POINTS")
             .unwrap()
             .parse::<usize>()
             .unwrap();
 
-        let min_points = env::var("PATTERNS_MIN_POINTS")
+        let min_points = env::var("DIVERGENCES_MIN_POINTS")
             .unwrap()
             .parse::<usize>()
             .unwrap();
 
-        let window_size = env::var("PATTERNS_WINDOW_SIZE")
+        let window_size = env::var("DIVERGENCES_WINDOW_SIZE")
             .unwrap()
             .parse::<usize>()
             .unwrap();
-
-        let max_pattern_days = env::var("MAX_PATTERN_DAYS")
-            .unwrap()
-            .parse::<i64>()
-            .unwrap();
-
-        let max_pattern_date = Local::now() - Duration::days(max_pattern_days);
 
         let fake_date = Local::now() - Duration::days(1000);
 
         let last_pattern = patterns.last();
-        let pattern_type = match last_pattern {
-            Some(pat) => &pat.pattern_type,
-            None => &PatternType::None,
-        };
-
-        let pattern_date = match last_pattern {
-            Some(pat) => pat.date.to_chrono(),
-            None => DateTime::from(fake_date),
-        };
 
         let mut max_start = 0;
         let mut max_end = 0;
@@ -122,10 +120,10 @@ impl Divergences {
                 min_end = minima_length;
             }
 
-            let mut locals = [&maxima[max_start..max_end], &minima[min_start..min_end]].concat();
+            //let mut locals = [&maxima[max_start..max_end], &minima[min_start..min_end]].concat();
+            let mut locals = [&maxima[max_start..max_end]].concat();
 
-            locals.sort_by(|(id_a, _price_a), (id_b, _price_b)| id_a.cmp(id_b));
-            //locals.reverse();
+            locals.sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
             let mut iter = locals.windows(window_size);
             let mut no_pattern = true;
             while no_pattern {
@@ -135,34 +133,42 @@ impl Divergences {
                         let last_id = window.last().unwrap().0;
                         let candle = candles.get(last_id).unwrap();
 
-                        if pattern_date > max_pattern_date
-                            && (pattern_type == &PatternType::ChannelDown
-                                || pattern_type == &PatternType::TriangleDown)
-                            && ((is_higher_highs_top(&data_points)
-                                || is_higher_highs_bottom(&data_points))
-                                && data_points[0].1 < data_points[1].1)
+                        let indicator_points: Vec<f64> = data_points.iter().map(|x| x.1).collect();
+                        let indicator_peaks_sorted = peaks_are_sorted(&indicator_points);
+                        if indicator_peaks_sorted == Ordering::Greater
+                            || indicator_peaks_sorted == Ordering::Less
                         {
-                            self.set_pattern(
-                                &data_points,
-                                indicator_type,
-                                DivergenceType::Bullish,
-                                candle.date(),
-                            );
-                        } else if pattern_date > max_pattern_date
-                            && (pattern_type == &PatternType::ChannelUp
-                                || pattern_type == &PatternType::TriangleUp)
-                            && ((is_lower_highs_top(&data_points)
-                                || is_lower_highs_bottom(&data_points))
-                                && data_points[0].1 > data_points[1].1)
-                        {
-                            self.set_pattern(
-                                &data_points,
-                                indicator_type,
-                                DivergenceType::Bearish,
-                                candle.date(),
-                            );
-                        } else {
-                            no_pattern = false;
+                            let min_id = &data_points[0].0;
+                            let max_id = &data_points[1].0;
+                            let maxima_points: Vec<f64> = maxima_minima
+                                .iter()
+                                .filter(|x| x.0 >= *min_id && x.0 <= *max_id)
+                                .map(|x| x.1)
+                                .collect();
+
+                            let maxima_peaks_sorted = peaks_are_sorted(&maxima_points);
+
+                            if maxima_points.len() > 1
+                                && indicator_peaks_sorted == Ordering::Greater
+                                && maxima_peaks_sorted == Ordering::Less
+                            {
+                                self.set_pattern(
+                                    &data_points,
+                                    indicator_type,
+                                    DivergenceType::Bullish,
+                                    candle.date(),
+                                );
+                            } else if maxima_points.len() > 1
+                                && indicator_peaks_sorted == Ordering::Less
+                                && maxima_peaks_sorted == Ordering::Greater
+                            {
+                                self.set_pattern(
+                                    &data_points,
+                                    indicator_type,
+                                    DivergenceType::Bearish,
+                                    candle.date(),
+                                );
+                            }
                         }
                     }
                     None => {
@@ -177,6 +183,8 @@ impl Divergences {
                 }
             }
         }
+        self.data
+            .sort_by(|divergence_a, divergence_b| divergence_a.date.cmp(&divergence_b.date));
     }
 
     fn set_pattern(

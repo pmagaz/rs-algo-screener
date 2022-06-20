@@ -185,8 +185,12 @@ impl Instrument {
                 .calculate_horizontal_lows(&self.current_price, &self.peaks)
                 .unwrap();
 
-            self.divergences
-                .calculate(&self.indicators, &self.patterns.local_patterns, &candles);
+            self.divergences.calculate(
+                &self.indicators,
+                &self.patterns.local_patterns,
+                &candles,
+                &local_maxima,
+            );
 
             self.data = candles
                 .into_iter()
