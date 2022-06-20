@@ -77,6 +77,7 @@ pub fn calculate_price_target(data_points: &DataPoints) -> f64 {
     percentage_change(data_points[4].1, data_points[3].1).abs()
 }
 
+//FIXME UPDATE PATTERN BREAK DETECTION
 pub fn search_price_break(
     points: Vec<(usize, f64)>,
     candles: &Vec<Candle>,

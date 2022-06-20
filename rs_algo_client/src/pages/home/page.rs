@@ -138,7 +138,7 @@ pub fn home() -> Html {
         .filter(|x| {
             (x.patterns.local_patterns.len() > 0
                 && x.patterns.local_patterns.last().unwrap().date
-                    > to_dbtime(Local::now() - Duration::days(4))
+                    > to_dbtime(Local::now() - Duration::days(5))
                 && !x.patterns.local_patterns.last().unwrap().active.active)
         })
         .map(|x| x.clone())
@@ -147,9 +147,10 @@ pub fn home() -> Html {
     let activated: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
-            (x.patterns.local_patterns.len() > 0
+            x.patterns.local_patterns.len() > 0
+                && x.patterns.local_patterns.last().unwrap().active.active
                 && x.patterns.local_patterns.last().unwrap().active.date
-                    > to_dbtime(Local::now() - Duration::days(4)))
+                    > to_dbtime(Local::now() - Duration::days(3))
         })
         .map(|x| x.clone())
         .collect();
@@ -180,8 +181,10 @@ pub fn home() -> Html {
             x.symbol == "BITCOIN"
                 || x.symbol == "ETHEREUM"
                 || x.symbol == "RIPPLE"
+                || x.symbol == "LITECOIN"
                 || x.symbol == "DOGECOIN"
                 || x.symbol == "POLKADOT"
+                || x.symbol == "CHAINLINK"
                 || x.symbol == "SOLANA"
         })
         .map(|x| x.clone())

@@ -69,7 +69,6 @@ pub fn resolve_trade_out(
     };
 
     if index > trade_in.index_in && (exit_condition || stop_loss_activated) {
-        //println!("1111111 {:?} {:?}", date_in, date_out);
         TradeResult::TradeOut(TradeOut {
             index_in,
             price_in,

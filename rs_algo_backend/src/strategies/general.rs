@@ -59,10 +59,11 @@ impl General {
 
         doc! {
         "$or": [
-            {"$and": [
+            {"$or": [
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
-                    "date": { "$gte" : self.max_pattern_date },
+                        "date": { "$gte" : self.max_pattern_date },
+                        "active.active": false ,
                     "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                     }}}
                 ]},
@@ -78,7 +79,8 @@ impl General {
               //  ]},
                 {"$and": [
                     {"patterns.local_patterns": {"$elemMatch" : {
-                    "active.target":{"$gte": minimum_pattern_target },
+                    //"active.target":{"$gte": minimum_pattern_target },
+                    "active.active": true ,
                     "active.date": { "$gte" : self.max_activated_date },
                     "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                     }}}
@@ -108,7 +110,7 @@ impl General {
                     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelDown"] }},
                 ]},
             ]},
-            { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA"] } },
+            { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","LITECOIN","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA","CHAINLINK"] } },
             { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
         ]}
     }
@@ -181,7 +183,7 @@ impl General {
                         .unwrap();
 
                     let last_pattern_status =
-                        get_pattern_status(last_pattern, second_last_pattern_type, max_days);
+                        get_pattern_status(last_pattern, second_last_pattern_type, max_days + 20);
                     //let second_last_pattern_status = get_pattern_status(second_last_pattern);
                     if last_pattern_status != Status::Default {
                         let len = instrument.patterns.local_patterns.len();

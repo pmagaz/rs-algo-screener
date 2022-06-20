@@ -394,11 +394,7 @@ impl Patterns {
                                 data_points.to_owned(),
                                 change,
                                 candle_date,
-                                channel::channel_descendant_top_active(
-                                    &data_points,
-                                    candles,
-                                    PatternType::ChannelDown,
-                                ),
+                                non_activated(),
                             );
                             not_founded = true;
                         } else if highs_lows::is_higher_highs_higher_lows_bottom(&data_points) {
@@ -410,11 +406,7 @@ impl Patterns {
                                 data_points.to_owned(),
                                 change,
                                 candle_date,
-                                channel::channel_descendant_top_active(
-                                    &data_points,
-                                    candles,
-                                    PatternType::ChannelDown,
-                                ),
+                                non_activated(),
                             );
                             not_founded = true;
                         } else if highs_lows::is_lower_highs_lower_lows_top(&data_points) {
@@ -426,11 +418,7 @@ impl Patterns {
                                 data_points.to_owned(),
                                 change,
                                 candle_date,
-                                channel::channel_descendant_top_active(
-                                    &data_points,
-                                    candles,
-                                    PatternType::ChannelDown,
-                                ),
+                                non_activated(),
                             );
                             not_founded = true;
                         } else if highs_lows::is_lower_highs_lower_lows_bottom(&data_points) {
@@ -442,11 +430,7 @@ impl Patterns {
                                 data_points.to_owned(),
                                 change,
                                 candle_date,
-                                channel::channel_descendant_top_active(
-                                    &data_points,
-                                    candles,
-                                    PatternType::ChannelDown,
-                                ),
+                                non_activated(),
                             );
                             not_founded = true;
                         }
@@ -481,7 +465,8 @@ impl Patterns {
                         //             PatternType::HeadShoulders,
                         //         ),
                         //     );
-                        not_founded = true;
+                        //     not_founded = true;
+                        // }
                     }
                     None => {
                         let date = Local::now() - Duration::days(1000);
@@ -626,6 +611,7 @@ pub fn pattern_active_result(
 ) -> PatternActive {
     let (top_result, top_id, top_price, top_date) = top;
     let (bottom_result, bottom_id, bottom_price, bottom_date) = bottom;
+
     let price_change = calculate_price_change(&data);
     //FIXME pattern direction
     let price_target = calculate_price_target(&data);
@@ -666,5 +652,19 @@ pub fn pattern_active_result(
             target: 0.,
             break_direction: PatternDirection::None,
         }
+    }
+}
+
+fn non_activated() -> PatternActive {
+    PatternActive {
+        active: false,
+        completed: false,
+        status: Status::Default,
+        index: 0,
+        date: to_dbtime(Local::now() - Duration::days(10000)),
+        price: 0.,
+        change: 0.,
+        target: 0.,
+        break_direction: PatternDirection::None,
     }
 }

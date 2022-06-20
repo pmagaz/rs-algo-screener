@@ -45,7 +45,7 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
             // .parse::<i64>()
             // .unwrap();
    
-            let max_pattern_days = 20;
+            let max_pattern_days = 3;
             
             let pattern_direction = match pattern {
                 //Some(val) => val.active.pattern_direction.clone(),
@@ -92,6 +92,7 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
                 _x if active_date < Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string), 
                 _x if date < Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(),"".to_string(),"".to_string(),"".to_string()),
                 _x if status == Status::Bullish => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string),
+                _x if status == Status::Neutral => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string),
                 _x if status == Status::Bearish => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string),
                 _x if status == Status::ChangeUp || status == Status::ChangeDown => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), ("").to_string()),
                 _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
