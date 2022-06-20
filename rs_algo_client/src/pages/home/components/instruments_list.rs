@@ -173,7 +173,12 @@ pub fn instrument_list(props: &Props
             // // };
             
             let divergence_type = match instrument.divergences.data.last() {
-                Some(val) => &val.divergence_type,
+                Some(val) => {
+                    if val.date.to_chrono() < Local::now() - Duration::days(25) {
+                        &DivergenceType::None
+                    } else {
+                       &val.divergence_type
+                    } } ,
                 None   => &DivergenceType::None
             }; 
 
