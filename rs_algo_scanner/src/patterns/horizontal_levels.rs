@@ -1,7 +1,7 @@
 use super::peaks::Peaks;
 
 use crate::error::Result;
-use rs_algo_shared::helpers::comp::is_same_band;
+use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::horizontal_level::{HorizontalLevel, HorizontalLevelType};
 
@@ -55,7 +55,7 @@ impl HorizontalLevels {
     pub fn calculate_bands(
         &mut self,
         current_price: &f64,
-        data: &Vec<(usize, f64)>,
+        local_maxima: &Vec<(usize, f64)>,
         peak_type: &Vec<f64>,
     ) -> Result<Vec<HorizontalLevel>> {
         let mut hash: HashMap<String, HorizontalLevel> = HashMap::new();
@@ -70,10 +70,15 @@ impl HorizontalLevels {
             .parse::<f64>()
             .unwrap();
 
-        for (_peak_index, peak_price) in data {
-            let price = peak_price.abs();
-            for (_compare_index, compare_price) in data {
-                if is_same_band(price, *compare_price, threshold) {
+        for (peak_index, peak_price) in local_maxima {
+            let price = *peak_price;
+            for (compare_index, compare_price) in local_maxima {
+                //println!("11111 {:?} {:?}", price, compare_price);
+
+                // let price_diff = max_price - min_price;
+                // kernel_bandwidth = kernel_bandwidth * price_diff;
+                // local_prominence = local_prominence * price_diff;
+                if compare_index != peak_index && is_equal(price, *compare_price, threshold) {
                     let mut occurrences = 1;
                     if hash.contains_key(&price.to_string()) {
                         occurrences += 1;
@@ -83,7 +88,6 @@ impl HorizontalLevels {
                         _x if &price <= &current_price => HorizontalLevelType::Support,
                         _ => HorizontalLevelType::Support,
                     };
-
                     hash.insert(
                         price.to_string(),
                         HorizontalLevel {

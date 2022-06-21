@@ -110,6 +110,10 @@ impl General {
                     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelDown"] }},
                 ]},
             ]},
+            {"$and": [
+                {"$expr": {"$gte": [{ "$last": "$divergences.data.date" }, self.max_pattern_date ] }},
+                {"$expr": {"$in": [{ "$last": "$divergences.data.divergence_type" }, ["Bullish", "Bearish"]] }},
+            ]},
             { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","LITECOIN","DOGECOIN","POLKADOT","STELLAR","CARDANO","SOLANA","CHAINLINK"] } },
             { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
         ]}
