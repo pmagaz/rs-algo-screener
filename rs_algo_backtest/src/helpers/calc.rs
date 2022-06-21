@@ -147,8 +147,8 @@ pub fn total_profitable_trades(winning_trades: usize, total_trades: usize) -> f6
     ((winning_trades as f64 / total_trades as f64) * 100.).abs()
 }
 
-pub fn total_profit_per(trades_out: &Vec<TradeOut>, _equity: f64) -> f64 {
-    trades_out.iter().map(|trade| trade.profit_per).sum()
+pub fn total_profit_per(net_profit: f64, equity: f64) -> f64 {
+    (net_profit + equity) / equity
 }
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {
