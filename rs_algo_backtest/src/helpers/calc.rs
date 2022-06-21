@@ -3,6 +3,8 @@ use rs_algo_shared::models::candle::Candle;
 use rs_algo_shared::models::pattern::*;
 use std::cmp::Ordering;
 
+use crate::trade;
+
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
     size * (price_out - price_in)
 }
@@ -147,8 +149,14 @@ pub fn total_profitable_trades(winning_trades: usize, total_trades: usize) -> f6
     ((winning_trades as f64 / total_trades as f64) * 100.).abs()
 }
 
-pub fn total_profit_per(net_profit: f64, equity: f64) -> f64 {
-    (net_profit + equity) / equity
+pub fn total_profit_per(trades_in: &Vec<TradeIn>, trades_out: &Vec<TradeOut>) -> f64 {
+    let initial_value = match trades_in.first() {
+        Some(val) => val.price_in,
+        _ => 0.,
+    };
+    let profit: f64 = trades_out.iter().map(|trade| trade.profit).sum();
+    let end_value = initial_value + profit;
+    ((end_value - initial_value) / initial_value) * 100.
 }
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {
