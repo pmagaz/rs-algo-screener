@@ -132,6 +132,12 @@ impl Peaks {
         self.local_maxima =
             maxima_minima(source.0, source.1, local_prominence, local_min_distance)?;
 
+        self.local_maxima
+            .sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
+
+        self.local_minima
+            .sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
+
         self.local_minima = maxima_minima(
             &minima_smooth,
             source.3,

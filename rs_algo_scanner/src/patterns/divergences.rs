@@ -22,7 +22,7 @@ impl Divergences {
         Ok(Self { data: vec![] })
     }
     // CONTINUE HERE
-    pub fn calculate(
+    pub fn detect_divergences(
         &mut self,
         indicators: &Indicators,
         patterns: &Vec<Pattern>,
@@ -45,10 +45,9 @@ impl Divergences {
         ];
 
         for (indicator_type, indicator_value) in data_indicators {
-            let mut maxima =
+            let maxima =
                 maxima_minima_exp(&indicator_value, &indicator_value, prominence, min_distance)
                     .unwrap();
-            maxima.sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
 
             let minima = maxima_minima_exp(
                 &indicator_value.iter().map(|x| -x).collect(),
@@ -124,6 +123,7 @@ impl Divergences {
             let mut locals = [&maxima[max_start..max_end]].concat();
 
             locals.sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
+            //locals.reverse();
             let mut iter = locals.windows(window_size);
             let mut no_pattern = true;
             while no_pattern {

@@ -164,18 +164,18 @@ impl Instrument {
 
             let local_maxima = self.peaks.local_maxima();
             let local_minima = self.peaks.local_minima();
-            let extrema_maxima = self.peaks.extrema_maxima();
-            let extrema_minima = self.peaks.extrema_minima();
+            // let extrema_maxima = self.peaks.extrema_maxima();
+            // let extrema_minima = self.peaks.extrema_minima();
 
             self.patterns
                 .detect_pattern(PatternSize::Local, local_maxima, local_minima, &candles);
 
-            self.patterns.detect_pattern(
-                PatternSize::Extrema,
-                extrema_maxima,
-                extrema_minima,
-                &candles,
-            );
+            // self.patterns.detect_pattern(
+            //     PatternSize::Extrema,
+            //     extrema_maxima,
+            //     extrema_minima,
+            //     &candles,
+            // );
 
             self.horizontal_levels
                 .calculate_horizontal_highs(&self.current_price, &self.peaks)
@@ -185,7 +185,7 @@ impl Instrument {
                 .calculate_horizontal_lows(&self.current_price, &self.peaks)
                 .unwrap();
 
-            self.divergences.calculate(
+            self.divergences.detect_divergences(
                 &self.indicators,
                 &self.patterns.local_patterns,
                 &candles,
