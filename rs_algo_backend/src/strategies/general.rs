@@ -21,7 +21,6 @@ pub struct General {
     pub max_pattern_date: DbDateTime,
     pub max_activated_date: DbDateTime,
 }
-
 //FIMXE impl trait (fix asyn-trait)
 impl General {
     pub fn new() -> Result<General> {
@@ -191,6 +190,7 @@ impl General {
                     //let second_last_pattern_status = get_pattern_status(second_last_pattern);
                     if last_pattern_status != Status::Default {
                         let len = instrument.patterns.local_patterns.len();
+                        
                         instrument.patterns.local_patterns[len - 1].active.status =
                             last_pattern_status.clone();
                     }

@@ -200,7 +200,7 @@ pub fn home() -> Html {
                         //<textarea id="query_box" class="textarea is-link is-invisible" placeholder="Textarea" cols="60" rows="0" value={ {format!("{}", *use_query)}}></textarea>
                         // <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
                         //<div width="400" height="400"></div>
-                        <Loading loading={ *use_loading} />
+                        <Loading loading={ *use_loading } />
                 </div>
             </div>
             <Chart url={(*use_instruments_url).clone()}/>

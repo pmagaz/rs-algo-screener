@@ -12,7 +12,7 @@ use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::status::*;
 use std::env;
-use yew::{function_component, html, Callback, Properties, Html};
+use yew::{function_component, html, Callback, Properties, Html,events::Event};
 use wasm_bindgen::prelude::*;
 
 
@@ -203,9 +203,25 @@ pub fn instrument_list(props: &Props
             let bb_size = percentage_change(instrument.indicators.bb.current_b, instrument.indicators.bb.current_a);
             let bb_width = (instrument.indicators.bb.current_a - instrument.indicators.bb.current_b) / instrument.indicators.bb.current_c;
 
+            let leches = instrument.symbol.split(".").collect::<Vec<_>>();
+
+            let instrument_image = match instrument.symbol.contains(".") {
+                true => {
+                    let leches = instrument.symbol.split(".").collect::<Vec<_>>();
+                    (true, format!("https://eodhistoricaldata.com/img/logos/{}/{}.png",leches[1],leches[0]))
+                }
+                _ => (false, "".to_owned())
+            };
+
+            let onleches = "this.style.display='none'";
             html! {
                 <tr>
-                    <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{format!("{}", instrument.symbol)}</a></td>
+                    <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>
+                        if instrument_image.0 {
+                        <img loading="lazy" class="icon" src={instrument_image.1} />
+                    }
+                        {format!("{}", instrument.symbol)}</a>
+                    </td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
                     <td class={get_status_class(&price_change_status)}> {format!("{}%", price_display)}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
