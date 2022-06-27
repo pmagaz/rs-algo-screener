@@ -143,10 +143,10 @@ impl CandleBuilder {
 
     fn get_current_ohlc(&self) -> OHLCV {
         (
-            self.open.unwrap(),
-            self.high.unwrap(),
-            self.low.unwrap(),
-            self.close.unwrap(),
+            self.open.unwrap().exp(),
+            self.high.unwrap().exp(),
+            self.low.unwrap().exp(),
+            self.close.unwrap().exp(),
         )
     }
 
@@ -389,6 +389,7 @@ impl CandleBuilder {
             self.volume,
             self.previous_candles.as_ref(),
         ) {
+
             Ok(Candle {
                 candle_type: self.identify_candle_type(),
                 date,
