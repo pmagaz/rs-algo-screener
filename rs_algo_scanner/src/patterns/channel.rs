@@ -2,6 +2,7 @@ use super::highs_lows::*;
 use super::pattern::pattern_active_result;
 use crate::candle::Candle;
 use crate::prices::*;
+use rs_algo_shared::helpers::date::*;
 
 use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 
@@ -81,7 +82,7 @@ pub fn channel_descendant_top_active(
     pattern_active_result(
         &data,
         price_is_higher_upper_band_top(&data, candles, &pattern_type),
-        price_is_higher_upper_band_top(&data, candles, &pattern_type),
+       (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000))),
     )
 }
 
@@ -93,7 +94,7 @@ pub fn channel_descendant_bottom_active(
     pattern_active_result(
         &data,
         price_is_higher_upper_band_bottom(&data, candles, &pattern_type),
-        price_is_higher_upper_band_bottom(&data, candles, &pattern_type),
+        (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000))),
     )
 }
 
@@ -104,7 +105,7 @@ pub fn channel_ascendant_top_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_lower_low_band_bottom(&data, candles, &pattern_type),
+        (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000))),
         price_is_lower_low_band_bottom(&data, candles, &pattern_type),
     )
 }
@@ -116,7 +117,7 @@ pub fn channel_ascendant_bottom_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_lower_low_band_top(&data, candles, &pattern_type),
+        (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000))),
         price_is_lower_low_band_top(&data, candles, &pattern_type),
     )
 }

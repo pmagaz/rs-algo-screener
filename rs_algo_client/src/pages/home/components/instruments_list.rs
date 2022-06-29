@@ -84,18 +84,28 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
             };
 
             let activate_string = match active_date {
-                _x if active_date < Local::now() - Duration::days(max_pattern_days) => "".to_string(),
-                _ =>  active_date.format("%d/%m/%y").to_string()
+                _x if active_date > Local::now() - Duration::days(max_pattern_days) =>  active_date.format("%d/%m/%y").to_string(),
+                _ =>  "".to_string()
             };
 
+            let pattern_direction_string = match change {
+                _x if !active => "".to_string(),
+                _ => pattern_direction.to_string()
+            };
+
+            let change_string = match change {
+                _x if !active => "".to_string(),
+                _ => [change.to_string(),"%".to_string()].concat()
+            };
+    
             let info: (String, String, String, String) = match date {
-                _x if active_date < Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string), 
-                _x if date < Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(),"".to_string(),"".to_string(),"".to_string()),
-                _x if status == Status::Bullish => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string),
-                _x if status == Status::Neutral => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string),
-                _x if status == Status::Bearish => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), activate_string),
-                _x if status == Status::ChangeUp || status == Status::ChangeDown => (pattern_type.to_string(), pattern_direction.to_string(), [change.to_string(),"%".to_string()].concat(), ("").to_string()),
-                _ => ("".to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if active_date > Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(), pattern_direction.to_string(), change_string, activate_string), 
+                _x if date > Local::now() - Duration::days(max_pattern_days) && !active => (pattern_type.to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if status == Status::Bullish => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
+                _x if status == Status::Neutral => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
+                _x if status == Status::Bearish => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
+                _x if status == Status::ChangeUp || status == Status::ChangeDown => (pattern_type.to_string(), pattern_direction_string, change_string, ("").to_string()),
+                _ => (pattern_type.to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
             PatternInfo{
@@ -141,7 +151,7 @@ pub fn instrument_list(props: &Props
                 let on_watch_click = on_watch_click.clone();
                 Callback::from(move |_| on_watch_click.emit(instrument.clone()))
             };
-           
+          
             let local_pattern = pattern_info(instrument.patterns.local_patterns.last()); 
 
             let macd = instrument.indicators.macd.clone();

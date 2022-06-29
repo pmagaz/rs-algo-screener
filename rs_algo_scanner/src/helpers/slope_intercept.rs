@@ -36,8 +36,8 @@ pub fn next_bottom_point(data: &DataPoints) -> (usize, f64) {
 }
 
 pub fn add_next_top_points(mut data: DataPoints) -> Vec<(usize, f64)> {
-    data.push(next_bottom_point(&data));
     data.push(next_top_point(&data));
+    data.push(next_bottom_point(&data));
     data
 }
 

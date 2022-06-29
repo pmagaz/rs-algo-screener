@@ -239,7 +239,7 @@ impl Backend {
                         .zip(pattern.data_points.iter())
                         .enumerate()
                         .filter(|(key, (i, highs))| {
-                            key < &(total_len - 3) && highs.0 < total_len && key % 2 == 0
+                            key < &(total_len - 3) && highs.0 < total_len
                         })
                         .map(|(key, (i, highs))| {
                             let idx = highs.0;
@@ -260,7 +260,7 @@ impl Backend {
                         .zip(pattern.data_points.iter())
                         .enumerate()
                         .filter(|(key, (i, highs))| {
-                            key < &(total_len - 3) && highs.0 < total_len && key % 2 != 0
+                            key < &(total_len - 3) && highs.0 < total_len
                         })
                         .map(|(key, (i, highs))| {
                             let idx = highs.0;

@@ -501,6 +501,7 @@ impl Patterns {
     }
 
     //FXIME too many arguments
+    //TOO complex I can't barely understand it after a while XD 
     fn set_pattern(
         &mut self,
         pattern_type: PatternType,
@@ -511,6 +512,7 @@ impl Patterns {
         date: DateTime<Local>,
         active: PatternActive,
     ) {
+
         let len = data_points.len();
         if len > 3 {
             let index = data_points.get(data_points.len() - 2).unwrap().0;
@@ -547,6 +549,7 @@ impl Patterns {
                 let polynomial_bottom = poly_fit(&x_values_bottom, &y_values_bottom, 1);
                 let top_len = polynomial_top.len();
                 let bottom_len = polynomial_bottom.len();
+
                 // CONTINUE
                 // let mut poly_points = vec![
                 //     (x_values_top[0] as usize, y_values_top[0]),

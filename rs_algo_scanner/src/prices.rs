@@ -95,7 +95,7 @@ pub fn search_price_break(
         for n in (start_index..=end_index).step_by(2) {
             if n < end_index {
                 let next_price = (slope * n as f64) + y_intercept;
-                let current_price = &candles[n].close();
+                let current_price = &candles[n].close().exp();
                 let current_date = &candles[n].date();
 
                 if comparator(*current_price, next_price) {
