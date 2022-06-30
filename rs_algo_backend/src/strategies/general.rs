@@ -94,7 +94,6 @@ impl General {
                    // {"symbol": {"$regex" : ".*.ES.*"}},
                    // {"symbol": {"$regex" : ".*.CH.*"}},
                 ]},
-                {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
                 {"$or": [
                     {"$expr": {"$lte": ["$indicators.bbw.current_a", 0.2]}},
                     {"$and": [
@@ -105,6 +104,7 @@ impl General {
                 {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
                 {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
                 {"$and": [
+                    {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
                     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
                     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelDown"] }},
                 ]},

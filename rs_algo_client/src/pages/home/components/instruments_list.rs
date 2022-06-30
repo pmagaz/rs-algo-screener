@@ -99,8 +99,9 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
             };
     
             let info: (String, String, String, String) = match date {
-                _x if active_date > Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(), pattern_direction.to_string(), change_string, activate_string), 
-                _x if date > Local::now() - Duration::days(max_pattern_days) && !active => (pattern_type.to_string(),"".to_string(),"".to_string(),"".to_string()),
+                _x if active_date > Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string), 
+                _x if date > Local::now() - Duration::days(max_pattern_days) && !active => (pattern_type.to_string(),pattern_direction.to_string(),[change.to_string(),"%".to_string()].concat(),"".to_string()),
+                //_x if date < Local::now() - Duration::days(max_pattern_days) && !active => (pattern_type.to_string(),pattern_direction.to_string(),[change.to_string(),"%".to_string()].concat(),"".to_string()),
                 _x if status == Status::Bullish => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
                 _x if status == Status::Neutral => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
                 _x if status == Status::Bearish => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
