@@ -85,8 +85,10 @@ async fn main() -> Result<()> {
                     )
                     .route("/watchlist", web::get().to(watch_list::find))
                     .route("/watchlist", web::put().to(watch_list::upsert))
+                    .route("/watchlist", web::delete().to(watch_list::delete))
                     .route("/portfolio", web::get().to(portfolio::find))
                     .route("/portfolio", web::put().to(portfolio::upsert))
+                    .route("/portfolio", web::delete().to(portfolio::delete))
                     .route(
                         "/backtest",
                         web::put().to(back_test::upsert_instruments_result),

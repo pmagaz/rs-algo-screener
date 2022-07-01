@@ -62,7 +62,7 @@ pub async fn upsert(
     );
 
     let now = Instant::now();
-    let _upsert = db::watch_list::upsert(watch_instrument, &state)
+    let _upsert = db::watch_list::upsert(&watch_instrument, &state)
         .await
         .unwrap();
 
@@ -72,6 +72,27 @@ pub async fn upsert(
         Local::now(),
         now.elapsed()
     );
+    
+    Ok(HttpResponse::Ok().json(ApiResponse {
+        result: "ok".to_owned(),
+    }))
+}
+
+
+pub async fn delete(watch_instrument: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+    let watch_instrument: WatchInstrument = serde_json::from_str(&watch_instrument).unwrap();
+    let symbol = watch_instrument.symbol.clone();
+
+    let result = db::watch_list::delete(&watch_instrument, &state).await.unwrap();
+
+    println!(
+        "[DELETED WATCH LIST] {:?} {:?} {:?}",
+        Local::now(),
+        symbol,
+        now.elapsed()
+    );
+
     Ok(HttpResponse::Ok().json(ApiResponse {
         result: "ok".to_owned(),
     }))

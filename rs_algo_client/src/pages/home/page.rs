@@ -20,6 +20,25 @@ extern "C" {
 
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub enum ActionType {
+    PortfolioAdd,
+    PortfolioDelete,
+    WatchListAdd,
+    WatchListDelete,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum ListType {
+    PortFolio,
+    WatchList,
+    Strategy,
+    NewPatterns,
+    Activated,
+    Commodities,
+    Crypto,
+}
+
 #[function_component(Home)]
 pub fn home() -> Html {
     let base_url = get_base_url();
@@ -67,27 +86,6 @@ pub fn home() -> Html {
         );
     }
 
-    // let on_query_send = {
-    //     let use_instruments = use_instruments.clone();
-    //     let use_query = use_query.clone();
-    //     let use_loading = use_loading.clone();
-
-    //     Callback::from(move |_e: MouseEvent| {
-    //         let use_instruments = use_instruments.clone();
-    //         let use_query = use_query.clone();
-    //         let use_loading = use_loading.clone();
-    //         let query = get_query_value();
-    //         use_query.set(query.clone());
-    //         use_loading.set(true);
-    //         let instruments_url = instruments_url.clone();
-
-    //         wasm_bindgen_futures::spawn_local(async move {
-    //             use_instruments.set(api::get_instruments(&instruments_url, query).await.unwrap());
-    //             use_loading.set(false);
-    //         });
-    //     })
-    // };
-
     let on_symbol_click = {
         let use_instruments_url = use_instruments_url.clone();
         Callback::from(move |instruments_url: String| {
@@ -98,14 +96,15 @@ pub fn home() -> Html {
         })
     };
 
-    let on_watch_click = {
+    let on_action_click = {
         let use_watch_instruments = use_watch_instruments.clone();
         let use_portfolio_instruments = use_portfolio_instruments.clone();
         let use_loading = use_loading.clone();
 
-        Callback::from(move |inst: CompactInstrument| {
+        Callback::from(move |(action_type, list_type, inst): (ActionType, ListType, CompactInstrument)| {
             let use_watch_instruments = use_watch_instruments.clone();
             let use_portfolio_instruments = use_portfolio_instruments.clone();
+            let portfolio_url = portfolio_url.clone();
             let watch_list_url = watch_list_url.clone();
             let use_loading = use_loading.clone();
             use_loading.set(true);
@@ -123,11 +122,40 @@ pub fn home() -> Html {
             };
 
             wasm_bindgen_futures::spawn_local(async move {
-                let watch_list_url = watch_list_url.clone();
-                let _res = api::upsert_watch_instrument(&watch_list_url, watch_instrument)
-                    .await
-                    .unwrap();
-                use_watch_instruments.set(vec![inst.clone()]);
+
+            match list_type {
+                _x if action_type == ActionType::WatchListAdd => {
+                    let watch_list = &*use_watch_instruments;
+                    let mut current_items = watch_list.clone();
+                    if !current_items.contains(&inst) { 
+                        current_items.push(inst.clone());
+                        use_watch_instruments.set(current_items);
+                    }
+                    api::upsert_watch_instrument(watch_list_url.clone(), watch_instrument).await.unwrap()
+                }
+                _x if action_type == ActionType::WatchListDelete => {
+                    let watch_list = &*use_watch_instruments;
+                    let current_items: Vec<CompactInstrument> = watch_list.iter().filter(|x| inst.symbol != x.symbol).map(|x|x.clone()).collect();
+                    use_watch_instruments.set(current_items);
+                    api::delete_watch_instrument(watch_list_url.clone(), watch_instrument).await.unwrap()
+                }
+                _x if action_type == ActionType::PortfolioAdd => {
+                    let portfolio = &*use_portfolio_instruments;
+                    let mut current_items = portfolio.clone();
+                    if !current_items.contains(&inst) { 
+                        current_items.push(inst.clone());
+                        use_portfolio_instruments.set(current_items);
+                    }
+                    api::upsert_portfolio_instrument(portfolio_url.clone(), watch_instrument).await.unwrap()
+                }, 
+                _x if action_type == ActionType::PortfolioDelete  => {
+                    let portfolio = &*use_portfolio_instruments;
+                    let current_items: Vec<CompactInstrument> = portfolio.iter().filter(|x| inst.symbol != x.symbol).map(|x|x.clone()).collect();
+                    use_portfolio_instruments.set(current_items); 
+                    api::delete_portfolio_instrument(portfolio_url.clone(), watch_instrument).await.unwrap()
+                }
+                _ => api::upsert_watch_instrument(watch_list_url.clone(), watch_instrument).await.unwrap() 
+            };
                 use_loading.set(false);
             });
         })
@@ -207,19 +235,19 @@ pub fn home() -> Html {
            <div class="container">
                 <div class="notification is-fluid ">
                     <h2 class="navbar-item is-size-3">{ "Portfolio" }</h2>
-                    <InstrumentsList on_symbol_click={ on_symbol_click.clone()} on_watch_click={ on_watch_click.clone()} instruments={(*use_portfolio_instruments).clone()} />
+                    <InstrumentsList list_type={ ListType::PortFolio } on_symbol_click={ on_symbol_click.clone()} on_action_click={ on_action_click.clone()} instruments={(*use_portfolio_instruments).clone()} />
                     <h2 class="navbar-item is-size-3">{ "Watch List" }</h2>
-                    <InstrumentsList on_symbol_click={ on_symbol_click.clone()} on_watch_click={ on_watch_click.clone()} instruments={(*use_watch_instruments).clone()} />
+                    <InstrumentsList list_type={ ListType::WatchList } on_symbol_click={ on_symbol_click.clone()} on_action_click={ on_action_click.clone()} instruments={(*use_watch_instruments).clone()} />
                     <h2 class="navbar-item is-size-3">{ "Strategy" }</h2>
-                    <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={strategy} />
+                    <InstrumentsList list_type={ ListType::Strategy } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={strategy} />
                     <h2 class="navbar-item is-size-3">{ "New patterns" }</h2>
-                    <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={suggested} />
+                    <InstrumentsList list_type={ ListType::NewPatterns } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={suggested} />
                       <h2 class="navbar-item is-size-3">{ "Pattern activated" }</h2>
-                    <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={activated} />
+                    <InstrumentsList list_type={ ListType::Activated } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={activated} />
                     <h2 class="navbar-item is-size-3">{ "Commodities " }</h2>
-                    <InstrumentsList on_symbol_click={ on_symbol_click.clone() } on_watch_click={ on_watch_click.clone() } instruments={commodities} />
+                    <InstrumentsList list_type={ ListType::Commodities } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={commodities} />
                      <h2 class="navbar-item is-size-3">{ "Crypto" }</h2>
-                    <InstrumentsList on_symbol_click={ on_symbol_click } on_watch_click={ on_watch_click } instruments={crypto} />
+                    <InstrumentsList list_type={ ListType::Crypto } on_symbol_click={ on_symbol_click } on_action_click={ on_action_click } instruments={crypto} />
 
             </div>
             </div>

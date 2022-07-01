@@ -76,3 +76,23 @@ pub async fn upsert(
         result: "ok".to_owned(),
     }))
 }
+
+
+pub async fn delete(watch_instrument: String, state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+    let watch_instrument: WatchInstrument = serde_json::from_str(&watch_instrument).unwrap();
+    let symbol = watch_instrument.symbol.clone();
+
+    let result = db::portfolio::delete(&watch_instrument, &state).await.unwrap();
+
+    println!(
+        "[DELETED PORTFOLIO] {:?} {:?} {:?}",
+        Local::now(),
+        symbol,
+        now.elapsed()
+    );
+
+    Ok(HttpResponse::Ok().json(ApiResponse {
+        result: "ok".to_owned(),
+    }))
+}

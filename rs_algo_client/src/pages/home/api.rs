@@ -45,12 +45,27 @@ where
     Ok(res)
 }
 
-pub async fn upsert_watch_instrument(url: &str, data: WatchInstrument) -> Result<ApiResponse>
+pub async fn upsert_watch_instrument(url: String, data: WatchInstrument) -> Result<ApiResponse>
 where
 {
     log::info!("[CLIENT] Request with {}", data);
 
     let res: ApiResponse = request::<WatchInstrument>(&url, &data, HttpMethod::Put)
+        .await
+        .unwrap()
+        .json()
+        .await
+        .map_err(|_e| RsAlgoError::RequestError)?;
+
+    Ok(res)
+}
+
+pub async fn delete_watch_instrument(url: String, data: WatchInstrument) -> Result<ApiResponse>
+where
+{
+    log::info!("[CLIENT] Request with {}", data);
+
+    let res: ApiResponse = request::<WatchInstrument>(&url, &data, HttpMethod::Delete)
         .await
         .unwrap()
         .json()
@@ -78,12 +93,27 @@ where
     Ok(res)
 }
 
-pub async fn upsert_portfolio_instrument(url: &str, data: WatchInstrument) -> Result<ApiResponse>
+pub async fn upsert_portfolio_instrument(url: String, data: WatchInstrument) -> Result<ApiResponse>
 where
 {
     log::info!("[CLIENT] Request with {}", data);
 
     let res: ApiResponse = request::<WatchInstrument>(&url, &data, HttpMethod::Put)
+        .await
+        .unwrap()
+        .json()
+        .await
+        .map_err(|_e| RsAlgoError::RequestError)?;
+
+    Ok(res)
+}
+
+pub async fn delete_portfolio_instrument(url: String, data: WatchInstrument) -> Result<ApiResponse>
+where
+{
+    log::info!("[CLIENT] Request with {}", data);
+
+    let res: ApiResponse = request::<WatchInstrument>(&url, &data, HttpMethod::Delete)
         .await
         .unwrap()
         .json()

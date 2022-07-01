@@ -15,7 +15,7 @@ use std::env;
 use yew::{function_component, html, Callback, Properties, Html,events::Event};
 use wasm_bindgen::prelude::*;
 
-
+use crate::pages::home::page::{ActionType,ListType};
 
 #[wasm_bindgen]
 extern "C" {
@@ -125,14 +125,15 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
 #[derive(Clone, Properties, PartialEq)]
 pub struct Props {
     pub instruments: Vec<CompactInstrument>,
+    pub list_type: ListType, 
     pub on_symbol_click: Callback<String>,
-    pub on_watch_click: Callback<CompactInstrument>,
+    pub on_action_click: Callback<(ActionType, ListType, CompactInstrument)>,
 }
 
 #[function_component(InstrumentsList)]
 pub fn instrument_list(props: &Props
 ) -> Html {
-    let Props { instruments, on_symbol_click, on_watch_click } = props;
+    let Props { instruments, list_type, on_symbol_click, on_action_click } = props;
     let base_url = get_base_url();
     let url = [base_url.as_str(), "api/instruments/chart/"].concat();
 
@@ -149,8 +150,25 @@ pub fn instrument_list(props: &Props
 
             let on_watch_select = {
                 let instrument = instrument.clone();
-                let on_watch_click = on_watch_click.clone();
-                Callback::from(move |_| on_watch_click.emit(instrument.clone()))
+                let on_action_click = on_action_click.clone();
+                let action = match list_type {
+                    ListType::WatchList => ActionType::WatchListDelete,
+                    _ => ActionType::WatchListAdd
+                };
+
+                let res = (action, list_type.clone(), instrument);
+                Callback::from(move |_| on_action_click.emit(res.clone()))
+            };
+
+            let on_portfolio_select = {
+                let instrument = instrument.clone();
+                let on_action_click = on_action_click.clone();
+                let action = match list_type {
+                    ListType::PortFolio => ActionType::PortfolioDelete,
+                    _ => ActionType::PortfolioAdd
+                };
+                let res = (action, list_type.clone(), instrument);
+                Callback::from(move |_| on_action_click.emit(res.clone()))
             };
           
             let local_pattern = pattern_info(instrument.patterns.local_patterns.last()); 
@@ -224,12 +242,21 @@ pub fn instrument_list(props: &Props
                 _ => (false, "".to_owned())
             };
 
-            let onleches = "this.style.display='none'";
+            let icon_portfolio = match list_type {
+                ListType::PortFolio => "img/delete.png",
+                _ => "img/add.png",
+            };
+
+            let icon_watchlist = match list_type {
+                ListType::WatchList => "img/delete.png",
+                _ => "img/add.png",
+            };
+
             html! {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>
                         if instrument_image.0 {
-                        <img loading="lazy" class="icon" src={instrument_image.1} />
+                        <img loading="lazy" class="instrument_icon" src={instrument_image.1} />
                     }
                         {format!("{}", instrument.symbol)}</a>
                     </td>
@@ -245,7 +272,8 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
                     <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
                     <td> {format!("{}", date.format("%d/%m %H:%M"))}</td>
-                    <td  onclick={ on_watch_select }><a href={"javascript:void(0);"}>{ "x" }</a></td>
+                    <td  onclick={ on_watch_select }><a href={"javascript:void(0);"}><img src={ icon_watchlist } class="action_icon" /></a></td>
+                    <td  onclick={ on_portfolio_select }><a href={"javascript:void(0);"}><img src={ icon_portfolio } class="action_icon" /></a></td>
                 </tr>
             }
         })
@@ -270,6 +298,7 @@ pub fn instrument_list(props: &Props
                 <th>{ "Divergence" }</th>
                 <th>{ "Updated" }</th>
                 <th>{ "W" }</th>
+                <th>{ "P" }</th>
                 </tr>
             </thead>
             <tbody>

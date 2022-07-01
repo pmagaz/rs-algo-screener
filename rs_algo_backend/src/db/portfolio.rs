@@ -6,7 +6,8 @@ use actix_web::web;
 use bson::doc;
 use futures::StreamExt;
 use mongodb::error::Error;
-use mongodb::options::FindOneAndReplaceOptions;
+use mongodb::results::DeleteResult;
+use mongodb::options::{DeleteOptions, FindOneAndReplaceOptions};
 use std::env;
 
 pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<WatchInstrument>, Error> {
@@ -41,6 +42,22 @@ pub async fn upsert(
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))
                 .build(),
+        )
+        .await
+}
+
+
+pub async fn delete(
+    doc: &WatchInstrument,
+    state: &web::Data<AppState>,
+) -> Result<DeleteResult, Error> {
+    let collection_name = &env::var("DB_PORTFOLIO_COLLECTION").unwrap();
+    let collection = get_collection::<WatchInstrument>(&state.db_hdd, collection_name).await;
+
+    collection
+        .delete_one(
+            doc! { "symbol": doc.symbol.clone() },
+            DeleteOptions::builder().build(),
         )
         .await
 }
