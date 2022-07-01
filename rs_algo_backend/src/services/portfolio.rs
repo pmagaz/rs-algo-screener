@@ -83,7 +83,7 @@ pub async fn delete(watch_instrument: String, state: web::Data<AppState>) -> Res
     let watch_instrument: WatchInstrument = serde_json::from_str(&watch_instrument).unwrap();
     let symbol = watch_instrument.symbol.clone();
 
-    let result = db::portfolio::delete(&watch_instrument, &state).await.unwrap();
+    let _result = db::portfolio::delete(&watch_instrument, &state).await.unwrap();
 
     println!(
         "[DELETED PORTFOLIO] {:?} {:?} {:?}",

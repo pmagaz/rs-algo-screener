@@ -5,7 +5,7 @@ use crate::trade::*;
 use async_trait::async_trait;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::candle::*;
+
 use rs_algo_shared::models::instrument::Instrument;
 use rs_algo_shared::models::pattern::*;
 
@@ -40,7 +40,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
         let backwards_candles = 5;
-        let max_band_hits = 3;
+        let _max_band_hits = 3;
         let mut hits_over_top_band: usize = 0;
         let mut hits_over_low_band: usize = 0;
         let mut hits_above_mid_band: usize = 0;
@@ -80,23 +80,23 @@ impl<'a> Strategy for BollingerBands<'a> {
         trade_in: &TradeIn,
     ) -> TradeResult {
         let prev_index = get_prev_index(index);
-        let candle_type = &instrument.data.get(index).unwrap().candle_type;
+        let _candle_type = &instrument.data.get(index).unwrap().candle_type;
 
         let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let mid_band = instrument.indicators.bb.data_c.get(index).unwrap();
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
 
-        let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
+        let _prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
         let patterns = &instrument.patterns.local_patterns;
         let current_pattern = get_current_pattern(index, patterns);
-        let close_price = &instrument.data.get(index).unwrap().close;
-        let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let bbw = instrument.indicators.bbw.data_a.get(index).unwrap();
-        let prev_bbw = instrument.indicators.bbw.data_a.get(prev_index).unwrap();
+        let _close_price = &instrument.data.get(index).unwrap().close;
+        let _prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let _bbw = instrument.indicators.bbw.data_a.get(index).unwrap();
+        let _prev_bbw = instrument.indicators.bbw.data_a.get(prev_index).unwrap();
 
         let backwards_candles = 5;
-        let max_band_hits = 3;
+        let _max_band_hits = 3;
         let mut hits_over_top_band: usize = 0;
         let mut hits_over_low_band: usize = 0;
         let mut hits_above_mid_band: usize = 0;

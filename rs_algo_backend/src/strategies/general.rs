@@ -44,7 +44,7 @@ impl General {
     }
 
     pub fn query(&self) -> Document {
-        let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
+        let _minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -155,7 +155,7 @@ impl General {
                         None => fake_date,
                     };
 
-                    let last_divergence_type = match last_divergence {
+                    let _last_divergence_type = match last_divergence {
                         Some(val) => &val.divergence_type,
                         None => &DivergenceType::None,
                     };

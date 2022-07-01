@@ -3,7 +3,7 @@ use rs_algo_shared::models::candle::Candle;
 use rs_algo_shared::models::pattern::*;
 use std::cmp::Ordering;
 
-use crate::trade;
+
 
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
     size * (price_out - price_in)
@@ -66,8 +66,8 @@ pub fn total_gross(trades_out: &Vec<&TradeOut>) -> f64 {
 }
 
 pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
-    if trades_out.len() < 1 {
-        return 0.01;
+    if trades_out.is_empty() {
+        0.01
     } else {
         let profit_per_trade: f64 = trades_out.iter().map(|trade| trade.profit_per).sum();
         profit_per_trade / trades_out.len() as f64
