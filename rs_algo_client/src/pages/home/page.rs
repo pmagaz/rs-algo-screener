@@ -37,6 +37,7 @@ pub enum ListType {
     Activated,
     Commodities,
     Crypto,
+    Currency,
 }
 
 #[function_component(Home)]
@@ -203,17 +204,26 @@ pub fn home() -> Html {
         .map(|x| x.clone())
         .collect();
 
+    let currency: Vec<CompactInstrument> = use_instruments
+        .iter()
+        .filter(|x| {
+            x.symbol == "EURUSD"
+                || x.symbol == "USDJPY"
+                || x.symbol == "GBPUSD"
+                || x.symbol == "USDCHF"
+                || x.symbol == "USDCAD"
+        })
+        .map(|x| x.clone())
+        .collect();
+
     let crypto: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
             x.symbol == "BITCOIN"
                 || x.symbol == "ETHEREUM"
                 || x.symbol == "RIPPLE"
-                || x.symbol == "LITECOIN"
                 || x.symbol == "DOGECOIN"
-                || x.symbol == "POLKADOT"
-                || x.symbol == "CHAINLINK"
-                || x.symbol == "SOLANA"
+                || x.symbol == "CARDANO"
         })
         .map(|x| x.clone())
         .collect();
@@ -242,11 +252,13 @@ pub fn home() -> Html {
                     <InstrumentsList list_type={ ListType::Strategy } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={strategy} />
                     <h2 class="navbar-item is-size-3">{ "New patterns" }</h2>
                     <InstrumentsList list_type={ ListType::NewPatterns } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={suggested} />
-                      <h2 class="navbar-item is-size-3">{ "Pattern activated" }</h2>
+                    <h2 class="navbar-item is-size-3">{ "Pattern activated" }</h2>
                     <InstrumentsList list_type={ ListType::Activated } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={activated} />
+                    <h2 class="navbar-item is-size-3">{ "Currency" }</h2>
+                    <InstrumentsList list_type={ ListType::Currency } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={currency} />
                     <h2 class="navbar-item is-size-3">{ "Commodities " }</h2>
                     <InstrumentsList list_type={ ListType::Commodities } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={commodities} />
-                     <h2 class="navbar-item is-size-3">{ "Crypto" }</h2>
+                    <h2 class="navbar-item is-size-3">{ "Crypto" }</h2>
                     <InstrumentsList list_type={ ListType::Crypto } on_symbol_click={ on_symbol_click } on_action_click={ on_action_click } instruments={crypto} />
 
             </div>
