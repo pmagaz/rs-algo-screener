@@ -93,6 +93,8 @@ impl Peaks {
             .parse::<f64>()
             .unwrap();
 
+        let logarithmic = env::var("LOGARITHMIC_SCANNER").unwrap().parse::<bool>().unwrap();
+
         let kernel_source = env::var("PRICE_SOURCE").unwrap();
 
         let mut smooth_highs: Vec<f64> = vec![];
@@ -106,6 +108,7 @@ impl Peaks {
         let mut candle_id = 0;
         for x in &self.close {
             if kernel_source == "highs_lows" {
+
                 let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
                 let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
                 smooth_highs.push(smoothed_high.abs());

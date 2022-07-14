@@ -98,6 +98,7 @@ impl Instrument {
     ) -> Result<()> {
         let mut avg_volume = vec![];
         let logarithmic = env::var("LOGARITHMIC_SCANNER").unwrap().parse::<bool>().unwrap();
+        
         let candles: Vec<Candle> = data
             .iter()
             .enumerate()
@@ -113,7 +114,7 @@ impl Instrument {
                     true => {
                         open = x.1.ln();
                         high = x.2.ln();
-                        close = x.3.ln();
+                        close = x.4.ln();
                         low = match x.3 {
                             _x if x.3 > 0. => x.3.ln(),
                             _x if x.3 <= 0. => 0.01,
