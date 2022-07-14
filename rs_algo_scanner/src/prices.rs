@@ -4,6 +4,7 @@ use crate::helpers::slope_intercept::slope_intercept;
 use rs_algo_shared::helpers::comp::percentage_change;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::pattern::{DataPoints, PatternType};
+use std::env;
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
 
@@ -83,6 +84,8 @@ pub fn search_price_break(
     candles: &Vec<Candle>,
     comparator: &dyn Fn(f64, f64) -> bool,
 ) -> PriceBreak {
+    let logarithmic = env::var("LOGARITHMIC_SCANNER").unwrap().parse::<bool>().unwrap();
+
     let len = points.len();
     if len > 1 {
         let start = points[0];
@@ -95,10 +98,13 @@ pub fn search_price_break(
         for n in (start_index..=end_index).step_by(2) {
             if n < end_index {
                 let next_price = (slope * n as f64) + y_intercept;
-                let current_price = &candles[n].close().exp();
+                let current_price = match logarithmic {
+                    true => candles[n].close().exp(),
+                    false => candles[n].close()
+                };
                 let current_date = &candles[n].date();
 
-                if comparator(*current_price, next_price) {
+                if comparator(current_price, next_price) {
                     return (true, n, next_price, to_dbtime(*current_date));
                 }
             }

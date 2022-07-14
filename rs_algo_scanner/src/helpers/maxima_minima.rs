@@ -1,6 +1,7 @@
 use crate::error::Result;
 use find_peaks::PeakFinder;
 use std::cmp::Ordering;
+use std::env;
 
 pub fn maxima_minima(
     x_values: &Vec<f64>,
@@ -8,6 +9,7 @@ pub fn maxima_minima(
     min_prominence: f64,
     min_distance: usize,
 ) -> Result<Vec<(usize, f64)>> {
+    let logarithmic = env::var("LOGARITHMIC_SCANNER").unwrap().parse::<bool>().unwrap();
     let result: Vec<(usize, f64)> = PeakFinder::new(&x_values)
         .with_min_prominence(min_prominence)
         .with_min_distance(min_distance)
@@ -16,7 +18,11 @@ pub fn maxima_minima(
         .map(|peak| {
             let x = peak.middle_position();
             let y = y_values[x];
-            return (x, y.exp());
+            let y = match logarithmic {
+                true => y.exp(),
+                false => y
+            };
+            return (x, y);
         })
         .collect();
     Ok(result)

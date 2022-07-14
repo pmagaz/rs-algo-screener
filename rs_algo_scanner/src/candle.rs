@@ -6,6 +6,7 @@ pub type OHLCV = (f64, f64, f64, f64);
 pub type DOHLCV = (DateTime<Local>, f64, f64, f64, f64, f64);
 
 use serde::{Deserialize, Serialize};
+use std::env;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CandleType {
@@ -70,7 +71,7 @@ impl Candle {
         &self.candle_type
     }
 
-    pub fn to_exp_values(&self) -> Self {
+    pub fn from_logarithmic_values(&self) -> Self {
         Self {
             date: self.date,
             open: self.open.exp(),
@@ -91,6 +92,7 @@ pub struct CandleBuilder {
     close: Option<f64>,
     volume: Option<f64>,
     previous_candles: Option<Vec<DOHLCV>>,
+    logarithmic: Option<bool>,
 }
 
 impl CandleBuilder {
@@ -103,6 +105,7 @@ impl CandleBuilder {
             close: None,
             volume: None,
             previous_candles: None,
+            logarithmic: None,
         }
     }
 
@@ -141,22 +144,43 @@ impl CandleBuilder {
         self
     }
 
+    pub fn logarithmic(mut self, val: bool) -> Self {
+        self.logarithmic = Some(val);
+        self
+    }
+
     fn get_current_ohlc(&self) -> OHLCV {
-        (
-            self.open.unwrap().exp(),
-            self.high.unwrap().exp(),
-            self.low.unwrap().exp(),
-            self.close.unwrap().exp(),
-        )
+        
+        match self.logarithmic.unwrap() {
+            true => (
+                self.open.unwrap().exp(),
+                self.high.unwrap().exp(),
+                self.low.unwrap().exp(),
+                self.close.unwrap().exp(),
+        ),
+            false => (
+                self.open.unwrap(),
+                self.high.unwrap(),
+                self.low.unwrap(),
+                self.close.unwrap(),
+        ) }
     }
 
     fn get_previous_ohlc(&self, index: usize) -> OHLCV {
-        (
-            self.previous_candles.as_ref().unwrap()[index].1,
-            self.previous_candles.as_ref().unwrap()[index].2,
-            self.previous_candles.as_ref().unwrap()[index].3,
-            self.previous_candles.as_ref().unwrap()[index].4,
-        )
+        match self.logarithmic.unwrap() {
+            true => (
+                self.previous_candles.as_ref().unwrap()[index].1.exp(),
+                self.previous_candles.as_ref().unwrap()[index].2.exp(),
+                self.previous_candles.as_ref().unwrap()[index].3.exp(),
+                self.previous_candles.as_ref().unwrap()[index].4.exp(),
+            ),
+            false => (
+                self.previous_candles.as_ref().unwrap()[index].1,
+                self.previous_candles.as_ref().unwrap()[index].2,
+                self.previous_candles.as_ref().unwrap()[index].3,
+                self.previous_candles.as_ref().unwrap()[index].4,
+            )
+        }
     }
 
     fn is_doji(&self) -> bool {
@@ -380,6 +404,7 @@ impl CandleBuilder {
             Some(close),
             Some(volume),
             Some(previous_candles),
+            Some(logarithmic),
         ) = (
             self.date,
             self.open,
@@ -388,6 +413,7 @@ impl CandleBuilder {
             self.close,
             self.volume,
             self.previous_candles.as_ref(),
+            self.logarithmic,
         ) {
 
             Ok(Candle {
