@@ -173,8 +173,8 @@ pub fn bands_have_same_slope(data: &DataPoints) -> bool {
 
     let (points_1, _y) = slope_intercept(data[0].0 as f64, data[0].1, data[2].0 as f64, data[2].1);
     let (points_2, _y) = slope_intercept(data[1].0 as f64, data[1].1, data[3].0 as f64, data[3].1);
-    
-    (round(points_1.abs(), 2) - round(points_2.abs(), 2)).abs() < threshold
+   
+    (round(points_1.abs(), 2) / round(points_2.abs(), 2)).abs() < threshold
 }
 
 pub fn are_parallel_lines(data: &DataPoints) -> bool {
@@ -182,7 +182,15 @@ pub fn are_parallel_lines(data: &DataPoints) -> bool {
         .unwrap()
         .parse::<f64>()
         .unwrap();
-        //println!("444444 {:?} ",  ((data[0].1 * data[3].1) / (data[2].1 * data[1].1)).abs());
+    ((data[0].1 * data[3].1) / (data[2].1 * data[1].1)).abs() <= threshold
+}
+
+pub fn is_valid_triangle(data: &DataPoints) -> bool {
+    let threshold = env::var("PARALLEL_LINES_THRESHOLD")
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
+        println!("444444 {:?} ",  ((data[0].1 * data[3].1) / (data[2].1 * data[1].1)).abs());
     ((data[0].1 * data[3].1) / (data[2].1 * data[1].1)).abs() <= threshold
 }
 

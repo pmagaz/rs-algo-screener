@@ -8,6 +8,7 @@ use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 pub fn is_ascendant_top(data: &DataPoints) -> bool {
     if upper_band_is_equal_top(data)
         && is_higher_lows_bottom(data)
+        && is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && has_minimum_bars(data)
         && has_minimum_target(data)
@@ -23,6 +24,7 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
 pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
     if is_higher_lows_top(data)
         && upper_band_is_equal_bottom(data)
+        && is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && has_minimum_bars(data)
         && has_minimum_target(data)
@@ -38,6 +40,7 @@ pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
 pub fn is_descendant_top(data: &DataPoints) -> bool {
     if is_lower_highs_top(data)
         && lower_band_is_equal_bottom(data)
+        && is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && has_minimum_bars(data)
         && has_minimum_target(data)
@@ -53,6 +56,7 @@ pub fn is_descendant_top(data: &DataPoints) -> bool {
 pub fn is_descendant_bottom(data: &DataPoints) -> bool {
     if lower_band_is_equal_top(data)
         && is_lower_highs_bottom(data)
+        && is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && has_minimum_bars(data)
         && has_minimum_target(data)
@@ -68,6 +72,7 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
 pub fn is_symmetrical_top(data: &DataPoints) -> bool {
     if is_lower_highs_top(data)
         && is_higher_lows_bottom(data)
+        //&& is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
         && has_minimum_bars(data)
@@ -84,6 +89,7 @@ pub fn is_symmetrical_top(data: &DataPoints) -> bool {
 pub fn is_symmetrical_bottom(data: &DataPoints) -> bool {
     if is_lower_highs_bottom(data)
         && is_higher_lows_top(data)
+        //&& is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
         && has_minimum_bars(data)

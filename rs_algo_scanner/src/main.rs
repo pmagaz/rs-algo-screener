@@ -84,12 +84,27 @@ async fn main() -> Result<()> {
     let env = env::var("ENV").unwrap();
 
     if env == "development" {
-        symbols = vec![Symbol {
-            symbol: "DOYU.US".to_owned(),
+        symbols = vec![
+        Symbol {
+            symbol: "RIPPLE".to_owned(),
             category: "".to_owned(),
             description: "".to_owned(),
             currency: "".to_owned(),
-        }]
+        },
+        Symbol {
+            symbol: "ETHEREUM".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        Symbol {
+            symbol: "BITCOIN".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+
+        ]
     };
 
     let backtest_mode = env::var("SCANNER_BACKTEST_MODE")

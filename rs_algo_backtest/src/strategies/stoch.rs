@@ -1,24 +1,33 @@
-use super::strategy::Strategy;
+use super::strategy::*;
 
 use crate::helpers::calc::*;
 use crate::trade::*;
 use async_trait::async_trait;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::Instrument;
 
 pub struct Stoch<'a> {
     name: &'a str,
+    strategy_type: StrategyType,
 }
 
 #[async_trait]
 impl<'a> Strategy for Stoch<'a> {
     fn new() -> Result<Self> {
-        Ok(Self { name: "Stoch" })
+        Ok(Self {
+            name: "Stoch",
+            strategy_type: StrategyType::OnlyLong,
+        })
     }
 
     fn name(&self) -> &str {
         self.name
+    }
+
+    fn strategy_type(&self) -> &StrategyType {
+        &self.strategy_type
     }
 
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {

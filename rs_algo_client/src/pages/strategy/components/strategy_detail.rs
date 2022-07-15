@@ -61,8 +61,8 @@ pub fn strategy_detail(props: &Props) -> Html {
                 <tr>
                     <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.instrument.symbol.clone()}</a></td>
                     <td class={get_status_class(&profit_status)}> { format!("{}%", round(backtest_instrument.net_profit_per,2))}</td>
-                    <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(backtest_instrument.profitable_trades,2))}</td>
                     <td class={get_status_class(&profit_factor_status)}> { round(backtest_instrument.profit_factor,2) }</td>
+                    <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(backtest_instrument.profitable_trades,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}>{ format!("{}%", round(backtest_instrument.max_drawdown,2))}</td>
                     <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(backtest_instrument.won_per_trade_per,2))}</td>
                     <td>{ backtest_instrument.trades}</td>
@@ -81,8 +81,8 @@ pub fn strategy_detail(props: &Props) -> Html {
                 <tr>
                 <th><abbr>{ "Instrument" }</abbr></th>
                 <th><abbr>{ "Net Profit" }</abbr></th>
-                <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Profit F." }</abbr></th>
+                <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
                 <th><abbr>{ "Won p trade" }</abbr></th>
                 <th><abbr>{ "Trades" }</abbr></th>

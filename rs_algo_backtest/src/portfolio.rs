@@ -124,6 +124,7 @@ impl PortFolio {
 
             let strategy_result = BackTestStrategyResult {
                 strategy: strategy.name().to_owned(),
+                strategy_type: strategy.strategy_type().to_owned(),
                 date: to_dbtime(Local::now()),
                 avg_sessions: average_usize(&avg_sessions),
                 avg_trades: average_usize(&avg_trades),

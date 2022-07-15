@@ -44,9 +44,10 @@ pub fn strategy_list(props: &Props) -> Html {
                     <td>
                     <Link<Route> to={Route::Strategy { id: strategy.strategy.clone() }}>{ strategy.strategy.clone() }</Link<Route>>
                     </td>
+                    <td>{ format!(" {:?} ", strategy.strategy_type )}</td>
                     <td class={get_status_class(&profit_status)}> { format!("{}%", round(strategy.avg_net_profit_per,2))}</td>
-                    <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
                     <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
+                    <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}> { format!("{}%", round(strategy.avg_max_drawdown,2))}</td>
                     <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(strategy.avg_won_per_trade,2))}</td>
                     <td>{ strategy.avg_trades}</td>
@@ -64,10 +65,11 @@ pub fn strategy_list(props: &Props) -> Html {
         <table class="table is-bordered">
             <thead class="has-background-grey-lighter">
                 <tr>
-                <th><abbr>{ "Instrument" }</abbr></th>
+                <th><abbr>{ "Strategy" }</abbr></th>
+                <th><abbr>{ "Type" }</abbr></th>
                 <th><abbr>{ "Net Profit" }</abbr></th>
-                <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Profit F." }</abbr></th>
+                <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
                 <th><abbr>{ "Won p trade" }</abbr></th>
                 <th><abbr>{ "Trades" }</abbr></th>

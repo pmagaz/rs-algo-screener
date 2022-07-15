@@ -1,16 +1,17 @@
-use super::strategy::Strategy;
+use super::strategy::*;
 
 use crate::helpers::calc::*;
 use crate::trade::*;
 use async_trait::async_trait;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
-
+use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::Instrument;
 use rs_algo_shared::models::pattern::*;
 
 pub struct BollingerBands<'a> {
     name: &'a str,
+    strategy_type: StrategyType,
 }
 
 #[async_trait]
@@ -18,11 +19,16 @@ impl<'a> Strategy for BollingerBands<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
             name: "Bollinger_Bands_Reversal_Riding_BandWidth",
+            strategy_type: StrategyType::OnlyLong,
         })
     }
 
     fn name(&self) -> &str {
         self.name
+    }
+
+    fn strategy_type(&self) -> &StrategyType {
+        &self.strategy_type
     }
 
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {

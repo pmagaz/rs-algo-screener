@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::Instrument;
 
 #[async_trait(?Send)]
@@ -63,6 +64,8 @@ pub trait Strategy {
         self.backtest_result(instrument, trades_in, trades_out, equity, commission)
     }
     fn name(&self) -> &str;
+    fn strategy_type(&self) -> &StrategyType;
+    //fn entry_type(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeType;
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult;
     fn market_out_fn(
         &self,
