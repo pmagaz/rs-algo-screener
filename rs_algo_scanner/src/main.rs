@@ -1,8 +1,8 @@
 use crate::broker::Symbol;
 use crate::error::Result;
 use error::RsAlgoErrorKind;
+use reqwest::{Client, Error, Response};
 use std::time::Instant;
-
 //use broker::xtb::*;
 use instrument::Instrument;
 use rs_algo_shared::broker;
@@ -23,10 +23,35 @@ mod prices;
 mod screener;
 
 use dotenv::dotenv;
-use rs_algo_shared::helpers::http::{request, HttpMethod};
+use rs_algo_shared::helpers::http::HttpMethod;
 
+use serde::{Deserialize, Serialize};
 use std::env;
+use std::fmt::Debug;
 use std::{thread, time};
+
+pub async fn request<T>(
+    url: &str,
+    data: &T,
+    method: HttpMethod,
+) -> std::result::Result<Response, Error>
+where
+    for<'de> T: Serialize + Deserialize<'de> + Debug,
+{
+    println!("[HTTP] {:?} request to {}", method, url);
+
+    let result = match method {
+        HttpMethod::Post => Client::builder().build().unwrap().post(url),
+        HttpMethod::Put => Client::builder().build().unwrap().put(url),
+        HttpMethod::Get => Client::builder().build().unwrap().get(url),
+        HttpMethod::Patch => Client::builder().build().unwrap().patch(url),
+        HttpMethod::Delete => Client::builder().build().unwrap().delete(url),
+    };
+    let response = result.json(&data).send().await;
+    println!("[HTTP] response {:?}", &response);
+
+    response
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -115,7 +140,7 @@ async fn main() -> Result<()> {
                         };
 
                         let now = Instant::now();
-
+                        println!("{:?}", instrument);
                         let res = request(&url, &instrument, HttpMethod::Put).await.unwrap();
                         //.map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
