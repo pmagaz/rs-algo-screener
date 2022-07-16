@@ -140,7 +140,6 @@ async fn main() -> Result<()> {
                         };
 
                         let now = Instant::now();
-                        println!("{:?}", instrument);
                         let res = request(&url, &instrument, HttpMethod::Put).await.unwrap();
                         //.map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
