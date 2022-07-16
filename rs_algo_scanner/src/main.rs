@@ -122,7 +122,7 @@ async fn main() -> Result<()> {
         if !backtest_mode
             || (backtest_mode && broker::sp500::is_in_sp500(&s.symbol, &sp500_symbols))
         {
-            println!("[INSTRUMENT] {:?} processing...", &s.symbol);
+            println!("[SCANNER] processing {} ...", &s.symbol);
 
             screener
                 .get_instrument_data(
@@ -131,7 +131,8 @@ async fn main() -> Result<()> {
                     from,
                     |instrument: Instrument| async move {
                         println!(
-                            "[INSTRUMENT] procesed {} to {} in {:?}",
+                            "[SCANNER] {} processed {} to {} in {:?}",
+                            &instrument.symbol(),
                             &instrument.data().first().unwrap().date(),
                             &instrument.date(),
                             now.elapsed(),
@@ -149,7 +150,7 @@ async fn main() -> Result<()> {
                             .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
                         println!(
-                            "[RESPONSE] {:?} status {:?} at {:?} in {:?}",
+                            "[BACKEND RESPONSE] {:?} status {:?} at {:?} in {:?}",
                             &instrument.symbol(),
                             res.status(),
                             Local::now(),
