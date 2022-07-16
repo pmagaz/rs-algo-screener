@@ -115,7 +115,6 @@ async fn main() -> Result<()> {
 
                         let now = Instant::now();
 
-                        println!("[SCANNER] sending data...");
                         let res = request(&url, &instrument, HttpMethod::Put)
                             .await
                             .map_err(|_e| RsAlgoErrorKind::RequestError)?;
