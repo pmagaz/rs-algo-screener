@@ -170,11 +170,11 @@ pub fn bands_have_same_slope(data: &DataPoints) -> bool {
         .unwrap()
         .parse::<f64>()
         .unwrap();
-
-    let (points_1, _y) = slope_intercept(data[0].0 as f64, data[0].1, data[2].0 as f64, data[2].1);
-    let (points_2, _y) = slope_intercept(data[1].0 as f64, data[1].1, data[3].0 as f64, data[3].1);
-   
-    (round(points_1.abs(), 2) / round(points_2.abs(), 2)).abs() < threshold
+    let (slope_1, _y1) = slope_intercept(data[0].0 as f64, data[0].1, data[2].0 as f64, data[2].1);
+    let (slope_2, _y2) = slope_intercept(data[1].0 as f64, data[1].1, data[3].0 as f64, data[3].1);
+    let diff = (slope_1 / slope_2).abs();
+    //println!("55555555 {:?} {:?} {:?}", slope_1, slope_2, diff);
+    diff < threshold
 }
 
 pub fn are_parallel_lines(data: &DataPoints) -> bool {
@@ -182,7 +182,28 @@ pub fn are_parallel_lines(data: &DataPoints) -> bool {
         .unwrap()
         .parse::<f64>()
         .unwrap();
-    ((data[0].1 * data[3].1) / (data[2].1 * data[1].1)).abs() <= threshold
+
+    let one = data[0].1 / data[1].1;
+    let two = data[2].1 / data[3].1;
+    // println!(
+    //     "3333333 {:?}",
+    //     (data[0].1 * data[3].1) / (data[2].1 * data[1].1).abs()
+    // );
+
+    /*
+    a1 = data[0]
+    */
+    //println!("666666 {:?} {:?} {:?} ", one, two, one / two);
+    println!(
+        "666666 6666666 {:?} {:?} {:?}",
+        (data[0].1 / data[1].1),
+        (data[2].1 / data[3].1),
+        ((data[0].1 / data[1].1) / (data[2].1 / data[3].1)).abs()
+    );
+
+    // leches < threshold
+    //(one / two).abs() < threshold
+    true
 }
 
 pub fn is_valid_triangle(data: &DataPoints) -> bool {
@@ -190,7 +211,6 @@ pub fn is_valid_triangle(data: &DataPoints) -> bool {
         .unwrap()
         .parse::<f64>()
         .unwrap();
-        println!("444444 {:?} ",  ((data[0].1 * data[3].1) / (data[2].1 * data[1].1)).abs());
     ((data[0].1 * data[3].1) / (data[2].1 * data[1].1)).abs() <= threshold
 }
 

@@ -329,7 +329,6 @@ impl Patterns {
                             not_founded = true;
                         } else if channel::is_descendant_bottom(&data_points) {
                             data_points = add_next_bottom_points(data_points);
-
                             let is_pattern_active = channel::channel_descendant_bottom_active(
                                 &data_points,
                                 candles,
