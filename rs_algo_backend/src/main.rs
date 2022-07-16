@@ -14,7 +14,7 @@ mod strategies;
 use db::mongo;
 use error::RsAlgoError;
 use middleware::cors::cors_middleware;
-use middleware::logger::logger;
+use middleware::logger::logger_middleware;
 use models::app_state::AppState;
 use models::db::Db;
 use services::back_test;
@@ -61,7 +61,7 @@ async fn main() -> Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(cors_middleware())
-            .wrap(logger())
+            .wrap(logger_middleware())
             .data(AppState {
                 app_name: String::from(&app_name),
                 db_mem: Db {
@@ -73,7 +73,7 @@ async fn main() -> Result<()> {
                     name: db_hdd_name.to_owned(),
                 },
             })
-            .app_data(web::PayloadConfig::new(10000000))
+            .app_data(web::PayloadConfig::new(100000000))
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")

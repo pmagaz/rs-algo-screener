@@ -24,22 +24,17 @@ ARG APP_NAME
 ARG TARGET
 
 ARG APP_DIR=/usr/src/$APP_NAME
-#EXPOSE 8000
 ENV APP_USER=dev
 
 #DEPENDENCIES
 RUN apk update \
   && apk add --no-cache tzdata \
-  && apk add --no-cache su-exec sudo \
   && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
   && rm -rf /var/cache/apk/*
 
 #USER
 RUN addgroup -S $APP_USER \
-  && adduser -S -g $APP_USER $APP_USER \
-  && echo '%wheel ALL=(ALL) ALL' >> \
-  /etc/sudoers.d/wheel \
-  && adduser $APP_USER wheel
+  && adduser -S -g $APP_USER $APP_USER 
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
 
