@@ -104,13 +104,13 @@ impl Peaks {
         let mut smooth_lows: Vec<f64> = vec![];
         let mut smooth_close: Vec<f64> = vec![];
 
-        let price_diff = max_price - min_price;
-        kernel_bandwidth = kernel_bandwidth * price_diff;
-        local_prominence = local_prominence * price_diff;
-
-        let mut candle_id = 0;
-
         if kernel_smoothing {
+            let mut candle_id = 0;
+
+            let price_diff = max_price - min_price;
+            kernel_bandwidth = kernel_bandwidth * price_diff;
+            local_prominence = local_prominence * price_diff;
+
             for x in &self.close {
                 if price_source == "highs_lows" {
                     let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
