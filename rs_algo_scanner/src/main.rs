@@ -47,41 +47,15 @@ async fn main() -> Result<()> {
     screener.login(username, password).await?;
     let mut symbols = screener.get_symbols().await.unwrap().symbols;
     let sp500_symbols = broker::sp500::get_symbols();
-    // let symbols = [
-    //     Symbol {
-    //         symbol: "ETSY.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     // Symbol {
-    //     //     symbol: "GOLD.US_9".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "GOOGL.US_9".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "BITCOIN".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    //     // Symbol {
-    //     //     symbol: "OIL".to_owned(),
-    //     //     category: "".to_owned(),
-    //     //     description: "".to_owned(),
-    //     //     currency: "".to_owned(),
-    //     // },
-    // ];
+
+    let env = env::var("ENV").unwrap();
 
     let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
-    let env = env::var("ENV").unwrap();
+
+    let backtest_mode = env::var("SCANNER_BACKTEST_MODE")
+        .unwrap()
+        .parse::<bool>()
+        .unwrap();
 
     if env == "development" {
         symbols = vec![
@@ -91,12 +65,12 @@ async fn main() -> Result<()> {
             //     description: "".to_owned(),
             //     currency: "".to_owned(),
             // },
-            Symbol {
-                symbol: "BITCOIN".to_owned(),
-                category: "".to_owned(),
-                description: "".to_owned(),
-                currency: "".to_owned(),
-            },
+            // Symbol {
+            //     symbol: "BITCOIN".to_owned(),
+            //     category: "".to_owned(),
+            //     description: "".to_owned(),
+            //     currency: "".to_owned(),
+            // },
             // Symbol {
             //     symbol: "ETHEREUM".to_owned(),
             //     category: "".to_owned(),
@@ -111,11 +85,6 @@ async fn main() -> Result<()> {
             // },
         ]
     };
-
-    let backtest_mode = env::var("SCANNER_BACKTEST_MODE")
-        .unwrap()
-        .parse::<bool>()
-        .unwrap();
 
     for s in symbols {
         let now = Instant::now();
