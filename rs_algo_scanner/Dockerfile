@@ -32,8 +32,15 @@ RUN addgroup -S $APP_USER \
 
 RUN apk update \
   && apk add --no-cache tzdata \
+  && apk add --no-cache su-exec sudo \
   && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
   && rm -rf /var/cache/apk/*
+
+RUN addgroup -S $APP_USER \
+  && adduser -S -g $APP_USER $APP_USER \
+  && echo '%wheel ALL=(ALL) ALL' >> \
+  /etc/sudoers.d/wheel \
+  && adduser $APP_USER wheel
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
 

@@ -16,7 +16,7 @@ jobs:
         cpu: 100m
       limits:
         cpu: 200m
-        memory: 128Mi
+        memory: 256Mi
     nodeSelector:
       nodeType: cpu
     affinity:
