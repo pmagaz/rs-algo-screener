@@ -115,9 +115,8 @@ async fn main() -> Result<()> {
 
                         let now = Instant::now();
 
-                        let res = request(&url, &instrument, HttpMethod::Put)
-                            .await
-                            .map_err(|_e| RsAlgoErrorKind::RequestError)?;
+                        let res = request(&url, &instrument, HttpMethod::Put).await.unwrap();
+                        //.map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
                         println!(
                             "[BACKEND RESPONSE] {:?} status {:?} at {:?} in {:?}",
