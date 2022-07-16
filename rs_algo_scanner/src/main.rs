@@ -39,6 +39,16 @@ where
     for<'de> T: Serialize + Deserialize<'de> + Debug,
 {
     println!("[HTTP] {:?} request to {}", method, url);
+    println!(
+        "[HTTP] {:?} aaaaaa",
+        Client::builder()
+            .build()
+            .unwrap()
+            .put(url)
+            .json(&data)
+            .send()
+            .await
+    );
 
     let result = match method {
         HttpMethod::Post => Client::builder().build().unwrap().post(url),

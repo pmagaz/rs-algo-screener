@@ -27,15 +27,14 @@ ARG APP_DIR=/usr/src/$APP_NAME
 #EXPOSE 8000
 ENV APP_USER=dev
 
-RUN addgroup -S $APP_USER \
-  && adduser -S -g $APP_USER $APP_USER
-
+#DEPENDENCIES
 RUN apk update \
   && apk add --no-cache tzdata \
   && apk add --no-cache su-exec sudo \
   && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
   && rm -rf /var/cache/apk/*
 
+#USER
 RUN addgroup -S $APP_USER \
   && adduser -S -g $APP_USER $APP_USER \
   && echo '%wheel ALL=(ALL) ALL' >> \
