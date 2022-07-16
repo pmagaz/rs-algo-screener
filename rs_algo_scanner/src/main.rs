@@ -106,6 +106,7 @@ async fn main() -> Result<()> {
                             &instrument.date(),
                             now.elapsed(),
                         );
+
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
 
                         let url = match backtest_mode {
@@ -130,6 +131,7 @@ async fn main() -> Result<()> {
                     },
                 )
                 .await?;
+
             thread::sleep(sleep);
         }
     }

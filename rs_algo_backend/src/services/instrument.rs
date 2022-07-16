@@ -128,7 +128,6 @@ pub async fn upsert(
     instrument: String,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
-    let _now = Instant::now();
     let mode = &query.mode;
     println!(
         "[INSTRUMENT] Received at {:?} for mode {:?}",
@@ -136,7 +135,6 @@ pub async fn upsert(
         mode
     );
 
-    let _now = Instant::now();
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
 
