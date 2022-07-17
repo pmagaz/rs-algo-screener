@@ -42,4 +42,4 @@ RUN chown -R $APP_USER:$APP_USER ${APP_DIR}
 
 USER $APP_USER
 WORKDIR ${APP_DIR}
-CMD ["./rs_algo_scanner"]
+CMD ["RUST_BACKTRACE=1 ./rs_algo_scanner"]
