@@ -97,8 +97,11 @@ impl Instrument {
         data: Vec<(DateTime<Local>, f64, f64, f64, f64, f64)>,
     ) -> Result<()> {
         let mut avg_volume = vec![];
-        let logarithmic = env::var("LOGARITHMIC_SCANNER").unwrap().parse::<bool>().unwrap();
-        
+        let logarithmic = env::var("LOGARITHMIC_SCANNER")
+            .unwrap()
+            .parse::<bool>()
+            .unwrap();
+
         let candles: Vec<Candle> = data
             .iter()
             .enumerate()
@@ -120,7 +123,7 @@ impl Instrument {
                             _x if x.3 <= 0. => 0.01,
                             _ => x.3.ln(),
                         };
-                    },
+                    }
                     false => {
                         open = x.1;
                         high = x.2;
@@ -130,7 +133,7 @@ impl Instrument {
                             _x if x.3 <= 0. => 0.01,
                             _ => x.3,
                         };
-                    } 
+                    }
                 };
 
                 // let low = match x.3 {
@@ -168,10 +171,12 @@ impl Instrument {
 
                 let ohlc_indicators = match logarithmic {
                     true => (open.exp(), high.exp(), low.exp(), close.exp()),
-                    false => (open, high, low, close) 
+                    false => (open, high, low, close),
                 };
 
-                self.indicators.calculate_indicators(ohlc_indicators).unwrap();
+                self.indicators
+                    .calculate_indicators(ohlc_indicators)
+                    .unwrap();
 
                 Candle::new()
                     .date(date)
@@ -227,7 +232,7 @@ impl Instrument {
                 .map(|candle| {
                     let data = match logarithmic {
                         true => candle.from_logarithmic_values(),
-                        false =>  candle
+                        false => candle,
                     };
 
                     if self.min_price == -100. {

@@ -88,59 +88,66 @@ impl Peaks {
             .parse::<usize>()
             .unwrap();
 
+        let kernel_smoothing = env::var("KERNEL_PRICE_SMOOTHING")
+            .unwrap()
+            .parse::<bool>()
+            .unwrap();
+
         let mut kernel_bandwidth = env::var("KERNEL_REGRESSION_BANDWIDTH")
             .unwrap()
             .parse::<f64>()
             .unwrap();
 
-        let logarithmic = env::var("LOGARITHMIC_SCANNER")
-            .unwrap()
-            .parse::<bool>()
-            .unwrap();
-
-        let kernel_source = env::var("PRICE_SOURCE").unwrap();
+        let price_source = env::var("PRICE_SOURCE").unwrap();
 
         let mut smooth_highs: Vec<f64> = vec![];
         let mut smooth_lows: Vec<f64> = vec![];
         let mut smooth_close: Vec<f64> = vec![];
 
-        let price_diff = max_price - min_price;
-        kernel_bandwidth = kernel_bandwidth * price_diff;
-        local_prominence = local_prominence * price_diff;
+        if kernel_smoothing {
+            let mut candle_id = 0;
 
-        let mut candle_id = 0;
-        for x in &self.close {
-            if kernel_source == "highs_lows" {
-                let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
-                let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
-                smooth_highs.push(smoothed_high.abs());
-                smooth_lows.push(smoothed_low.abs());
-                self.smooth_highs.push((candle_id, smoothed_high.abs()));
-                self.smooth_lows.push((candle_id, smoothed_low.abs()));
-            } else {
-                let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
-                smooth_close.push(smoothed_close.abs());
-                self.smooth_close.push((candle_id, smoothed_close.abs()));
+            let price_diff = max_price - min_price;
+            kernel_bandwidth = kernel_bandwidth * price_diff;
+            local_prominence = local_prominence * price_diff;
+
+            for x in &self.close {
+                if price_source == "highs_lows" {
+                    let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
+                    let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
+                    smooth_highs.push(smoothed_high.abs());
+                    smooth_lows.push(smoothed_low.abs());
+                    self.smooth_highs.push((candle_id, smoothed_high.abs()));
+                    self.smooth_lows.push((candle_id, smoothed_low.abs()));
+                } else {
+                    let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
+                    smooth_close.push(smoothed_close.abs());
+                    self.smooth_close.push((candle_id, smoothed_close.abs()));
+                }
+
+                candle_id += 1;
             }
-
-            candle_id += 1;
         }
 
-        let source = match kernel_source.as_ref() {
-            "highs_lows" => (&self.highs, &self.highs, &self.lows, &self.lows),
-            "close" => (&self.close, &self.close, &self.close, &self.close),
-            &_ => (&self.close, &self.close, &self.close, &self.close),
+        let source = match kernel_smoothing {
+            true => match price_source.as_ref() {
+                "highs_lows" => (&smooth_highs, &self.highs, &smooth_lows, &self.lows),
+                "close" => (&smooth_close, &self.close, &smooth_close, &self.close),
+                &_ => (&smooth_close, &smooth_close, &self.close, &self.close),
+            },
+            false => match price_source.as_ref() {
+                "highs_lows" => (&self.highs, &self.highs, &self.lows, &self.lows),
+                "close" => (&self.close, &self.close, &self.close, &self.close),
+                &_ => (&self.close, &self.close, &self.close, &self.close),
+            },
         };
 
         let minima_smooth: Vec<f64> = source.2.iter().map(|x| -x).collect();
 
         self.local_maxima =
-            maxima_minima(source.0, source.1, local_prominence, local_min_distance)?;
+            maxima_minima(source.0, source.1, local_prominence, local_min_distance).unwrap();
 
         self.local_maxima
-            .sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
-
-        self.local_minima
             .sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
 
         self.local_minima = maxima_minima(
@@ -148,7 +155,11 @@ impl Peaks {
             source.3,
             local_prominence,
             local_min_distance,
-        )?;
+        )
+        .unwrap();
+
+        self.local_minima
+            .sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
 
         Ok(())
     }
