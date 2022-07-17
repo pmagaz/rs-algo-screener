@@ -13,7 +13,7 @@ pub fn is_top(data: &DataPoints) -> bool {
 
     if is_equal(data[3].1, data[1].1, threshold)
         && has_minimum_bars(data)
-        && has_minimum_target(data)
+        // && has_minimum_target(data)
         && data[0].1 < data[1].1
         && data[2].1 < data[1].1
         && data[2].1 < data[3].1
@@ -42,7 +42,7 @@ pub fn is_bottom(data: &DataPoints) -> bool {
 
     if is_equal(data[3].1, data[1].1, threshold)
         && has_minimum_bars(data)
-        && has_minimum_target(data)
+        // && has_minimum_target(data)
         && data[0].1 > data[1].1
         && data[2].1 > data[1].1
         && data[2].1 > data[3].1
