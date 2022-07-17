@@ -129,6 +129,13 @@ impl Peaks {
             }
         }
 
+        println!(
+            "LEN {:?} {:?} {:?}",
+            self.highs.len(),
+            self.lows.len(),
+            self.close.len()
+        );
+
         let source = match kernel_smoothing {
             true => match price_source.as_ref() {
                 "highs_lows" => (&smooth_highs, &self.highs, &smooth_lows, &self.lows),
