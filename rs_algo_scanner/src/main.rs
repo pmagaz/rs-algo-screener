@@ -94,12 +94,12 @@ async fn main() -> Result<()> {
 
     if env == "development" {
         symbols = vec![
-            // Symbol {
-            //     symbol: "QGEN.US_4".to_owned(),
-            //     category: "".to_owned(),
-            //     description: "".to_owned(),
-            //     currency: "".to_owned(),
-            // },
+            Symbol {
+                symbol: "CRM.US_4".to_owned(),
+                category: "".to_owned(),
+                description: "".to_owned(),
+                currency: "".to_owned(),
+            },
             // Symbol {
             //     symbol: "BITCOIN".to_owned(),
             //     category: "".to_owned(),
