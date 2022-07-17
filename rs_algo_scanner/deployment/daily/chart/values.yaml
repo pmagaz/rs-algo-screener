@@ -2,7 +2,7 @@ jobs:
   - name: daily
     image:
       repository: cluster.loc:5000/rs-algo-scanner
-      tag: 4d3a795c0aa7
+      tag: latest 
       imagePullPolicy: Always
     schedule: "0 0 * * *"
     failedJobsHistoryLimit: 0
