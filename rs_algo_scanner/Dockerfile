@@ -28,7 +28,7 @@ ENV APP_USER=dev
 
 #DEPENDENCIES
 RUN apk update \
-  && apk add --no-cache tzdata \
+  && apk add --no-cache tzdata curl \
   && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
   && rm -rf /var/cache/apk/*
 
