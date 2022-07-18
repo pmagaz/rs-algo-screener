@@ -116,24 +116,20 @@ impl Peaks {
         let mut candle_id = 0;
 
         for x in &self.close {
-            if price_smoothing {
-                if price_source == "highs_lows" {
-                    let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
-                    let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
-                    smooth_highs.push(smoothed_high.abs());
-                    smooth_lows.push(smoothed_low.abs());
-                    self.smooth_highs.push((candle_id, smoothed_high.abs()));
-                    self.smooth_lows.push((candle_id, smoothed_low.abs()));
-                } else {
-                    let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
-                    smooth_close.push(smoothed_close.abs());
-                    self.smooth_close.push((candle_id, smoothed_close.abs()));
-                }
+            if price_source == "highs_lows" {
+                let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
+                let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
+                smooth_highs.push(smoothed_high.abs());
+                smooth_lows.push(smoothed_low.abs());
+                self.smooth_highs.push((candle_id, smoothed_high.abs()));
+                self.smooth_lows.push((candle_id, smoothed_low.abs()));
+            } else {
+                let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
+                smooth_close.push(smoothed_close.abs());
+                self.smooth_close.push((candle_id, smoothed_close.abs()));
             }
             candle_id += 1;
         }
-
-        println!("1111 {:?}", self.highs);
 
         let source = match price_source.as_ref() {
             "highs_lows" => (&self.highs, &self.highs, &self.lows, &self.lows),
@@ -149,8 +145,7 @@ impl Peaks {
         self.local_maxima
             .sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
 
-        self.local_minima
-            .sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
+        println!("1111 {:?}", self.local_maxima);
 
         self.local_minima = maxima_minima(
             &minima_smooth,
@@ -158,6 +153,11 @@ impl Peaks {
             local_prominence,
             local_min_distance,
         )?;
+
+        self.local_minima
+            .sort_by(|(id_a, _indicator_value_a), (id_b, _indicator_value_b)| id_a.cmp(id_b));
+
+        println!("222222 {:?}", self.local_minima);
 
         Ok(())
     }
