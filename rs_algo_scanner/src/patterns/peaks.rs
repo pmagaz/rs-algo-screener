@@ -104,12 +104,13 @@ impl Peaks {
         let mut smooth_lows: Vec<f64> = vec![];
         let mut smooth_close: Vec<f64> = vec![];
 
-        if price_smoothing {
-            let mut candle_id = 0;
+        let price_diff = max_price - min_price;
+        local_prominence = local_prominence * price_diff;
 
-            let price_diff = max_price - min_price;
+        if price_smoothing {
             kernel_bandwidth = kernel_bandwidth * price_diff;
-            local_prominence = local_prominence * price_diff;
+
+            let mut candle_id = 0;
 
             for x in &self.close {
                 if price_source == "highs_lows" {

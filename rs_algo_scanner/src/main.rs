@@ -74,7 +74,7 @@ async fn main() -> Result<()> {
     if env == "development" {
         symbols = vec![
             Symbol {
-                symbol: "FANG.US_4".to_owned(),
+                symbol: "BITCOIN".to_owned(),
                 category: "".to_owned(),
                 description: "".to_owned(),
                 currency: "".to_owned(),

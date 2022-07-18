@@ -10,6 +10,7 @@ pub fn is_top(data: &DataPoints) -> bool {
         && is_lower_lows_bottom(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
+        && is_valid_broadening(data)
         && has_minimum_bars(data)
         // && has_minimum_target(data)
         && data[0].1 > data[1].1
@@ -26,6 +27,7 @@ pub fn is_bottom(data: &DataPoints) -> bool {
         && is_lower_lows_top(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
+        && is_valid_broadening(data)
         && has_minimum_bars(data)
         // && has_minimum_target(data)
         && data[1].1 > data[0].1

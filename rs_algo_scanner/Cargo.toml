@@ -16,6 +16,7 @@ find_peaks = "0.1.5"
 polyfit-rs="0.2.0"
 chrono = {version = "0.4.19",  features = ["serde"] }
 round = "0.1.2"
+libm ="0.2.2"
 reqwest = { version = "0.11.11", features = ["json"] }
 
 ta = {git = "https://github.com/pmagaz/ta-rs", features = ["serde"]}

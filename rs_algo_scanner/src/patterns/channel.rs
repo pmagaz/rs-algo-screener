@@ -11,13 +11,13 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
         && is_higher_lows_bottom(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
-        //&& are_parallel_lines(data)
+        && are_parallel_lines(data)
         && has_minimum_bars(data)
         //// && has_minimum_target(data)
         && data[0].1 > data[1].1
         && data[2].1 > data[3].1
     {
-        //println!("7777777 {:?}", &data);
+        println!("7777777 {:?}", &data);
 
         true
     } else {
@@ -30,13 +30,13 @@ pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
         && is_higher_lows_top(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
-        //&& are_parallel_lines(data)
+        && are_parallel_lines(data)
         && has_minimum_bars(data)
         // && has_minimum_target(data)
         && data[0].1 < data[1].1
         && data[2].1 < data[3].1
     {
-        // println!("88888888 {:?}", &data);
+        println!("88888888 {:?}", &data);
 
         true
     } else {
@@ -49,7 +49,7 @@ pub fn is_descendant_top(data: &DataPoints) -> bool {
         && is_lower_lows_bottom(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
-       // && are_parallel_lines(data)
+       && are_parallel_lines(data)
         && has_minimum_bars(data)
         // && has_minimum_target(data)
         && data[0].1 > data[1].1
@@ -66,7 +66,7 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
         && is_lower_lows_top(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
-        //&& are_parallel_lines(data)
+        && are_parallel_lines(data)
         && has_minimum_bars(data)
         // && has_minimum_target(data)
         && data[0].1 < data[1].1
