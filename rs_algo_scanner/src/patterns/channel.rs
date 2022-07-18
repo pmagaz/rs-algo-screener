@@ -17,8 +17,6 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
         && data[0].1 > data[1].1
         && data[2].1 > data[3].1
     {
-        println!("7777777 {:?}", &data);
-
         true
     } else {
         false
@@ -36,8 +34,6 @@ pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
         && data[0].1 < data[1].1
         && data[2].1 < data[3].1
     {
-        println!("88888888 {:?}", &data);
-
         true
     } else {
         false
