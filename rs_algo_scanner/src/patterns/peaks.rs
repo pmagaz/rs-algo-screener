@@ -113,8 +113,10 @@ impl Peaks {
 
         for x in &self.close {
             if price_source == "highs_lows" {
+                println!("111111 {:?}", &self.highs);
                 let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
                 let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
+                println!("222222 {:?}", &self.highs);
                 // smooth_highs.push(smoothed_high.abs());
                 // smooth_lows.push(smoothed_low.abs());
                 // self.smooth_highs.push((candle_id, smoothed_high.abs()));
