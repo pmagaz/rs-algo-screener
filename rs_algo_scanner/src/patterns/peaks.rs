@@ -98,7 +98,7 @@ impl Peaks {
             .parse::<bool>()
             .unwrap();
 
-        let kernel_source = env::var("PRICE_SOURCE").unwrap();
+        let price_source = env::var("PRICE_SOURCE").unwrap();
 
         let price_smoothing = env::var("KERNEL_PRICE_SMOOTHING")
             .unwrap()
@@ -117,7 +117,7 @@ impl Peaks {
 
         for x in &self.close {
             if price_smoothing {
-                if kernel_source == "highs_lows" {
+                if price_source == "highs_lows" {
                     let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
                     let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
                     smooth_highs.push(smoothed_high.abs());
@@ -129,12 +129,13 @@ impl Peaks {
                     smooth_close.push(smoothed_close.abs());
                     self.smooth_close.push((candle_id, smoothed_close.abs()));
                 }
-
-                candle_id += 1;
             }
+            candle_id += 1;
         }
 
-        let source = match kernel_source.as_ref() {
+        println!("1111 {:?}", self.highs);
+
+        let source = match price_source.as_ref() {
             "highs_lows" => (&self.highs, &self.highs, &self.lows, &self.lows),
             "close" => (&self.close, &self.close, &self.close, &self.close),
             &_ => (&self.close, &self.close, &self.close, &self.close),
