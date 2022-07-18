@@ -105,33 +105,33 @@ impl Peaks {
             .parse::<bool>()
             .unwrap();
 
-        let mut smooth_highs: Vec<f64> = vec![];
-        let mut smooth_lows: Vec<f64> = vec![];
-        let mut smooth_close: Vec<f64> = vec![];
+        // let mut smooth_highs: Vec<f64> = vec![];
+        // let mut smooth_lows: Vec<f64> = vec![];
+        // let mut smooth_close: Vec<f64> = vec![];
 
-        if price_smoothing {
-            let price_diff = max_price - min_price;
-            kernel_bandwidth = kernel_bandwidth * price_diff;
-            local_prominence = local_prominence * price_diff;
+        // if price_smoothing {
+        //     let price_diff = max_price - min_price;
+        //     kernel_bandwidth = kernel_bandwidth * price_diff;
+        //     local_prominence = local_prominence * price_diff;
 
-            let mut candle_id = 0;
+        //     let mut candle_id = 0;
 
-            for x in &self.close {
-                if price_source == "highs_lows" {
-                    let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
-                    let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
-                    smooth_highs.push(smoothed_high.abs());
-                    smooth_lows.push(smoothed_low.abs());
-                    self.smooth_highs.push((candle_id, smoothed_high.abs()));
-                    self.smooth_lows.push((candle_id, smoothed_low.abs()));
-                } else {
-                    let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
-                    smooth_close.push(smoothed_close.abs());
-                    self.smooth_close.push((candle_id, smoothed_close.abs()));
-                }
-                candle_id += 1;
-            }
-        }
+        //     for x in &self.close {
+        //         if price_source == "highs_lows" {
+        //             let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
+        //             let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
+        //             smooth_highs.push(smoothed_high.abs());
+        //             smooth_lows.push(smoothed_low.abs());
+        //             self.smooth_highs.push((candle_id, smoothed_high.abs()));
+        //             self.smooth_lows.push((candle_id, smoothed_low.abs()));
+        //         } else {
+        //             let smoothed_close = kernel_regression(kernel_bandwidth, *x, &self.close);
+        //             smooth_close.push(smoothed_close.abs());
+        //             self.smooth_close.push((candle_id, smoothed_close.abs()));
+        //         }
+        //         candle_id += 1;
+        //     }
+        // }
 
         let source = match price_source.as_ref() {
             "highs_lows" => (&self.highs, &self.highs, &self.lows, &self.lows),

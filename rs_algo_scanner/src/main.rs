@@ -56,16 +56,31 @@ async fn main() -> Result<()> {
         .parse::<bool>()
         .unwrap();
 
+    symbols = vec![
+        Symbol {
+            symbol: "FANG.US_4".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+        Symbol {
+            symbol: "TGNA.US_9".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        },
+    ];
+
     if env == "development" {
         symbols = vec![
             Symbol {
-                symbol: "CRM.US_4".to_owned(),
+                symbol: "FANG.US_4".to_owned(),
                 category: "".to_owned(),
                 description: "".to_owned(),
                 currency: "".to_owned(),
             },
             // Symbol {
-            //     symbol: "BITCOIN".to_owned(),
+            //     symbol: "TGNA.US_9".to_owned(),
             //     category: "".to_owned(),
             //     description: "".to_owned(),
             //     currency: "".to_owned(),
