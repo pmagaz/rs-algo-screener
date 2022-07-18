@@ -143,9 +143,9 @@ impl Peaks {
                 &_ => (&smooth_close, &smooth_close, &self.close, &self.close),
             },
             false => match price_source.as_ref() {
-                "highs_lows" => (&self.highs, &self.highs, &self.lows, &self.lows),
-                "close" => (&self.close, &self.close, &self.close, &self.close),
-                &_ => (&self.close, &self.close, &self.close, &self.close),
+                "highs_lows" => (&smooth_highs, &self.highs, &smooth_lows, &self.lows),
+                "close" => (&smooth_close, &self.close, &smooth_close, &self.close),
+                &_ => (&smooth_close, &smooth_close, &self.close, &self.close),
             },
         };
 
