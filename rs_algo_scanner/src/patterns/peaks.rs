@@ -115,8 +115,8 @@ impl Peaks {
 
         let mut candle_id = 0;
 
-        if price_smoothing {
-            for x in &self.close {
+        for x in &self.close {
+            if price_smoothing {
                 if kernel_source == "highs_lows" {
                     let smoothed_high = kernel_regression(kernel_bandwidth, *x, &self.highs);
                     let smoothed_low = kernel_regression(kernel_bandwidth, *x, &self.lows);
