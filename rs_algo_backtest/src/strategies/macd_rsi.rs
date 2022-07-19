@@ -30,7 +30,7 @@ impl<'a> Strategy for Macd<'a> {
         &self.strategy_type
     }
 
-    fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
+    fn entry_long(&self, index: usize, instrument: &Instrument) -> bool {
         let prev_index = get_prev_index(index);
 
         let current_rsi = instrument.indicators.rsi.data_a.get(index).unwrap();
@@ -44,15 +44,10 @@ impl<'a> Strategy for Macd<'a> {
 
         let entry_condition = current_rsi <= &30. && current_macd_a > current_macd_b;
 
-        resolve_trade_in(index, instrument, entry_condition, stop_loss)
+        entry_condition
     }
 
-    fn market_out_fn(
-        &self,
-        index: usize,
-        instrument: &Instrument,
-        trade_in: &TradeIn,
-    ) -> TradeResult {
+    fn exit_long(&self, index: usize, instrument: &Instrument) -> bool {
         let prev_index = get_prev_index(index);
 
         let current_rsi = instrument.indicators.rsi.data_a.get(index).unwrap();
@@ -66,7 +61,23 @@ impl<'a> Strategy for Macd<'a> {
 
         let exit_condition = current_rsi >= &70. && current_macd_a < current_macd_b;
         let stop_loss = true;
-        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
+        exit_condition
+    }
+
+    fn entry_short(&self, index: usize, instrument: &Instrument) -> bool {
+        match self.strategy_type {
+            StrategyType::LongShort => self.exit_long(index, instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument),
+            _ => false,
+        }
+    }
+
+    fn exit_short(&self, index: usize, instrument: &Instrument) -> bool {
+        match self.strategy_type {
+            StrategyType::LongShort => self.entry_long(index, instrument),
+            StrategyType::OnlyShort => self.entry_long(index, instrument),
+            _ => false,
+        }
     }
 
     fn backtest_result(

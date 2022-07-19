@@ -31,7 +31,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &self.strategy_type
     }
 
-    fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
+    fn entry_long(&self, index: usize, instrument: &Instrument) -> bool {
         let prev_index = get_prev_index(index);
 
         let close_price = &instrument.data.get(index).unwrap().close;
@@ -52,15 +52,10 @@ impl<'a> Strategy for BollingerBands<'a> {
             && close_price < low_band
             && prev_close >= prev_low_band;
 
-        resolve_trade_in(index, instrument, entry_condition, stop_loss)
+        entry_condition
     }
 
-    fn market_out_fn(
-        &self,
-        index: usize,
-        instrument: &Instrument,
-        trade_in: &TradeIn,
-    ) -> TradeResult {
+    fn exit_long(&self, index: usize, instrument: &Instrument) -> bool {
         let prev_index = get_prev_index(index);
         let _candle_type = &instrument.data.get(index).unwrap().candle_type;
 
@@ -106,9 +101,24 @@ impl<'a> Strategy for BollingerBands<'a> {
         || (hits_over_low_band >= 3);
 
         let stop_loss = true;
-        resolve_trade_out(index, instrument, trade_in, exit_condition, stop_loss)
+        exit_condition
     }
 
+    fn entry_short(&self, index: usize, instrument: &Instrument) -> bool {
+        match self.strategy_type {
+            StrategyType::LongShort => self.exit_long(index, instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument),
+            _ => false,
+        }
+    }
+
+    fn exit_short(&self, index: usize, instrument: &Instrument) -> bool {
+        match self.strategy_type {
+            StrategyType::LongShort => self.entry_long(index, instrument),
+            StrategyType::OnlyShort => self.entry_long(index, instrument),
+            _ => false,
+        }
+    }
     fn backtest_result(
         &self,
         instrument: &Instrument,

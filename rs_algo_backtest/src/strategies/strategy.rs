@@ -1,3 +1,4 @@
+use crate::trade::*;
 use async_trait::async_trait;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
@@ -66,13 +67,43 @@ pub trait Strategy {
     fn name(&self) -> &str;
     fn strategy_type(&self) -> &StrategyType;
     //fn entry_type(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeType;
-    fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult;
+    fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
+        let entry_type: TradeType;
+
+        if self.entry_long(index, instrument) {
+            entry_type = TradeType::EntryLong
+        } else if self.entry_short(index, instrument) {
+            entry_type = TradeType::EntryShort
+        } else {
+            entry_type = TradeType::None
+        }
+
+        resolve_trade_in(index, instrument, entry_type, stop_loss)
+    }
+
     fn market_out_fn(
         &self,
         index: usize,
         instrument: &Instrument,
         trade_in: &TradeIn,
-    ) -> TradeResult;
+    ) -> TradeResult {
+        let exit_type: TradeType;
+
+        if self.exit_long(index, instrument) {
+            exit_type = TradeType::ExitLong
+        } else if self.exit_short(index, instrument) {
+            exit_type = TradeType::ExitShort
+        } else {
+            exit_type = TradeType::None
+        }
+        let stop_loss = true;
+
+        resolve_trade_out(index, instrument, trade_in, exit_type, stop_loss)
+    }
+    fn entry_long(&self, index: usize, instrument: &Instrument) -> bool;
+    fn exit_long(&self, index: usize, instrument: &Instrument) -> bool;
+    fn entry_short(&self, index: usize, instrument: &Instrument) -> bool;
+    fn exit_short(&self, index: usize, instrument: &Instrument) -> bool;
     fn backtest_result(
         &self,
         instrument: &Instrument,
