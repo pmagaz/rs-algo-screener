@@ -1,5 +1,5 @@
 package_name: rs_algo_backtest
-release_name: rs-algo-backtest
+release_name: rs-algo-backtest-cr
 local_path: /home/dev/rs-algo-screener
-chart_path: crypto/deployment/chart
+chart_path: deployment/crypto/chart
 

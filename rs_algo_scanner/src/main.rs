@@ -106,11 +106,9 @@ async fn main() -> Result<()> {
 
         if !backtest_mode
             || (backtest_mode
-                && (
-                    //symbol_in_list(&s.symbol, &sp500::get_symbols())
-                    symbol_in_list(&s.symbol, &forex::get_symbols())
-                        || symbol_in_list(&s.symbol, &crypto::get_symbols())
-                ))
+                && (symbol_in_list(&s.symbol, &sp500::get_symbols())
+                    || symbol_in_list(&s.symbol, &forex::get_symbols())
+                    || symbol_in_list(&s.symbol, &crypto::get_symbols())))
         {
             println!("[SCANNER] processing {} ...", &s.symbol);
 
