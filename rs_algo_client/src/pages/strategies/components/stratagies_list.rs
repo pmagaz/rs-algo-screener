@@ -4,7 +4,7 @@ use crate::helpers::status::*;
 use round::round;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::helpers::status::*;
-use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::market::*;
 
 
 use wasm_bindgen::prelude::*;

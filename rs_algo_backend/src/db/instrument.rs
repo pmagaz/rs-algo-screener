@@ -136,9 +136,29 @@ pub async fn insert_detail(
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
-
-    let collection = get_collection::<Instrument>(&state.db_mem, &collection_name).await;
+    let collection = match mode {
+        "daily" => {
+            get_collection::<Instrument>(
+                &state.db_mem,
+                &env::var("DB_INSTRUMENTS_COLLECTION").unwrap(),
+            )
+            .await
+        }
+        "backtest" => {
+            get_collection::<Instrument>(
+                &state.db_hdd,
+                &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
+            )
+            .await
+        }
+        _ => {
+            get_collection::<Instrument>(
+                &state.db_mem,
+                &env::var("DB_INSTRUMENTS_COLLECTION").unwrap(),
+            )
+            .await
+        }
+    };
 
     collection
         .find_one_and_replace(

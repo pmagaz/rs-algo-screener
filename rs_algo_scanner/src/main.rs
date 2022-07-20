@@ -8,6 +8,7 @@ use rs_algo_shared::helpers::comp::symbol_in_list;
 use rs_algo_shared::helpers::date;
 use rs_algo_shared::helpers::date::Local;
 use rs_algo_shared::helpers::http::request;
+use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::time_frame::TimeFrame;
 use screener::Screener;
 use std::time::Instant;
@@ -100,20 +101,53 @@ async fn main() -> Result<()> {
         ]
     };
 
+    let mut market: Market = Market::Stock;
+    let mut sp500_symbols = vec![];
+    let mut forex_symbols = vec![];
+    let mut crypto_symbols = vec![];
+    let mut is_sp500: bool = false;
+    let mut is_forex: bool = false;
+    let mut is_crypto: bool = false;
+
+    if backtest_mode {
+        sp500_symbols = sp500::get_symbols();
+        forex_symbols = forex::get_symbols();
+        crypto_symbols = crypto::get_symbols();
+    }
+
     for s in symbols {
         let now = Instant::now();
 
-        if !backtest_mode
-            || (backtest_mode
-                && (symbol_in_list(&s.symbol, &sp500::get_symbols())
-                    || symbol_in_list(&s.symbol, &forex::get_symbols())
-                    || symbol_in_list(&s.symbol, &crypto::get_symbols())))
-        {
+        if backtest_mode {
+            if symbol_in_list(&s.symbol, &sp500_symbols) {
+                is_sp500 = true;
+                is_forex = false;
+                is_crypto = false;
+                market = Market::Stock;
+            } else if symbol_in_list(&s.symbol, &forex_symbols) {
+                is_forex = true;
+                is_sp500 = false;
+                is_crypto = false;
+                market = Market::Forex;
+            } else if symbol_in_list(&s.symbol, &crypto_symbols) {
+                is_crypto = true;
+                is_sp500 = false;
+                is_forex = false;
+                market = Market::Crypto;
+            } else {
+                is_sp500 = false;
+                is_forex = false;
+                is_crypto = false;
+            }
+        }
+
+        if !backtest_mode || (backtest_mode && (is_sp500 || is_forex || is_crypto)) {
             println!("[SCANNER] processing {} ...", &s.symbol);
 
             screener
                 .get_instrument_data(
                     &s.symbol,
+                    market.clone(),
                     time_frame.clone(),
                     from,
                     |instrument: Instrument| async move {

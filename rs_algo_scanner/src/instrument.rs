@@ -8,6 +8,7 @@ use crate::patterns::peaks::Peaks;
 
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
+use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::pattern::PatternSize;
 use rs_algo_shared::models::time_frame::TimeFrameType;
 
@@ -18,6 +19,7 @@ use std::env;
 pub struct Instrument {
     symbol: String,
     time_frame: TimeFrameType,
+    market: Market,
     data: Vec<Candle>,
     current_price: f64,
     current_candle: CandleType,
@@ -39,6 +41,10 @@ impl Instrument {
 
     pub fn symbol(&self) -> &str {
         &self.symbol
+    }
+
+    pub fn market(&self) -> &Market {
+        &self.market
     }
 
     pub fn time_frame(&self) -> &TimeFrameType {
@@ -262,6 +268,7 @@ impl Instrument {
 
 pub struct InstrumentBuilder {
     symbol: Option<String>,
+    market: Option<Market>,
     time_frame: Option<TimeFrameType>,
     //indicators: Option<Indicators>,
 }
@@ -270,6 +277,7 @@ impl InstrumentBuilder {
     pub fn new() -> InstrumentBuilder {
         Self {
             symbol: None,
+            market: None,
             time_frame: None,
         }
     }
@@ -277,15 +285,24 @@ impl InstrumentBuilder {
         self.symbol = Some(String::from(val));
         self
     }
+
+    pub fn market(mut self, val: Market) -> Self {
+        self.market = Some(val);
+        self
+    }
+
     pub fn time_frame(mut self, val: TimeFrameType) -> Self {
         self.time_frame = Some(val);
         self
     }
 
     pub fn build(self) -> Result<Instrument> {
-        if let (Some(symbol), Some(time_frame)) = (self.symbol, self.time_frame) {
+        if let (Some(symbol), Some(market), Some(time_frame)) =
+            (self.symbol, self.market, self.time_frame)
+        {
             Ok(Instrument {
                 symbol,
+                market,
                 time_frame: time_frame,
                 current_price: 0.,
                 date: to_dbtime(Local::now()), //FIXME

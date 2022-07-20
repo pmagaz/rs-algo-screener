@@ -3,8 +3,8 @@ use crate::components::loading::Loading;
 use crate::pages::strategies::components::stratagies_list::StrategiesList;
 
 use crate::components::chart::Chart;
-use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
+use rs_algo_shared::models::market::*;
 use wasm_bindgen::prelude::*;
 
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};

@@ -3,7 +3,9 @@ use crate::error::Result;
 use crate::instrument::Instrument;
 
 use rs_algo_shared::broker::{Broker, Response, VEC_DOHLC};
+use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::time_frame::TimeFrameType;
+
 use std::env;
 use std::future::Future;
 
@@ -37,6 +39,7 @@ where
     pub async fn get_instrument_data<F, T>(
         &mut self,
         symbol: &str,
+        market: Market,
         time_frame: TimeFrameType,
         start_date: i64,
         mut callback: F,
@@ -52,7 +55,8 @@ where
             .unwrap();
 
         let mut instrument = Instrument::new()
-            .symbol(&res.symbol)
+            .symbol(&symbol)
+            .market(market)
             .time_frame(time_frame)
             .build()
             .unwrap();

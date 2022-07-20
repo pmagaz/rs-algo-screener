@@ -26,6 +26,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
     let doc = CompactInstrument {
         symbol: doc.symbol,
         date: doc.date,
+        market: doc.market,
         time_frame: doc.time_frame,
         current_price: doc.current_price,
         avg_volume: doc.avg_volume,

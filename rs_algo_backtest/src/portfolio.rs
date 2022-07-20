@@ -5,6 +5,7 @@ use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::Instrument;
+use rs_algo_shared::models::market::*;
 use std::env;
 
 pub struct PortFolio {

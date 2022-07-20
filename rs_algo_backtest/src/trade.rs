@@ -3,6 +3,7 @@ use crate::helpers::calc::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::instrument::Instrument;
+use rs_algo_shared::models::market::*;
 
 pub fn resolve_trade_in(
     index: usize,

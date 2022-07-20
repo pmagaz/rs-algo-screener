@@ -35,7 +35,6 @@ pub fn strategy(props: &Props) -> Html {
         name.to_string(),
     ]
     .concat();
-
     let use_backtest_instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_strategy_url = use_state(|| String::from(""));

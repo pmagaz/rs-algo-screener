@@ -1,14 +1,14 @@
 use super::helpers::get_collection;
 use crate::models::app_state::AppState;
-use crate::models::backtest_strategy::BackTestStrategyResult;
 use crate::models::instrument::Instrument;
 
+use crate::models::backtest_instrument::BackTestInstrumentResult;
+use crate::models::backtest_strategy::BackTestStrategyResult;
 use actix_web::web;
 use bson::{doc, Document};
 use futures::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
-use rs_algo_shared::models::backtest_instrument::*;
 use std::env;
 
 pub async fn find_instruments(
@@ -19,7 +19,7 @@ pub async fn find_instruments(
 ) -> Result<Vec<Instrument>, Error> {
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
 
-    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
 
     let mut cursor = collection
         .find(

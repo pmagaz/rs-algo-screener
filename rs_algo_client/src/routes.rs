@@ -2,7 +2,7 @@ use crate::pages::home::page::Home;
 use crate::pages::strategies::page::Strategies;
 use crate::pages::strategy::page::Strategy;
 
-use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::market::*;
 
 use yew::{html, Html};
 use yew_router::prelude::*;

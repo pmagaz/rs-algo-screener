@@ -3,8 +3,6 @@ use rs_algo_shared::models::candle::Candle;
 use rs_algo_shared::models::pattern::*;
 use std::cmp::Ordering;
 
-
-
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
     size * (price_out - price_in)
 }

@@ -1,9 +1,6 @@
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::models::backtest_instrument::BackTestInstrumentResult;
-use crate::models::backtest_strategy::BackTestStrategyResult;
-use crate::models::instrument::Instrument;
 use crate::render_image::Backend;
 
 use actix_files as fs;
@@ -11,6 +8,8 @@ use actix_web::{web, HttpResponse};
 use bson::doc;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
+use rs_algo_shared::models::instrument::Instrument;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
@@ -40,14 +39,21 @@ pub async fn find_instruments(
     let now = Instant::now();
     let env = env::var("ENV").unwrap();
 
-    println!("[BACK TEST INSTRUMENTS] Request for {:?}", market);
+    let market = market.into_inner();
+
     let offset = query.offset;
     let limit = query.limit;
 
+    // let market = match market.as_ref() {
+    //     "crytpo"
+    // }
+
     let query = match env.as_ref() {
-        "development" => doc! {"symbol": "HOLX.US"},
-        _ => doc! {},
+        "development" => doc! {"market": &market, "symbol": "HOLX.US"},
+        _ => doc! { "market": &market},
     };
+
+    println!("[BACK TEST INSTRUMENTS] Request for {:?}", market);
 
     let backtest_instruments: Vec<Instrument> =
         db::back_test::find_instruments(query, offset, limit, &state)
