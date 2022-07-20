@@ -95,7 +95,7 @@ async fn main() -> Result<()> {
                         web::put().to(back_test::upsert_instruments_result),
                     )
                     .route(
-                        "/backtest/instruments",
+                        "/backtest/instruments/{market}",
                         web::get().to(back_test::find_instruments),
                     )
                     .route(
@@ -111,11 +111,11 @@ async fn main() -> Result<()> {
                         web::put().to(back_test::upsert_strategies_result),
                     )
                     .route(
-                        "/backtest/strategies/{strategy}",
+                        "/backtest/strategies/{market}/{strategy}",
                         web::get().to(back_test::find_instruments_result_by_strategy),
                     )
                     .route(
-                        "/backtest/strategies/chart/{strategy}",
+                        "/backtest/strategies/chart/{market}/{strategy}",
                         web::get().to(back_test::chart),
                     ),
             )

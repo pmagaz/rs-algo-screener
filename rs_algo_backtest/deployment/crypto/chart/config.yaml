@@ -1,5 +1,6 @@
 ENV: "production"
-BACkTEST_LIMIT_INSTRUMENTS: "20"
+BACkTEST_LIMIT_INSTRUMENTS: "30"
+BACKTEST_MARKET: "crypto"
 BACKEND_INSTRUMENTS_ENDPOINT: "http://rs-algo-backend/api/instruments"
 BACKEND_BACKTEST_ENDPOINT: "http://rs-algo-backend/api/backtest"
 BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT: "http://rs-algo-backend/api/backtest/instruments"

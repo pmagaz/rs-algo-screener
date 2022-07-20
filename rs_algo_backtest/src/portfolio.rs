@@ -23,6 +23,15 @@ impl PortFolio {
             .parse::<i32>()
             .unwrap();
 
+        let backtest_market = env::var("BACKTEST_MARKET").unwrap();
+
+        let market = match backtest_market.as_ref() {
+            "stock" => Market::Stock,
+            "forex" => Market::Forex,
+            "crypto" => Market::Crypto,
+            _ => Market::Stock,
+        };
+
         let endpoint = env::var("BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT").unwrap();
 
         let instrument_result_endpoint = env::var("BACKEND_BACKTEST_ENDPOINT").unwrap().clone();
@@ -49,6 +58,8 @@ impl PortFolio {
             for _key in 0..500 / limit {
                 let url = [
                     &endpoint,
+                    "/",
+                    backtest_market.as_ref(),
                     "?offset=",
                     &offset.to_string(),
                     "&limit=",
@@ -78,7 +89,8 @@ impl PortFolio {
                         strategy.test(instrument, self.equity, self.commission, self.stop_loss);
 
                     match backtest_result {
-                        BackTestResult::BackTestInstrumentResult(result) => {
+                        BackTestResult::BackTestInstrumentResult(mut result) => {
+                            result.market = market.to_owned();
                             let _send_instrument_result: BackTestInstrumentResult =
                                 request(&instrument_result_endpoint, &result, HttpMethod::Put)
                                     .await
@@ -125,6 +137,7 @@ impl PortFolio {
             let strategy_result = BackTestStrategyResult {
                 strategy: strategy.name().to_owned(),
                 strategy_type: strategy.strategy_type().to_owned(),
+                market: market.to_owned(),
                 date: to_dbtime(Local::now()),
                 avg_sessions: average_usize(&avg_sessions),
                 avg_trades: average_usize(&avg_trades),

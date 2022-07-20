@@ -73,8 +73,6 @@ impl HorizontalLevels {
         for (peak_index, peak_price) in local_maxima {
             let price = *peak_price;
             for (compare_index, compare_price) in local_maxima {
-                //println!("11111 {:?} {:?}", price, compare_price);
-
                 // let price_diff = max_price - min_price;
                 // kernel_bandwidth = kernel_bandwidth * price_diff;
                 // local_prominence = local_prominence * price_diff;

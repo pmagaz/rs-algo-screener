@@ -19,19 +19,23 @@ extern "C" {
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct Props {
-    pub id: String,
+    pub name: String,
+    pub market: String,
 }
 
 #[function_component(Strategy)]
 pub fn strategy(props: &Props) -> Html {
-    let Props { id } = props;
+    let Props { name, market } = props;
     let base_url = get_base_url();
+    let replace = ["strategy/", market, "/", name].concat();
     let backtested_strategy_url = [
-        base_url.replace(&["strategy/", id].concat(), "").as_str(),
-        "api/backtest/strategies/",
-        id,
+        base_url.replace(replace.as_str(), "api/backtest/strategies/"),
+        market.to_string(),
+        "/".to_owned(),
+        name.to_string(),
     ]
     .concat();
+
     let use_backtest_instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_strategy_url = use_state(|| String::from(""));
@@ -73,7 +77,7 @@ pub fn strategy(props: &Props) -> Html {
         <div class="tile is-ancestor is-vertical ">
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
-                     <h1 class="navbar-item is-size-2">{ id }</h1>
+                     <h1 class="navbar-item is-size-2">{ name }</h1>
 
                         <Loading loading={ *use_loading} />
                 </div>
@@ -81,7 +85,7 @@ pub fn strategy(props: &Props) -> Html {
             <Chart url={(*use_strategy_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid ">
-                <StrategyDetail on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} />
+                <StrategyDetail market={ market.clone() } on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} />
             </div>
             </div>
         </div>

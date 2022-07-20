@@ -21,4 +21,4 @@ reqwest = { version = "0.11.11", features = ["json"] }
 
 ta = {git = "https://github.com/pmagaz/ta-rs", features = ["serde"]}
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", features = ["broker"], rev = "82da575"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", features = ["broker"], rev = "2c7876d"}

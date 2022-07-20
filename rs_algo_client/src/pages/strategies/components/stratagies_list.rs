@@ -3,8 +3,9 @@ use crate::helpers::status::*;
 
 use round::round;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
-use rs_algo_shared::models::status::Status;
 use rs_algo_shared::helpers::status::*;
+use rs_algo_shared::models::backtest_instrument::*;
+
 
 use wasm_bindgen::prelude::*;
 use yew::{function_component, html, Html, Properties};
@@ -22,11 +23,12 @@ extern "C" {
 #[derive(Clone, Properties, PartialEq)]
 pub struct Props {
     pub strategies: Vec<BackTestStrategyResult>,
+    pub market: Market,
 }
 
 #[function_component(StrategiesList)]
 pub fn strategy_list(props: &Props) -> Html {
-    let Props { strategies } = props;
+    let Props { strategies, market} = props;
 
     let strategy_list: Html = strategies
         .iter()
@@ -42,7 +44,7 @@ pub fn strategy_list(props: &Props) -> Html {
             html! {
                 <tr>
                     <td>
-                    <Link<Route> to={Route::Strategy { id: strategy.strategy.clone() }}>{ strategy.strategy.clone() }</Link<Route>>
+                    <Link<Route> to={Route::Strategy { market: strategy.market.to_string(), name: strategy.strategy.clone() }}>{ strategy.strategy.clone() }</Link<Route>>
                     </td>
                     <td>{ format!(" {:?} ", strategy.strategy_type )}</td>
                     <td class={get_status_class(&profit_status)}> { format!("{}%", round(strategy.avg_net_profit_per,2))}</td>

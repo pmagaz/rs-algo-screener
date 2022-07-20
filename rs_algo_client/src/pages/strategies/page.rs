@@ -3,7 +3,8 @@ use crate::components::loading::Loading;
 use crate::pages::strategies::components::stratagies_list::StrategiesList;
 
 use crate::components::chart::Chart;
-use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
+use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::backtest_strategy::*;
 use wasm_bindgen::prelude::*;
 
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
@@ -59,24 +60,41 @@ pub fn strategies() -> Html {
         })
     };
 
+    let stock_strategies: Vec<BackTestStrategyResult> = use_strategies
+        .iter()
+        .filter(|x| x.market == Market::Stock)
+        .map(|x| x.clone())
+        .collect();
+
+    let forex_strategies: Vec<BackTestStrategyResult> = use_strategies
+        .iter()
+        .filter(|x| x.market == Market::Forex)
+        .map(|x| x.clone())
+        .collect();
+
+    let crypto_strategies: Vec<BackTestStrategyResult> = use_strategies
+        .iter()
+        .filter(|x| x.market == Market::Crypto)
+        .map(|x| x.clone())
+        .collect();
+
     html! {
         <div class="tile is-ancestor is-vertical ">
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
-                        //<label class="label">{ "Query" }</label>
                      <h1 class="navbar-item is-size-2">{ "Strategies" }</h1>
-
-                        //<textarea id="query_box" class="textarea is-link is-invisible" placeholder="Textarea" cols="60" rows="0" value={ {format!("{}", *use_query)}}></textarea>
-                        // <button id="leches" class="button" onclick={on_query_send}>{ "Search" }</button>
-                        //<div width="400" height="400"></div>
                         <Loading loading={ *use_loading} />
                 </div>
             </div>
             <Chart url={(*use_strategies_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid ">
-                    <StrategiesList strategies={(*use_strategies).clone()} />
-
+                    <h2 class="navbar-item is-size-3">{ "Stocks" }</h2>
+                    <StrategiesList market={ Market::Stock } strategies={(stock_strategies)} />
+                    <h2 class="navbar-item is-size-3">{ "Forex" }</h2>
+                    <StrategiesList market={ Market::Forex } strategies={(forex_strategies)} />
+                    <h2 class="navbar-item is-size-3">{ "Crytpo" }</h2>
+                    <StrategiesList market={ Market::Crypto } strategies={(crypto_strategies)} />
             </div>
             </div>
         </div>

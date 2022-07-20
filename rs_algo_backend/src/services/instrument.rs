@@ -129,10 +129,11 @@ pub async fn upsert(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let mode = &query.mode;
+
     println!(
-        "[INSTRUMENT] Received at {:?} for mode {:?}",
+        "[INSTRUMENT] Received at {:?} for mode {:?} in",
         Local::now(),
-        mode
+        mode,
     );
 
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
@@ -160,7 +161,9 @@ pub async fn upsert(
             "{} {:?} at {:?} in {:?}",
             match mode.as_ref() {
                 "daily" => "[INSTRUMENT UPSERTED]",
-                "backtest" => "[BACKTEST INSTRUMENT UPSERTED]",
+                "backtest_stock" => "[BACKTEST STOCK INSTRUMENT UPSERTED]",
+                "backtest_forex" => "[BACKTEST FOREX INSTRUMENT UPSERTED]",
+                "backtest_crypto" => "[BACKTEST CRYPTO INSTRUMENT UPSERTED]",
                 &_ => "",
             },
             symbol,
@@ -174,7 +177,7 @@ pub async fn upsert(
         .parse::<bool>()
         .unwrap();
 
-    if mode != "backtest" && insert_compact_instruments {
+    if !mode.contains("backtest") && insert_compact_instruments {
         let now = Instant::now();
         let _insert_compact =
             db::instrument::upsert(compact_instrument(instrument).unwrap(), &state)

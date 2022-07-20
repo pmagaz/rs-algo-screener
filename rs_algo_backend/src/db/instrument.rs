@@ -136,11 +136,7 @@ pub async fn insert_detail(
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = match mode {
-        "daily" => env::var("DB_INSTRUMENTS_COLLECTION").unwrap(),
-        "backtest" => env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap(),
-        &_ => "".to_string(),
-    };
+    let collection_name = env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
 
     let collection = get_collection::<Instrument>(&state.db_mem, &collection_name).await;
 

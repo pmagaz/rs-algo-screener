@@ -10,7 +10,20 @@ pub trait Strategy {
     fn new() -> Result<Self>
     where
         Self: Sized;
-
+    fn name(&self) -> &str;
+    fn strategy_type(&self) -> &StrategyType;
+    fn entry_long(&self, index: usize, instrument: &Instrument) -> bool;
+    fn exit_long(&self, index: usize, instrument: &Instrument) -> bool;
+    fn entry_short(&self, index: usize, instrument: &Instrument) -> bool;
+    fn exit_short(&self, index: usize, instrument: &Instrument) -> bool;
+    fn backtest_result(
+        &self,
+        instrument: &Instrument,
+        trades_in: Vec<TradeIn>,
+        trades_out: Vec<TradeOut>,
+        equity: f64,
+        commision: f64,
+    ) -> BackTestResult;
     fn test(
         &self,
         instrument: &Instrument,
@@ -36,18 +49,7 @@ pub trait Strategy {
         );
 
         for (index, _candle) in data.iter().enumerate() {
-            if index < len - 1 {
-                if !open_positions {
-                    let trade_in_result = self.market_in_fn(index, instrument, stop_loss);
-                    match trade_in_result {
-                        TradeResult::TradeIn(trade_in) => {
-                            trades_in.push(trade_in);
-                            open_positions = true;
-                        }
-                        _ => (),
-                    };
-                }
-
+            if index < len - 1 && index >= 5 {
                 if open_positions {
                     let trade_in = trades_in.last().unwrap();
                     let trade_out_result = self.market_out_fn(index, instrument, trade_in);
@@ -59,14 +61,22 @@ pub trait Strategy {
                         _ => (),
                     };
                 }
+
+                if !open_positions {
+                    let trade_in_result = self.market_in_fn(index, instrument, stop_loss);
+                    match trade_in_result {
+                        TradeResult::TradeIn(trade_in) => {
+                            trades_in.push(trade_in);
+                            open_positions = true;
+                        }
+                        _ => (),
+                    };
+                }
             }
         }
 
         self.backtest_result(instrument, trades_in, trades_out, equity, commission)
     }
-    fn name(&self) -> &str;
-    fn strategy_type(&self) -> &StrategyType;
-    //fn entry_type(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeType;
     fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
         let entry_type: TradeType;
 
@@ -100,16 +110,4 @@ pub trait Strategy {
 
         resolve_trade_out(index, instrument, trade_in, exit_type, stop_loss)
     }
-    fn entry_long(&self, index: usize, instrument: &Instrument) -> bool;
-    fn exit_long(&self, index: usize, instrument: &Instrument) -> bool;
-    fn entry_short(&self, index: usize, instrument: &Instrument) -> bool;
-    fn exit_short(&self, index: usize, instrument: &Instrument) -> bool;
-    fn backtest_result(
-        &self,
-        instrument: &Instrument,
-        trades_in: Vec<TradeIn>,
-        trades_out: Vec<TradeOut>,
-        equity: f64,
-        commision: f64,
-    ) -> BackTestResult;
 }

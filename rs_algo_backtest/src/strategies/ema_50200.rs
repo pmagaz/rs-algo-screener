@@ -55,7 +55,6 @@ impl<'a> Strategy for Ema<'a> {
 
         let exit_condition = current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200;
 
-        let stop_loss = true;
         exit_condition
     }
 

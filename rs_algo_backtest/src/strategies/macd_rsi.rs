@@ -60,7 +60,7 @@ impl<'a> Strategy for Macd<'a> {
         let _prev_macd_b = instrument.indicators.macd.data_b.get(prev_index).unwrap();
 
         let exit_condition = current_rsi >= &70. && current_macd_a < current_macd_b;
-        let stop_loss = true;
+
         exit_condition
     }
 

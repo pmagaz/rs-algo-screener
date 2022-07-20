@@ -59,7 +59,6 @@ impl<'a> Strategy for Stoch<'a> {
             && current_stoch_a < current_stoch_b
             && prev_stoch_a >= prev_stoch_b;
 
-        let stop_loss = true;
         exit_condition
     }
 

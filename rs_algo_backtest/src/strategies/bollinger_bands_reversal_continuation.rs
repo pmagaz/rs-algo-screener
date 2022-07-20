@@ -31,38 +31,6 @@ impl<'a> Strategy for BollingerBands<'a> {
         &self.strategy_type
     }
 
-    // fn market_in_fn(&self, index: usize, instrument: &Instrument, stop_loss: f64) -> TradeResult {
-    //     let entry_type: TradeType;
-
-    //     if self.entry_long(index, instrument) {
-    //         entry_type = TradeType::EntryLong
-    //     } else if self.entry_short(index, instrument) {
-    //         entry_type = TradeType::EntryShort
-    //     } else {
-    //         entry_type = TradeType::None
-    //     }
-
-    //     resolve_trade_in2(index, instrument, entry_type, stop_loss)
-    // }
-
-    // fn market_out_fn(
-    //     &self,
-    //     index: usize,
-    //     instrument: &Instrument,
-    //     trade_in: &TradeIn,
-    // ) -> TradeResult {
-    //     let exit_type: TradeType;
-
-    //     if self.exit_long(index, instrument) {
-    //         exit_type = TradeType::ExitLong
-    //     } else if self.exit_short(index, instrument) {
-    //         exit_type = TradeType::ExitShort
-    //     } else {
-    //         exit_type = TradeType::None
-    //     }
-    //     let stop_loss = true;
-    //     resolve_trade_out2(index, instrument, trade_in, exit_type, stop_loss)
-    // }
     fn entry_long(&self, index: usize, instrument: &Instrument) -> bool {
         let prev_index = get_prev_index(index);
 

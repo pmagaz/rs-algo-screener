@@ -17,7 +17,7 @@ pub async fn find_instruments(
     limit: i64,
     state: &web::Data<AppState>,
 ) -> Result<Vec<Instrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
+    let collection_name = &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
 
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
@@ -41,8 +41,7 @@ pub async fn find_instruments(
 }
 
 pub async fn find_strategy_instrument_result(
-    strategy: &str,
-    symbol: &str,
+    query: Document,
     state: &web::Data<AppState>,
 ) -> Result<Option<BackTestInstrumentResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION").unwrap();
@@ -50,10 +49,7 @@ pub async fn find_strategy_instrument_result(
         get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
 
     let instrument = collection
-        .find_one(
-            doc! { "strategy": strategy, "instrument.symbol": symbol},
-            FindOneOptions::builder().build(),
-        )
+        .find_one(query, FindOneOptions::builder().build())
         .await
         .unwrap();
 
@@ -160,7 +156,7 @@ pub async fn find_backtest_instrument_by_symbol(
     symbol: &str,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = &env::var("DB_INSTRUMENTS_BACKTEST_COLLECTION").unwrap();
+    let collection_name = &env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap();
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let instrument = collection

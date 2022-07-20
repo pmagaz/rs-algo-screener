@@ -21,11 +21,13 @@ extern "C" {
 pub struct Props {
     pub backtested_instruments: Vec<BackTestInstrumentResult>,
     pub on_symbol_click: Callback<String>,
+    pub market: String,
 }
 
 #[function_component(StrategyDetail)]
 pub fn strategy_detail(props: &Props) -> Html {
     let Props {
+        market,
         backtested_instruments,
         on_symbol_click,
     } = props;
@@ -39,14 +41,18 @@ pub fn strategy_detail(props: &Props) -> Html {
                 let on_symbol_click = on_symbol_click.clone();
                 let symbol = backtest_instrument.instrument.symbol.clone();
                 let strategy = backtest_instrument.strategy.clone();
+
+                let replace = ["strategy/", market, "/", &strategy].concat();
+
                 let url = [
-                    base_url.replace(&["strategy/", &strategy].concat(), "").as_str(),
-                    "api/backtest/strategies/chart/",
-                    &strategy,
-                    "?symbol=",
-                    &symbol
+                    base_url.replace(replace.as_str(), "api/backtest/strategies/chart/"),
+                    market.to_string(),
+                    "/".to_owned(),
+                    strategy.to_string(),
+                    "?symbol=".to_string(),
+                    symbol
                 ]
-                 .concat();
+                .concat();
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
             };
 

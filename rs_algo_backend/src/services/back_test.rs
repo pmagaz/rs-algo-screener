@@ -33,13 +33,14 @@ pub struct Params {
 }
 
 pub async fn find_instruments(
+    market: web::Path<String>,
     query: web::Query<Params>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
     let env = env::var("ENV").unwrap();
 
-    println!("[BACK TEST INSTRUMENTS] Request for {:?}", env);
+    println!("[BACK TEST INSTRUMENTS] Request for {:?}", market);
     let offset = query.offset;
     let limit = query.limit;
 
@@ -85,14 +86,20 @@ pub async fn find_instruments_result(
 }
 
 pub async fn find_instruments_result_by_strategy(
-    strategy: web::Path<String>,
+    params: web::Path<(String, String)>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    println!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
+    let (market, strategy) = params.into_inner();
 
-    let query = doc! {"strategy": strategy.to_string()};
+    println!(
+        "[BACK TEST STRATEGIES] For {} Request at {:?}",
+        market,
+        Local::now()
+    );
+
+    let query = doc! {"market": market, "strategy": strategy.to_string()};
 
     let backtest_instruments_result: Vec<BackTestInstrumentResult> =
         db::back_test::find_backtest_instruments_result(query, 500, &state)
@@ -187,12 +194,13 @@ pub async fn find_strategies_result(
 }
 
 pub async fn chart(
-    strategy: web::Path<String>,
+    params: web::Path<(String, String)>,
     query: web::Query<SymbolQuery>,
     state: web::Data<AppState>,
 ) -> Result<fs::NamedFile, RsAlgoError> {
     let now = Instant::now();
     let symbol = &query.symbol;
+    let (market, strategy) = params.into_inner();
 
     println!(
         "[BACKTEST CHART] for {:?} / {:?} at {:?}",
@@ -201,8 +209,11 @@ pub async fn chart(
         Local::now(),
     );
 
+    let query =
+        doc! {"market": market, "strategy": strategy.to_string(),  "instrument.symbol": symbol};
+
     let backtest_result: BackTestInstrumentResult =
-        db::back_test::find_strategy_instrument_result(&*strategy, &*symbol, &state)
+        db::back_test::find_strategy_instrument_result(query, &state)
             .await
             .unwrap()
             .unwrap();
@@ -218,7 +229,7 @@ pub async fn chart(
 
     let output_file = [
         &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap(),
-        strategy.as_ref(),
+        &strategy,
         "_",
         symbol,
         ".png",

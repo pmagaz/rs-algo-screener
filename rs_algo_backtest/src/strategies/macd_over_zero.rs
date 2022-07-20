@@ -55,7 +55,6 @@ impl<'a> Strategy for Macd<'a> {
 
         let exit_condition = current_macd_a < &0.;
 
-        let stop_loss = true;
         exit_condition
     }
 

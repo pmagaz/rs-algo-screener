@@ -55,7 +55,6 @@ impl<'a> Strategy for BollingerBands<'a> {
 
         let exit_condition = close_price > top_band && prev_close <= prev_top_band;
 
-        let stop_loss = true;
         exit_condition
     }
 

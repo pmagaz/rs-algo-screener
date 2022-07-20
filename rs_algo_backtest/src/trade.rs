@@ -93,91 +93,6 @@ pub fn resolve_trade_out(
     }
 }
 
-// pub fn resolve_trade_in(
-//     index: usize,
-//     instrument: &Instrument,
-//     entry_condition: bool,
-//     stop_loss: f64,
-// ) -> TradeResult {
-//     if entry_condition {
-//         let nex_day_index = index + 1;
-//         let current_candle = instrument.data.get(nex_day_index);
-//         let current_price = match current_candle {
-//             Some(candle) => candle.open,
-//             None => -100.,
-//         };
-//         let current_date = current_candle.unwrap().date;
-
-//         TradeResult::TradeIn(TradeIn {
-//             index_in: nex_day_index,
-//             price_in: current_price,
-//             stop_loss: calculate_stoploss(instrument, nex_day_index, stop_loss),
-//             date_in: to_dbtime(current_date),
-//             trade_type: TradeType::EntryLong,
-//         })
-//     } else {
-//         TradeResult::None
-//     }
-// }
-
-// pub fn resolve_trade_out(
-//     index: usize,
-//     instrument: &Instrument,
-//     trade_in: &TradeIn,
-//     exit_condition: bool,
-//     stop_loss: bool,
-// ) -> TradeResult {
-//     let size = 1.;
-//     let data = &instrument.data;
-//     let nex_day_index = index + 1;
-//     let index_in = trade_in.index_in;
-//     let price_in = trade_in.price_in;
-//     let current_candle = data.get(nex_day_index);
-//     let current_price = match current_candle {
-//         Some(candle) => candle.open,
-//         None => -100.,
-//     };
-
-//     let date_in = instrument.data.get(index_in).unwrap().date;
-//     let date_out = current_candle.unwrap().date;
-//     let profit = calculate_profit(size, price_in, current_price);
-//     let profit_per = calculate_profit_per(price_in, current_price);
-//     let run_up = calculate_runup(data, price_in, index_in, nex_day_index);
-//     let run_up_per = calculate_runup_per(run_up, price_in);
-//     let draw_down = calculate_drawdown(data, price_in, index_in, nex_day_index);
-//     let draw_down_per = calculate_drawdown_per(draw_down, price_in);
-
-//     let stop_loss_activated = match stop_loss {
-//         true => resolve_stoploss(current_price, trade_in),
-//         false => false,
-//     };
-
-//     let trade_type = match stop_loss_activated {
-//         true => TradeType::StopLoss,
-//         false => TradeType::ExitLong,
-//     };
-
-//     if index > trade_in.index_in && (exit_condition || stop_loss_activated) {
-//         TradeResult::TradeOut(TradeOut {
-//             index_in,
-//             price_in,
-//             trade_type,
-//             date_in: to_dbtime(date_in),
-//             index_out: nex_day_index,
-//             price_out: current_price,
-//             date_out: to_dbtime(date_out),
-//             profit,
-//             profit_per,
-//             run_up,
-//             run_up_per,
-//             draw_down,
-//             draw_down_per,
-//         })
-//     } else {
-//         TradeResult::None
-//     }
-// }
-
 pub fn resolve_backtest(
     instrument: &Instrument,
     trades_in: Vec<TradeIn>,
@@ -234,6 +149,7 @@ pub fn resolve_backtest(
                 trades_out,
             },
             strategy: name.to_owned(),
+            market: Market::Stock,
             date_start,
             date_end,
             sessions,
@@ -268,6 +184,7 @@ pub fn resolve_backtest(
                 trades_out: vec![],
             },
             strategy: name.to_owned(),
+            market: Market::Stock,
             date_start: fake_date,
             date_end: fake_date,
             sessions: 0,

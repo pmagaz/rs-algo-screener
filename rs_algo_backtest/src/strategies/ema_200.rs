@@ -53,7 +53,7 @@ impl<'a> Strategy for Ema<'a> {
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
         let exit_condition = close_price < current_ema_200 && prev_close >= prev_ema_200;
-        let stop_loss = true;
+
         exit_condition
     }
 

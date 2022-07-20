@@ -49,7 +49,6 @@ impl<'a> Strategy for Rsi<'a> {
 
         let exit_condition = current_rsi >= &70. && prev_rsi <= &70.;
 
-        let stop_loss = true;
         exit_condition
     }
 

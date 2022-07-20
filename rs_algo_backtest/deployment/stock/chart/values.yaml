@@ -1,5 +1,5 @@
 jobs:
-  - name: sp500
+  - name: stock
     image:
       repository: cluster.loc:5000/rs-algo-backtest
       tag: latest

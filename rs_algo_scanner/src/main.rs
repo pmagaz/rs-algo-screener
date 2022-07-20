@@ -1,9 +1,10 @@
-use crate::broker::Symbol;
+use crate::broker::*;
 use crate::error::Result;
 use error::RsAlgoErrorKind;
 use instrument::Instrument;
 use rs_algo_shared::broker;
 use rs_algo_shared::broker::xtb::*;
+use rs_algo_shared::helpers::comp::symbol_in_list;
 use rs_algo_shared::helpers::date;
 use rs_algo_shared::helpers::date::Local;
 use rs_algo_shared::helpers::http::request;
@@ -45,7 +46,6 @@ async fn main() -> Result<()> {
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
     let mut symbols = screener.get_symbols().await.unwrap().symbols;
-    let sp500_symbols = broker::sp500::get_symbols();
 
     let env = env::var("ENV").unwrap();
 
@@ -56,6 +56,7 @@ async fn main() -> Result<()> {
         .parse::<bool>()
         .unwrap();
 
+    let backtest_market = env::var("SCANNER_BACKTEST_MARKET").unwrap().clone();
     // symbols = vec![
     //     Symbol {
     //         symbol: "FANG.US_4".to_owned(),
@@ -102,8 +103,12 @@ async fn main() -> Result<()> {
 
     for s in symbols {
         let now = Instant::now();
+
         if !backtest_mode
-            || (backtest_mode && broker::sp500::is_in_sp500(&s.symbol, &sp500_symbols))
+            || (backtest_mode
+                && (symbol_in_list(&s.symbol, &sp500::get_symbols())
+                    || symbol_in_list(&s.symbol, &forex::get_symbols())
+                    || symbol_in_list(&s.symbol, &crypto::get_symbols())))
         {
             println!("[SCANNER] processing {} ...", &s.symbol);
 
