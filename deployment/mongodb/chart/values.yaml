@@ -36,9 +36,9 @@ serviceAccount: {}
 
 resources:
   requests:
-     cpu: 100m
+     cpu: 300m
   limits:
-    cpu: 300m
+    cpu: 600m
     #storage: 2Gi
 
 ingress: {}
