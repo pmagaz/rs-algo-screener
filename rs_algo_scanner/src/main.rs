@@ -56,7 +56,6 @@ async fn main() -> Result<()> {
         .parse::<bool>()
         .unwrap();
 
-    let backtest_market = env::var("SCANNER_BACKTEST_MARKET").unwrap().clone();
     // symbols = vec![
     //     Symbol {
     //         symbol: "FANG.US_4".to_owned(),
