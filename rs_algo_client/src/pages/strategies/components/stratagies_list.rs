@@ -4,6 +4,7 @@ use crate::helpers::status::*;
 use round::round;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::helpers::status::*;
+use rs_algo_shared::models::status::Status;
 use rs_algo_shared::models::market::*;
 
 
@@ -25,6 +26,7 @@ pub struct Props {
     pub strategies: Vec<BackTestStrategyResult>,
     pub market: Market,
 }
+
 
 #[function_component(StrategiesList)]
 pub fn strategy_list(props: &Props) -> Html {

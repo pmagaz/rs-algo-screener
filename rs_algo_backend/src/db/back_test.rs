@@ -65,12 +65,13 @@ pub async fn find_backtest_instruments_result(
 
     let collection =
         get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
+
     let mut cursor = collection
         .find(
             query,
             FindOptions::builder()
                 .limit(limit)
-                .sort(doc! {"profitable_trades":-1})
+                .sort(doc! {"net_profit_per":-1})
                 .build(),
         )
         .await
@@ -125,7 +126,7 @@ pub async fn upsert_instruments_result(
 
     collection
         .find_one_and_replace(
-            doc! { "instrument.symbol": doc.instrument.symbol.clone(), "strategy": doc.strategy.clone() },
+            doc! { "market": doc.market.to_string(), "strategy": doc.strategy.clone(), "instrument.symbol": doc.instrument.symbol.clone() },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))
@@ -143,7 +144,7 @@ pub async fn upsert_strategies_result(
 
     collection
         .find_one_and_replace(
-            doc! { "strategy": doc.strategy.clone() },
+            doc! { "market": doc.market.to_string(), "strategy": doc.strategy.clone() },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))

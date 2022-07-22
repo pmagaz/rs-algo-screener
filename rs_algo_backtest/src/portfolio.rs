@@ -27,9 +27,9 @@ impl PortFolio {
         let backtest_market = env::var("BACKTEST_MARKET").unwrap();
 
         let market = match backtest_market.as_ref() {
-            "stock" => Market::Stock,
-            "forex" => Market::Forex,
-            "crypto" => Market::Crypto,
+            "Stock" => Market::Stock,
+            "Forex" => Market::Forex,
+            "Crypto" => Market::Crypto,
             _ => Market::Stock,
         };
 
