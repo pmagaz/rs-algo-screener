@@ -53,10 +53,10 @@ pub fn strategy_list(props: &Props) -> Html {
                     <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}> { format!("{}%", round(strategy.avg_max_drawdown,2))}</td>
-                    <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(strategy.avg_won_per_trade,2))}</td>
                     <td>{ strategy.avg_trades}</td>
+                    <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(strategy.avg_won_per_trade,2))}</td>
+                    <td class={get_status_class(&avg_lost_status)}>{ format!("{}%", round(strategy.avg_lost_per_trade,2))}</td>
                     <td>{ format!("{} / {}", strategy.avg_wining_trades, strategy.avg_losing_trades)} </td>
-                    //<td class={get_status_class(&avg_lost_status)}>{ format!("{}%", round(strategy.avg_lost_per_trade,2))}</td>
                     <td>{ strategy.avg_stop_losses}</td>
                     <td>{ format!("{}%", round(strategy.avg_buy_hold,2))}</td>
                     <td> {format!("{}", strategy.date.to_chrono().format("%d/%m %H:%M"))}</td>
@@ -75,10 +75,10 @@ pub fn strategy_list(props: &Props) -> Html {
                 <th><abbr>{ "Profit F." }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
-                <th><abbr>{ "Won p trade" }</abbr></th>
                 <th><abbr>{ "Trades" }</abbr></th>
+                <th><abbr>{ "Avg Won" }</abbr></th>
+                <th><abbr>{ "Avg Lost" }</abbr></th>
                 <th><abbr>{ "Won / Lost" }</abbr></th>
-                //<th><abbr>{ "Lost p trade" }</abbr></th>
                 <th><abbr>{ "Stops " }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
                 <th><abbr>{ "Updated" }</abbr></th>

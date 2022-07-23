@@ -19,7 +19,7 @@ impl<'a> Strategy for BollingerBands<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
             name: "Bollinger_Bands_Reversal_Riding",
-            strategy_type: StrategyType::LongShort,
+            strategy_type: StrategyType::OnlyLong,
         })
     }
 

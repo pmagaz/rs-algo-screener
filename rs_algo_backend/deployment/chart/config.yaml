@@ -17,7 +17,7 @@ MIN_HORIZONTAL_LEVELS_OCCURENCES: "2"
 MIN_VOLUME: "30000000"
 MAX_PATTERN_DAYS: "2"
 MAX_PATTERN_ACTIVATED_DAYS: "2"
-BACkTEST_LIMIT_INSTRUMENTS: "10"
+BACkTEST_LIMIT_INSTRUMENTS: "20"
 
 MONGO_MEM_DB_NAME: "screener-db"
 MONGO_MEM_DB_URI: "@mongodb-mem:27017/screener-db?authSource=admin&readPreference=primary&retryWrites=true&directConnection=true&ssl=false"

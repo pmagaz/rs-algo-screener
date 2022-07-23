@@ -70,10 +70,10 @@ pub fn strategy_detail(props: &Props) -> Html {
                     <td class={get_status_class(&profit_factor_status)}> { round(backtest_instrument.profit_factor,2) }</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(backtest_instrument.profitable_trades,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}>{ format!("{}%", round(backtest_instrument.max_drawdown,2))}</td>
-                    <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(backtest_instrument.won_per_trade_per,2))}</td>
                     <td>{ backtest_instrument.trades}</td>
+                    <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(backtest_instrument.won_per_trade_per,2))}</td>
+                    <td class={get_status_class(&avg_lost_status)}>{ format!("{}%", round(backtest_instrument.lost_per_trade_per,2))}</td>
                     <td>{ format!("{} / {}", backtest_instrument.wining_trades, backtest_instrument.losing_trades)} </td>
-                    //<td class={get_status_class(&avg_lost_status)}>{ format!("{}%", round(backtest_instrument.lost_per_trade_per,2))}</td>
                     <td>{ backtest_instrument.stop_losses}</td>
                     <td>{ format!("{}%", round(backtest_instrument.buy_hold,2))}</td>
                 </tr>
@@ -90,10 +90,10 @@ pub fn strategy_detail(props: &Props) -> Html {
                 <th><abbr>{ "Profit F." }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
-                <th><abbr>{ "Won p trade" }</abbr></th>
                 <th><abbr>{ "Trades" }</abbr></th>
+                <th><abbr>{ "Avg Won" }</abbr></th>
+                <th><abbr>{ "Avg Lost" }</abbr></th>
                 <th><abbr>{ "Won / Lost" }</abbr></th>
-                //<th><abbr>{ "Lost p trade" }</abbr></th>
                 <th><abbr>{ "Stops " }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
                 </tr>

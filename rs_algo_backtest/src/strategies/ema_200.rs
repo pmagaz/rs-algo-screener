@@ -18,7 +18,7 @@ impl<'a> Strategy for Ema<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
             name: "EMA_200",
-            strategy_type: StrategyType::LongShort,
+            strategy_type: StrategyType::OnlyLong,
         })
     }
 
