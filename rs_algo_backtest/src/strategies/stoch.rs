@@ -18,7 +18,7 @@ impl<'a> Strategy for Stoch<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
             name: "Stoch",
-            strategy_type: StrategyType::OnlyLong,
+            strategy_type: StrategyType::LongShort,
         })
     }
 

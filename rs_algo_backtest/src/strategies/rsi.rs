@@ -18,7 +18,7 @@ impl<'a> Strategy for Rsi<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
             name: "RSI",
-            strategy_type: StrategyType::OnlyLong,
+            strategy_type: StrategyType::LongShort,
         })
     }
 

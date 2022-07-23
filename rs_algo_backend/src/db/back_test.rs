@@ -157,8 +157,8 @@ pub async fn find_backtest_instrument_by_symbol(
     symbol: &str,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = &env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap();
-    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
+    let collection_name = &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
+    let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())

@@ -1,9 +1,11 @@
 use crate::helpers::slope_intercept::slope_intercept;
 
-use libm::atan2;
-use round::round;
+use super::pattern::pattern_active_result;
+use crate::candle::Candle;
+use crate::prices::*;
+
 use rs_algo_shared::helpers::comp::*;
-use rs_algo_shared::models::pattern::DataPoints;
+use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 use std::env;
 
 pub fn is_higher_highs_higher_lows_top(data: &DataPoints) -> bool {
@@ -22,6 +24,30 @@ pub fn is_higher_highs_higher_lows_bottom(data: &DataPoints) -> bool {
     }
 }
 
+pub fn ascendant_top_active(
+    data: &DataPoints,
+    candles: &Vec<Candle>,
+    pattern_type: PatternType,
+) -> PatternActive {
+    pattern_active_result(
+        &data,
+        price_is_higher_last_high_top(&data, candles, &pattern_type),
+        price_is_lower_last_low_bottom(&data, candles, &pattern_type),
+    )
+}
+
+pub fn ascendant_bottom_active(
+    data: &DataPoints,
+    candles: &Vec<Candle>,
+    pattern_type: PatternType,
+) -> PatternActive {
+    pattern_active_result(
+        &data,
+        price_is_higher_last_high_bottom(&data, candles, &pattern_type),
+        price_is_lower_last_low_top(&data, candles, &pattern_type),
+    )
+}
+
 pub fn is_lower_highs_lower_lows_top(data: &DataPoints) -> bool {
     if is_lower_highs_top(data) && is_lower_lows_bottom(data) {
         true
@@ -36,6 +62,30 @@ pub fn is_lower_highs_lower_lows_bottom(data: &DataPoints) -> bool {
     } else {
         false
     }
+}
+
+pub fn descendant_top_active(
+    data: &DataPoints,
+    candles: &Vec<Candle>,
+    pattern_type: PatternType,
+) -> PatternActive {
+    pattern_active_result(
+        &data,
+        price_is_lower_last_low_top(&data, candles, &pattern_type),
+        price_is_higher_last_high_bottom(&data, candles, &pattern_type),
+    )
+}
+
+pub fn descendant_bottom_active(
+    data: &DataPoints,
+    candles: &Vec<Candle>,
+    pattern_type: PatternType,
+) -> PatternActive {
+    pattern_active_result(
+        &data,
+        price_is_lower_last_low_bottom(&data, candles, &pattern_type),
+        price_is_higher_last_high_top(&data, candles, &pattern_type),
+    )
 }
 
 pub fn is_higher_highs_top(data: &DataPoints) -> bool {

@@ -31,8 +31,8 @@ pub fn top_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_top(&data, candles, &pattern_type),
-        price_is_lower_low_band_bottom(&data, candles, &pattern_type),
+        price_is_higher_last_high_top(&data, candles, &pattern_type),
+        price_is_lower_last_low_bottom(&data, candles, &pattern_type),
     )
 }
 
@@ -60,7 +60,7 @@ pub fn bottom_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_bottom(&data, candles, &pattern_type),
-        price_is_lower_low_band_top(&data, candles, &pattern_type),
+        price_is_higher_last_high_bottom(&data, candles, &pattern_type),
+        price_is_lower_last_low_top(&data, candles, &pattern_type),
     )
 }

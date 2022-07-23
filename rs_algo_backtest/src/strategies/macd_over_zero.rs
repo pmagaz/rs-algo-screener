@@ -18,7 +18,7 @@ impl<'a> Strategy for Macd<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
             name: "MACD_Over_Zero",
-            strategy_type: StrategyType::OnlyLong,
+            strategy_type: StrategyType::LongShort,
         })
     }
 

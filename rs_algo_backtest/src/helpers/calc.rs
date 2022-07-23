@@ -131,8 +131,7 @@ pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
 //     (profit / equity) * 100.
 // }
 
-pub fn calculate_buy_hold(trades_out: &Vec<TradeOut>, equity: f64, current_price: f64) -> f64 {
-    let bought_at = trades_out.first().unwrap().price_in;
+pub fn calculate_buy_hold(bought_at: f64, equity: f64, current_price: f64) -> f64 {
     let size = equity / bought_at;
     let sold_at = size * current_price;
     let profit = sold_at - (equity);

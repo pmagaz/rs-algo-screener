@@ -423,6 +423,13 @@ impl Patterns {
                             not_founded = true;
                         } else if highs_lows::is_higher_highs_higher_lows_top(&data_points) {
                             data_points = add_next_top_points(data_points);
+
+                            let is_pattern_active = highs_lows::ascendant_top_active(
+                                &data_points,
+                                candles,
+                                PatternType::HigherHighsHigherLows,
+                            );
+
                             self.set_pattern(
                                 PatternType::HigherHighsHigherLows,
                                 PatternDirection::Top,
@@ -430,11 +437,18 @@ impl Patterns {
                                 data_points.to_owned(),
                                 change,
                                 candle_date,
-                                non_activated(),
+                                is_pattern_active,
                             );
                             not_founded = true;
                         } else if highs_lows::is_higher_highs_higher_lows_bottom(&data_points) {
                             data_points = add_next_top_points(data_points);
+
+                            let is_pattern_active = highs_lows::ascendant_bottom_active(
+                                &data_points,
+                                candles,
+                                PatternType::HigherHighsHigherLows,
+                            );
+
                             self.set_pattern(
                                 PatternType::HigherHighsHigherLows,
                                 PatternDirection::Top,
@@ -442,11 +456,18 @@ impl Patterns {
                                 data_points.to_owned(),
                                 change,
                                 candle_date,
-                                non_activated(),
+                                is_pattern_active,
                             );
                             not_founded = true;
                         } else if highs_lows::is_lower_highs_lower_lows_top(&data_points) {
                             data_points = add_next_top_points(data_points);
+
+                            let is_pattern_active = highs_lows::descendant_top_active(
+                                &data_points,
+                                candles,
+                                PatternType::HigherHighsHigherLows,
+                            );
+
                             self.set_pattern(
                                 PatternType::LowerHighsLowerLows,
                                 PatternDirection::Top,
@@ -454,11 +475,18 @@ impl Patterns {
                                 data_points.to_owned(),
                                 change,
                                 candle_date,
-                                non_activated(),
+                                is_pattern_active,
                             );
                             not_founded = true;
                         } else if highs_lows::is_lower_highs_lower_lows_bottom(&data_points) {
                             data_points = add_next_top_points(data_points);
+
+                            let is_pattern_active = highs_lows::descendant_bottom_active(
+                                &data_points,
+                                candles,
+                                PatternType::HigherHighsHigherLows,
+                            );
+
                             self.set_pattern(
                                 PatternType::LowerHighsLowerLows,
                                 PatternDirection::Top,
@@ -466,7 +494,7 @@ impl Patterns {
                                 data_points.to_owned(),
                                 change,
                                 candle_date,
-                                non_activated(),
+                                is_pattern_active,
                             );
                             not_founded = true;
                         }

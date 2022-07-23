@@ -48,6 +48,46 @@ pub fn price_is_lower_low_band_top(
     search_price_break(points, candles, &break_price_comparator)
 }
 
+pub fn price_is_higher_last_high_top(
+    data: &DataPoints,
+    candles: &Vec<Candle>,
+    pattern_type: &PatternType,
+) -> PriceBreak {
+    let points = vec![data[2]];
+    let break_price_comparator = |price: f64, price_break: f64| price > price_break;
+    search_price_break(points, candles, &break_price_comparator)
+}
+
+pub fn price_is_higher_last_high_bottom(
+    data: &DataPoints,
+    candles: &Vec<Candle>,
+    pattern_type: &PatternType,
+) -> PriceBreak {
+    let points = vec![data[3]];
+    let break_price_comparator = |price: f64, price_break: f64| price > price_break;
+    search_price_break(points, candles, &break_price_comparator)
+}
+
+pub fn price_is_lower_last_low_top(
+    data: &DataPoints,
+    candles: &Vec<Candle>,
+    pattern_type: &PatternType,
+) -> PriceBreak {
+    let points = vec![data[3]];
+    let break_price_comparator = |price: f64, price_break: f64| price > price_break;
+    search_price_break(points, candles, &break_price_comparator)
+}
+
+pub fn price_is_lower_last_low_bottom(
+    data: &DataPoints,
+    candles: &Vec<Candle>,
+    pattern_type: &PatternType,
+) -> PriceBreak {
+    let points = vec![data[2]];
+    let break_price_comparator = |price: f64, price_break: f64| price > price_break;
+    search_price_break(points, candles, &break_price_comparator)
+}
+
 pub fn price_is_higher_peak(
     peak: (usize, f64),
     candles: &Vec<Candle>,
@@ -84,7 +124,10 @@ pub fn search_price_break(
     candles: &Vec<Candle>,
     comparator: &dyn Fn(f64, f64) -> bool,
 ) -> PriceBreak {
-    let logarithmic = env::var("LOGARITHMIC_SCANNER").unwrap().parse::<bool>().unwrap();
+    let logarithmic = env::var("LOGARITHMIC_SCANNER")
+        .unwrap()
+        .parse::<bool>()
+        .unwrap();
 
     let len = points.len();
     if len > 1 {
@@ -100,7 +143,7 @@ pub fn search_price_break(
                 let next_price = (slope * n as f64) + y_intercept;
                 let current_price = match logarithmic {
                     true => candles[n].close().exp(),
-                    false => candles[n].close()
+                    false => candles[n].close(),
                 };
                 let current_date = &candles[n].date();
 

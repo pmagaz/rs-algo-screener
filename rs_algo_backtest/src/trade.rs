@@ -23,7 +23,7 @@ pub fn resolve_trade_in(
         TradeResult::TradeIn(TradeIn {
             index_in: nex_day_index,
             price_in: current_price,
-            stop_loss: calculate_stoploss(instrument, nex_day_index, stop_loss),
+            stop_loss: calculate_stoploss(&entry_type, instrument, nex_day_index, stop_loss),
             date_in: to_dbtime(current_date),
             trade_type: entry_type,
         })
@@ -135,7 +135,13 @@ pub fn resolve_backtest(
         let profit_factor = total_profit_factor(gross_profits, gross_loses);
         let max_drawdown = total_drawdown(&trades_out, equity);
         let max_runup = total_runup(&trades_out, equity);
-        let buy_hold = calculate_buy_hold(&trades_out, equity, current_price);
+
+        let strategy_start_price = match instrument.data.first().map(|x| x.open) {
+            Some(open) => open,
+            None => 0.0,
+        };
+
+        let buy_hold = calculate_buy_hold(strategy_start_price, equity, current_price);
         let annual_return = 100.;
 
         println!(
@@ -209,14 +215,27 @@ pub fn resolve_backtest(
     }
 }
 
-pub fn calculate_stoploss(instrument: &Instrument, index: usize, stop_loss: f64) -> f64 {
+pub fn calculate_stoploss(
+    entry_type: &TradeType,
+    instrument: &Instrument,
+    index: usize,
+    stop_loss: f64,
+) -> f64 {
     let current_price = &instrument.data.get(index).unwrap().open;
     let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * stop_loss;
-    current_price - atr_value
+
+    match entry_type {
+        TradeType::EntryLong => current_price - atr_value,
+        TradeType::EntryShort => current_price + atr_value,
+        _ => current_price - atr_value,
+    }
 }
 
 pub fn resolve_stoploss(current_price: f64, trade_in: &TradeIn) -> bool {
     let stop_loss = trade_in.stop_loss;
-    current_price <= stop_loss
-    //false
+    match trade_in.trade_type {
+        TradeType::EntryLong => current_price <= stop_loss,
+        TradeType::EntryShort => current_price >= stop_loss,
+        _ => current_price - current_price <= stop_loss,
+    }
 }
