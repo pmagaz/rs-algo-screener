@@ -126,7 +126,7 @@ pub async fn upsert_instruments_result(
 
     collection
         .find_one_and_replace(
-            doc! { "market": doc.market.to_string(), "strategy": doc.strategy.clone(), "instrument.symbol": doc.instrument.symbol.clone() },
+            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(), "market": doc.market.to_string(),  "instrument.symbol": doc.instrument.symbol.clone() },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))
@@ -144,7 +144,7 @@ pub async fn upsert_strategies_result(
 
     collection
         .find_one_and_replace(
-            doc! { "market": doc.market.to_string(), "strategy": doc.strategy.clone() },
+            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(), "market": doc.market.to_string(),   },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))

@@ -2,6 +2,7 @@ use crate::helpers::calc::*;
 
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::Instrument;
 use rs_algo_shared::models::market::*;
 
@@ -96,6 +97,7 @@ pub fn resolve_trade_out(
 
 pub fn resolve_backtest(
     instrument: &Instrument,
+    strategy_type: &StrategyType,
     trades_in: Vec<TradeIn>,
     trades_out: Vec<TradeOut>,
     name: &str,
@@ -156,6 +158,7 @@ pub fn resolve_backtest(
                 trades_out,
             },
             strategy: name.to_owned(),
+            strategy_type: strategy_type.to_owned(),
             market: Market::Stock,
             date_start,
             date_end,
@@ -191,6 +194,7 @@ pub fn resolve_backtest(
                 trades_out: vec![],
             },
             strategy: name.to_owned(),
+            strategy_type: strategy_type.to_owned(),
             market: Market::Stock,
             date_start: fake_date,
             date_end: fake_date,

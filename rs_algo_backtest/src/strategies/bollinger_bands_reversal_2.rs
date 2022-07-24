@@ -7,7 +7,6 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::Instrument;
-use rs_algo_shared::models::pattern::*;
 
 pub struct BollingerBands<'a> {
     name: &'a str,
@@ -101,7 +100,13 @@ impl<'a> Strategy for BollingerBands<'a> {
         commission: f64,
     ) -> BackTestResult {
         resolve_backtest(
-            instrument, trades_in, trades_out, self.name, equity, commission,
+            instrument,
+            &self.strategy_type,
+            trades_in,
+            trades_out,
+            self.name,
+            equity,
+            commission,
         )
     }
 }

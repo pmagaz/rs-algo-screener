@@ -87,7 +87,13 @@ impl<'a> Strategy for Stoch<'a> {
         commission: f64,
     ) -> BackTestResult {
         resolve_backtest(
-            instrument, trades_in, trades_out, self.name, equity, commission,
+            instrument,
+            &self.strategy_type,
+            trades_in,
+            trades_out,
+            self.name,
+            equity,
+            commission,
         )
     }
 }
