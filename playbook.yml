@@ -13,6 +13,3 @@
     - { role: "rs_algo_backtest/deployment/stock/roles/" }
     - { role: "rs_algo_backtest/deployment/forex/roles/" }
     - { role: "rs_algo_backtest/deployment/crypto/roles/" }
-  
-   
-
