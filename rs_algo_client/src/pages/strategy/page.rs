@@ -19,20 +19,27 @@ extern "C" {
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct Props {
-    pub name: String,
     pub market: String,
+    pub strategy: String,
+    pub stype: String,
 }
 
 #[function_component(Strategy)]
 pub fn strategy(props: &Props) -> Html {
-    let Props { name, market } = props;
+    let Props {
+        market,
+        strategy,
+        stype,
+    } = props;
     let base_url = get_base_url();
-    let replace = ["strategy/", market, "/", name].concat();
+    let replace = ["strategy/", market, "/", strategy, "/", stype].concat();
     let backtested_strategy_url = [
-        base_url.replace(replace.as_str(), "api/backtest/strategies/"),
+        base_url.replace(replace.as_str(), "api/backtest/strategies"),
         market.to_string(),
         "/".to_owned(),
-        name.to_string(),
+        strategy.to_string(),
+        "/".to_owned(),
+        stype.to_string(),
     ]
     .concat();
     let use_backtest_instruments = use_state(|| vec![]);
@@ -76,8 +83,7 @@ pub fn strategy(props: &Props) -> Html {
         <div class="tile is-ancestor is-vertical ">
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
-                     <h1 class="navbar-item is-size-2">{ name }</h1>
-
+                     <h1 class="navbar-item is-size-2">{format!("{} {}",strategy, stype) }</h1>
                         <Loading loading={ *use_loading} />
                 </div>
             </div>

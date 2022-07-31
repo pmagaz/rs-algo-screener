@@ -41,14 +41,17 @@ pub fn strategy_detail(props: &Props) -> Html {
                 let on_symbol_click = on_symbol_click.clone();
                 let symbol = backtest_instrument.instrument.symbol.clone();
                 let strategy = backtest_instrument.strategy.clone();
+                let strategy_type = backtest_instrument.strategy_type.clone();
 
-                let replace = ["strategy/", market, "/", &strategy].concat();
+                let replace = ["strategy/", market, "/", &strategy, "/", &strategy_type.to_string()].concat();
 
                 let url = [
-                    base_url.replace(replace.as_str(), "api/backtest/strategies/chart/"),
+                    base_url.replace(replace.as_str(), "api/backtest/strategies/chart"),
                     market.to_string(),
                     "/".to_owned(),
                     strategy.to_string(),
+                    "/".to_owned(),
+                    strategy_type.to_string(),
                     "?symbol=".to_string(),
                     symbol
                 ]

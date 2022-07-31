@@ -92,12 +92,12 @@ pub async fn find_instruments_result(
 }
 
 pub async fn find_instruments_result_by_strategy(
-    params: web::Path<(String, String)>,
+    params: web::Path<(String, String, String)>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    let (market, strategy) = params.into_inner();
+    let (market, strategy, strategy_type) = params.into_inner();
 
     println!(
         "[BACK TEST STRATEGIES] For {} Request at {:?}",
@@ -105,7 +105,7 @@ pub async fn find_instruments_result_by_strategy(
         Local::now()
     );
 
-    let query = doc! {"market": market, "strategy": strategy.to_string()};
+    let query = doc! {"market": market, "strategy": strategy, "strategy_type": strategy_type};
 
     let backtest_instruments_result: Vec<BackTestInstrumentResult> =
         db::back_test::find_backtest_instruments_result(query, 500, &state)
@@ -200,13 +200,13 @@ pub async fn find_strategies_result(
 }
 
 pub async fn chart(
-    params: web::Path<(String, String)>,
+    params: web::Path<(String, String, String)>,
     query: web::Query<SymbolQuery>,
     state: web::Data<AppState>,
 ) -> Result<fs::NamedFile, RsAlgoError> {
     let now = Instant::now();
     let symbol = &query.symbol;
-    let (market, strategy) = params.into_inner();
+    let (market, strategy, strategy_type) = params.into_inner();
 
     println!(
         "[BACKTEST CHART] for {:?} / {:?} at {:?}",
@@ -215,8 +215,7 @@ pub async fn chart(
         Local::now(),
     );
 
-    let query =
-        doc! {"market": market, "strategy": strategy.to_string(),  "instrument.symbol": symbol};
+    let query = doc! {"market": market, "strategy": &strategy , "strategy_type": &strategy_type, "instrument.symbol": symbol};
 
     let backtest_result: BackTestInstrumentResult =
         db::back_test::find_strategy_instrument_result(query, &state)

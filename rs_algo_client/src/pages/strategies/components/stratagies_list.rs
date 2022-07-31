@@ -46,7 +46,7 @@ pub fn strategy_list(props: &Props) -> Html {
             html! {
                 <tr>
                     <td>
-                    <Link<Route> to={Route::Strategy { market: strategy.market.to_string(), name: strategy.strategy.clone() }}>{ strategy.strategy.clone() }</Link<Route>>
+                    <Link<Route> to={Route::Strategy { market: strategy.market.to_string(), strategy: strategy.strategy.to_string(), stype: strategy.strategy_type.to_string()  }}>{ strategy.strategy.clone() }</Link<Route>>
                     </td>
                     <td>{ format!(" {:?} ", strategy.strategy_type )}</td>
                     <td class={get_status_class(&profit_status)}> { format!("{}%", round(strategy.avg_net_profit_per,2))}</td>

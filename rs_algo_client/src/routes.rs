@@ -2,8 +2,6 @@ use crate::pages::home::page::Home;
 use crate::pages::strategies::page::Strategies;
 use crate::pages::strategy::page::Strategy;
 
-use rs_algo_shared::models::market::*;
-
 use yew::{html, Html};
 use yew_router::prelude::*;
 
@@ -13,8 +11,12 @@ pub enum Route {
     Home,
     #[at("/strategies")]
     Strategies,
-    #[at("/strategy/:market/:name")]
-    Strategy { market: String, name: String },
+    #[at("/strategy/:market/:strategy/:stype/")]
+    Strategy {
+        market: String,
+        strategy: String,
+        stype: String,
+    },
 }
 
 pub fn switch(routes: &Route) -> Html {
@@ -25,8 +27,12 @@ pub fn switch(routes: &Route) -> Html {
         Route::Strategies => {
             html! { <Strategies /> }
         }
-        Route::Strategy { market, name } => {
-            html! { <Strategy market={ market } name={ name }/> }
+        Route::Strategy {
+            market,
+            strategy,
+            stype,
+        } => {
+            html! { <Strategy market={ market } strategy={strategy } stype={stype}/> }
         }
     }
 }
