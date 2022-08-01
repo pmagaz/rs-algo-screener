@@ -72,34 +72,34 @@ async fn main() -> Result<()> {
     //     },
     // ];
 
-    // if env == "development" {
-    //     symbols = vec![
-    //         Symbol {
-    //             symbol: "BITCOIN".to_owned(),
-    //             category: "".to_owned(),
-    //             description: "".to_owned(),
-    //             currency: "".to_owned(),
-    //         },
-    //         // Symbol {
-    //         //     symbol: "TGNA.US_9".to_owned(),
-    //         //     category: "".to_owned(),
-    //         //     description: "".to_owned(),
-    //         //     currency: "".to_owned(),
-    //         // },
-    //         // Symbol {
-    //         //     symbol: "ETHEREUM".to_owned(),
-    //         //     category: "".to_owned(),
-    //         //     description: "".to_owned(),
-    //         //     currency: "".to_owned(),
-    //         // },
-    //         // Symbol {
-    //         //     symbol: "CRM.US_4".to_owned(),
-    //         //     category: "".to_owned(),
-    //         //     description: "".to_owned(),
-    //         //     currency: "".to_owned(),
-    //         // },
-    //     ]
-    // };
+    if env == "development" {
+        symbols = vec![
+            Symbol {
+                symbol: "DOYU.US".to_owned(),
+                category: "".to_owned(),
+                description: "".to_owned(),
+                currency: "".to_owned(),
+            },
+            // Symbol {
+            //     symbol: "TGNA.US_9".to_owned(),
+            //     category: "".to_owned(),
+            //     description: "".to_owned(),
+            //     currency: "".to_owned(),
+            // },
+            // Symbol {
+            //     symbol: "ETHEREUM".to_owned(),
+            //     category: "".to_owned(),
+            //     description: "".to_owned(),
+            //     currency: "".to_owned(),
+            // },
+            // Symbol {
+            //     symbol: "CRM.US_4".to_owned(),
+            //     category: "".to_owned(),
+            //     description: "".to_owned(),
+            //     currency: "".to_owned(),
+            // },
+        ]
+    };
 
     let mut market: Market = Market::Stock;
     let mut sp500_symbols = vec![];
