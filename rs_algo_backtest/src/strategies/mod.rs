@@ -14,6 +14,7 @@ pub mod macd_over_zero;
 pub mod macd_rsi;
 pub mod rsi;
 pub mod stoch;
+pub mod stoch_ls;
 
 pub mod bollinger_bands_reversal_continuation_ls;
 pub mod bollinger_bands_reversal_ls;

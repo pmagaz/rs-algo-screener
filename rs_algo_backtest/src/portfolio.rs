@@ -18,13 +18,11 @@ pub struct PortFolio {
 }
 
 impl PortFolio {
-    pub async fn backtest(&self) {
+    pub async fn backtest(&self, backtest_market: String) {
         let limit = env::var("BACkTEST_LIMIT_INSTRUMENTS")
             .unwrap()
             .parse::<i32>()
             .unwrap();
-
-        let backtest_market = env::var("BACKTEST_MARKET").unwrap();
 
         let market = match backtest_market.as_ref() {
             "Stock" => Market::Stock,
