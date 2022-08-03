@@ -103,9 +103,14 @@ impl Instrument {
         data: Vec<(DateTime<Local>, f64, f64, f64, f64, f64)>,
     ) -> Result<()> {
         let mut avg_volume = vec![];
-        let logarithmic = env::var("LOGARITHMIC_SCANNER")
+        let logarithmic_scanner = env::var("LOGARITHMIC_SCANNER")
             .unwrap()
             .parse::<bool>()
+            .unwrap();
+
+        let avg_volume_days = env::var("AVG_VOLUME_DAYS")
+            .unwrap()
+            .parse::<usize>()
             .unwrap();
 
         let candles: Vec<Candle> = data
@@ -119,7 +124,7 @@ impl Instrument {
                 let close: f64;
                 let volume = x.5;
 
-                match logarithmic {
+                match logarithmic_scanner {
                     true => {
                         open = x.1.ln();
                         high = x.2.ln();
@@ -175,7 +180,7 @@ impl Instrument {
                     _ => id - 1,
                 };
 
-                let ohlc_indicators = match logarithmic {
+                let ohlc_indicators = match logarithmic_scanner {
                     true => (open.exp(), high.exp(), low.exp(), close.exp()),
                     false => (open, high, low, close),
                 };
@@ -192,7 +197,7 @@ impl Instrument {
                     .close(close)
                     .volume(volume)
                     .previous_candles(vec![data[pre_0], data[prev_1]])
-                    .logarithmic(logarithmic)
+                    .logarithmic(logarithmic_scanner)
                     .build()
                     .unwrap()
             })
@@ -236,7 +241,7 @@ impl Instrument {
             self.data = candles
                 .into_iter()
                 .map(|candle| {
-                    let data = match logarithmic {
+                    let data = match logarithmic_scanner {
                         true => candle.from_logarithmic_values(),
                         false => candle,
                     };
@@ -260,7 +265,8 @@ impl Instrument {
             self.set_current_price(self.data.last().unwrap().close());
 
             self.current_candle = self.current_candle().candle_type().clone();
-            self.avg_volume = average_f64(&avg_volume);
+            self.avg_volume =
+                average_f64(&avg_volume.into_iter().rev().take(avg_volume_days).collect());
         }
         Ok(())
     }

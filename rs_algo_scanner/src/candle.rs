@@ -150,20 +150,20 @@ impl CandleBuilder {
     }
 
     fn get_current_ohlc(&self) -> OHLCV {
-        
         match self.logarithmic.unwrap() {
             true => (
                 self.open.unwrap().exp(),
                 self.high.unwrap().exp(),
                 self.low.unwrap().exp(),
                 self.close.unwrap().exp(),
-        ),
+            ),
             false => (
                 self.open.unwrap(),
                 self.high.unwrap(),
                 self.low.unwrap(),
                 self.close.unwrap(),
-        ) }
+            ),
+        }
     }
 
     fn get_previous_ohlc(&self, index: usize) -> OHLCV {
@@ -179,7 +179,7 @@ impl CandleBuilder {
                 self.previous_candles.as_ref().unwrap()[index].2,
                 self.previous_candles.as_ref().unwrap()[index].3,
                 self.previous_candles.as_ref().unwrap()[index].4,
-            )
+            ),
         }
     }
 
@@ -415,7 +415,6 @@ impl CandleBuilder {
             self.previous_candles.as_ref(),
             self.logarithmic,
         ) {
-
             Ok(Candle {
                 candle_type: self.identify_candle_type(),
                 date,
