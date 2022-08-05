@@ -12,7 +12,6 @@ use std::cmp::Ordering;
 
 use round::round;
 use rs_algo_shared::error::Result;
-
 use rs_algo_shared::helpers::date::*;
 use std::env;
 
@@ -58,66 +57,79 @@ impl General {
         let min_volume = env::var("MIN_VOLUME").unwrap().parse::<f64>().unwrap();
 
         doc! {
-        "$or": [
+        "$and": [
+            {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
             {"$or": [
-                {"$and": [
-                    {"patterns.local_patterns": {"$elemMatch" : {
-                        "date": { "$gte" : self.max_pattern_date },
-                        "active.active": false ,
-                    "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
-                    }}}
-                ]},
-              //  {"or": [
-
-                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelUp"] }},
-                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "TriangleUp"] }},
-                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "Rectangle"] }},
-                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "BroadeningUp"] }},
-                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "DoubleBottom"] }},
-                    // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HeadShoulders"] }},
-
-              //  ]},
-                {"$and": [
-                    {"patterns.local_patterns": {"$elemMatch" : {
-                    //"active.target":{"$gte": minimum_pattern_target },
-                    "active.active": true ,
-                    "active.date": { "$gte" : self.max_activated_date },
-                    "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
-                    }}}
-                ]},
-                ]
-            },
-            {"$and": [
                 {"$or": [
-                    {"symbol": {"$regex" : ".*.US.*"}},
-                   // {"symbol": {"$regex" : ".*.DK.*"}},
-                   // {"symbol": {"$regex" : ".*.DE.*"}},
-                   // {"symbol": {"$regex" : ".*.ES.*"}},
-                   // {"symbol": {"$regex" : ".*.CH.*"}},
-                ]},
-                {"$or": [
-                    {"$expr": {"$lte": ["$indicators.bbw.current_a", 0.2]}},
                     {"$and": [
-                        {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
-                        {"$expr": {"$gte": ["$prev_price","$indicators.bb.prev_b"]}},
+                        
+                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
+                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                        {"patterns.local_patterns": {"$elemMatch" : {
+                            "date": { "$gte" : self.max_pattern_date },
+                            "active.active": false ,
+                        //"pattern_type": { "$in": ["ChannelUp","TriangleUp","TriangleDown","TriangleSym","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
+                        }}},
+                        // {"symbol": {"$regex" : ".*.US.*"}},
+                        // {"symbol": {"$regex" : ".*.ES.*"}},
+                    ]},
+                //  {"or": [
+
+                        // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelUp"] }},
+                        // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "TriangleUp"] }},
+                        // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "Rectangle"] }},
+                        // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "BroadeningUp"] }},
+                        // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "DoubleBottom"] }},
+                        // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HeadShoulders"] }},
+
+                //  ]},
+                    {"$and": [
+                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
+                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                        {"patterns.local_patterns": {"$elemMatch" : {
+                        //"active.target":{"$gte": minimum_pattern_target },
+                        "active.active": true ,
+                        "active.date": { "$gte" : self.max_activated_date },
+                                        // "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
+
+                        }}},
+                        // {"symbol": {"$regex" : ".*.US"}},
+                        // {"symbol": {"$regex" : ".*.ES"}},
+                    ]},
+                    ]
+                },
+                {"$and": [
+                    {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
+                    {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                    {"$or": [
+                        {"symbol": {"$regex" : ".*.US"}},
+                    // {"symbol": {"$regex" : ".*.DK.*"}},
+                    // {"symbol": {"$regex" : ".*.DE.*"}},
+                    // {"symbol": {"$regex" : ".*.ES.*"}},
+                    // {"symbol": {"$regex" : ".*.CH.*"}},
+                    ]},
+                    {"$or": [
+                        {"$expr": {"$lte": ["$indicators.bbw.current_a", 0.2]}},
+                        {"$and": [
+                            {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
+                            {"$expr": {"$gte": ["$prev_price","$indicators.bb.prev_b"]}},
+                        ]},
+                    ]},
+                    {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
+                    {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
+                    {"$and": [
+                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
                     ]},
                 ]},
-                {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
-                {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
                 {"$and": [
-                    {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
-                    {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
-                    {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelDown"] }},
+                    {"$expr": {"$gte": [{ "$last": "$divergences.data.date" }, self.max_pattern_date ] }},
+                    {"$expr": {"$in": [{ "$last": "$divergences.data.divergence_type" }, ["Bullish", "Bearish"]] }},
                 ]},
-            ]},
-            {"$and": [
-                {"$expr": {"$gte": [{ "$last": "$divergences.data.date" }, self.max_pattern_date ] }},
-                {"$expr": {"$in": [{ "$last": "$divergences.data.divergence_type" }, ["Bullish", "Bearish"]] }},
-            ]},
-            { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","CARDANO"] } },
-            { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
-            { "symbol": { "$in": [ "EURUSD","USDJPY","GBPUSD","USDCHF","USDCAD"] } },
-        ]}
+                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","CARDANO","BINANCECOIN","SOLANA"] } },
+                { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
+                { "symbol": { "$in": [ "EURUSD","USDJPY","GBPUSD","USDCHF","USDCAD","CHFJPY"] } },
+            ]}]}
     }
 
     pub async fn format_instrument(

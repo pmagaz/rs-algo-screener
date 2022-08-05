@@ -169,16 +169,16 @@ impl CandleBuilder {
     fn get_previous_ohlc(&self, index: usize) -> OHLCV {
         match self.logarithmic.unwrap() {
             true => (
-                self.previous_candles.as_ref().unwrap()[index].1.exp(),
-                self.previous_candles.as_ref().unwrap()[index].2.exp(),
-                self.previous_candles.as_ref().unwrap()[index].3.exp(),
-                self.previous_candles.as_ref().unwrap()[index].4.exp(),
-            ),
-            false => (
                 self.previous_candles.as_ref().unwrap()[index].1,
                 self.previous_candles.as_ref().unwrap()[index].2,
                 self.previous_candles.as_ref().unwrap()[index].3,
                 self.previous_candles.as_ref().unwrap()[index].4,
+            ),
+            false => (
+                self.previous_candles.as_ref().unwrap()[index].1.exp(),
+                self.previous_candles.as_ref().unwrap()[index].2.exp(),
+                self.previous_candles.as_ref().unwrap()[index].3.exp(),
+                self.previous_candles.as_ref().unwrap()[index].4.exp(),
             ),
         }
     }
@@ -315,6 +315,7 @@ impl CandleBuilder {
         //((C1 > O1) AND (O > C) AND (O <= C1) AND (O1 <= C) AND ((O – C) < (C1 – O1)))
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (_a, _prev_high, prev_low, _prev_close) = &self.get_previous_ohlc(0);
+        println!("111111 {} {}", close, prev_low);
         let percentage_diff = percentage_change(*prev_low, *open);
         open < prev_low && percentage_diff > 3. && close < prev_low
     }
