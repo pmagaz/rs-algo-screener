@@ -5,9 +5,6 @@ use rs_algo_shared::models::pattern::*;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::status::Status;
 use rs_algo_shared::models::divergence::*;
-use rs_algo_shared::models::candle::*;
-
-use rs_algo_shared::models::horizontal_level::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::status::*;
@@ -38,14 +35,14 @@ pub struct PatternInfo {
    info: (String, String, String, String)
 }
 
-pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
+pub fn pattern_info(pattern: &Option<&Pattern>) -> PatternInfo  {
     
             // let max_pattern_days = env::var("MAX_PATTERN_DAYS")
             // .unwrap()
             // .parse::<i64>()
             // .unwrap();
    
-            let max_pattern_days = 3;
+            let max_pattern_days = 5;
             
             let pattern_direction = match pattern {
                 //Some(val) => val.active.pattern_direction.clone(),
@@ -73,8 +70,11 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
                 None   => DateTime::from(Local::now() - Duration::days(1000))
             };
             
-            let change = match pattern {
-                Some(val) => round(val.active.change,0),
+            let target = match pattern {
+                Some(val) => match active {
+                   true => round(val.active.target,0),
+                   false => round(val.target,0),
+                }
                 None   => 0.,
             };
 
@@ -83,29 +83,36 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
                 None   => Status::Default 
             };
 
-            let activate_string = match active_date {
+            let activate_string = match active {
                 _x if active_date > Local::now() - Duration::days(max_pattern_days) =>  active_date.format("%d/%m/%y").to_string(),
                 _ =>  "".to_string()
             };
 
-            let pattern_direction_string = match change {
-                _x if !active => "".to_string(),
-                _ => pattern_direction.to_string()
+            let pattern_direction_string = match active {
+                false => "".to_string(),
+                true => pattern_direction.to_string()
             };
 
-            let change_string = match change {
-                _x if !active => "".to_string(),
-                _ => [change.to_string(),"%".to_string()].concat()
+            let target_string = match active {
+                true => match active_date {
+                    _x if active_date > Local::now() - Duration::days(max_pattern_days) =>  [target.to_string(),"%".to_string()].concat() , 
+                    _ =>  "".to_string() 
+                } 
+                false => match date {
+                    _x if date > Local::now() - Duration::days(max_pattern_days) =>  [target.to_string(),"%".to_string()].concat() , 
+                    _ =>  "".to_string() 
+                } 
             };
+
     
             let info: (String, String, String, String) = match date {
-                _x if active_date > Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string), 
-                _x if date > Local::now() - Duration::days(max_pattern_days) && !active => (pattern_type.to_string(),pattern_direction.to_string(),[change.to_string(),"%".to_string()].concat(),"".to_string()),
+                _x if active_date > Local::now() - Duration::days(max_pattern_days) => (pattern_type.to_string(), pattern_direction_string, target_string, activate_string), 
+                _x if date > Local::now() - Duration::days(max_pattern_days) && !active => (pattern_type.to_string(),pattern_direction.to_string(),target_string,"".to_string()),
                 //_x if date < Local::now() - Duration::days(max_pattern_days) && !active => (pattern_type.to_string(),pattern_direction.to_string(),[change.to_string(),"%".to_string()].concat(),"".to_string()),
-                _x if status == Status::Bullish => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
-                _x if status == Status::Neutral => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
-                _x if status == Status::Bearish => (pattern_type.to_string(), pattern_direction_string, change_string, activate_string),
-                _x if status == Status::ChangeUp || status == Status::ChangeDown => (pattern_type.to_string(), pattern_direction_string, change_string, ("").to_string()),
+                _x if status == Status::Bullish => (pattern_type.to_string(), pattern_direction_string, target_string, activate_string),
+                _x if status == Status::Neutral => (pattern_type.to_string(), pattern_direction_string, target_string, activate_string),
+                _x if status == Status::Bearish => (pattern_type.to_string(), pattern_direction_string, target_string, activate_string),
+                _x if status == Status::ChangeUp || status == Status::ChangeDown => (pattern_type.to_string(), pattern_direction_string, target_string, ("").to_string()),
                 _ => (pattern_type.to_string(),"".to_string(),"".to_string(),"".to_string()),
             };
 
@@ -115,7 +122,7 @@ pub fn pattern_info(pattern: Option<&Pattern>) -> PatternInfo  {
                 date,
                 active_date,
                 status,
-                change,
+                change: target,
                 pattern_direction,
                 info
             }
@@ -170,8 +177,9 @@ pub fn instrument_list(props: &Props
                 let res = (action, list_type.clone(), instrument);
                 Callback::from(move |_| on_action_click.emit(res.clone()))
             };
-          
-            let local_pattern = pattern_info(instrument.patterns.local_patterns.last()); 
+         
+            let current_pattern = instrument.patterns.local_patterns.last();
+            let local_pattern = pattern_info(&current_pattern); 
 
             let macd = instrument.indicators.macd.clone();
             let stoch = instrument.indicators.stoch.clone();
@@ -212,6 +220,8 @@ pub fn instrument_list(props: &Props
             }; 
 
             let divergence_status = get_divergence_status(divergence_type);
+
+            let target_status = get_target_status(current_pattern.unwrap().target); 
 
             let divergence_str = match divergence_type {
                 DivergenceType::Bullish => divergence_type.to_string(),
@@ -265,7 +275,7 @@ pub fn instrument_list(props: &Props
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
                     <td class={get_status_class(&band_direction_status)}> {local_pattern.info.1}</td>
-                    <td> {local_pattern.info.2}</td>
+                    <td class={get_status_class(&target_status)}> {local_pattern.info.2}</td>
                     <td> {local_pattern.info.3}</td>
                     <td class={get_status_class(&bb.status)}> {format!("{} / {}%", round(bb_width,2), round(bb_size, 1))}</td>
                     //<td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>

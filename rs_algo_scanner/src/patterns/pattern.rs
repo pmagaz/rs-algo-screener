@@ -120,7 +120,8 @@ impl Patterns {
                         let last_index = data_points.last().unwrap().0;
                         let candle_date = candles.get(last_index).unwrap().date();
 
-                        let change = self.calculate_change(&data_points);
+                        //let change = self.calculate_change(&data_points);
+
                         if rectangle::is_renctangle_top(&data_points) {
                             data_points = add_next_top_points(data_points);
 
@@ -135,7 +136,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -154,7 +154,6 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -170,7 +169,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -189,7 +187,6 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -208,7 +205,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -227,7 +223,6 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -246,7 +241,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -265,7 +259,6 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -284,7 +277,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -303,7 +295,6 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -322,7 +313,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -340,7 +330,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -359,7 +348,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -378,7 +366,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -397,7 +384,6 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -416,7 +402,6 @@ impl Patterns {
                                 PatternDirection::Bottom,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -435,7 +420,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -454,7 +438,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -473,7 +456,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -492,7 +474,6 @@ impl Patterns {
                                 PatternDirection::Top,
                                 &pattern_size,
                                 data_points.to_owned(),
-                                change,
                                 candle_date,
                                 is_pattern_active,
                             );
@@ -539,19 +520,8 @@ impl Patterns {
                             PatternDirection::None,
                             &pattern_size,
                             vec![(0, 0.)],
-                            0.,
                             date,
-                            PatternActive {
-                                active: false,
-                                completed: true,
-                                status: Status::Default,
-                                date: to_dbtime(date),
-                                target: 0.,
-                                change: 0.,
-                                index: 0,
-                                price: 0.,
-                                break_direction: PatternDirection::None,
-                            },
+                            non_activated(),
                         );
                         not_founded = false;
                     }
@@ -571,12 +541,14 @@ impl Patterns {
         pattern_type: PatternType,
         direction: PatternDirection,
         pattern_size: &PatternSize,
-        mut data_points: DataPoints,
-        change: f64,
+        data_points: DataPoints,
         date: DateTime<Local>,
         active: PatternActive,
     ) {
         let len = data_points.len();
+
+        let target = calculate_price_target(&direction, &data_points);
+
         if len > 3 {
             let index = data_points.get(data_points.len() - 2).unwrap().0;
             if pattern_type != PatternType::None {
@@ -646,7 +618,7 @@ impl Patterns {
                 match &pattern_size {
                     PatternSize::Local => self.local_patterns.push(Pattern {
                         pattern_type,
-                        change,
+                        target,
                         index,
                         date: to_dbtime(date),
                         direction,
@@ -656,7 +628,7 @@ impl Patterns {
                     }),
                     PatternSize::Extrema => self.extrema_patterns.push(Pattern {
                         pattern_type,
-                        change,
+                        target,
                         index,
                         date: to_dbtime(date),
                         direction,
@@ -678,11 +650,10 @@ pub fn pattern_active_result(
     let (top_result, top_id, top_price, top_date) = top;
     let (bottom_result, bottom_id, bottom_price, bottom_date) = bottom;
 
-    let price_change = calculate_price_change(&data);
     //FIXME pattern direction
-    let price_target = calculate_price_target(&data);
-    let fake_date = Local::now() - Duration::days(10000);
     if top_result {
+        let target = calculate_price_target(&PatternDirection::Top, &data);
+
         PatternActive {
             active: true,
             completed: false,
@@ -690,11 +661,12 @@ pub fn pattern_active_result(
             index: top_id,
             price: top_price,
             date: top_date,
-            change: price_change,
-            target: price_target,
             break_direction: PatternDirection::Top,
+            target,
         }
     } else if bottom_result {
+        let target = calculate_price_target(&PatternDirection::Bottom, &data);
+
         PatternActive {
             active: true,
             completed: false,
@@ -702,22 +674,11 @@ pub fn pattern_active_result(
             index: bottom_id,
             date: bottom_date,
             price: bottom_price,
-            change: price_change,
-            target: price_target,
             break_direction: PatternDirection::Bottom,
+            target,
         }
     } else {
-        PatternActive {
-            active: false,
-            completed: false,
-            status: Status::Default,
-            index: 0,
-            date: to_dbtime(fake_date),
-            price: 0.,
-            change: 0.,
-            target: 0.,
-            break_direction: PatternDirection::None,
-        }
+        non_activated()
     }
 }
 
@@ -729,8 +690,7 @@ fn non_activated() -> PatternActive {
         index: 0,
         date: to_dbtime(Local::now() - Duration::days(10000)),
         price: 0.,
-        change: 0.,
-        target: 0.,
         break_direction: PatternDirection::None,
+        target: 0.,
     }
 }

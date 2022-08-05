@@ -3,7 +3,7 @@ use crate::candle::Candle;
 use crate::helpers::slope_intercept::slope_intercept;
 use rs_algo_shared::helpers::comp::percentage_change;
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::models::pattern::{DataPoints, PatternType};
+use rs_algo_shared::models::pattern::*;
 use std::env;
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
@@ -114,8 +114,19 @@ pub fn calculate_price_change(data_points: &DataPoints) -> f64 {
     percentage_change(data_points[4].1, data_points[3].1).abs()
 }
 //FIXME
-pub fn calculate_price_target(data_points: &DataPoints) -> f64 {
-    percentage_change(data_points[4].1, data_points[3].1).abs()
+pub fn calculate_price_target(
+    pattern_direction: &PatternDirection,
+    data_points: &DataPoints,
+) -> f64 {
+    if data_points.len() < 2 {
+        0.
+    } else {
+        match pattern_direction {
+            PatternDirection::Top => percentage_change(data_points[1].1, data_points[0].1).abs(),
+            PatternDirection::Bottom => percentage_change(data_points[0].1, data_points[1].1).abs(),
+            _ => percentage_change(data_points[1].1, data_points[0].1).abs(),
+        }
+    }
 }
 
 //FIXME UPDATE PATTERN BREAK DETECTION

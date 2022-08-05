@@ -15,7 +15,6 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::date::*;
 use std::env;
 
-
 pub struct General {
     pub query: Document,
     pub max_pattern_date: DbDateTime,
@@ -44,7 +43,7 @@ impl General {
     }
 
     pub fn query(&self) -> Document {
-        let _minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
+        let minimum_pattern_target = env::var("MINIMUM_PATTERN_TARGET")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -62,19 +61,21 @@ impl General {
             {"$or": [
                 {"$or": [
                     {"$and": [
-                        
                         {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
                         {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
                         {"patterns.local_patterns": {"$elemMatch" : {
-                            "date": { "$gte" : self.max_pattern_date },
                             "active.active": false ,
+                            "date": { "$gte" : self.max_pattern_date },
+                            "$or": [
+                                {"target": { "$gte" : minimum_pattern_target }},
+                                {"pattern_type": { "$in": ["DoubleTop","DoubleBottom","HeadAndShoulders"] }},
+                            ],
                         //"pattern_type": { "$in": ["ChannelUp","TriangleUp","TriangleDown","TriangleSym","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                         }}},
                         // {"symbol": {"$regex" : ".*.US.*"}},
                         // {"symbol": {"$regex" : ".*.ES.*"}},
                     ]},
                 //  {"or": [
-
                         // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelUp"] }},
                         // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "TriangleUp"] }},
                         // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "Rectangle"] }},
@@ -87,11 +88,12 @@ impl General {
                         {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
                         {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
                         {"patterns.local_patterns": {"$elemMatch" : {
-                        //"active.target":{"$gte": minimum_pattern_target },
-                        "active.active": true ,
-                        "active.date": { "$gte" : self.max_activated_date },
-                                        // "pattern_type": { "$in": ["ChannelUp","TriangleUp","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
-
+                            "active.active": true ,
+                            "active.date": { "$gte" : self.max_activated_date },
+                            "$or": [
+                                {"active.target": { "$gte" : minimum_pattern_target }},
+                                {"pattern_type": { "$in": ["DoubleTop","DoubleBottom","HeadAndShoulders"] }},
+                            ],
                         }}},
                         // {"symbol": {"$regex" : ".*.US"}},
                         // {"symbol": {"$regex" : ".*.ES"}},
@@ -153,7 +155,7 @@ impl General {
                     let last_divergence = instrument.divergences.data.last();
 
                     let _last_pattern_target = match last_pattern {
-                        Some(val) => round(val.active.change, 0),
+                        Some(val) => round(val.target, 0),
                         None => 0.,
                     };
 
@@ -204,7 +206,7 @@ impl General {
                     //let second_last_pattern_status = get_pattern_status(second_last_pattern);
                     if last_pattern_status != Status::Default {
                         let len = instrument.patterns.local_patterns.len();
-                        
+
                         instrument.patterns.local_patterns[len - 1].active.status =
                             last_pattern_status.clone();
                     }

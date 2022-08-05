@@ -102,64 +102,89 @@ pub fn home() -> Html {
         let use_portfolio_instruments = use_portfolio_instruments.clone();
         let use_loading = use_loading.clone();
 
-        Callback::from(move |(action_type, list_type, inst): (ActionType, ListType, CompactInstrument)| {
-            let use_watch_instruments = use_watch_instruments.clone();
-            let use_portfolio_instruments = use_portfolio_instruments.clone();
-            let portfolio_url = portfolio_url.clone();
-            let watch_list_url = watch_list_url.clone();
-            let use_loading = use_loading.clone();
-            use_loading.set(true);
+        Callback::from(
+            move |(action_type, list_type, inst): (ActionType, ListType, CompactInstrument)| {
+                let use_watch_instruments = use_watch_instruments.clone();
+                let use_portfolio_instruments = use_portfolio_instruments.clone();
+                let portfolio_url = portfolio_url.clone();
+                let watch_list_url = watch_list_url.clone();
+                let use_loading = use_loading.clone();
+                use_loading.set(true);
 
-            let fake_date = to_dbtime(Local::now() - Duration::days(1000));
-            let watch_instrument = WatchInstrument {
-                symbol: inst.symbol.clone(),
-                alarm: Alarm {
-                    active: false,
-                    completed: false,
-                    price: 0.0,
-                    date: fake_date,
-                    condition: AlarmCondition::None,
-                },
-            };
+                let fake_date = to_dbtime(Local::now() - Duration::days(1000));
+                let watch_instrument = WatchInstrument {
+                    symbol: inst.symbol.clone(),
+                    alarm: Alarm {
+                        active: false,
+                        completed: false,
+                        price: 0.0,
+                        date: fake_date,
+                        condition: AlarmCondition::None,
+                    },
+                };
 
-            wasm_bindgen_futures::spawn_local(async move {
-
-            match list_type {
-                _x if action_type == ActionType::WatchListAdd => {
-                    let watch_list = &*use_watch_instruments;
-                    let mut current_items = watch_list.clone();
-                    if !current_items.contains(&inst) { 
-                        current_items.push(inst.clone());
-                        use_watch_instruments.set(current_items);
-                    }
-                    api::upsert_watch_instrument(watch_list_url.clone(), watch_instrument).await.unwrap()
-                }
-                _x if action_type == ActionType::WatchListDelete => {
-                    let watch_list = &*use_watch_instruments;
-                    let current_items: Vec<CompactInstrument> = watch_list.iter().filter(|x| inst.symbol != x.symbol).map(|x|x.clone()).collect();
-                    use_watch_instruments.set(current_items);
-                    api::delete_watch_instrument(watch_list_url.clone(), watch_instrument).await.unwrap()
-                }
-                _x if action_type == ActionType::PortfolioAdd => {
-                    let portfolio = &*use_portfolio_instruments;
-                    let mut current_items = portfolio.clone();
-                    if !current_items.contains(&inst) { 
-                        current_items.push(inst.clone());
-                        use_portfolio_instruments.set(current_items);
-                    }
-                    api::upsert_portfolio_instrument(portfolio_url.clone(), watch_instrument).await.unwrap()
-                }, 
-                _x if action_type == ActionType::PortfolioDelete  => {
-                    let portfolio = &*use_portfolio_instruments;
-                    let current_items: Vec<CompactInstrument> = portfolio.iter().filter(|x| inst.symbol != x.symbol).map(|x|x.clone()).collect();
-                    use_portfolio_instruments.set(current_items); 
-                    api::delete_portfolio_instrument(portfolio_url.clone(), watch_instrument).await.unwrap()
-                }
-                _ => api::upsert_watch_instrument(watch_list_url.clone(), watch_instrument).await.unwrap() 
-            };
-                use_loading.set(false);
-            });
-        })
+                wasm_bindgen_futures::spawn_local(async move {
+                    match list_type {
+                        _x if action_type == ActionType::WatchListAdd => {
+                            let watch_list = &*use_watch_instruments;
+                            let mut current_items = watch_list.clone();
+                            if !current_items.contains(&inst) {
+                                current_items.push(inst.clone());
+                                use_watch_instruments.set(current_items);
+                            }
+                            api::upsert_watch_instrument(watch_list_url.clone(), watch_instrument)
+                                .await
+                                .unwrap()
+                        }
+                        _x if action_type == ActionType::WatchListDelete => {
+                            let watch_list = &*use_watch_instruments;
+                            let current_items: Vec<CompactInstrument> = watch_list
+                                .iter()
+                                .filter(|x| inst.symbol != x.symbol)
+                                .map(|x| x.clone())
+                                .collect();
+                            use_watch_instruments.set(current_items);
+                            api::delete_watch_instrument(watch_list_url.clone(), watch_instrument)
+                                .await
+                                .unwrap()
+                        }
+                        _x if action_type == ActionType::PortfolioAdd => {
+                            let portfolio = &*use_portfolio_instruments;
+                            let mut current_items = portfolio.clone();
+                            if !current_items.contains(&inst) {
+                                current_items.push(inst.clone());
+                                use_portfolio_instruments.set(current_items);
+                            }
+                            api::upsert_portfolio_instrument(
+                                portfolio_url.clone(),
+                                watch_instrument,
+                            )
+                            .await
+                            .unwrap()
+                        }
+                        _x if action_type == ActionType::PortfolioDelete => {
+                            let portfolio = &*use_portfolio_instruments;
+                            let current_items: Vec<CompactInstrument> = portfolio
+                                .iter()
+                                .filter(|x| inst.symbol != x.symbol)
+                                .map(|x| x.clone())
+                                .collect();
+                            use_portfolio_instruments.set(current_items);
+                            api::delete_portfolio_instrument(
+                                portfolio_url.clone(),
+                                watch_instrument,
+                            )
+                            .await
+                            .unwrap()
+                        }
+                        _ => api::upsert_watch_instrument(watch_list_url.clone(), watch_instrument)
+                            .await
+                            .unwrap(),
+                    };
+                    use_loading.set(false);
+                });
+            },
+        )
     };
 
     let suggested: Vec<CompactInstrument> = use_instruments
@@ -212,6 +237,7 @@ pub fn home() -> Html {
                 || x.symbol == "GBPUSD"
                 || x.symbol == "USDCHF"
                 || x.symbol == "USDCAD"
+                || x.symbol == "CHFJPY"
         })
         .map(|x| x.clone())
         .collect();
@@ -224,6 +250,8 @@ pub fn home() -> Html {
                 || x.symbol == "RIPPLE"
                 || x.symbol == "DOGECOIN"
                 || x.symbol == "CARDANO"
+                || x.symbol == "BINANCECOIN"
+                || x.symbol == "SOLANA"
         })
         .map(|x| x.clone())
         .collect();
