@@ -271,11 +271,11 @@ pub fn instrument_list(props: &Props
                         {format!("{}", instrument.symbol)}</a>
                     </td>
                     <td> {format!("{}", round(instrument.current_price,2))}</td>
-                    <td class={get_status_class(&price_change_status)}> {format!("{}%", price_display)}</td>
+                    <td> {format!("{}%", price_display)}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
                     <td class={get_status_class(&band_direction_status)}> {local_pattern.info.1}</td>
-                    <td class={get_status_class(&target_status)}> {local_pattern.info.2}</td>
+                    <td> {local_pattern.info.2}</td>
                     <td> {local_pattern.info.3}</td>
                     <td class={get_status_class(&bb.status)}> {format!("{} / {}%", round(bb_width,2), round(bb_size, 1))}</td>
                     //<td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>

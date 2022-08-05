@@ -3,6 +3,7 @@ use crate::components::loading::Loading;
 use crate::pages::home::components::instruments_list::InstrumentsList;
 
 use crate::components::chart::Chart;
+use rs_algo_shared::models::candle::*;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::watch_instrument::*;
 use wasm_bindgen::prelude::*;
@@ -190,10 +191,12 @@ pub fn home() -> Html {
     let suggested: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
+            let last_pattern = x.patterns.local_patterns.last().unwrap();
             (x.patterns.local_patterns.len() > 0
-                && x.patterns.local_patterns.last().unwrap().date
-                    > to_dbtime(Local::now() - Duration::days(5))
-                && !x.patterns.local_patterns.last().unwrap().active.active)
+                && last_pattern.date > to_dbtime(Local::now() - Duration::days(5))
+                && !last_pattern.active.active)
+                && (x.current_candle != CandleType::Karakasa
+                    || x.current_candle != CandleType::Engulfing)
         })
         .map(|x| x.clone())
         .collect();
@@ -201,10 +204,12 @@ pub fn home() -> Html {
     let activated: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
+            let last_pattern = x.patterns.local_patterns.last().unwrap();
             x.patterns.local_patterns.len() > 0
-                && x.patterns.local_patterns.last().unwrap().active.active
-                && x.patterns.local_patterns.last().unwrap().active.date
-                    > to_dbtime(Local::now() - Duration::days(3))
+                && last_pattern.active.active
+                && last_pattern.active.date > to_dbtime(Local::now() - Duration::days(3))
+                && (x.current_candle != CandleType::Karakasa
+                    || x.current_candle != CandleType::Engulfing)
         })
         .map(|x| x.clone())
         .collect();
@@ -212,7 +217,18 @@ pub fn home() -> Html {
     let strategy: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
-            x.current_price <= x.indicators.bb.current_b && x.prev_price >= x.indicators.bb.prev_b
+            x.current_price <= x.indicators.bb.current_b
+                && x.prev_price >= x.indicators.bb.prev_b
+                && (x.current_candle == CandleType::Karakasa
+                    || x.current_candle == CandleType::Engulfing)
+        })
+        .map(|x| x.clone())
+        .collect();
+
+    let candles: Vec<CompactInstrument> = use_instruments
+        .iter()
+        .filter(|x| {
+            x.current_candle == CandleType::Karakasa || x.current_candle == CandleType::Engulfing
         })
         .map(|x| x.clone())
         .collect();
@@ -282,6 +298,8 @@ pub fn home() -> Html {
                     <InstrumentsList list_type={ ListType::NewPatterns } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={suggested} />
                     <h2 class="navbar-item is-size-3">{ "Pattern activated" }</h2>
                     <InstrumentsList list_type={ ListType::Activated } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={activated} />
+                    <h2 class="navbar-item is-size-3">{ "Candles" }</h2>
+                    <InstrumentsList list_type={ ListType::Activated } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={candles} />
                     <h2 class="navbar-item is-size-3">{ "Currency" }</h2>
                     <InstrumentsList list_type={ ListType::Currency } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={currency} />
                     <h2 class="navbar-item is-size-3">{ "Commodities " }</h2>

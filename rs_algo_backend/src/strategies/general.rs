@@ -59,6 +59,10 @@ impl General {
         "$and": [
             {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
             {"$or": [
+                   {"$and": [
+                        {"current_candle": { "$in": ["Karakasa","Engulfing"] }},
+                        {"$expr": {"$lte": ["$indicators.rsi.current_a", 30]}},
+                   ]},
                 {"$or": [
                     {"$and": [
                         {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
