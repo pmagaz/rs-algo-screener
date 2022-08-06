@@ -107,13 +107,13 @@ impl General {
                 {"$and": [
                     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
                     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
-                    {"$or": [
-                        {"symbol": {"$regex" : ".*.US"}},
-                    // {"symbol": {"$regex" : ".*.DK.*"}},
-                    // {"symbol": {"$regex" : ".*.DE.*"}},
-                    // {"symbol": {"$regex" : ".*.ES.*"}},
-                    // {"symbol": {"$regex" : ".*.CH.*"}},
-                    ]},
+                    // {"$or": [
+                    //   //  {"symbol": {"$regex" : ".*.US"}},
+                    // // {"symbol": {"$regex" : ".*.DK.*"}},
+                    // // {"symbol": {"$regex" : ".*.DE.*"}},
+                    // // {"symbol": {"$regex" : ".*.ES.*"}},
+                    // // {"symbol": {"$regex" : ".*.CH.*"}},
+                    // ]},
                     {"$or": [
                         {"$expr": {"$lte": ["$indicators.bbw.current_a", 0.2]}},
                         {"$and": [
@@ -132,9 +132,9 @@ impl General {
                     {"$expr": {"$gte": [{ "$last": "$divergences.data.date" }, self.max_pattern_date ] }},
                     {"$expr": {"$in": [{ "$last": "$divergences.data.divergence_type" }, ["Bullish", "Bearish"]] }},
                 ]},
-                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","CARDANO","BINANCECOIN","SOLANA"] } },
+                { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","CARDANO","BINANCECOIN","SOLANA","STELLAR","POLKADOT"] } },
                 { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
-                { "symbol": { "$in": [ "EURUSD","USDJPY","GBPUSD","USDCHF","USDCAD","CHFJPY"] } },
+                { "symbol": { "$in": [ "EURUSD","USDJPY","GBPUSD","USDCHF","USDCAD","CHFJPY","CADCHF","AUDUSD"] } },
             ]}]}
     }
 
