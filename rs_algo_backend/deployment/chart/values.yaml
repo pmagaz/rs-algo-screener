@@ -54,7 +54,7 @@ resources:
   limits:
     cpu: 2500m
     ephemeral-storage: 256Mi 
-    memory: 1Gi
+    memory: 512Mi
 
 autoscaling:
   enabled: false
