@@ -19,7 +19,7 @@ pub async fn find_instruments(
 ) -> Result<Vec<Instrument>, Error> {
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
 
-    let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
         .find(
@@ -158,7 +158,7 @@ pub async fn find_backtest_instrument_by_symbol(
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
-    let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())

@@ -146,7 +146,7 @@ pub async fn insert_detail(
         }
         "backtest" => {
             get_collection::<Instrument>(
-                &state.db_hdd,
+                &state.db_mem,
                 &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
             )
             .await
