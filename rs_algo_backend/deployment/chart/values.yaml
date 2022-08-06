@@ -50,9 +50,9 @@ ingress:
 
 resources:
   requests:
-    cpu: 1900m
+    cpu: 1400m
   limits:
-    cpu: 2400m
+    cpu: 2600m
     ephemeral-storage: 256Mi 
     memory: 256Mi
 
