@@ -46,7 +46,7 @@ pub async fn find_strategy_instrument_result(
 ) -> Result<Option<BackTestInstrumentResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION").unwrap();
     let collection =
-        get_collection::<BackTestInstrumentResult>(&state.db_hdd, collection_name).await;
+        get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
 
     let instrument = collection
         .find_one(query, FindOneOptions::builder().build())
@@ -64,7 +64,7 @@ pub async fn find_backtest_instruments_result(
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION").unwrap();
 
     let collection =
-        get_collection::<BackTestInstrumentResult>(&state.db_hdd, collection_name).await;
+        get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
         .find(
@@ -122,7 +122,7 @@ pub async fn upsert_instruments_result(
 ) -> Result<Option<BackTestInstrumentResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION").unwrap();
     let collection =
-        get_collection::<BackTestInstrumentResult>(&state.db_hdd, collection_name).await;
+        get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
 
     collection
         .find_one_and_replace(
