@@ -6,7 +6,7 @@
   kubernetes.core.helm:
     name: "{{ release_name }}" 
     chart_ref: "{{ local_path }}/{{ package_name }}/{{ chart_path }}"
-    purge: yes
-    replace: yes
-    update_repo_cache: yes 
+    force: true 
+    purge: true
+    wait: false 
     release_namespace: default
