@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: cluster.loc:5000/rs-algo-backend 
-  pullPolicy: Always 
+  pullPolicy: IfNotPresent
   tag: "latest"
 
 imagePullSecrets:
