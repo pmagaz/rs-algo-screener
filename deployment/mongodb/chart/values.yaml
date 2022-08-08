@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: arm64v8/mongo
-  pullPolicy: "Always" 
+  pullPolicy: Always
   tag: "4.4.15"
 
 imagePullSecrets:
