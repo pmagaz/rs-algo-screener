@@ -3,7 +3,7 @@ jobs:
     image:
       repository: cluster.loc:5000/rs-algo-backtest
       tag: latest
-      imagePullPolicy: IfNotPresent
+      imagePullPolicy: Always
     schedule: "30 4 * * 6"
     failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
