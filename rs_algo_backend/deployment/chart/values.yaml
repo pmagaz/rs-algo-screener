@@ -36,6 +36,8 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: traefik
+    timestamp: {{ now | quote }}
+    checksum/config: {{ include (print $.Template.BasePath "/config.yaml") . | sha256sum }}
   hosts:
     - host: cluster.loc
       paths:
