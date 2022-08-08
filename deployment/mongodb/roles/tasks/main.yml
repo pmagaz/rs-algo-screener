@@ -1,6 +1,5 @@
 ---
 
-
 - name: Deploy "{{ release_name }}" helm chart 
   kubernetes.core.helm:
     name: "{{ release_name }}" 

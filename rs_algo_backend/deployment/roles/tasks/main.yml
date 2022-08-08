@@ -1,7 +1,6 @@
 ---
-
-- name: Uninstall "{{ release_name }}"  
-  ansible.builtin.shell: helm uninstall "{{ release_name }}"
+# - name: Uninstall "{{ release_name }}"  
+#   ansible.builtin.shell: helm uninstall "{{ release_name }}"
 
 - name: Deploy "{{ release_name }}" helm chart 
   kubernetes.core.helm:
