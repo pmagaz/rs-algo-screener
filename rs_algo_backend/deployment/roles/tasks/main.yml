@@ -8,5 +8,4 @@
     chart_ref: "{{ local_path }}/{{ package_name }}/{{ chart_path }}"
     force: yes 
     purge: yes 
-    wait: false 
     release_namespace: default
