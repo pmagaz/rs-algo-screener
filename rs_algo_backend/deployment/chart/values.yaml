@@ -50,11 +50,11 @@ ingress:
 
 resources:
   requests:
-    cpu: 1500m
+    cpu: 1000m
   limits:
     cpu: 2500m
     ephemeral-storage: 256Mi 
-    memory: 512Mi
+    memory: 256Mi
 
 autoscaling:
   enabled: false
