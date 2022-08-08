@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
             .unwrap();
 
     println!(
-        "[BACKEND] 111 Launching {:} on port {:?}",
+        "[BACKEND] 22222 Launching {:} on port {:?}",
         app_name,
         port.clone()
     );
