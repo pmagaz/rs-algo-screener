@@ -1,16 +1,17 @@
 use crate::broker::*;
 use crate::error::Result;
+use chrono::Datelike;
 use error::RsAlgoErrorKind;
 use instrument::Instrument;
 use rs_algo_shared::broker;
 use rs_algo_shared::broker::xtb::*;
 use rs_algo_shared::helpers::comp::symbol_in_list;
 use rs_algo_shared::helpers::date;
-use rs_algo_shared::helpers::date::Local;
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::request;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use rs_algo_shared::models::market::*;
-use rs_algo_shared::models::time_frame::TimeFrame;
+use rs_algo_shared::models::time_frame::*;
 use screener::Screener;
 use std::time::Instant;
 
@@ -36,14 +37,39 @@ async fn main() -> Result<()> {
     let start = Instant::now();
     let username = &env::var("BROKER_USERNAME").unwrap();
     let password = &env::var("BROKER_PASSWORD").unwrap();
-    let from_date = env::var("FROM_DATE").unwrap().parse::<i64>().unwrap();
+    let num_test_bars = env::var("NUM_TEST_BARS").unwrap().parse::<i64>().unwrap();
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
-    let time_frame = &env::var("TIME_FRAME").unwrap();
+    let time_frame = &env::var("BASE_TIME_FRAME").unwrap();
+    //let upper_time_frame = &env::var("UPPER_BASE_TIME_FRAME").unwrap();
 
     let sleep = time::Duration::from_millis(*sleep_time);
-    let from = (Local::now() - date::Duration::days(from_date)).timestamp();
-
     let time_frame = TimeFrame::new(time_frame);
+    //let upper_time_frame = TimeFrame::new(upper_time_frame);
+
+    let base_timeframe_from = match time_frame {
+        TimeFrameType::W => {
+            let num_weeks = date::Duration::days(num_test_bars).num_weeks();
+            Local::now() - date::Duration::weeks(num_weeks + 1)
+        }
+        TimeFrameType::D => (Local::now() - date::Duration::days(num_test_bars)),
+        TimeFrameType::H1 => (Local::now() - date::Duration::hours(num_test_bars)),
+        TimeFrameType::M30 => (Local::now() - date::Duration::minutes(num_test_bars)),
+        _ => (Local::now() - date::Duration::days(num_test_bars)),
+    };
+
+    // let upper_timeframe_from = match upper_time_frame {
+    //     TimeFrameType::W => {
+    //         let num_weeks = date::Duration::days(num_test_bars).num_weeks();
+    //         Local::now() - date::Duration::weeks(num_weeks + 1)
+    //     }
+    //     _ => (Local::now() - date::Duration::days(num_test_bars)),
+    // };
+
+    //let num_weeks = date::Duration::days(from_leches).num_weeks();
+
+    //println!("444444 {:?}", &base_timeframe_from.clone());
+
+    let from = (Local::now() - date::Duration::days(num_test_bars)).timestamp();
 
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
@@ -148,23 +174,37 @@ async fn main() -> Result<()> {
             screener
                 .get_instrument_data(
                     &s.symbol,
-                    market.clone(),
-                    time_frame.clone(),
-                    from,
+                    &market,
+                    &time_frame,
+                    base_timeframe_from.timestamp(),
                     |instrument: Instrument| async move {
+                        let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
+                        let time_frame = &env::var("BASE_TIME_FRAME").unwrap();
+
                         println!(
-                            "[SCANNER] {} scanned from {} to {} in {:?}",
+                            "[SCANNER] {} scanned {} from {} to {} in {:?}",
                             &instrument.symbol(),
+                            &time_frame,
                             &instrument.data().first().unwrap().date(),
                             &instrument.date(),
                             now.elapsed(),
                         );
 
-                        let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
-
                         let url = match backtest_mode {
-                            true => [endpoint, "?mode=backtest".to_string()].concat(),
-                            false => [endpoint, "?mode=daily".to_string()].concat(),
+                            true => [
+                                endpoint.as_ref(),
+                                "?mode=backtest",
+                                "&time_frame=",
+                                &time_frame,
+                            ]
+                            .concat(),
+                            false => [
+                                endpoint.as_ref(),
+                                "?mode=daily",
+                                "&time_frame=",
+                                &time_frame,
+                            ]
+                            .concat(),
                         };
 
                         let now = Instant::now();

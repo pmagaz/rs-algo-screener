@@ -39,8 +39,8 @@ where
     pub async fn get_instrument_data<F, T>(
         &mut self,
         symbol: &str,
-        market: Market,
-        time_frame: TimeFrameType,
+        market: &Market,
+        time_frame: &TimeFrameType,
         start_date: i64,
         mut callback: F,
     ) -> Result<()>
@@ -56,8 +56,8 @@ where
 
         let mut instrument = Instrument::new()
             .symbol(&symbol)
-            .market(market)
-            .time_frame(time_frame)
+            .market(market.to_owned())
+            .time_frame(time_frame.to_owned())
             .build()
             .unwrap();
 

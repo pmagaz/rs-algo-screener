@@ -1,16 +1,22 @@
 use crate::error::Result;
 
 use crate::models::db::Db;
-
 use mongodb::Collection;
 use rs_algo_shared::models::divergence::*;
 use rs_algo_shared::models::indicator::*;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::*;
 use rs_algo_shared::models::status::Status;
+use std::env;
 
 use std::cmp::Ordering;
 
+pub fn get_collection_name(collection: &str, time_frame: &str) -> String {
+    let arr_str = collection.split("_").collect::<Vec<_>>();
+    let time_frame_code = arr_str.last().unwrap();
+    let collection_name = collection.replace(time_frame_code, time_frame);
+    collection_name
+}
 pub async fn get_collection<T>(db: &Db, collection: &str) -> Collection<T> {
     db.client.database(&db.name).collection::<T>(collection)
 }

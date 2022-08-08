@@ -18,8 +18,9 @@ use std::env;
 use std::path::PathBuf;
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
-pub struct Mode {
+pub struct Params {
     pub mode: String,
+    pub time_frame: String,
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
@@ -124,16 +125,18 @@ pub async fn find_all(
 }
 
 pub async fn upsert(
-    query: web::Query<Mode>,
+    query: web::Query<Params>,
     instrument: String,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let mode = &query.mode;
+    let time_frame = &query.time_frame;
 
     println!(
-        "[INSTRUMENT] Received at {:?} for mode {:?} in",
-        Local::now(),
+        "[INSTRUMENT] Received for {:?} mode in {:?} time frame at {:?}",
         mode,
+        time_frame,
+        Local::now()
     );
 
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
@@ -153,9 +156,10 @@ pub async fn upsert(
     if insert_compact_instruments_detail {
         let now = Instant::now();
 
-        let _insert_result = db::instrument::insert_detail(mode, &instrument, &state)
-            .await
-            .unwrap();
+        let _insert_result =
+            db::instrument::insert_instrument(mode, time_frame, &instrument, &state)
+                .await
+                .unwrap();
 
         println!(
             "{} {:?} at {:?} in {:?}",

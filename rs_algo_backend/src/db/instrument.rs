@@ -1,4 +1,4 @@
-use super::helpers::get_collection;
+use super::helpers::*;
 use crate::models::app_state::AppState;
 use crate::strategies::general::General;
 
@@ -131,25 +131,26 @@ pub async fn upsert(
         .await
 }
 
-pub async fn insert_detail(
+pub async fn insert_instrument(
     mode: &str,
+    time_frame: &str,
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
     let collection = match mode {
         "daily" => {
-            get_collection::<Instrument>(
-                &state.db_mem,
-                &env::var("DB_INSTRUMENTS_COLLECTION").unwrap(),
-            )
-            .await
+            let collection_name =
+                get_collection_name(&env::var("DB_INSTRUMENTS_COLLECTION").unwrap(), time_frame);
+
+            get_collection::<Instrument>(&state.db_mem, &collection_name).await
         }
         "backtest" => {
-            get_collection::<Instrument>(
-                &state.db_mem,
+            let collection_name = get_collection_name(
                 &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
-            )
-            .await
+                time_frame,
+            );
+
+            get_collection::<Instrument>(&state.db_mem, &collection_name).await
         }
         _ => {
             get_collection::<Instrument>(
