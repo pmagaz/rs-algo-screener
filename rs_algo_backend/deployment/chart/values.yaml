@@ -36,6 +36,7 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: traefik
+    deploymentTime: {{ now | date "2006-01-02T15:04:05" }}
   hosts:
     - host: cluster.loc
       paths:
