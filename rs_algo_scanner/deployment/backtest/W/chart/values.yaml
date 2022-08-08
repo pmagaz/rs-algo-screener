@@ -1,5 +1,5 @@
 jobs:
-  - name: backtest-w
+  - name: backtest
     image:
       repository: cluster.loc:5000/rs-algo-scanner
       tag: latest
