@@ -95,6 +95,10 @@ async fn main() -> Result<()> {
                         web::put().to(back_test::upsert_instruments_result),
                     )
                     .route(
+                        "/backtest/instruments/{symbol}/{time_frame}",
+                        web::get().to(back_test::find_one),
+                    )
+                    .route(
                         "/backtest/instruments/{market}",
                         web::get().to(back_test::find_instruments),
                     )

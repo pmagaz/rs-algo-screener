@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
-use rs_algo_shared::models::instrument::Instrument;
+use rs_algo_shared::models::instrument::*;
 
 pub struct Macd<'a> {
     name: &'a str,
@@ -30,7 +30,12 @@ impl<'a> Strategy for Macd<'a> {
         &self.strategy_type
     }
 
-    fn entry_long(&self, index: usize, instrument: &Instrument) -> bool {
+    fn entry_long(
+        &self,
+        index: usize,
+        instrument: &Instrument,
+        higher_tm_instrument: &HigherTMInstrument,
+    ) -> bool {
         let prev_index = get_prev_index(index);
 
         let current_rsi = instrument.indicators.rsi.data_a.get(index).unwrap();
@@ -47,7 +52,12 @@ impl<'a> Strategy for Macd<'a> {
         entry_condition
     }
 
-    fn exit_long(&self, index: usize, instrument: &Instrument) -> bool {
+    fn exit_long(
+        &self,
+        index: usize,
+        instrument: &Instrument,
+        higher_tm_instrument: &HigherTMInstrument,
+    ) -> bool {
         let prev_index = get_prev_index(index);
 
         let current_rsi = instrument.indicators.rsi.data_a.get(index).unwrap();
@@ -64,18 +74,28 @@ impl<'a> Strategy for Macd<'a> {
         exit_condition
     }
 
-    fn entry_short(&self, index: usize, instrument: &Instrument) -> bool {
+    fn entry_short(
+        &self,
+        index: usize,
+        instrument: &Instrument,
+        higher_tm_instrument: &HigherTMInstrument,
+    ) -> bool {
         match self.strategy_type {
-            StrategyType::LongShort => self.exit_long(index, instrument),
-            StrategyType::OnlyShort => self.exit_long(index, instrument),
+            StrategyType::LongShort => self.exit_long(index, instrument, higher_tm_instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument, higher_tm_instrument),
             _ => false,
         }
     }
 
-    fn exit_short(&self, index: usize, instrument: &Instrument) -> bool {
+    fn exit_short(
+        &self,
+        index: usize,
+        instrument: &Instrument,
+        higher_tm_instrument: &HigherTMInstrument,
+    ) -> bool {
         match self.strategy_type {
-            StrategyType::LongShort => self.entry_long(index, instrument),
-            StrategyType::OnlyShort => self.entry_long(index, instrument),
+            StrategyType::LongShort => self.entry_long(index, instrument, higher_tm_instrument),
+            StrategyType::OnlyShort => self.entry_long(index, instrument, higher_tm_instrument),
             _ => false,
         }
     }

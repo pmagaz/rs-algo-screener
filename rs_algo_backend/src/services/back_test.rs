@@ -31,6 +31,27 @@ pub struct Params {
     pub limit: i64,
 }
 
+pub async fn find_one(
+    path: web::Path<(String, String)>,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+    let (symbol, time_frame) = path.into_inner();
+
+    let instrument = db::back_test::find_one(&symbol, &time_frame, &state)
+        .await
+        .unwrap();
+
+    println!(
+        "[FINDONE] {:?} {:?} {:?}",
+        &symbol,
+        Local::now(),
+        now.elapsed()
+    );
+
+    Ok(HttpResponse::Ok().json(instrument))
+}
+
 pub async fn find_instruments(
     market: web::Path<String>,
     query: web::Query<Params>,

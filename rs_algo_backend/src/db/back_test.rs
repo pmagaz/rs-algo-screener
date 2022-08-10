@@ -1,15 +1,39 @@
-use super::helpers::get_collection;
+use super::helpers::*;
 use crate::models::app_state::AppState;
 use crate::models::instrument::Instrument;
 
 use crate::models::backtest_instrument::BackTestInstrumentResult;
 use crate::models::backtest_strategy::BackTestStrategyResult;
+
 use actix_web::web;
 use bson::{doc, Document};
 use futures::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
+use rs_algo_shared::helpers::date::*;
 use std::env;
+
+pub async fn find_one(
+    symbol: &str,
+    time_frame: &str,
+    state: &web::Data<AppState>,
+) -> Result<Option<Instrument>, Error> {
+    let collection_name = get_collection_name(
+        &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
+        &time_frame,
+    );
+
+    let collection = get_collection::<Instrument>(&state.db_mem, &collection_name).await;
+
+    let instrument = collection
+        .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
+        .await
+        .unwrap();
+
+    println!("[FINDONE] {:?} {:?}", symbol, Local::now(),);
+
+    Ok(instrument)
+}
 
 pub async fn find_instruments(
     query: Document,

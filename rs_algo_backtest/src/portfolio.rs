@@ -84,8 +84,10 @@ impl PortFolio {
 
                 for instrument in &instruments_to_test {
                     println!("[BACKTEST] Testing {}... ", instrument.symbol);
-                    let backtest_result =
-                        strategy.test(instrument, self.equity, self.commission, self.stop_loss);
+
+                    let backtest_result = strategy
+                        .test(instrument, self.equity, self.commission, self.stop_loss)
+                        .await;
 
                     match backtest_result {
                         BackTestResult::BackTestInstrumentResult(mut result) => {

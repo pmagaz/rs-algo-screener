@@ -12,6 +12,7 @@ pub mod ema_50200;
 pub mod macd;
 pub mod macd_over_zero;
 pub mod macd_rsi;
+pub mod multi_timeframe;
 pub mod rsi;
 pub mod stoch;
 pub mod stoch_ls;

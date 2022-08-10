@@ -29,13 +29,13 @@ pub struct SymbolQuery {
 }
 
 pub async fn find_one(
-    query: web::Query<SymbolQuery>,
+    path: web::Path<String>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
-    let symbol = &query.symbol;
+    let symbol = path.into_inner();
 
-    let instrument = db::instrument::find_by_symbol(symbol, &state)
+    let instrument = db::instrument::find_by_symbol(&symbol, &state)
         .await
         .unwrap()
         .unwrap();
@@ -51,10 +51,12 @@ pub async fn find_one(
 }
 
 pub async fn chart(
-    symbol: web::Path<String>,
+    path: web::Path<String>,
     state: web::Data<AppState>,
 ) -> Result<fs::NamedFile, RsAlgoError> {
     let now = Instant::now();
+
+    let symbol = path.into_inner();
 
     let instrument = db::instrument::find_by_symbol(&*symbol, &state)
         .await
@@ -134,9 +136,9 @@ pub async fn upsert(
 
     println!(
         "[INSTRUMENT] Received for {:?} mode in {:?} time frame at {:?}",
+        Local::now(),
         mode,
         time_frame,
-        Local::now()
     );
 
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
