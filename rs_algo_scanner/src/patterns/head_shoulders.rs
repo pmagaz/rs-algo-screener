@@ -43,7 +43,7 @@ pub fn hs_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_peak(data[2], candles, &pattern_type),
+        price_is_upperpeak(data[2], candles, &pattern_type),
         price_is_lower_peak(data[2], candles, &pattern_type),
     )
 }
@@ -51,7 +51,7 @@ pub fn hs_active(
 // pub fn inverse_active(data: &DataPoints, candles: &Vec<Candle>, pattern_type: PatternType) -> PatternActive {
 //     pattern_active_result(
 //         &data,
-//         price_is_higher_peak(&data, candles, &pattern_type),
+//         price_is_upperpeak(&data, candles, &pattern_type),
 //         price_is_lower_low_band_bottom(&data, candles, &pattern_type),
 //     )
 // }

@@ -1,6 +1,9 @@
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::candle::Candle;
+use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::*;
+use rs_algo_shared::models::time_frame::*;
 use std::cmp::Ordering;
 
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
@@ -168,6 +171,38 @@ pub fn get_prev_index(index: usize) -> usize {
         Ordering::Equal => 0,
         Ordering::Less => 0,
     }
+}
+
+pub fn get_proportion(base_time_frame: &TimeFrame, time_frame: &TimeFrame) -> usize {
+    // match time_frame {
+    //     TimeFrameType::D => 5,
+    // }
+    1
+}
+
+pub fn get_upper_timeframe_index(
+    index: usize,
+    instrument: &Instrument,
+    upper_tf_instrument: &HigherTMInstrument,
+) -> usize {
+    let base_time_frame = &instrument.time_frame;
+    let base_date = &instrument.date;
+
+    let instrument = match upper_tf_instrument {
+        HigherTMInstrument::HigherTMInstrument(instrument) => {
+            let leches = match &instrument.time_frame {
+                TimeFrameType::W => {
+                    println!("11111");
+                    true
+                }
+                _ => false,
+            };
+
+            ()
+        }
+        _ => (),
+    };
+    1
 }
 
 pub fn get_current_pattern(index: usize, patterns: &Vec<Pattern>) -> PatternType {

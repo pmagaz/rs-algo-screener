@@ -8,16 +8,16 @@ use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 use std::env;
 
-pub fn is_higher_highs_higher_lows_top(data: &DataPoints) -> bool {
-    if is_higher_highs_top(data) && is_higher_lows_bottom(data) {
+pub fn is_upperhighs_upperlows_top(data: &DataPoints) -> bool {
+    if is_upperhighs_top(data) && is_upperlows_bottom(data) {
         true
     } else {
         false
     }
 }
 
-pub fn is_higher_highs_higher_lows_bottom(data: &DataPoints) -> bool {
-    if is_higher_highs_bottom(data) && is_higher_lows_top(data) {
+pub fn is_upperhighs_upperlows_bottom(data: &DataPoints) -> bool {
+    if is_upperhighs_bottom(data) && is_upperlows_top(data) {
         true
     } else {
         false
@@ -31,7 +31,7 @@ pub fn ascendant_top_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_last_high_top(&data, candles, &pattern_type),
+        price_is_upperlast_high_top(&data, candles, &pattern_type),
         price_is_lower_last_low_bottom(&data, candles, &pattern_type),
     )
 }
@@ -43,7 +43,7 @@ pub fn ascendant_bottom_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_last_high_bottom(&data, candles, &pattern_type),
+        price_is_upperlast_high_bottom(&data, candles, &pattern_type),
         price_is_lower_last_low_top(&data, candles, &pattern_type),
     )
 }
@@ -72,7 +72,7 @@ pub fn descendant_top_active(
     pattern_active_result(
         &data,
         price_is_lower_last_low_top(&data, candles, &pattern_type),
-        price_is_higher_last_high_bottom(&data, candles, &pattern_type),
+        price_is_upperlast_high_bottom(&data, candles, &pattern_type),
     )
 }
 
@@ -84,11 +84,11 @@ pub fn descendant_bottom_active(
     pattern_active_result(
         &data,
         price_is_lower_last_low_bottom(&data, candles, &pattern_type),
-        price_is_higher_last_high_top(&data, candles, &pattern_type),
+        price_is_upperlast_high_top(&data, candles, &pattern_type),
     )
 }
 
-pub fn is_higher_highs_top(data: &DataPoints) -> bool {
+pub fn is_upperhighs_top(data: &DataPoints) -> bool {
     if data[0].1 < data[2].1 {
         true
     } else {
@@ -96,7 +96,7 @@ pub fn is_higher_highs_top(data: &DataPoints) -> bool {
     }
 }
 
-pub fn is_higher_lows_top(data: &DataPoints) -> bool {
+pub fn is_upperlows_top(data: &DataPoints) -> bool {
     if data[0].1 < data[2].1 {
         true
     } else {
@@ -104,7 +104,7 @@ pub fn is_higher_lows_top(data: &DataPoints) -> bool {
     }
 }
 
-pub fn is_higher_lows_bottom(data: &DataPoints) -> bool {
+pub fn is_upperlows_bottom(data: &DataPoints) -> bool {
     if data[1].1 < data[3].1 {
         true
     } else {
@@ -120,7 +120,7 @@ pub fn two_increments(data: &DataPoints) -> bool {
     }
 }
 
-pub fn is_higher_highs_bottom(data: &DataPoints) -> bool {
+pub fn is_upperhighs_bottom(data: &DataPoints) -> bool {
     if data[1].1 < data[3].1 {
         true
     } else {

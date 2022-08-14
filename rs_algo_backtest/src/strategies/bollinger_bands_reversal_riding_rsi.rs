@@ -35,7 +35,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &self,
         index: usize,
         instrument: &Instrument,
-        higher_tm_instrument: &HigherTMInstrument,
+        upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -64,7 +64,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &self,
         index: usize,
         instrument: &Instrument,
-        higher_tm_instrument: &HigherTMInstrument,
+        upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
         let _candle_type = &instrument.data.get(index).unwrap().candle_type;
@@ -117,11 +117,11 @@ impl<'a> Strategy for BollingerBands<'a> {
         &self,
         index: usize,
         instrument: &Instrument,
-        higher_tm_instrument: &HigherTMInstrument,
+        upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         match self.strategy_type {
-            StrategyType::LongShort => self.exit_long(index, instrument, higher_tm_instrument),
-            StrategyType::OnlyShort => self.exit_long(index, instrument, higher_tm_instrument),
+            StrategyType::LongShort => self.exit_long(index, instrument, upper_tf_instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
             _ => false,
         }
     }
@@ -130,11 +130,11 @@ impl<'a> Strategy for BollingerBands<'a> {
         &self,
         index: usize,
         instrument: &Instrument,
-        higher_tm_instrument: &HigherTMInstrument,
+        upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         match self.strategy_type {
-            StrategyType::LongShort => self.entry_long(index, instrument, higher_tm_instrument),
-            StrategyType::OnlyShort => self.entry_long(index, instrument, higher_tm_instrument),
+            StrategyType::LongShort => self.entry_long(index, instrument, upper_tf_instrument),
+            StrategyType::OnlyShort => self.entry_long(index, instrument, upper_tf_instrument),
             _ => false,
         }
     }

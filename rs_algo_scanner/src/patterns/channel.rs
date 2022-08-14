@@ -7,8 +7,8 @@ use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 
 pub fn is_ascendant_top(data: &DataPoints) -> bool {
-    if is_higher_highs_top(data)
-        && is_higher_lows_bottom(data)
+    if is_upperhighs_top(data)
+        && is_upperlows_bottom(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
         && are_parallel_lines(data)
@@ -24,8 +24,8 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
 }
 
 pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
-    if is_higher_highs_bottom(data)
-        && is_higher_lows_top(data)
+    if is_upperhighs_bottom(data)
+        && is_upperlows_top(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
         && are_parallel_lines(data)
@@ -82,7 +82,7 @@ pub fn channel_descendant_top_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_top(&data, candles, &pattern_type),
+        price_is_upperupper_band_top(&data, candles, &pattern_type),
         (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000))),
     )
 }
@@ -94,7 +94,7 @@ pub fn channel_descendant_bottom_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_bottom(&data, candles, &pattern_type),
+        price_is_upperupper_band_bottom(&data, candles, &pattern_type),
         (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000))),
     )
 }

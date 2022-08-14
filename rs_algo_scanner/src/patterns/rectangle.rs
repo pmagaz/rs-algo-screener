@@ -51,7 +51,7 @@ pub fn rectangle_top_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_top(&data, candles, &pattern_type),
+        price_is_upperupper_band_top(&data, candles, &pattern_type),
         price_is_lower_low_band_bottom(&data, candles, &pattern_type),
     )
 }
@@ -63,7 +63,7 @@ pub fn rectangle_bottom_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_bottom(&data, candles, &pattern_type),
+        price_is_upperupper_band_bottom(&data, candles, &pattern_type),
         price_is_lower_low_band_top(&data, candles, &pattern_type),
     )
 }

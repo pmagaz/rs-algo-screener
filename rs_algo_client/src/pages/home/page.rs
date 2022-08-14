@@ -235,6 +235,7 @@ pub fn home() -> Html {
         .filter(|x| {
             x.current_candle == CandleType::Karakasa
                 || x.current_candle == CandleType::Engulfing
+                || x.current_candle == CandleType::BullishGap
                     && (!!symbol_in_list(&x.symbol, &forex_symbols)
                         && !!symbol_in_list(&x.symbol, &crypto_symbols))
         })

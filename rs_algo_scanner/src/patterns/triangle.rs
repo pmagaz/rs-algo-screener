@@ -7,7 +7,7 @@ use rs_algo_shared::models::pattern::{DataPoints, PatternActive, PatternType};
 
 pub fn is_ascendant_top(data: &DataPoints) -> bool {
     if upper_band_is_equal_top(data)
-        && is_higher_lows_bottom(data)
+        && is_upperlows_bottom(data)
         && is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && has_minimum_bars(data)
@@ -22,7 +22,7 @@ pub fn is_ascendant_top(data: &DataPoints) -> bool {
 }
 
 pub fn is_ascendant_bottom(data: &DataPoints) -> bool {
-    if is_higher_lows_top(data)
+    if is_upperlows_top(data)
         && upper_band_is_equal_bottom(data)
         && is_valid_triangle(data)
         //&& points_are_in_slope(data)
@@ -71,7 +71,7 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
 
 pub fn is_symmetrical_top(data: &DataPoints) -> bool {
     if is_lower_highs_top(data)
-        && is_higher_lows_bottom(data)
+        && is_upperlows_bottom(data)
         //&& is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
@@ -88,7 +88,7 @@ pub fn is_symmetrical_top(data: &DataPoints) -> bool {
 
 pub fn is_symmetrical_bottom(data: &DataPoints) -> bool {
     if is_lower_highs_bottom(data)
-        && is_higher_lows_top(data)
+        && is_upperlows_top(data)
         //&& is_valid_triangle(data)
         //&& points_are_in_slope(data)
         && bands_have_same_slope(data)
@@ -110,7 +110,7 @@ pub fn ascendant_top_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_top(&data, candles, &pattern_type),
+        price_is_upperupper_band_top(&data, candles, &pattern_type),
         price_is_lower_low_band_bottom(&data, candles, &pattern_type),
     )
 }
@@ -122,7 +122,7 @@ pub fn ascendant_bottom_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_bottom(&data, candles, &pattern_type),
+        price_is_upperupper_band_bottom(&data, candles, &pattern_type),
         price_is_lower_low_band_top(&data, candles, &pattern_type),
     )
 }
@@ -134,7 +134,7 @@ pub fn descendant_top_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_top(&data, candles, &pattern_type),
+        price_is_upperupper_band_top(&data, candles, &pattern_type),
         price_is_lower_low_band_bottom(&data, candles, &pattern_type),
     )
 }
@@ -146,7 +146,7 @@ pub fn descendant_bottom_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_bottom(&data, candles, &pattern_type),
+        price_is_upperupper_band_bottom(&data, candles, &pattern_type),
         price_is_lower_low_band_top(&data, candles, &pattern_type),
     )
 }
@@ -158,7 +158,7 @@ pub fn symetrical_top_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_top(&data, candles, &pattern_type),
+        price_is_upperupper_band_top(&data, candles, &pattern_type),
         price_is_lower_low_band_bottom(&data, candles, &pattern_type),
     )
 }
@@ -170,7 +170,7 @@ pub fn symetrical_bottom_active(
 ) -> PatternActive {
     pattern_active_result(
         &data,
-        price_is_higher_upper_band_bottom(&data, candles, &pattern_type),
+        price_is_upperupper_band_bottom(&data, candles, &pattern_type),
         price_is_lower_low_band_top(&data, candles, &pattern_type),
     )
 }

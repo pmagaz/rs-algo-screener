@@ -406,7 +406,7 @@ impl Patterns {
                                 is_pattern_active,
                             );
                             not_founded = true;
-                        } else if highs_lows::is_higher_highs_higher_lows_top(&data_points) {
+                        } else if highs_lows::is_upperhighs_upperlows_top(&data_points) {
                             data_points = add_next_top_points(data_points);
 
                             let is_pattern_active = highs_lows::ascendant_top_active(
@@ -424,7 +424,7 @@ impl Patterns {
                                 is_pattern_active,
                             );
                             not_founded = true;
-                        } else if highs_lows::is_higher_highs_higher_lows_bottom(&data_points) {
+                        } else if highs_lows::is_upperhighs_upperlows_bottom(&data_points) {
                             data_points = add_next_top_points(data_points);
 
                             let is_pattern_active = highs_lows::ascendant_bottom_active(

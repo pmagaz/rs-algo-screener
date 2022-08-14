@@ -60,7 +60,7 @@ impl General {
             {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
             {"$or": [
                    {"$and": [
-                        {"current_candle": { "$in": ["Karakasa","Engulfing"] }},
+                        {"current_candle": { "$in": ["Karakasa","Engulfing","BullishGap"] }},
                         {"$expr": {"$lte": ["$indicators.rsi.current_a", 30]}},
                    ]},
                 {"$or": [
@@ -225,9 +225,29 @@ impl General {
             }
         }
         docs.sort_by(|a, b| {
-            let a_band = percentage_change(a.indicators.bb.current_b, a.indicators.bb.current_a);
-            let b_band = percentage_change(b.indicators.bb.current_b, b.indicators.bb.current_a);
-            b_band.partial_cmp(&a_band).unwrap()
+            let a_last_pattern_target = match a.patterns.local_patterns.last() {
+                Some(val) => match val.active.active {
+                    true => round(val.active.target, 0),
+                    false => round(val.target, 0),
+                },
+                None => 0.,
+            };
+
+            let b_last_pattern_target = match b.patterns.local_patterns.last() {
+                Some(val) => match val.active.active {
+                    true => round(val.active.target, 0),
+                    false => round(val.target, 0),
+                },
+                None => 0.,
+            };
+
+            b_last_pattern_target
+                .partial_cmp(&a_last_pattern_target)
+                .unwrap()
+
+            // let a_band = percentage_change(a.indicators.bb.current_b, a.indicators.bb.current_a);
+            // let b_band = percentage_change(b.indicators.bb.current_b, b.indicators.bb.current_a);
+            // b_band.partial_cmp(&a_band).unwrap()
         });
         docs
     }

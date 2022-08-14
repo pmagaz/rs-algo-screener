@@ -8,7 +8,7 @@ use std::env;
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
 
-pub fn price_is_higher_upper_band_top(
+pub fn price_is_upperupper_band_top(
     data: &DataPoints,
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
@@ -18,7 +18,7 @@ pub fn price_is_higher_upper_band_top(
     search_price_break(points, candles, &break_price_comparator)
 }
 
-pub fn price_is_higher_upper_band_bottom(
+pub fn price_is_upperupper_band_bottom(
     data: &DataPoints,
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
@@ -48,7 +48,7 @@ pub fn price_is_lower_low_band_top(
     search_price_break(points, candles, &break_price_comparator)
 }
 
-pub fn price_is_higher_last_high_top(
+pub fn price_is_upperlast_high_top(
     data: &DataPoints,
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
@@ -58,7 +58,7 @@ pub fn price_is_higher_last_high_top(
     search_price_break(points, candles, &break_price_comparator)
 }
 
-pub fn price_is_higher_last_high_bottom(
+pub fn price_is_upperlast_high_bottom(
     data: &DataPoints,
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
@@ -88,7 +88,7 @@ pub fn price_is_lower_last_low_bottom(
     search_price_break(points, candles, &break_price_comparator)
 }
 
-pub fn price_is_higher_peak(
+pub fn price_is_upperpeak(
     peak: (usize, f64),
     candles: &Vec<Candle>,
     pattern_type: &PatternType,
