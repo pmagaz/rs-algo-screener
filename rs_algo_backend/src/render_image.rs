@@ -99,8 +99,8 @@ impl Backend {
         let CANDLE_BEARISH = &RGBColor(71, 113, 181).mix(0.95);
         let CANDLE_BULLISH = &RGBColor(255, 255, 255).mix(0.95);
         let RED_LINE = &RGBColor(235, 69, 125).mix(0.8);
-        let _BLUE_LINE = &RGBColor(71, 113, 181).mix(0.3);
-        let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.3);
+        let _BLUE_LINE = &RGBColor(71, 113, 181).mix(0.25);
+        let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.25);
         let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
         let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.25);
         let _GREEN_LINE = &RGBColor(56, 142, 59);
