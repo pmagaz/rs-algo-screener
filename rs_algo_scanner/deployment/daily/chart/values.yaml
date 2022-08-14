@@ -5,7 +5,7 @@ jobs:
       tag: latest 
       imagePullPolicy: Always
     schedule: "0 0 * * *"
-    failedJobsHistoryLimit: 1
+    failedJobsHistoryLimit: 0
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
     restartPolicy: Never
@@ -13,9 +13,9 @@ jobs:
     envSecretName: rs-algo-screener-secrets
     resources:
       requests:
-        cpu: 200m
-      limits:
         cpu: 400m
+      limits:
+        cpu: 500m
         memory: 256Mi
     nodeSelector:
       nodeType: cpu
@@ -28,4 +28,3 @@ jobs:
               operator: In
               values:
               - cpu
-    
