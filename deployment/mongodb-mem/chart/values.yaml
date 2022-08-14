@@ -35,7 +35,7 @@ serviceAccount: {}
 
 resources:
   requests:
-     cpu: 700m
+     cpu: 400m
   limits:
     cpu: 1000m
     ephemeral-storage: 5Gi
