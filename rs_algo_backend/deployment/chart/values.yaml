@@ -50,31 +50,31 @@ ingress:
 
 resources:
   requests:
-    cpu: 1900m
+    cpu: 200m
   limits:
-    cpu: 2500m
+    cpu: 500m
     ephemeral-storage: 256Mi 
-    memory: 512Mi
+    memory: 256Mi
 
 autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 2
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
   targetCPUUtilizationPercentage: 25
   # targetMemoryUtilizationPercentage: 80
 
-nodeSelector:
-  nodeType: cpu 
+# nodeSelector:
+#   nodeType: cpu 
 
-affinity:
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: nodeType
-          operator: In
-          values:
-          - cpu
+# affinity:
+#   nodeAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#       nodeSelectorTerms:
+#       - matchExpressions:
+#         - key: nodeType
+#           operator: In
+#           values:
+#           - cpu
 
 tolerations: []
 
