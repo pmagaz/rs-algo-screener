@@ -58,23 +58,23 @@ resources:
 
 autoscaling:
   enabled: true
-  minReplicas: 2
-  maxReplicas: 6
+  minReplicas: 1
+  maxReplicas: 5
   targetCPUUtilizationPercentage: 25
   # targetMemoryUtilizationPercentage: 80
 
-# nodeSelector:
-#   nodeType: cpu 
+nodeSelector:
+  nodeType: cpu 
 
-# affinity:
-#   nodeAffinity:
-#     requiredDuringSchedulingIgnoredDuringExecution:
-#       nodeSelectorTerms:
-#       - matchExpressions:
-#         - key: nodeType
-#           operator: In
-#           values:
-#           - cpu
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: nodeType
+          operator: In
+          values:
+          - cpu
 
 tolerations: []
 

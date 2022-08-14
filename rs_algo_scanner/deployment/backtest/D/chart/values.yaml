@@ -13,7 +13,7 @@ jobs:
     envSecretName: rs-algo-screener-secrets
     resources:
       requests:
-        cpu: 500m
+        cpu: 200m
       limits:
         cpu: 800m
         memory: 256Mi
