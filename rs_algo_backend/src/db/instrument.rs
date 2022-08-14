@@ -112,26 +112,7 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<Instrument>, Er
     Ok(instruments)
 }
 
-pub async fn upsert(
-    doc: CompactInstrument,
-    state: &web::Data<AppState>,
-) -> Result<Option<CompactInstrument>, Error> {
-    let collection_name = env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
-
-    let collection = get_collection::<CompactInstrument>(&state.db_mem, &collection_name).await;
-
-    collection
-        .find_one_and_replace(
-            doc! { "symbol": doc.symbol.clone() },
-            doc,
-            FindOneAndReplaceOptions::builder()
-                .upsert(Some(true))
-                .build(),
-        )
-        .await
-}
-
-pub async fn insert_instrument(
+pub async fn upsert_instrument(
     mode: &str,
     time_frame: &str,
     doc: &Instrument,
@@ -160,6 +141,25 @@ pub async fn insert_instrument(
             .await
         }
     };
+
+    collection
+        .find_one_and_replace(
+            doc! { "symbol": doc.symbol.clone() },
+            doc,
+            FindOneAndReplaceOptions::builder()
+                .upsert(Some(true))
+                .build(),
+        )
+        .await
+}
+
+pub async fn upsert_compact_instrument(
+    doc: CompactInstrument,
+    state: &web::Data<AppState>,
+) -> Result<Option<CompactInstrument>, Error> {
+    let collection_name = env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
+
+    let collection = get_collection::<CompactInstrument>(&state.db_mem, &collection_name).await;
 
     collection
         .find_one_and_replace(

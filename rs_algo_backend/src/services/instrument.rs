@@ -134,13 +134,6 @@ pub async fn upsert(
     let mode = &query.mode;
     let time_frame = &query.time_frame;
 
-    println!(
-        "[INSTRUMENT] Received for {:?} mode in {:?} time frame at {:?}",
-        Local::now(),
-        mode,
-        time_frame,
-    );
-
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
 
@@ -149,6 +142,14 @@ pub async fn upsert(
         let symbol_str: Vec<&str> = symbol.split('_').collect();
         instrument.symbol = symbol_str[0].to_owned();
     }
+
+    println!(
+        "[INSTRUMENT] {} {:?} in {} mode at {:?}",
+        instrument.symbol,
+        time_frame,
+        mode,
+        Local::now(),
+    );
 
     let insert_compact_instruments_detail = env::var("INSERT_COMPACT_INSTRUMENTS_DETAIL")
         .unwrap()
@@ -159,7 +160,7 @@ pub async fn upsert(
         let now = Instant::now();
 
         let _insert_result =
-            db::instrument::insert_instrument(mode, time_frame, &instrument, &state)
+            db::instrument::upsert_instrument(mode, time_frame, &instrument, &state)
                 .await
                 .unwrap();
 
@@ -185,10 +186,12 @@ pub async fn upsert(
 
     if !mode.contains("backtest") && insert_compact_instruments {
         let now = Instant::now();
-        let _insert_compact =
-            db::instrument::upsert(compact_instrument(instrument).unwrap(), &state)
-                .await
-                .unwrap();
+        let _insert_compact = db::instrument::upsert_compact_instrument(
+            compact_instrument(instrument).unwrap(),
+            &state,
+        )
+        .await
+        .unwrap();
 
         println!(
             "[COMPACT INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
