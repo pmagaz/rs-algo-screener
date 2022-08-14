@@ -52,7 +52,7 @@ resources:
   requests:
     cpu: 200m
   limits:
-    cpu: 500m
+    cpu: 800m
     ephemeral-storage: 256Mi 
     memory: 256Mi
 
@@ -60,7 +60,7 @@ autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 3
-  targetCPUUtilizationPercentage: 25
+  targetCPUUtilizationPercentage: 50
   # targetMemoryUtilizationPercentage: 80
 
 # nodeSelector:
