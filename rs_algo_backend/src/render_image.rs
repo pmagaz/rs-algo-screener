@@ -111,7 +111,7 @@ impl Backend {
         };
 
         let top_point_color = match points_mode {
-            PointsMode::MaximaMinima => BLUE.mix(0.15),
+            PointsMode::MaximaMinima => BLUE.mix(0.10),
             PointsMode::Trades => RED_LINE.mix(1.),
         };
 
@@ -275,7 +275,7 @@ impl Backend {
                             let date = data[idx].date;
                             (date, value)
                         }),
-                    RED_LINE.mix(0.30),
+                    RED_LINE.mix(0.40),
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));

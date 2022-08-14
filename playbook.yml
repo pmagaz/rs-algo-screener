@@ -7,10 +7,10 @@
     #- { role: "deployment/mongodb-mem/roles/" }
     #- { role: "deployment/docker-registry/roles/" }
     - { role: "rs_algo_backend/deployment/roles/" }
-    #- { role: "rs_algo_client/deployment/roles/" }
+    - { role: "rs_algo_client/deployment/roles/" }
     - { role: "rs_algo_scanner/deployment/daily/roles/" }
-    # - { role: "rs_algo_scanner/deployment/backtest/D/roles/" }
-    # - { role: "rs_algo_scanner/deployment/backtest/W/roles/" }
-    # - { role: "rs_algo_backtest/deployment/stock/roles/" }
-    # - { role: "rs_algo_backtest/deployment/forex/roles/" }
-    # - { role: "rs_algo_backtest/deployment/crypto/roles/" }
+    - { role: "rs_algo_scanner/deployment/backtest/D/roles/" }
+    - { role: "rs_algo_scanner/deployment/backtest/W/roles/" }
+    - { role: "rs_algo_backtest/deployment/stock/roles/" }
+    - { role: "rs_algo_backtest/deployment/forex/roles/" }
+    - { role: "rs_algo_backtest/deployment/crypto/roles/" }
