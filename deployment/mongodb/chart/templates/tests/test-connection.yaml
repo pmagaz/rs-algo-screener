@@ -12,4 +12,4 @@ spec:
       image: busybox
       command: ['wget']
       args: ['{{ include "mongodb.fullname" . }}:{{ .Values.service.port }}']
-  restartPolicy: Never
+  restartPolicy: OnFailure
