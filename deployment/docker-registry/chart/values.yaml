@@ -10,12 +10,12 @@ imagePullSecrets:
 
 volumeMounts:
 - name: data
-  mountPath: /data
+  mountPath: /mnt/ssd
 
 volumes:
 - name: data
   hostPath:
-    path: /data
+    path: /mnt/ssd
     type: Directory
 
 envSecretName: rs-algo-screener-secrets

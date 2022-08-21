@@ -56,7 +56,7 @@ affinity:
         - key: nodeType
           operator: In
           values:
-          - worker
+          - storage
 
 tolerations: []
 

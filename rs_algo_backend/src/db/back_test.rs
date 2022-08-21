@@ -43,7 +43,7 @@ pub async fn find_instruments(
 ) -> Result<Vec<Instrument>, Error> {
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
 
-    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
 
     let mut cursor = collection
         .find(
