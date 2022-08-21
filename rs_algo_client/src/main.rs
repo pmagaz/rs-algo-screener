@@ -9,7 +9,6 @@ mod routes;
 use components::footer::Footer;
 use components::header::Header;
 use routes::{switch, Route};
-use std::env;
 
 pub enum Msg {}
 
