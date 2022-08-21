@@ -14,8 +14,8 @@ volumeMounts:
 
 volumes:
 - name: data
-  persistentVolumeClaim:
-        claimName: data-pvc-claim
+  # persistentVolumeClaim:
+  #       claimName: data-pvc-claim
   hostPath:
     path: /mnt/data
     type: Directory
