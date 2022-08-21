@@ -54,7 +54,8 @@ autoscaling:
   targetCPUUtilizationPercentage: 25
   # targetMemoryUtilizationPercentage: 80
 
-nodeSelector: {}
+nodeSelector:
+  nodeType: worker
 
 affinity:
   nodeAffinity:
@@ -64,7 +65,7 @@ affinity:
         - key: nodeType
           operator: In
           values:
-          - storage
+          - worker
 
 tolerations: []
 

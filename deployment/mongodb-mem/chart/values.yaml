@@ -10,7 +10,7 @@ imagePullSecrets:
 
 volumeMounts:
 - name: data
-  mountPath: /data/db
+  mountPath: /mnt/ssd/db
 
 volumes:
 - name: data
@@ -46,7 +46,7 @@ ingress: {}
 autoscaling: {}
 
 nodeSelector:
-  nodeType: cpu
+  nodeType: storage
 
 affinity:
   nodeAffinity:
@@ -56,7 +56,7 @@ affinity:
         - key: nodeType
           operator: In
           values:
-          - cpu
+          - worker
 
 tolerations: []
 
