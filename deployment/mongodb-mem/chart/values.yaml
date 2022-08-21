@@ -10,7 +10,7 @@ imagePullSecrets:
 
 volumeMounts:
 - name: data
-  mountPath: /mnt/data/db
+  mountPath: /data/db
 
 volumes:
 - name: data
@@ -35,7 +35,7 @@ serviceAccount: {}
 
 resources:
   requests:
-     cpu: 400m
+     cpu: 100m
   limits:
     cpu: 1000m
     ephemeral-storage: 5Gi
