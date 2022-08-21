@@ -10,7 +10,7 @@ imagePullSecrets:
 
 volumeMounts:
 - name: data
-  mountPath: /mnt/ssd/db
+  mountPath: /mnt/data/db
 
 volumes:
 - name: data

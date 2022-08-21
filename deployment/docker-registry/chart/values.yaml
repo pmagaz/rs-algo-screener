@@ -9,13 +9,13 @@ imagePullSecrets:
  - name: docker-credentials 
 
 volumeMounts:
-- name: mnt
-  mountPath: /mnt/ssd
+- name: data
+  mountPath: /mnt/data
 
 volumes:
-- name: mnt
+- name: data
   hostPath:
-    path: /mnt/ssd
+    path: /mnt/data
     type: Directory
 
 envSecretName: rs-algo-screener-secrets
