@@ -9,11 +9,11 @@ imagePullSecrets:
  - name: docker-credentials 
 
 volumeMounts:
-- name: data
+- name: mnt
   mountPath: /mnt/ssd/db
 
 volumes:
-- name: data
+- name: mnt
   hostPath:
     path: /mnt/ssd/db
     type: Directory

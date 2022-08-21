@@ -23,7 +23,7 @@ pub async fn find_one(
         &time_frame,
     );
 
-    let collection = get_collection::<Instrument>(&state.db_mem, &collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_hdd, &collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())

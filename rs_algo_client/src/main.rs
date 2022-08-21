@@ -10,6 +10,8 @@ use components::footer::Footer;
 use components::header::Header;
 use routes::{switch, Route};
 
+//Test
+
 pub enum Msg {}
 
 pub struct App {}
@@ -19,6 +21,7 @@ impl Component for App {
 
     fn create(_ctx: &Context<Self>) -> Self {
         log::info!("[CLIENT] Loading app...");
+        leches();
         Self {}
     }
 
@@ -35,8 +38,9 @@ impl Component for App {
     }
 }
 
+fn leches() {}
+
 fn main() {
-    dotenv().ok();
     wasm_logger::init(wasm_logger::Config::new(log::Level::Trace));
     yew::start_app::<App>();
 }
