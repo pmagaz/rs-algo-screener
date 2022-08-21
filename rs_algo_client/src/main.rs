@@ -10,8 +10,6 @@ use components::footer::Footer;
 use components::header::Header;
 use routes::{switch, Route};
 
-//Test
-
 pub enum Msg {}
 
 pub struct App {}
