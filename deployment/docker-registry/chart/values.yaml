@@ -10,14 +10,14 @@ imagePullSecrets:
 
 volumeMounts:
 - name: data
-  mountPath: /mnt/data
+  mountPath: /data
 
 volumes:
 - name: data
   # persistentVolumeClaim:
   #       claimName: data-pvc-claim
   hostPath:
-    path: /mnt/data
+    path: /data
     type: Directory
 
 envSecretName: rs-algo-screener-secrets
