@@ -208,17 +208,17 @@ async fn main() -> Result<()> {
                         };
 
                         let now = Instant::now();
-                        let res = request(&url, &instrument, HttpMethod::Put)
-                            .await
-                            .map_err(|_e| RsAlgoErrorKind::RequestError)?;
+                        // let res = request(&url, &instrument, HttpMethod::Put)
+                        //     .await
+                        //     .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
-                        println!(
-                            "[BACKEND RESPONSE] {:?} status {:?} at {:?} in {:?}",
-                            &instrument.symbol(),
-                            res.status(),
-                            Local::now(),
-                            now.elapsed()
-                        );
+                        // println!(
+                        //     "[BACKEND RESPONSE] {:?} status {:?} at {:?} in {:?}",
+                        //     &instrument.symbol(),
+                        //     res.status(),
+                        //     Local::now(),
+                        //     now.elapsed()
+                        // );
 
                         Ok(())
                     },
