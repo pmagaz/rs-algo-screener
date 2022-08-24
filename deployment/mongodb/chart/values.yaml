@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: arm64v8/mongo
   pullPolicy: Always
-  tag: "4.4.15"
+  tag: "4.4.16"
 
 imagePullSecrets:
  - name: docker-credentials 
