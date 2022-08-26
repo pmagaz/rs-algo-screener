@@ -131,7 +131,6 @@ pub async fn upsert_instrument(
                 time_frame,
             );
 
-            println!("[baaaaacktest upsert] {:?}", collection_name);
             get_collection::<Instrument>(&state.db_hdd, &collection_name).await
         }
         _ => {
