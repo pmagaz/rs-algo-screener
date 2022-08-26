@@ -144,7 +144,7 @@ pub async fn upsert(
     }
 
     println!(
-        "[INSTRUMENT] {} {:?} in {} mode at {:?}",
+        "[INSTRUMENT] Received {} for {} timeframe in {} mode at {:?}",
         instrument.symbol,
         time_frame,
         mode,
@@ -159,20 +159,24 @@ pub async fn upsert(
     if insert_compact_instruments_detail {
         let now = Instant::now();
 
-        let _insert_result =
-            db::instrument::upsert_instrument(mode, time_frame, &instrument, &state)
-                .await
-                .unwrap();
+        let insert_result = db::instrument::upsert_instrument(mode, &instrument, &state)
+            //let _insert_result = db::instrument::insert_detail(mode, time_frame, &instrument, &state)
+            .await
+            .unwrap();
+
+        println!("222222 {:?}", insert_result);
+
+        let str = match mode.as_ref() {
+            "daily" => "[INSTRUMENT UPSERTED]",
+            "backtest_stock" => "[BACKTEST STOCK INSTRUMENT UPSERTED]",
+            "backtest_forex" => "[BACKTEST FOREX INSTRUMENT UPSERTED]",
+            "backtest_crypto" => "[BACKTEST CRYPTO INSTRUMENT UPSERTED]",
+            &_ => "WRONG mode!",
+        };
 
         println!(
             "{} {:?} at {:?} in {:?}",
-            match mode.as_ref() {
-                "daily" => "[INSTRUMENT UPSERTED]",
-                "backtest_stock" => "[BACKTEST STOCK INSTRUMENT UPSERTED]",
-                "backtest_forex" => "[BACKTEST FOREX INSTRUMENT UPSERTED]",
-                "backtest_crypto" => "[BACKTEST CRYPTO INSTRUMENT UPSERTED]",
-                &_ => "",
-            },
+            str,
             symbol,
             Local::now(),
             now.elapsed()
