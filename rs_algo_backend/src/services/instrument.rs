@@ -165,23 +165,15 @@ pub async fn upsert(
                 .await
                 .unwrap();
 
-        println!("222222 {:?}", insert_result);
+        println!("222222 {:?} {:?}", insert_result, mode);
 
-        let str = match mode.as_ref() {
+        let msg = match mode.as_ref() {
             "daily" => "[INSTRUMENT UPSERTED]",
-            "backtest_stock" => "[BACKTEST STOCK INSTRUMENT UPSERTED]",
-            "backtest_forex" => "[BACKTEST FOREX INSTRUMENT UPSERTED]",
-            "backtest_crypto" => "[BACKTEST CRYPTO INSTRUMENT UPSERTED]",
+            "backtest" => "[BACKTEST INSTRUMENT UPSERTED]",
             &_ => "WRONG mode!",
         };
 
-        println!(
-            "{} {:?} at {:?} in {:?}",
-            str,
-            symbol,
-            Local::now(),
-            now.elapsed()
-        );
+        println!("3333333 {:?} {:?}", msg, symbol);
     }
 
     let insert_compact_instruments = env::var("INSERT_COMPACT_INSTRUMENTS")
