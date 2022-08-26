@@ -159,10 +159,11 @@ pub async fn upsert(
     if insert_compact_instruments_detail {
         let now = Instant::now();
 
-        let insert_result = db::instrument::upsert_instrument(mode, &instrument, &state)
-            //let _insert_result = db::instrument::insert_detail(mode, time_frame, &instrument, &state)
-            .await
-            .unwrap();
+        let insert_result =
+            db::instrument::upsert_instrument(mode, time_frame, &instrument, &state)
+                //let _insert_result = db::instrument::insert_detail(mode, time_frame, &instrument, &state)
+                .await
+                .unwrap();
 
         println!("222222 {:?}", insert_result);
 
