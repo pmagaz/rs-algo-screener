@@ -4,7 +4,7 @@ jobs:
       repository: cluster.loc:5000/rs-algo-backtest
       tag: latest
       imagePullPolicy: Always
-    schedule: "30 4 * * 6"
+    schedule: "30 4 * * *"
     failedJobsHistoryLimit: 1
     successfulJobsHistoryLimit: 0
     concurrencyPolicy: Forbid
