@@ -27,5 +27,5 @@ jobs:
             - key: nodeType
               operator: In
               values:
-              - cpu
+              - worker
     

@@ -18,7 +18,7 @@ impl Component for App {
     type Properties = ();
 
     fn create(_ctx: &Context<Self>) -> Self {
-        log::info!("[CLIENT] Loading app...");
+        log::info!("[CLIENT] Loading App...");
         leches();
         Self {}
     }
