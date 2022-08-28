@@ -18,7 +18,7 @@ jobs:
         cpu: 800m
         memory: 256Mi
     nodeSelector:
-      nodeType: storage
+      nodeType: worker
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
@@ -27,5 +27,5 @@ jobs:
             - key: nodeType
               operator: In
               values:
-              - storage
+              - worker
     
