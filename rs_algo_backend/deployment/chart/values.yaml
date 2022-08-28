@@ -52,7 +52,7 @@ resources:
   requests:
     cpu: 100m
   limits:
-    cpu: 1000m
+    cpu: 800m
     ephemeral-storage: 256Mi 
     memory: 256Mi
 
@@ -64,7 +64,7 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 nodeSelector:
-  nodeType: storage 
+  nodeType: worker
 
 affinity:
   nodeAffinity:
@@ -74,7 +74,7 @@ affinity:
         - key: nodeType
           operator: In
           values:
-          - storage 
+          - worker
 
 tolerations: []
 
