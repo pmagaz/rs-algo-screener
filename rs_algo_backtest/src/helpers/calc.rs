@@ -191,10 +191,7 @@ pub fn get_upper_timeframe_index(
     let instrument = match upper_tf_instrument {
         HigherTMInstrument::HigherTMInstrument(instrument) => {
             let leches = match &instrument.time_frame {
-                TimeFrameType::W => {
-                    println!("11111");
-                    true
-                }
+                TimeFrameType::W => true,
                 _ => false,
             };
 
