@@ -147,12 +147,6 @@ impl Instrument {
                     }
                 };
 
-                // let low = match x.3 {
-                //     _x if x.3 > 0. => x.3.ln(),
-                //     _x if x.3 <= 0. => 0.01,
-                //     _ => x.3.ln(),
-                // };
-
                 if self.min_price == -100. {
                     self.min_price = low;
                 }

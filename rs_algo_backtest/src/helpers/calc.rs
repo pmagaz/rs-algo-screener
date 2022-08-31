@@ -185,15 +185,21 @@ pub fn get_upper_timeframe_index(
     instrument: &Instrument,
     upper_tf_instrument: &HigherTMInstrument,
 ) -> usize {
-    let base_time_frame = &instrument.time_frame;
-    let base_date = &instrument.date;
+    let base_date = &instrument.data.get(index).unwrap().date;
 
     let instrument = match upper_tf_instrument {
-        HigherTMInstrument::HigherTMInstrument(instrument) => {
-            let leches = match &instrument.time_frame {
-                TimeFrameType::W => true,
-                _ => false,
-            };
+        HigherTMInstrument::HigherTMInstrument(upper_instrument) => {
+            let upper_date = &upper_instrument.data.get(index).unwrap().date;
+
+            println!(
+                "{} {} {} {}",
+                index, instrument.symbol, base_date, upper_date
+            );
+
+            // let leches = match &instrument.time_frame {
+            //     TimeFrameType::W => true,
+            //     _ => false,
+            // };
 
             ()
         }

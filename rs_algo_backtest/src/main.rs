@@ -28,43 +28,43 @@ async fn main() -> Result<()> {
         equity: 100000.,
         instruments: vec![],
         strategies: vec![
-            //OnlyLong
+            //MultiTimeFrame
             Box::new(strategies::multi_timeframe::MutiTimeFrame::new().unwrap()),
-            //OnlyLong
-            Box::new(strategies::ema_200::Ema::new().unwrap()),
-            Box::new(strategies::ema_50::Ema::new().unwrap()),
-            Box::new(strategies::ema_50200::Ema::new().unwrap()),
-            Box::new(
-                strategies::bollinger_bands_reversal_riding_rsi::BollingerBands::new().unwrap(),
-            ),
-            Box::new(strategies::bollinger_bands_reversal_riding::BollingerBands::new().unwrap()),
-            Box::new(
-                strategies::bollinger_bands_reversal_continuation::BollingerBands::new().unwrap(),
-            ),
-            Box::new(strategies::bollinger_bands_reversal::BollingerBands::new().unwrap()),
-            Box::new(strategies::macd_over_zero::Macd::new().unwrap()),
-            Box::new(strategies::stoch::Stoch::new().unwrap()),
-            //LongShort
-            Box::new(strategies::ema_200_ls::Ema::new().unwrap()),
-            Box::new(strategies::ema_50200_ls::Ema::new().unwrap()),
-            Box::new(
-                strategies::bollinger_bands_reversal_riding_rsi_ls::BollingerBands::new().unwrap(),
-            ),
-            Box::new(strategies::bollinger_bands_reversal_ls::BollingerBands::new().unwrap()),
-            Box::new(
-                strategies::bollinger_bands_reversal_continuation_ls::BollingerBands::new()
-                    .unwrap(),
-            ),
-            Box::new(strategies::bollinger_bands_reversal_2::BollingerBands::new().unwrap()),
-            // Box::new(strategies::bollinger_bands_reversal::BollingerBands::new().unwrap()),
+            // //OnlyLong
             // Box::new(strategies::ema_200::Ema::new().unwrap()),
-            // Box::new(strategies::ema_50200::Ema::new().unwrap()),
             // Box::new(strategies::ema_50::Ema::new().unwrap()),
-            Box::new(strategies::stoch_ls::Stoch::new().unwrap()),
-            // Box::new(strategies::macd::Macd::new().unwrap()),
-            // Box::new(strategies::rsi::Rsi::new().unwrap()),
-            // Box::new(strategies::macd_rsi::Macd::new().unwrap()),
+            // Box::new(strategies::ema_50200::Ema::new().unwrap()),
+            // Box::new(
+            //     strategies::bollinger_bands_reversal_riding_rsi::BollingerBands::new().unwrap(),
+            // ),
+            // Box::new(strategies::bollinger_bands_reversal_riding::BollingerBands::new().unwrap()),
+            // Box::new(
+            //     strategies::bollinger_bands_reversal_continuation::BollingerBands::new().unwrap(),
+            // ),
+            // Box::new(strategies::bollinger_bands_reversal::BollingerBands::new().unwrap()),
             // Box::new(strategies::macd_over_zero::Macd::new().unwrap()),
+            // Box::new(strategies::stoch::Stoch::new().unwrap()),
+            // //LongShort
+            // Box::new(strategies::ema_200_ls::Ema::new().unwrap()),
+            // Box::new(strategies::ema_50200_ls::Ema::new().unwrap()),
+            // Box::new(
+            //     strategies::bollinger_bands_reversal_riding_rsi_ls::BollingerBands::new().unwrap(),
+            // ),
+            // Box::new(strategies::bollinger_bands_reversal_ls::BollingerBands::new().unwrap()),
+            // Box::new(
+            //     strategies::bollinger_bands_reversal_continuation_ls::BollingerBands::new()
+            //         .unwrap(),
+            // ),
+            // Box::new(strategies::bollinger_bands_reversal_2::BollingerBands::new().unwrap()),
+            // // Box::new(strategies::bollinger_bands_reversal::BollingerBands::new().unwrap()),
+            // // Box::new(strategies::ema_200::Ema::new().unwrap()),
+            // // Box::new(strategies::ema_50200::Ema::new().unwrap()),
+            // // Box::new(strategies::ema_50::Ema::new().unwrap()),
+            // Box::new(strategies::stoch_ls::Stoch::new().unwrap()),
+            // // Box::new(strategies::macd::Macd::new().unwrap()),
+            // // Box::new(strategies::rsi::Rsi::new().unwrap()),
+            // // Box::new(strategies::macd_rsi::Macd::new().unwrap()),
+            // // Box::new(strategies::macd_over_zero::Macd::new().unwrap()),
         ],
     };
 

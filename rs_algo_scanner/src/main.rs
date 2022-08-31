@@ -57,6 +57,8 @@ async fn main() -> Result<()> {
         _ => (Local::now() - date::Duration::days(num_test_bars)),
     };
 
+    println!("11111 {:?}", base_timeframe_from);
+
     // let upper_timeframe_from = match upper_time_frame {
     //     TimeFrameType::W => {
     //         let num_weeks = date::Duration::days(num_test_bars).num_weeks();
@@ -82,48 +84,13 @@ async fn main() -> Result<()> {
         .parse::<bool>()
         .unwrap();
 
-    // symbols = vec![
-    //     Symbol {
-    //         symbol: "FANG.US_4".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    //     Symbol {
-    //         symbol: "TGNA.US_9".to_owned(),
-    //         category: "".to_owned(),
-    //         description: "".to_owned(),
-    //         currency: "".to_owned(),
-    //     },
-    // ];
-
     if env == "development" {
-        symbols = vec![
-            Symbol {
-                symbol: "DDOG.US".to_owned(),
-                category: "".to_owned(),
-                description: "".to_owned(),
-                currency: "".to_owned(),
-            },
-            // Symbol {
-            //     symbol: "TGNA.US_9".to_owned(),
-            //     category: "".to_owned(),
-            //     description: "".to_owned(),
-            //     currency: "".to_owned(),
-            // },
-            // Symbol {
-            //     symbol: "ETHEREUM".to_owned(),
-            //     category: "".to_owned(),
-            //     description: "".to_owned(),
-            //     currency: "".to_owned(),
-            // },
-            // Symbol {
-            //     symbol: "CRM.US_4".to_owned(),
-            //     category: "".to_owned(),
-            //     description: "".to_owned(),
-            //     currency: "".to_owned(),
-            // },
-        ]
+        symbols = vec![Symbol {
+            symbol: "AUDNZD".to_owned(),
+            category: "".to_owned(),
+            description: "".to_owned(),
+            currency: "".to_owned(),
+        }]
     };
 
     let mut market: Market = Market::Stock;
