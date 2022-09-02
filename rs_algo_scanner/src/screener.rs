@@ -48,7 +48,6 @@ where
         F: Send + FnMut(Instrument) -> T,
         T: Future<Output = Result<()>> + Send + 'static,
     {
-        println!("22222 {:?}", start_date);
         let res = self
             .broker
             .get_instrument_data(symbol, time_frame.value(), start_date)

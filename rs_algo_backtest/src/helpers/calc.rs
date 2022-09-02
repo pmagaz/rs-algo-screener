@@ -189,12 +189,26 @@ pub fn get_upper_timeframe_index(
 
     let instrument = match upper_tf_instrument {
         HigherTMInstrument::HigherTMInstrument(upper_instrument) => {
-            let upper_date = &upper_instrument.data.get(index).unwrap().date;
+            // println!(
+            //     "{} {} {} {}",
+            //     index, instrument.symbol, base_date, upper_date
+            // );
 
-            println!(
-                "{} {} {} {}",
-                index, instrument.symbol, base_date, upper_date
-            );
+            let proportion = 2;
+
+            let lowers: Vec<&Candle> = upper_instrument
+                .data
+                .iter()
+                .filter(|x| &x.date <= base_date)
+                .rev()
+                .take(proportion)
+                .collect();
+
+            //let leches = lowers.rev().take(proportion);
+
+            for x in lowers.iter() {
+                println!("11111 {} {}", x.date, base_date);
+            }
 
             // let leches = match &instrument.time_frame {
             //     TimeFrameType::W => true,

@@ -70,7 +70,7 @@ pub async fn find_instruments(
     // }
 
     let query = match env.as_ref() {
-        "development" => doc! {"market": &market, "symbol": "HOLX.US"},
+        "development" => doc! {"market": &market, "symbol": "AUDNZD"},
         _ => doc! { "market": &market},
     };
 
