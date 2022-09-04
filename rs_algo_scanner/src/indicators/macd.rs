@@ -1,8 +1,8 @@
 use super::Indicator;
 use crate::error::Result;
 
-use rs_algo_shared::models::*;
 use serde::{Deserialize, Serialize};
+use std::env;
 use ta::indicators::ExponentialMovingAverage;
 use ta::Next;
 
@@ -17,10 +17,14 @@ pub struct Macd {
 
 impl Indicator for Macd {
     fn new() -> Result<Self> {
+        let macd_a = env::var("MACD_A").unwrap().parse::<usize>().unwrap();
+        let macd_b = env::var("MACD_B").unwrap().parse::<usize>().unwrap();
+        let macd_c = env::var("MACD_C").unwrap().parse::<usize>().unwrap();
+
         Ok(Self {
-            ema12: ExponentialMovingAverage::new(12).unwrap(),
-            ema26: ExponentialMovingAverage::new(26).unwrap(),
-            ema9: ExponentialMovingAverage::new(9).unwrap(),
+            ema12: ExponentialMovingAverage::new(macd_a).unwrap(),
+            ema26: ExponentialMovingAverage::new(macd_b).unwrap(),
+            ema9: ExponentialMovingAverage::new(macd_c).unwrap(),
             data_a: vec![],
             data_b: vec![],
         })

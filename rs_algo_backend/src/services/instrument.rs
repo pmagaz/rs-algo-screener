@@ -41,7 +41,7 @@ pub async fn find_one(
         .unwrap();
 
     println!(
-        "[FINDONE] {:?} {:?} {:?}",
+        "[FINDONE] {} {} {:?}",
         instrument.symbol,
         Local::now(),
         now.elapsed()
