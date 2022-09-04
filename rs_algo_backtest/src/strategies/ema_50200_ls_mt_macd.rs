@@ -17,8 +17,8 @@ pub struct Ema<'a> {
 impl<'a> Strategy for Ema<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
-            name: "EMA_200",
-            strategy_type: StrategyType::LongShort,
+            name: "EMA_50_200_MT_Macd",
+            strategy_type: StrategyType::LongShortMultiTF,
         })
     }
 
@@ -36,15 +36,40 @@ impl<'a> Strategy for Ema<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
+        let first_weekly_entry = get_upper_timeframe_data(
+            index,
+            instrument,
+            upper_tf_instrument,
+            |(idx, prev_idx, upper_inst)| {
+                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
+                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
+
+                let prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
+                let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
+                curr_upper_macd_a > curr_upper_macd_b && prev_upper_macd_b >= prev_upper_macd_a
+            },
+        );
+
+        let upper_macd = get_upper_timeframe_data(
+            index,
+            instrument,
+            upper_tf_instrument,
+            |(idx, prev_idx, upper_inst)| {
+                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
+                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
+                curr_upper_macd_a > curr_upper_macd_b
+            },
+        );
         let prev_index = get_prev_index(index);
 
-        let close_price = &instrument.data.get(index).unwrap().close;
+        let current_ema_50 = instrument.indicators.ema_b.data_a.get(index).unwrap();
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
 
-        let prev_close = &instrument.data.get(prev_index).unwrap().close;
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
+        let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
-        let entry_condition = close_price > current_ema_200 && prev_close <= prev_ema_200;
+        let entry_condition = first_weekly_entry
+            || (upper_macd && current_ema_50 > current_ema_200 && prev_ema_50 <= prev_ema_200);
 
         entry_condition
     }
@@ -55,14 +80,29 @@ impl<'a> Strategy for Ema<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
+        let upper_macd = get_upper_timeframe_data(
+            index,
+            instrument,
+            upper_tf_instrument,
+            |(idx, prev_idx, upper_inst)| {
+                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
+                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
+
+                let prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
+                let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
+                curr_upper_macd_a < curr_upper_macd_b // && prev_upper_macd_a >= prev_upper_macd_b
+            },
+        );
         let prev_index = get_prev_index(index);
-        let close_price = &instrument.data.get(index).unwrap().close;
+
+        let current_ema_50 = instrument.indicators.ema_b.data_a.get(index).unwrap();
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
 
-        let prev_close = &instrument.data.get(prev_index).unwrap().close;
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
+        let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
-        let exit_condition = close_price < current_ema_200 && prev_close >= prev_ema_200;
+        let exit_condition =
+            upper_macd && current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200;
 
         exit_condition
     }

@@ -29,8 +29,28 @@ async fn main() -> Result<()> {
         instruments: vec![],
         strategies: vec![
             //MultiTimeFrame
-            Box::new(strategies::multi_timeframe::MutiTimeFrame::new().unwrap()),
-            // //OnlyLong
+            // Box::new(strategies::macd_dual::MacdDual::new().unwrap()),
+            // Box::new(strategies::macd_weekly::MacdWeekly::new().unwrap()),
+  
+            // Box::new(strategies::stoch_ls_mt_macd::Stoch::new().unwrap()),
+            // Box::new(strategies::ema_50200_ls_mt_macd::Ema::new().unwrap()),
+            Box::new(
+                strategies::bollinger_bands_reversals_mt_macd::MutiTimeFrameBollingerBands::new()
+                    .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals2_mt_macd::MutiTimeFrameBollingerBands::new()
+                    .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals_continuation_mt_macd::MutiTimeFrameBollingerBands::new()
+                    .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals_continuation_ls_mt_macd::MutiTimeFrameBollingerBands::new()
+                    .unwrap(),
+            ),
+            //OnlyLong
             // Box::new(strategies::ema_200::Ema::new().unwrap()),
             // Box::new(strategies::ema_50::Ema::new().unwrap()),
             // Box::new(strategies::ema_50200::Ema::new().unwrap()),

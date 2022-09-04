@@ -148,6 +148,9 @@ impl<'a> Strategy for BollingerBands<'a> {
     ) -> bool {
         match self.strategy_type {
             StrategyType::LongShort => self.exit_long(index, instrument, upper_tf_instrument),
+            StrategyType::LongShortMultiTF => {
+                self.exit_long(index, instrument, upper_tf_instrument)
+            }
             StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
             _ => false,
         }
@@ -161,7 +164,11 @@ impl<'a> Strategy for BollingerBands<'a> {
     ) -> bool {
         match self.strategy_type {
             StrategyType::LongShort => self.entry_long(index, instrument, upper_tf_instrument),
+            StrategyType::LongShortMultiTF => {
+                self.entry_long(index, instrument, upper_tf_instrument)
+            }
             StrategyType::OnlyShort => self.entry_long(index, instrument, upper_tf_instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
             _ => false,
         }
     }

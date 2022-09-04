@@ -180,52 +180,44 @@ pub fn get_proportion(base_time_frame: &TimeFrame, time_frame: &TimeFrame) -> us
     1
 }
 
-pub fn get_upper_timeframe_index(
-    index: usize,
-    instrument: &Instrument,
-    upper_tf_instrument: &HigherTMInstrument,
-) -> usize {
-    let base_date = &instrument.data.get(index).unwrap().date;
-
-    let instrument = match upper_tf_instrument {
-        HigherTMInstrument::HigherTMInstrument(upper_instrument) => {
-            // println!(
-            //     "{} {} {} {}",
-            //     index, instrument.symbol, base_date, upper_date
-            // );
-
-            let proportion = 2;
-
-            let lowers: Vec<&Candle> = upper_instrument
-                .data
-                .iter()
-                .filter(|x| &x.date <= base_date)
-                .rev()
-                .take(proportion)
-                .collect();
-
-            //let leches = lowers.rev().take(proportion);
-
-            for x in lowers.iter() {
-                println!("11111 {} {}", x.date, base_date);
-            }
-
-            // let leches = match &instrument.time_frame {
-            //     TimeFrameType::W => true,
-            //     _ => false,
-            // };
-
-            ()
-        }
-        _ => (),
-    };
-    1
-}
-
 pub fn get_current_pattern(index: usize, patterns: &Vec<Pattern>) -> PatternType {
     let last_pattern = patterns.iter().filter(|pat| pat.index < index).last();
     match last_pattern {
         Some(pattern) => pattern.pattern_type.clone(),
         None => PatternType::None,
     }
+}
+
+pub fn get_upper_timeframe_data<F>(
+    index: usize,
+    instrument: &Instrument,
+    upper_tf_instrument: &HigherTMInstrument,
+    mut callback: F,
+) -> bool
+where
+    F: Send + FnMut((usize, usize, &Instrument)) -> bool,
+{
+    let base_date = &instrument.data.get(index).unwrap().date;
+    let upper_tf_data = match upper_tf_instrument {
+        HigherTMInstrument::HigherTMInstrument(upper_instrument) => {
+            let upper_indexes: Vec<usize> = upper_instrument
+                .data
+                .iter()
+                .enumerate()
+                .filter(|(id, x)| &x.date <= base_date)
+                .map(|(id, x)| id)
+                .collect();
+
+            let upper_tf_indx = match upper_indexes.last() {
+                Some(val) => *val,
+                _ => 0,
+            };
+
+            let prev_upper_tf_indx = get_prev_index(upper_tf_indx);
+
+            (upper_tf_indx, prev_upper_tf_indx, upper_instrument)
+        }
+        _ => (0, 0, instrument),
+    };
+    callback(upper_tf_data)
 }

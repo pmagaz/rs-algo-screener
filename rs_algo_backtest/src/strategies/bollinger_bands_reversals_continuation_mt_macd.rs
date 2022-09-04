@@ -7,18 +7,19 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::models::pattern::*;
 
-pub struct Ema<'a> {
+pub struct MutiTimeFrameBollingerBands<'a> {
     name: &'a str,
     strategy_type: StrategyType,
 }
 
 #[async_trait]
-impl<'a> Strategy for Ema<'a> {
+impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
-            name: "EMA_200",
-            strategy_type: StrategyType::LongShort,
+            name: "Bollinger_Bands_Reversals_Continuation_MT_Macd",
+            strategy_type: StrategyType::LongShortMultiTF,
         })
     }
 
@@ -36,15 +37,29 @@ impl<'a> Strategy for Ema<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
+        let upper_macd = get_upper_timeframe_data(
+            index,
+            instrument,
+            upper_tf_instrument,
+            |(idx, _prev_idx, upper_inst)| {
+                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
+                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
+
+                // let prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
+                // let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
+                curr_upper_macd_a > curr_upper_macd_b //&& prev_upper_macd_b >= prev_upper_macd_a
+            },
+        );
+
         let prev_index = get_prev_index(index);
 
         let close_price = &instrument.data.get(index).unwrap().close;
-        let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
-
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
-        let entry_condition = close_price > current_ema_200 && prev_close <= prev_ema_200;
+        let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
+        let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+
+        let entry_condition = upper_macd && close_price < low_band && prev_close >= prev_low_band;
 
         entry_condition
     }
@@ -55,15 +70,40 @@ impl<'a> Strategy for Ema<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
+        let upper_macd = get_upper_timeframe_data(
+            index,
+            instrument,
+            upper_tf_instrument,
+            |(idx, prev_idx, upper_inst)| {
+                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
+                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
+
+                // let prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
+                // let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
+                curr_upper_macd_a < curr_upper_macd_b // && prev_upper_macd_a >= prev_upper_macd_b
+            },
+        );
+
         let prev_index = get_prev_index(index);
         let close_price = &instrument.data.get(index).unwrap().close;
-        let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
-
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
 
-        let exit_condition = close_price < current_ema_200 && prev_close >= prev_ema_200;
+        let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
+        let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
+        let patterns = &instrument.patterns.local_patterns;
+        let current_pattern = get_current_pattern(index, patterns);
+        let _low_band = instrument.indicators.bb.data_b.get(index).unwrap();
+        let _prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+        let mut exit_condition: bool = false;
+
+        // if !upper_macd && current_pattern == PatternType::ChannelUp
+        //     || current_pattern == PatternType::HigherHighsHigherLows
+        // {
+        //     exit_condition = false;
+        // } else {
+        exit_condition = upper_macd && close_price > top_band && prev_close <= prev_top_band;
+        //}
         exit_condition
     }
 
@@ -95,7 +135,6 @@ impl<'a> Strategy for Ema<'a> {
                 self.entry_long(index, instrument, upper_tf_instrument)
             }
             StrategyType::OnlyShort => self.entry_long(index, instrument, upper_tf_instrument),
-            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
             _ => false,
         }
     }
