@@ -9,7 +9,7 @@ use rs_algo_shared::models::market::*;
 use std::env;
 
 pub struct PortFolio {
-    pub order_size: i32,
+    pub order_size: f64,
     pub stop_loss: f64,
     pub commission: f64,
     pub equity: f64,
@@ -86,7 +86,13 @@ impl PortFolio {
                     println!("[BACKTEST] Testing {}... ", instrument.symbol);
 
                     let backtest_result = strategy
-                        .test(instrument, self.equity, self.commission, self.stop_loss)
+                        .test(
+                            instrument,
+                            self.order_size,
+                            self.equity,
+                            self.commission,
+                            self.stop_loss,
+                        )
                         .await;
 
                     match backtest_result {

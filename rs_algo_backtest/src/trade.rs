@@ -1,13 +1,15 @@
-use crate::helpers::calc::*;
-
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::Instrument;
 use rs_algo_shared::models::market::*;
 
+use crate::helpers::calc::*;
+use round::round;
+
 pub fn resolve_trade_in(
     index: usize,
+    order_size: f64,
     instrument: &Instrument,
     entry_type: TradeType,
     stop_loss: f64,
@@ -20,10 +22,12 @@ pub fn resolve_trade_in(
             None => -100.,
         };
         let current_date = current_candle.unwrap().date;
+        let quantity = round(order_size / current_price, 3);
 
         TradeResult::TradeIn(TradeIn {
             index_in: nex_day_index,
             price_in: current_price,
+            quantity: quantity,
             stop_loss: calculate_stoploss(&entry_type, instrument, nex_day_index, stop_loss),
             date_in: to_dbtime(current_date),
             trade_type: entry_type,
@@ -40,7 +44,7 @@ pub fn resolve_trade_out(
     exit_type: TradeType,
     stop_loss: bool,
 ) -> TradeResult {
-    let size = 1.;
+    let quantity = trade_in.quantity;
     let data = &instrument.data;
     let nex_day_index = index + 1;
     let index_in = trade_in.index_in;
@@ -53,7 +57,7 @@ pub fn resolve_trade_out(
 
     let date_in = instrument.data.get(index_in).unwrap().date;
     let date_out = current_candle.unwrap().date;
-    let profit = calculate_profit(size, price_in, current_price);
+    let profit = calculate_profit(quantity, price_in, current_price);
     let profit_per = calculate_profit_per(price_in, current_price);
     let run_up = calculate_runup(data, price_in, index_in, nex_day_index);
     let run_up_per = calculate_runup_per(run_up, price_in);
@@ -132,18 +136,21 @@ pub fn resolve_backtest(
         let gross_profit = gross_profits - gross_loses;
         let commissions = total_commissions(trades, commission);
         let net_profit = gross_profit - commissions;
-        let net_profit_per = total_profit_per(&trades_in, &trades_out);
+        let first = trades_in.first().unwrap();
+
+        let leches = (first.price_in * first.quantity).ceil();
+        let net_profit_per = total_profit_per(equity, net_profit);
         let profitable_trades = total_profitable_trades(wining_trades, trades);
         let profit_factor = total_profit_factor(gross_profits, gross_loses);
-        let max_drawdown = total_drawdown(&trades_out, equity);
+        let max_drawdown = total_drawdown(w_trades, l_trades, equity);
         let max_runup = total_runup(&trades_out, equity);
 
         let strategy_start_price = match instrument.data.first().map(|x| x.open) {
             Some(open) => open,
-            None => 0.0,
+            _ => 0.,
         };
 
-        let buy_hold = calculate_buy_hold(strategy_start_price, equity, current_price);
+        let buy_hold = calculate_buy_hold(strategy_start_price, leches, current_price);
         let annual_return = 100.;
 
         println!(

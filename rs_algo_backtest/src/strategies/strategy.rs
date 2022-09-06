@@ -84,6 +84,7 @@ pub trait Strategy {
     async fn test(
         &self,
         instrument: &Instrument,
+        order_size: f64,
         equity: f64,
         commission: f64,
         stop_loss: f64,
@@ -127,8 +128,13 @@ pub trait Strategy {
                 }
 
                 if !open_positions {
-                    let trade_in_result =
-                        self.market_in_fn(index, instrument, upper_tf_instrument, stop_loss);
+                    let trade_in_result = self.market_in_fn(
+                        index,
+                        instrument,
+                        upper_tf_instrument,
+                        order_size,
+                        stop_loss,
+                    );
                     match trade_in_result {
                         TradeResult::TradeIn(trade_in) => {
                             trades_in.push(trade_in);
@@ -147,6 +153,7 @@ pub trait Strategy {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
+        order_size: f64,
         stop_loss: f64,
     ) -> TradeResult {
         let entry_type: TradeType;
@@ -159,7 +166,7 @@ pub trait Strategy {
             entry_type = TradeType::None
         }
 
-        resolve_trade_in(index, instrument, entry_type, stop_loss)
+        resolve_trade_in(index, order_size, instrument, entry_type, stop_loss)
     }
 
     fn market_out_fn(

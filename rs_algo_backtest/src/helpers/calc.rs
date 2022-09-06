@@ -75,10 +75,15 @@ pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
     }
 }
 
-pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
+pub fn total_drawdown(
+    winning_trades: Vec<&TradeOut>,
+    losing_trades: Vec<&TradeOut>,
+    equity: f64,
+) -> f64 {
     let mut max_acc_equity = equity;
     let mut min_acc_equity = equity;
-    let max_equity = trades_out
+    let mut foo = 0.;
+    let max_equity = winning_trades
         .iter()
         .map(|x| {
             max_acc_equity += x.profit;
@@ -86,15 +91,15 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
         })
         .fold(0. / 0., f64::max);
 
-    let min_equity = trades_out
+    let min_equity = losing_trades
         .iter()
         .map(|x| {
-            let _profit = x.profit;
             min_acc_equity -= x.profit;
             min_acc_equity
         })
         .fold(0. / 0., f64::min);
-    ((min_equity - max_equity) / max_equity * 100.).abs() * 100.
+
+    ((min_equity - max_equity) / max_equity * 100.).abs()
 }
 
 pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
@@ -149,13 +154,9 @@ pub fn total_profitable_trades(winning_trades: usize, total_trades: usize) -> f6
     ((winning_trades as f64 / total_trades as f64) * 100.).abs()
 }
 
-pub fn total_profit_per(trades_in: &Vec<TradeIn>, trades_out: &Vec<TradeOut>) -> f64 {
-    let initial_value = match trades_in.first() {
-        Some(val) => val.price_in,
-        _ => 0.,
-    };
-    let profit: f64 = trades_out.iter().map(|trade| trade.profit).sum();
-    let end_value = initial_value + profit;
+pub fn total_profit_per(equity: f64, net_profit: f64) -> f64 {
+    let initial_value = equity;
+    let end_value = initial_value + net_profit;
     ((end_value - initial_value) / initial_value) * 100.
 }
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
