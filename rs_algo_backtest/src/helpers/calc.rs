@@ -82,22 +82,30 @@ pub fn total_drawdown(
 ) -> f64 {
     let mut max_acc_equity = equity;
     let mut min_acc_equity = equity;
-    let mut foo = 0.;
-    let max_equity = winning_trades
-        .iter()
-        .map(|x| {
-            max_acc_equity += x.profit;
-            max_acc_equity
-        })
-        .fold(0. / 0., f64::max);
 
-    let min_equity = losing_trades
-        .iter()
-        .map(|x| {
-            min_acc_equity -= x.profit;
-            min_acc_equity
-        })
-        .fold(0. / 0., f64::min);
+    let max_equity = match winning_trades.len().cmp(&0) {
+        Ordering::Greater => winning_trades
+            .iter()
+            .map(|x| {
+                max_acc_equity += x.profit;
+                max_acc_equity
+            })
+            .fold(0. / 0., f64::max),
+        Ordering::Equal => equity,
+        Ordering::Less => equity,
+    };
+
+    let min_equity = match losing_trades.len().cmp(&0) {
+        Ordering::Greater => losing_trades
+            .iter()
+            .map(|x| {
+                min_acc_equity -= x.profit;
+                min_acc_equity
+            })
+            .fold(0. / 0., f64::min),
+        Ordering::Equal => equity,
+        Ordering::Less => equity,
+    };
 
     ((min_equity - max_equity) / max_equity * 100.).abs()
 }
