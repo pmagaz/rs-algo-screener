@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
                 strategies::bollinger_bands_reversals_continuation_ls_mt_macd::MutiTimeFrameBollingerBands::new()
                     .unwrap(),
             ),
-            // OnlyLong
+            // // OnlyLong
             Box::new(strategies::ema_200::Ema::new().unwrap()),
             Box::new(strategies::ema_50::Ema::new().unwrap()),
             Box::new(strategies::ema_50200::Ema::new().unwrap()),
@@ -93,7 +93,6 @@ async fn main() -> Result<()> {
             Box::new(strategies::ema_200::Ema::new().unwrap()),
             Box::new(strategies::ema_50200::Ema::new().unwrap()),
             Box::new(strategies::ema_50::Ema::new().unwrap()),
-
             Box::new(strategies::macd::Macd::new().unwrap()),
             Box::new(strategies::rsi::Rsi::new().unwrap()),
             Box::new(strategies::macd_rsi::Macd::new().unwrap()),

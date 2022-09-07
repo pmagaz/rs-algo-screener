@@ -19,7 +19,7 @@ impl<'a> Strategy for MacdWeekly<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
             name: "MacD_Weekly",
-            strategy_type: StrategyType::OnlyLongMultiTF,
+            strategy_type: StrategyType::LongShortMultiTF,
         })
     }
 

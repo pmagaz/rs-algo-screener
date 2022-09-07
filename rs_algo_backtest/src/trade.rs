@@ -120,8 +120,8 @@ pub fn resolve_backtest(
         let current_candle = data.last().unwrap();
         let current_price = current_candle.close;
 
-        let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
-        let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit < 0.).collect();
+        let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit > 0.).collect();
+        let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit <= 0.).collect();
         let wining_trades = w_trades.len();
         let losing_trades = l_trades.len();
         let trades = wining_trades + losing_trades;
@@ -142,8 +142,15 @@ pub fn resolve_backtest(
         let net_profit_per = total_profit_per(equity, net_profit);
         let profitable_trades = total_profitable_trades(wining_trades, trades);
         let profit_factor = total_profit_factor(gross_profits, gross_loses);
-        let max_drawdown = total_drawdown(w_trades, l_trades, equity);
+        let max_drawdown = total_drawdown(&trades_out, equity);
         let max_runup = total_runup(&trades_out, equity);
+
+        if instrument.symbol == "POLKADOT" {
+            println!(
+                "1111111111111 {} {} {}",
+                stop_losses, max_drawdown, net_profit
+            );
+        }
 
         let strategy_start_price = match instrument.data.first().map(|x| x.open) {
             Some(open) => open,

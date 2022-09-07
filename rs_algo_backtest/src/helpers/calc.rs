@@ -75,39 +75,31 @@ pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
     }
 }
 
-pub fn total_drawdown(
-    winning_trades: Vec<&TradeOut>,
-    losing_trades: Vec<&TradeOut>,
-    equity: f64,
-) -> f64 {
+pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut max_acc_equity = equity;
     let mut min_acc_equity = equity;
+    let max_equity = trades_out
+        .iter()
+        .map(|x| {
+            max_acc_equity += x.profit;
+            max_acc_equity
+        })
+        .fold(0. / 0., f64::max);
 
-    let max_equity = match winning_trades.len().cmp(&0) {
-        Ordering::Greater => winning_trades
-            .iter()
-            .map(|x| {
-                max_acc_equity += x.profit;
-                max_acc_equity
-            })
-            .fold(0. / 0., f64::max),
-        Ordering::Equal => equity,
-        Ordering::Less => equity,
-    };
+    let min_equity = trades_out
+        .iter()
+        .map(|x| {
+            let _profit = x.profit;
+            min_acc_equity += x.profit;
+            min_acc_equity
+        })
+        .fold(0. / 0., f64::min);
 
-    let min_equity = match losing_trades.len().cmp(&0) {
-        Ordering::Greater => losing_trades
-            .iter()
-            .map(|x| {
-                min_acc_equity -= x.profit;
-                min_acc_equity
-            })
-            .fold(0. / 0., f64::min),
-        Ordering::Equal => equity,
-        Ordering::Less => equity,
-    };
+    println!("33333 {} {}", max_equity, min_equity);
 
     ((min_equity - max_equity) / max_equity * 100.).abs()
+
+    // ((min_equity - max_equity) / max_equity * 100.).abs()
 }
 
 pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {

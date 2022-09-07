@@ -113,7 +113,7 @@ pub trait Strategy {
             .await;
 
         for (index, _candle) in data.iter().enumerate() {
-            if index < len - 1 && index >= 2 {
+            if index < len - 1 && index >= 5 {
                 if open_positions {
                     let trade_in = trades_in.last().unwrap();
                     let trade_out_result =
