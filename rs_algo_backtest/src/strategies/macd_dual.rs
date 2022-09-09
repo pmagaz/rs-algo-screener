@@ -172,4 +172,5 @@ impl<'a> Strategy for MacdDual<'a> {
             commission,
         )
     }
+
 }
