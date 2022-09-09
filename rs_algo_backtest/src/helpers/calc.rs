@@ -95,8 +95,6 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
         })
         .fold(0. / 0., f64::min);
 
-    println!("33333 {} {}", max_equity, min_equity);
-
     ((min_equity - max_equity) / max_equity * 100.).abs()
 
     // ((min_equity - max_equity) / max_equity * 100.).abs()
@@ -124,6 +122,22 @@ pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
         .fold(0. / 0., f64::min);
 
     ((max_equity - min_equity) / min_equity * 100.).abs() * 100.
+}
+
+pub fn calculate_stoploss(
+    entry_type: &TradeType,
+    instrument: &Instrument,
+    index: usize,
+    stop_loss: f64,
+) -> f64 {
+    let current_price = &instrument.data.get(index).unwrap().open;
+    let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * stop_loss;
+
+    match entry_type {
+        TradeType::EntryLong => current_price - atr_value,
+        TradeType::EntryShort => current_price + atr_value,
+        _ => current_price - atr_value,
+    }
 }
 
 // pub fn calculate_annual_return(
@@ -154,10 +168,31 @@ pub fn total_profitable_trades(winning_trades: usize, total_trades: usize) -> f6
     ((winning_trades as f64 / total_trades as f64) * 100.).abs()
 }
 
-pub fn total_profit_per(equity: f64, net_profit: f64) -> f64 {
+pub fn total_profit_per(
+    equity: f64,
+    net_profit: f64,
+    trades_in: &Vec<TradeIn>,
+    trades_out: &Vec<TradeOut>,
+) -> f64 {
     let initial_value = equity;
     let end_value = initial_value + net_profit;
     ((end_value - initial_value) / initial_value) * 100.
+
+    // let initial_price = match &trades_in.first() {
+    //     Some(val) => val.price_in,
+    //     _ => 0.,
+    // };
+
+    // let initial_quantity = match &trades_in.first() {
+    //     Some(val) => val.quantity,
+    //     _ => 0.,
+    // };
+
+    // let initial_value = initial_price * initial_quantity;
+
+    // let profit: f64 = trades_out.iter().map(|trade| trade.profit).sum();
+    // let end_value = initial_value + profit;
+    // ((end_value - initial_value) / initial_value) * 100.
 }
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {

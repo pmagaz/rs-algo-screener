@@ -24,7 +24,7 @@ async fn main() -> Result<()> {
         .unwrap()
         .parse::<f64>()
         .unwrap();
-    let stop_loss = env::var("BACKTEST_STOP_LOSS")
+    let stop_loss = env::var("BACKTEST_ATR_STOP_LOSS")
         .unwrap()
         .parse::<f64>()
         .unwrap();
@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
                 strategies::bollinger_bands_reversals_continuation_ls_mt_macd::MutiTimeFrameBollingerBands::new()
                     .unwrap(),
             ),
-            // // OnlyLong
+            // // // OnlyLong
             Box::new(strategies::ema_200::Ema::new().unwrap()),
             Box::new(strategies::ema_50::Ema::new().unwrap()),
             Box::new(strategies::ema_50200::Ema::new().unwrap()),
@@ -76,7 +76,7 @@ async fn main() -> Result<()> {
             Box::new(strategies::bollinger_bands_reversal::BollingerBands::new().unwrap()),
             Box::new(strategies::macd_over_zero::Macd::new().unwrap()),
             Box::new(strategies::stoch::Stoch::new().unwrap()),
-            // LongShort
+            // // LongShort
             Box::new(strategies::ema_200_ls::Ema::new().unwrap()),
             Box::new(strategies::ema_50200_ls::Ema::new().unwrap()),
             Box::new(

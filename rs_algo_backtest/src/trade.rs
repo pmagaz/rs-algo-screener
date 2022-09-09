@@ -16,17 +16,18 @@ pub fn resolve_trade_in(
 ) -> TradeResult {
     if entry_type == TradeType::EntryLong || entry_type == TradeType::EntryShort {
         let nex_day_index = index + 1;
-        let current_candle = instrument.data.get(nex_day_index);
-        let current_price = match current_candle {
+        let next_day_candle = instrument.data.get(nex_day_index);
+        let next_day_price = match next_day_candle {
             Some(candle) => candle.open,
             None => -100.,
         };
-        let current_date = current_candle.unwrap().date;
-        let quantity = round(order_size / current_price, 3);
+        let current_date = next_day_candle.unwrap().date;
+        
+        let quantity = round(order_size / next_day_price, 3);
 
         TradeResult::TradeIn(TradeIn {
             index_in: nex_day_index,
-            price_in: current_price,
+            price_in: next_day_price,
             quantity: quantity,
             stop_loss: calculate_stoploss(&entry_type, instrument, nex_day_index, stop_loss),
             date_in: to_dbtime(current_date),
@@ -133,24 +134,19 @@ pub fn resolve_backtest(
             .count();
         let gross_profits = total_gross(&w_trades);
         let gross_loses = total_gross(&l_trades);
-        let gross_profit = gross_profits - gross_loses;
+        let gross_profit = gross_profits + gross_loses;
         let commissions = total_commissions(trades, commission);
         let net_profit = gross_profit - commissions;
         let first = trades_in.first().unwrap();
 
         let leches = (first.price_in * first.quantity).ceil();
-        let net_profit_per = total_profit_per(equity, net_profit);
-        let profitable_trades = total_profitable_trades(wining_trades, trades);
         let profit_factor = total_profit_factor(gross_profits, gross_loses);
+
+        let net_profit_per = total_profit_per(equity, net_profit, &trades_in, &trades_out);
+        //let net_profit_per = total_profit_per(equity, net_profit);
+        let profitable_trades = total_profitable_trades(wining_trades, trades);
         let max_drawdown = total_drawdown(&trades_out, equity);
         let max_runup = total_runup(&trades_out, equity);
-
-        if instrument.symbol == "POLKADOT" {
-            println!(
-                "1111111111111 {} {} {}",
-                stop_losses, max_drawdown, net_profit
-            );
-        }
 
         let strategy_start_price = match instrument.data.first().map(|x| x.open) {
             Some(open) => open,
@@ -230,22 +226,6 @@ pub fn resolve_backtest(
             buy_hold: 0.,
             annual_return: 0.,
         })
-    }
-}
-
-pub fn calculate_stoploss(
-    entry_type: &TradeType,
-    instrument: &Instrument,
-    index: usize,
-    stop_loss: f64,
-) -> f64 {
-    let current_price = &instrument.data.get(index).unwrap().open;
-    let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * stop_loss;
-
-    match entry_type {
-        TradeType::EntryLong => current_price - atr_value,
-        TradeType::EntryShort => current_price + atr_value,
-        _ => current_price - atr_value,
     }
 }
 
