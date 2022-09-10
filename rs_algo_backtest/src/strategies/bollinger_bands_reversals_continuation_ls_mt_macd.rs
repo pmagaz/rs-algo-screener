@@ -9,15 +9,18 @@ use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::*;
 
+#[derive(Clone)]
 pub struct MutiTimeFrameBollingerBands<'a> {
     name: &'a str,
-    strategy_type: StrategyType,
+     strategy_type: StrategyType,
+     stop_loss: f64
 }
 
 #[async_trait]
 impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
+            stop_loss: 0.,
             name: "Bollinger_Bands_Reversals_Continuation_MT_Macd",
             strategy_type: StrategyType::LongShortMultiTF,
         })
@@ -31,8 +34,17 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         &self.strategy_type
     }
 
+    fn update_stop_loss(&mut self, price: f64) -> bool {
+        self.stop_loss = price;
+        true
+    }
+
+    fn stop_loss(&self) -> f64 {
+        self.stop_loss
+    }
+
     fn entry_long(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
@@ -76,7 +88,7 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
     }
 
     fn exit_long(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
@@ -119,7 +131,7 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
     }
 
     fn entry_short(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
@@ -135,7 +147,7 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
     }
 
     fn exit_short(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,

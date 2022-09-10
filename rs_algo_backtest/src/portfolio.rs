@@ -8,6 +8,7 @@ use rs_algo_shared::models::instrument::Instrument;
 use rs_algo_shared::models::market::*;
 use std::env;
 
+#[derive(Clone)]
 pub struct PortFolio {
     pub order_size: f64,
     pub stop_loss: f64,
@@ -34,6 +35,7 @@ impl PortFolio {
         let endpoint = env::var("BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT").unwrap();
 
         let instrument_result_endpoint = env::var("BACKEND_BACKTEST_ENDPOINT").unwrap().clone();
+
         for strategy in &self.strategies {
             let mut avg_sessions = vec![];
             let mut avg_trades = vec![];
@@ -84,8 +86,7 @@ impl PortFolio {
 
                 for instrument in &instruments_to_test {
                     println!("[BACKTEST] Testing {}... ", instrument.symbol);
-
-                    let backtest_result = strategy
+                    let backtest_result = dyn_clone::clone_box(strategy)
                         .test(
                             instrument,
                             self.order_size,

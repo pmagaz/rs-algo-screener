@@ -1,9 +1,9 @@
-use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::candle::Candle;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::*;
 use rs_algo_shared::models::time_frame::*;
+use rs_algo_shared::helpers::comp::*;
 use std::cmp::Ordering;
 
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
@@ -153,11 +153,10 @@ pub fn calculate_stoploss(
 //     (profit / equity) * 100.
 // }
 
-pub fn calculate_buy_hold(bought_at: f64, equity: f64, current_price: f64) -> f64 {
-    let size = equity / bought_at;
+pub fn calculate_buy_hold(bought_at: f64, initial_equity: f64, current_price: f64) -> f64 {
+    let size = initial_equity / bought_at;
     let sold_at = size * current_price;
-    let profit = sold_at - (equity);
-    (profit / equity) * 100.
+    percentage_change(initial_equity, sold_at)
 }
 
 pub fn total_commissions(num_trades: usize, commission: f64) -> f64 {
@@ -176,23 +175,7 @@ pub fn total_profit_per(
 ) -> f64 {
     let initial_value = equity;
     let end_value = initial_value + net_profit;
-    ((end_value - initial_value) / initial_value) * 100.
-
-    // let initial_price = match &trades_in.first() {
-    //     Some(val) => val.price_in,
-    //     _ => 0.,
-    // };
-
-    // let initial_quantity = match &trades_in.first() {
-    //     Some(val) => val.quantity,
-    //     _ => 0.,
-    // };
-
-    // let initial_value = initial_price * initial_quantity;
-
-    // let profit: f64 = trades_out.iter().map(|trade| trade.profit).sum();
-    // let end_value = initial_value + profit;
-    // ((end_value - initial_value) / initial_value) * 100.
+    percentage_change(initial_value, end_value)
 }
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {

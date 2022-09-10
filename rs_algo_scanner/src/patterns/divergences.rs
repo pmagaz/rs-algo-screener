@@ -19,7 +19,8 @@ pub struct Divergences {
 
 impl Divergences {
     pub fn new() -> Result<Self> {
-        Ok(Self { data: vec![] })
+        Ok(Self {
+            data: vec![] })
     }
     // CONTINUE HERE
     pub fn detect_divergences(

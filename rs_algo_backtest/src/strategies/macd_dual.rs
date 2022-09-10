@@ -9,15 +9,18 @@ use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::*;
 
+#[derive(Clone)]
 pub struct MacdDual<'a> {
     name: &'a str,
     strategy_type: StrategyType,
+    stop_loss: f64
 }
 
 #[async_trait]
 impl<'a> Strategy for MacdDual<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
+            stop_loss: 0.,
             name: "MacD_Dual",
             strategy_type: StrategyType::OnlyLongMultiTF,
         })
@@ -31,8 +34,17 @@ impl<'a> Strategy for MacdDual<'a> {
         &self.strategy_type
     }
 
+    fn update_stop_loss(&mut self, price: f64) -> bool {
+        self.stop_loss = price;
+        true
+    }
+
+    fn stop_loss(&self) -> f64 {
+        self.stop_loss
+    }
+
     fn entry_long(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
@@ -77,7 +89,7 @@ impl<'a> Strategy for MacdDual<'a> {
     }
 
     fn exit_long(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
@@ -96,18 +108,6 @@ impl<'a> Strategy for MacdDual<'a> {
             },
         );
 
-        let upper_macd = get_upper_timeframe_data(
-            index,
-            instrument,
-            upper_tf_instrument,
-            |(idx, prev_idx, upper_inst)| {
-                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
-                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
-
-                curr_upper_macd_a < curr_upper_macd_b
-            },
-        );
-
         let prev_index = get_prev_index(index);
 
         let close_price = &instrument.data.get(index).unwrap().close;
@@ -119,11 +119,21 @@ impl<'a> Strategy for MacdDual<'a> {
         let exit_condition =
             first_weekly_exit || (close_price > top_band && prev_close <= prev_top_band); //close_price > top_band && prev_close <= prev_top_band;
 
-        exit_condition
+        match exit_condition {
+            true => {
+                self.update_stop_loss(*close_price);
+                false
+            }
+            false => {
+                self.update_stop_loss(0.);
+                false
+            }
+            }
+
     }
 
     fn entry_short(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
@@ -139,7 +149,7 @@ impl<'a> Strategy for MacdDual<'a> {
     }
 
     fn exit_short(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,

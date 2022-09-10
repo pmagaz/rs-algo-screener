@@ -7,34 +7,35 @@ use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::*;
 use std::env;
+use dyn_clone::DynClone;
 
 #[async_trait(?Send)]
-pub trait Strategy {
+pub trait Strategy: DynClone {
     fn new() -> Result<Self>
     where
         Self: Sized;
     fn name(&self) -> &str;
     fn strategy_type(&self) -> &StrategyType;
     fn entry_long(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool;
     fn exit_long(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool;
     fn entry_short(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool;
     fn exit_short(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
@@ -82,7 +83,7 @@ pub trait Strategy {
         }
     }
     async fn test(
-        &self,
+        &mut self,
         instrument: &Instrument,
         order_size: f64,
         equity: f64,
@@ -115,7 +116,7 @@ pub trait Strategy {
         for (index, _candle) in data.iter().enumerate() {
             if index < len - 1 && index >= 5 {
                 if open_positions {
-                    let trade_in = trades_in.last().unwrap();
+                    let trade_in = trades_in.last().unwrap().to_owned();
                     let trade_out_result =
                         self.market_out_fn(index, instrument, upper_tf_instrument, trade_in);
                     match trade_out_result {
@@ -149,7 +150,7 @@ pub trait Strategy {
         self.backtest_result(instrument, trades_in, trades_out, equity, commission)
     }
     fn market_in_fn(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
@@ -170,13 +171,18 @@ pub trait Strategy {
     }
 
     fn market_out_fn(
-        &self,
+        &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-        trade_in: &TradeIn,
+        mut trade_in: TradeIn,
     ) -> TradeResult {
         let exit_type: TradeType;
+
+        let stop_loss_value = self.stop_loss();
+        if stop_loss_value > 0. {
+            trade_in.stop_loss = stop_loss_value;
+        }
 
         if self.exit_long(index, instrument, upper_tf_instrument) {
             exit_type = TradeType::ExitLong
@@ -189,4 +195,13 @@ pub trait Strategy {
 
         resolve_trade_out(index, instrument, trade_in, exit_type, stop_loss)
     }
+    fn update_stop_loss(
+        &mut self,
+        price: f64,
+    ) -> bool;
+        fn stop_loss(
+        &self,
+    ) -> f64;
 }
+
+dyn_clone::clone_trait_object!(Strategy);

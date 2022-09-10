@@ -18,5 +18,6 @@ round = "0.1.2"
 futures = "0.3.21"
 reqwest = { version = "0.11.11", features = ["json"] }
 openssl = { version = "0.10.41", features = ["vendored"] }
+dyn-clone = "1.0.8"
 
 rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "f1e0bed"} 
