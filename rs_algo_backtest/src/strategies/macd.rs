@@ -11,8 +11,8 @@ use rs_algo_shared::models::instrument::*;
 #[derive(Clone)]
 pub struct Macd<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -46,7 +46,7 @@ impl<'a> Strategy for Macd<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -56,16 +56,14 @@ impl<'a> Strategy for Macd<'a> {
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
-        let entry_condition = current_macd_a > current_macd_b && prev_macd_b >= prev_macd_a;
-
-        entry_condition
+        current_macd_a > current_macd_b && prev_macd_b >= prev_macd_a
     }
 
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -75,9 +73,7 @@ impl<'a> Strategy for Macd<'a> {
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
-        let exit_condition = current_macd_a < current_macd_b && prev_macd_a >= prev_macd_b;
-
-        exit_condition
+        current_macd_a < current_macd_b && prev_macd_a >= prev_macd_b
     }
 
     fn entry_short(

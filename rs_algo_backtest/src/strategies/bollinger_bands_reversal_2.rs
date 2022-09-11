@@ -11,8 +11,8 @@ use rs_algo_shared::models::instrument::*;
 #[derive(Clone)]
 pub struct BollingerBands<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -46,37 +46,35 @@ impl<'a> Strategy for BollingerBands<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
         let patterns = &instrument.patterns.local_patterns;
-        let current_pattern = get_current_pattern(index, patterns);
+        let _current_pattern = get_current_pattern(index, patterns);
 
         let open_price = &instrument.data.get(index).unwrap().open;
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_open = &instrument.data.get(prev_index).unwrap().open;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let prev_high = &instrument.data.get(prev_index).unwrap().close;
+        let _prev_high = &instrument.data.get(prev_index).unwrap().close;
 
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
-        let mid_band = instrument.indicators.bb.data_c.get(index).unwrap();
-        let prev_mid_band = instrument.indicators.bb.data_c.get(prev_index).unwrap();
+        let _mid_band = instrument.indicators.bb.data_c.get(index).unwrap();
+        let _prev_mid_band = instrument.indicators.bb.data_c.get(prev_index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
-        let entry_condition = prev_close < prev_open
+        prev_close < prev_open
             && prev_close < prev_low_band
             && close_price >= low_band
-            && close_price >= open_price;
-
-        entry_condition
+            && close_price >= open_price
     }
 
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -84,17 +82,15 @@ impl<'a> Strategy for BollingerBands<'a> {
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_open = &instrument.data.get(prev_index).unwrap().open;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let prev_high = &instrument.data.get(prev_index).unwrap().close;
+        let _prev_high = &instrument.data.get(prev_index).unwrap().close;
 
         let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
-        let exit_condition = prev_close > prev_open
+        prev_close > prev_open
             && prev_close > prev_top_band
             && close_price <= top_band
-            && close_price <= open_price;
-
-        exit_condition
+            && close_price <= open_price
     }
 
     fn entry_short(

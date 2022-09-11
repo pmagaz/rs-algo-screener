@@ -12,8 +12,8 @@ use rs_algo_shared::models::pattern::*;
 #[derive(Clone)]
 pub struct BollingerBands<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -47,7 +47,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -60,19 +60,17 @@ impl<'a> Strategy for BollingerBands<'a> {
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
-        let entry_condition = current_pattern != PatternType::ChannelDown
+        current_pattern != PatternType::ChannelDown
             && current_pattern != PatternType::LowerHighsLowerLows
             && close_price < low_band
-            && prev_close >= prev_low_band;
-
-        entry_condition
+            && prev_close >= prev_low_band
     }
 
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
         let _candle_type = &instrument.data.get(index).unwrap().candle_type;
@@ -111,13 +109,11 @@ impl<'a> Strategy for BollingerBands<'a> {
             }
         }
 
-        let exit_condition = (current_pattern != PatternType::ChannelUp
+        (current_pattern != PatternType::ChannelUp
             && current_pattern != PatternType::HigherHighsHigherLows
             && (hits_over_top_band <= 5 && hits_above_mid_band > 5))
             //&& (close_price > top_band && prev_close <= prev_top_band ))
-            || (hits_over_low_band >= 3 );
-
-        exit_condition
+            || (hits_over_low_band >= 3 )
     }
 
     fn entry_short(

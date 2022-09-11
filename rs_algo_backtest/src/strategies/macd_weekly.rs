@@ -12,8 +12,8 @@ use rs_algo_shared::models::instrument::*;
 #[derive(Clone)]
 pub struct MacdWeekly<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -49,7 +49,7 @@ impl<'a> Strategy for MacdWeekly<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
-        let first_weekly_entry = get_upper_timeframe_data(
+        get_upper_timeframe_data(
             index,
             instrument,
             upper_tf_instrument,
@@ -61,11 +61,7 @@ impl<'a> Strategy for MacdWeekly<'a> {
                 let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
                 curr_upper_macd_a > curr_upper_macd_b && prev_upper_macd_b >= prev_upper_macd_a
             },
-        );
-
-        let entry_condition = first_weekly_entry;
-
-        entry_condition
+        )
     }
 
     fn exit_long(
@@ -74,7 +70,7 @@ impl<'a> Strategy for MacdWeekly<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
-        let first_weekly_exit = get_upper_timeframe_data(
+        get_upper_timeframe_data(
             index,
             instrument,
             upper_tf_instrument,
@@ -86,11 +82,7 @@ impl<'a> Strategy for MacdWeekly<'a> {
                 let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
                 curr_upper_macd_a < curr_upper_macd_b && prev_upper_macd_a >= prev_upper_macd_b
             },
-        );
-
-        let exit_condition = first_weekly_exit;
-
-        exit_condition
+        )
     }
 
     fn entry_short(

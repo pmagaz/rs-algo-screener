@@ -11,8 +11,8 @@ use rs_algo_shared::models::instrument::*;
 #[derive(Clone)]
 pub struct BollingerBands<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -46,7 +46,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -56,16 +56,14 @@ impl<'a> Strategy for BollingerBands<'a> {
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
-        let entry_condition = close_price < low_band && prev_close >= prev_low_band;
-
-        entry_condition
+        close_price < low_band && prev_close >= prev_low_band
     }
 
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -75,9 +73,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
-        let exit_condition = close_price > top_band && prev_close <= prev_top_band;
-
-        exit_condition
+        close_price > top_band && prev_close <= prev_top_band
     }
 
     fn entry_short(

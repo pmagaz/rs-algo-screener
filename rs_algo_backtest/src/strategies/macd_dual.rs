@@ -13,7 +13,7 @@ use rs_algo_shared::models::instrument::*;
 pub struct MacdDual<'a> {
     name: &'a str,
     strategy_type: StrategyType,
-    stop_loss: f64
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -67,7 +67,7 @@ impl<'a> Strategy for MacdDual<'a> {
             index,
             instrument,
             upper_tf_instrument,
-            |(idx, prev_idx, upper_inst)| {
+            |(idx, _prev_idx, upper_inst)| {
                 let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
                 curr_upper_macd_a > curr_upper_macd_b
@@ -82,10 +82,8 @@ impl<'a> Strategy for MacdDual<'a> {
         let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
         let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
-        let entry_condition = first_weekly_entry
-            || (upper_macd && current_macd_a > current_macd_b && prev_macd_b >= prev_macd_a);
-
-        entry_condition
+        first_weekly_entry
+            || (upper_macd && current_macd_a > current_macd_b && prev_macd_b >= prev_macd_a)
     }
 
     fn exit_long(
@@ -111,6 +109,7 @@ impl<'a> Strategy for MacdDual<'a> {
         let prev_index = get_prev_index(index);
 
         let close_price = &instrument.data.get(index).unwrap().close;
+        let low_price = &instrument.data.get(index).unwrap().low;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
 
         let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
@@ -118,18 +117,7 @@ impl<'a> Strategy for MacdDual<'a> {
 
         let exit_condition =
             first_weekly_exit || (close_price > top_band && prev_close <= prev_top_band); //close_price > top_band && prev_close <= prev_top_band;
-
-        match exit_condition {
-            true => {
-                self.update_stop_loss(*close_price);
-                false
-            }
-            false => {
-                self.update_stop_loss(0.);
-                false
-            }
-            }
-
+        self.stop_loss_exit(exit_condition, *low_price)
     }
 
     fn entry_short(
@@ -182,5 +170,4 @@ impl<'a> Strategy for MacdDual<'a> {
             commission,
         )
     }
-
 }

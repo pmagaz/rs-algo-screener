@@ -11,8 +11,8 @@ use rs_algo_shared::models::instrument::*;
 #[derive(Clone)]
 pub struct Ema<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -66,7 +66,7 @@ impl<'a> Strategy for Ema<'a> {
             index,
             instrument,
             upper_tf_instrument,
-            |(idx, prev_idx, upper_inst)| {
+            |(idx, _prev_idx, upper_inst)| {
                 let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
                 curr_upper_macd_a > curr_upper_macd_b
@@ -80,10 +80,8 @@ impl<'a> Strategy for Ema<'a> {
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
         let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
-        let entry_condition = first_weekly_entry
-            || (upper_macd && current_ema_50 > current_ema_200 && prev_ema_50 <= prev_ema_200);
-
-        entry_condition
+        first_weekly_entry
+            || (upper_macd && current_ema_50 > current_ema_200 && prev_ema_50 <= prev_ema_200)
     }
 
     fn exit_long(
@@ -100,12 +98,13 @@ impl<'a> Strategy for Ema<'a> {
                 let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
 
-                let prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
-                let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
+                let _prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
+                let _prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
                 curr_upper_macd_a < curr_upper_macd_b // && prev_upper_macd_a >= prev_upper_macd_b
             },
         );
         let prev_index = get_prev_index(index);
+        let low_price = &instrument.data.get(index).unwrap().low;
 
         let current_ema_50 = instrument.indicators.ema_b.data_a.get(index).unwrap();
         let current_ema_200 = instrument.indicators.ema_c.data_a.get(index).unwrap();
@@ -115,8 +114,7 @@ impl<'a> Strategy for Ema<'a> {
 
         let exit_condition =
             upper_macd && current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200;
-
-        exit_condition
+        self.stop_loss_exit(exit_condition, *low_price)
     }
 
     fn entry_short(

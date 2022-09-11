@@ -20,7 +20,7 @@ pub async fn find_one(
 ) -> Result<Option<Instrument>, Error> {
     let collection_name = get_collection_name(
         &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
-        &time_frame,
+        time_frame,
     );
 
     let collection = get_collection::<Instrument>(&state.db_hdd, &collection_name).await;

@@ -1,13 +1,13 @@
 use crate::trade::*;
 
 use async_trait::async_trait;
+use dyn_clone::DynClone;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::*;
 use std::env;
-use dyn_clone::DynClone;
 
 #[async_trait(?Send)]
 pub trait Strategy: DynClone {
@@ -63,7 +63,7 @@ pub trait Strategy: DynClone {
         if uppertime_frame {
             let endpoint = env::var("BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT").unwrap();
 
-            let url = [&endpoint, "/", symbol, "/", &uppertimeframe].concat();
+            let url = [&endpoint, "/", symbol, "/", uppertimeframe].concat();
 
             println!(
                 "[BACKTEST UPPER TIMEFRAME] {} instrument for {}",
@@ -195,13 +195,20 @@ pub trait Strategy: DynClone {
 
         resolve_trade_out(index, instrument, trade_in, exit_type, stop_loss)
     }
-    fn update_stop_loss(
-        &mut self,
-        price: f64,
-    ) -> bool;
-        fn stop_loss(
-        &self,
-    ) -> f64;
+    fn stop_loss(&self) -> f64;
+    fn update_stop_loss(&mut self, price: f64) -> bool;
+    fn stop_loss_exit(&mut self, exit_condition: bool, price: f64) -> bool {
+        match exit_condition {
+            true => {
+                self.update_stop_loss(price);
+                false
+            }
+            false => {
+                self.update_stop_loss(0.);
+                false
+            }
+        }
+    }
 }
 
 dyn_clone::clone_trait_object!(Strategy);

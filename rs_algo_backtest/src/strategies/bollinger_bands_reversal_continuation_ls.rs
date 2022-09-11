@@ -12,8 +12,8 @@ use rs_algo_shared::models::pattern::*;
 #[derive(Clone)]
 pub struct BollingerBands<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -47,7 +47,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -57,15 +57,14 @@ impl<'a> Strategy for BollingerBands<'a> {
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
-        let entry_condition = close_price < low_band && prev_close >= prev_low_band;
-        entry_condition
+        close_price < low_band && prev_close >= prev_low_band
     }
 
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
         let close_price = &instrument.data.get(index).unwrap().close;

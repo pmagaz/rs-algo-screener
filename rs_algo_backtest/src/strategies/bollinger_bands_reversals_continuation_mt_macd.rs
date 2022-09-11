@@ -7,13 +7,12 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::pattern::*;
 
 #[derive(Clone)]
 pub struct MutiTimeFrameBollingerBands<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -71,9 +70,7 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
-        let entry_condition = upper_macd && close_price < low_band && prev_close >= prev_low_band;
-
-        entry_condition
+        upper_macd && close_price < low_band && prev_close >= prev_low_band
     }
 
     fn exit_long(
@@ -86,7 +83,7 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
             index,
             instrument,
             upper_tf_instrument,
-            |(idx, prev_idx, upper_inst)| {
+            |(idx, _prev_idx, upper_inst)| {
                 let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
 
@@ -98,25 +95,25 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
 
         let prev_index = get_prev_index(index);
         let close_price = &instrument.data.get(index).unwrap().close;
-        let prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let low_price = &instrument.data.get(index).unwrap().low;
 
+        let prev_close = &instrument.data.get(prev_index).unwrap().close;
         let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
         let patterns = &instrument.patterns.local_patterns;
-        let current_pattern = get_current_pattern(index, patterns);
+        let _current_pattern = get_current_pattern(index, patterns);
         let _low_band = instrument.indicators.bb.data_b.get(index).unwrap();
         let _prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
-        let mut exit_condition: bool = false;
 
         // if !upper_macd && current_pattern == PatternType::ChannelUp
         //     || current_pattern == PatternType::HigherHighsHigherLows
         // {
         //     exit_condition = false;
         // } else {
-        exit_condition = upper_macd && close_price > top_band && prev_close <= prev_top_band;
+        let exit_condition = upper_macd && close_price > top_band && prev_close <= prev_top_band;
         //}
-        exit_condition
+        self.stop_loss_exit(exit_condition, *low_price)
     }
 
     fn entry_short(

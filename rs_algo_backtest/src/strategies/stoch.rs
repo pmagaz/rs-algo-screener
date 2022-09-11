@@ -11,8 +11,8 @@ use rs_algo_shared::models::instrument::*;
 #[derive(Clone)]
 pub struct Stoch<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -46,7 +46,7 @@ impl<'a> Strategy for Stoch<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -56,18 +56,14 @@ impl<'a> Strategy for Stoch<'a> {
         let current_stoch_b = instrument.indicators.stoch.data_b.get(index).unwrap();
         let prev_stoch_b = instrument.indicators.stoch.data_b.get(prev_index).unwrap();
 
-        let entry_condition = current_stoch_a <= &20.
-            && current_stoch_a > current_stoch_b
-            && prev_stoch_a <= prev_stoch_b;
-
-        entry_condition
+        current_stoch_a <= &20. && current_stoch_a > current_stoch_b && prev_stoch_a <= prev_stoch_b
     }
 
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -77,11 +73,7 @@ impl<'a> Strategy for Stoch<'a> {
         let current_stoch_b = instrument.indicators.stoch.data_b.get(index).unwrap();
         let prev_stoch_b = instrument.indicators.stoch.data_b.get(prev_index).unwrap();
 
-        let exit_condition = current_stoch_a >= &70.
-            && current_stoch_a < current_stoch_b
-            && prev_stoch_a >= prev_stoch_b;
-
-        exit_condition
+        current_stoch_a >= &70. && current_stoch_a < current_stoch_b && prev_stoch_a >= prev_stoch_b
     }
 
     fn entry_short(

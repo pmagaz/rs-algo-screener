@@ -170,8 +170,8 @@ pub fn total_profitable_trades(winning_trades: usize, total_trades: usize) -> f6
 pub fn total_profit_per(
     equity: f64,
     net_profit: f64,
-    trades_in: &Vec<TradeIn>,
-    trades_out: &Vec<TradeOut>,
+    _trades_in: &Vec<TradeIn>,
+    _trades_out: &Vec<TradeOut>,
 ) -> f64 {
     let initial_value = equity;
     let end_value = initial_value + net_profit;
@@ -192,7 +192,7 @@ pub fn get_prev_index(index: usize) -> usize {
     }
 }
 
-pub fn get_proportion(base_time_frame: &TimeFrame, time_frame: &TimeFrame) -> usize {
+pub fn get_proportion(_base_time_frame: &TimeFrame, _time_frame: &TimeFrame) -> usize {
     // match time_frame {
     //     TimeFrameType::D => 5,
     // }
@@ -223,8 +223,8 @@ where
                 .data
                 .iter()
                 .enumerate()
-                .filter(|(id, x)| &x.date <= base_date)
-                .map(|(id, x)| id)
+                .filter(|(_id, x)| &x.date <= base_date)
+                .map(|(id, _x)| id)
                 .collect();
 
             let upper_tf_indx = match upper_indexes.last() {

@@ -11,8 +11,8 @@ use rs_algo_shared::models::instrument::*;
 #[derive(Clone)]
 pub struct Rsi<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -46,32 +46,28 @@ impl<'a> Strategy for Rsi<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
         let current_rsi = instrument.indicators.rsi.data_a.get(index).unwrap();
         let prev_rsi = instrument.indicators.rsi.data_a.get(prev_index).unwrap();
 
-        let entry_condition = current_rsi <= &30. && prev_rsi >= &30.;
-
-        entry_condition
+        current_rsi <= &30. && prev_rsi >= &30.
     }
 
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
         let current_rsi = instrument.indicators.rsi.data_a.get(index).unwrap();
         let prev_rsi = instrument.indicators.rsi.data_a.get(prev_index).unwrap();
 
-        let exit_condition = current_rsi >= &70. && prev_rsi <= &70.;
-
-        exit_condition
+        current_rsi >= &70. && prev_rsi <= &70.
     }
 
     fn entry_short(

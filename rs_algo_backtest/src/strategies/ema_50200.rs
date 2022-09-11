@@ -11,8 +11,8 @@ use rs_algo_shared::models::instrument::*;
 #[derive(Clone)]
 pub struct Ema<'a> {
     name: &'a str,
-     strategy_type: StrategyType,
-     stop_loss: f64
+    strategy_type: StrategyType,
+    stop_loss: f64,
 }
 
 #[async_trait]
@@ -46,7 +46,7 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -56,16 +56,14 @@ impl<'a> Strategy for Ema<'a> {
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
         let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
-        let entry_condition = current_ema_50 > current_ema_200 && prev_ema_50 <= prev_ema_200;
-
-        entry_condition
+        current_ema_50 > current_ema_200 && prev_ema_50 <= prev_ema_200
     }
 
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        _upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -75,9 +73,7 @@ impl<'a> Strategy for Ema<'a> {
         let prev_ema_200 = instrument.indicators.ema_c.data_a.get(prev_index).unwrap();
         let prev_ema_50 = instrument.indicators.ema_b.data_a.get(prev_index).unwrap();
 
-        let exit_condition = current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200;
-
-        exit_condition
+        current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200
     }
 
     fn entry_short(

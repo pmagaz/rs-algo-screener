@@ -28,7 +28,7 @@ pub fn resolve_trade_in(
         TradeResult::TradeIn(TradeIn {
             index_in: nex_day_index,
             price_in: next_day_price,
-            quantity: quantity,
+            quantity,
             stop_loss: calculate_stoploss(&entry_type, instrument, nex_day_index, stop_loss),
             date_in: to_dbtime(current_date),
             trade_type: entry_type,
