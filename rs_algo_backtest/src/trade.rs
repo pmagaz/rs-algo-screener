@@ -22,7 +22,7 @@ pub fn resolve_trade_in(
             None => -100.,
         };
         let current_date = next_day_candle.unwrap().date;
-        
+
         let quantity = round(order_size / next_day_price, 3);
 
         TradeResult::TradeIn(TradeIn {
@@ -69,7 +69,7 @@ pub fn resolve_trade_out(
         true => resolve_stoploss(current_price, &trade_in),
         false => false,
     };
-    
+
     if index > trade_in.index_in
         && (exit_type == TradeType::ExitLong
             || exit_type == TradeType::ExitShort
@@ -142,7 +142,7 @@ pub fn resolve_backtest(
         let initial_order_amount = (first.price_in * first.quantity).ceil();
         let profit_factor = total_profit_factor(gross_profits, gross_loses);
 
-        let net_profit_per = total_profit_per(initial_order_amount, net_profit, &trades_in, &trades_out);
+        let net_profit_per = total_profit_per(equity, net_profit, &trades_in, &trades_out);
         //let net_profit_per = total_profit_per(equity, net_profit);
         let profitable_trades = total_profitable_trades(wining_trades, trades);
         let max_drawdown = total_drawdown(&trades_out, equity);
@@ -153,14 +153,13 @@ pub fn resolve_backtest(
             _ => 0.,
         };
 
-
-        let buy_hold = calculate_buy_hold(strategy_start_price, initial_order_amount, current_price);
+        let buy_hold =
+            calculate_buy_hold(strategy_start_price, initial_order_amount, current_price);
         let annual_return = 100.;
 
-        if instrument.symbol == "BITCOIN" {
+        if instrument.symbol == "SOLANA" {
             // 15.301118885378045
             println!("11111111111111111111111 {}", max_drawdown);
-
         }
 
         println!(

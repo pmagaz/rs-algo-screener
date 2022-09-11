@@ -1,9 +1,9 @@
+use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::candle::Candle;
 use rs_algo_shared::models::instrument::*;
 use rs_algo_shared::models::pattern::*;
 use rs_algo_shared::models::time_frame::*;
-use rs_algo_shared::helpers::comp::*;
 use std::cmp::Ordering;
 
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
@@ -77,27 +77,30 @@ pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
 
 pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut max_acc_equity = equity;
-    let mut min_acc_equity = equity;
+    let mut max_equity_index: usize = 0;
     let max_equity = trades_out
         .iter()
-        .map(|x| {
+        .enumerate()
+        .map(|(idx, x)| {
             max_acc_equity += x.profit;
+            max_equity_index = idx;
             max_acc_equity
         })
         .fold(0. / 0., f64::max);
 
+    let mut min_acc_equity = max_equity;
+
     let min_equity = trades_out
         .iter()
-        .map(|x| {
-            let _profit = x.profit;
+        .enumerate()
+        .filter(|(idx, x)| idx >= &max_equity_index)
+        .map(|(_idx, x)| {
             min_acc_equity += x.profit;
             min_acc_equity
         })
         .fold(0. / 0., f64::min);
 
     ((min_equity - max_equity) / max_equity * 100.).abs()
-
-    // ((min_equity - max_equity) / max_equity * 100.).abs()
 }
 
 pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
