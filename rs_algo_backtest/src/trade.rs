@@ -157,11 +157,6 @@ pub fn resolve_backtest(
             calculate_buy_hold(strategy_start_price, initial_order_amount, current_price);
         let annual_return = 100.;
 
-        if instrument.symbol == "SOLANA" {
-            // 15.301118885378045
-            println!("11111111111111111111111 {}", max_drawdown);
-        }
-
         println!(
             "[BACKTEST] {:} backtested for {:?} sessions",
             instrument.symbol, sessions
