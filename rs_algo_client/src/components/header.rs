@@ -41,6 +41,12 @@ pub fn header() -> Html {
                 </Link<Route>>
               </a>
 
+            <a class="navbar-item">
+            <Link<Route> classes={classes!("navbar-item")} to={Route::Instruments}>
+                { "Instruments" }
+                </Link<Route>>
+              </a>
+
               // <div class="navbar-item has-dropdown is-hoverable">
               //   <a class="navbar-link">
               //     { "More" }

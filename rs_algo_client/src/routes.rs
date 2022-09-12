@@ -1,4 +1,5 @@
 use crate::pages::home::page::Home;
+use crate::pages::instruments::page::Instruments;
 use crate::pages::strategies::page::Strategies;
 use crate::pages::strategy::page::Strategy;
 
@@ -11,6 +12,8 @@ pub enum Route {
     Home,
     #[at("/strategies")]
     Strategies,
+    #[at("/strategies/instruments")]
+    Instruments,
     #[at("/strategy/:market/:strategy/:stype/")]
     Strategy {
         market: String,
@@ -26,6 +29,9 @@ pub fn switch(routes: &Route) -> Html {
         }
         Route::Strategies => {
             html! { <Strategies /> }
+        }
+        Route::Instruments => {
+            html! { <Instruments /> }
         }
         Route::Strategy {
             market,
