@@ -57,8 +57,6 @@ async fn main() -> Result<()> {
         _ => (Local::now() - date::Duration::days(num_test_bars)),
     };
 
-    println!("11111 {:?}", base_timeframe_from);
-
     // let upper_timeframe_from = match upper_time_frame {
     //     TimeFrameType::W => {
     //         let num_weeks = date::Duration::days(num_test_bars).num_weeks();
