@@ -1,6 +1,6 @@
 use super::api;
 use crate::components::loading::Loading;
-use crate::pages::strategy::components::strategy_detail::StrategyDetail;
+use crate::components::strategy_detail::StrategyDetail;
 
 use crate::components::chart::Chart;
 use rs_algo_shared::models::backtest_instrument::*;
@@ -22,6 +22,7 @@ pub struct Props {
     pub market: String,
     pub strategy: String,
     pub stype: String,
+    pub instrument: String,
 }
 
 #[function_component(Strategy)]
@@ -30,18 +31,37 @@ pub fn strategy(props: &Props) -> Html {
         market,
         strategy,
         stype,
+        instrument,
     } = props;
     let base_url = get_base_url();
-    let replace = ["strategy/", market, "/", strategy, "/", stype].concat();
-    let backtested_strategy_url = [
-        base_url.replace(replace.as_str(), "api/backtest/strategies"),
-        market.to_string(),
-        "/".to_owned(),
-        strategy.to_string(),
-        "/".to_owned(),
-        stype.to_string(),
-    ]
-    .concat();
+
+    let is_instrument_strategies = match instrument.as_ref() {
+        "none" => false,
+        _ => true,
+    };
+
+    let backtested_strategy_url = match is_instrument_strategies {
+        false => [
+            base_url.replace(
+                &["strategy/", market, "/", strategy, "/", stype].concat(),
+                "api/backtest/strategies",
+            ),
+            market.to_string(),
+            "/".to_owned(),
+            strategy.to_string(),
+            "/".to_owned(),
+            stype.to_string(),
+        ]
+        .concat(),
+        true => [
+            base_url.replace(
+                &["strategies/", instrument].concat(),
+                "api/backtest/strategies/",
+            ),
+            instrument.to_string(),
+        ]
+        .concat(),
+    };
     let use_backtest_instruments = use_state(|| vec![]);
     let use_loading = use_state(|| true);
     let use_strategy_url = use_state(|| String::from(""));
@@ -83,14 +103,22 @@ pub fn strategy(props: &Props) -> Html {
         <div class="tile is-ancestor is-vertical ">
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
-                     <h1 class="navbar-item is-size-2">{format!("{} {}",strategy, stype) }</h1>
+                    if is_instrument_strategies {
+                        <h1 class="navbar-item is-size-2">{format!("{} Backtesting", instrument) }</h1>
+                    } else {
+                        <h1 class="navbar-item is-size-2">{format!("{} {}",strategy, stype) }</h1>
+                    }
                         <Loading loading={ *use_loading} />
                 </div>
             </div>
             <Chart url={(*use_strategy_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid ">
-                <StrategyDetail market={ market.clone() } on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} />
+                if is_instrument_strategies {
+                    <StrategyDetail market={ market.clone() } on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} show_strategy_name={ true }/>
+                } else {
+                    <StrategyDetail market={ market.clone() } on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} show_strategy_name={ false }/>
+                }
             </div>
             </div>
         </div>

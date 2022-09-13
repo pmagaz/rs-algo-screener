@@ -1,6 +1,6 @@
 use super::api;
+use crate::components::instruments_list::*;
 use crate::components::loading::Loading;
-use crate::pages::home::components::instruments_list::InstrumentsList;
 
 use crate::components::chart::Chart;
 use rs_algo_shared::helpers::comp::*;
@@ -21,26 +21,6 @@ extern "C" {
     fn get_base_url() -> String;
     fn open_modal();
 
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum ActionType {
-    PortfolioAdd,
-    PortfolioDelete,
-    WatchListAdd,
-    WatchListDelete,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum ListType {
-    PortFolio,
-    WatchList,
-    Strategy,
-    NewPatterns,
-    Activated,
-    Commodities,
-    Crypto,
-    forex,
 }
 
 #[function_component(Home)]

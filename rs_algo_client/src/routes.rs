@@ -1,19 +1,22 @@
 use crate::pages::home::page::Home;
-use crate::pages::instruments::page::Instruments;
 use crate::pages::strategies::page::Strategies;
 use crate::pages::strategy::page::Strategy;
 
 use yew::{html, Html};
 use yew_router::prelude::*;
 
+pub struct Instrument {
+    market: String,
+}
+
 #[derive(Routable, PartialEq, Clone, Debug)]
 pub enum Route {
     #[at("/")]
     Home,
-    #[at("/strategies")]
+    #[at("/strategies/")]
     Strategies,
-    #[at("/strategies/instruments")]
-    Instruments,
+    #[at("/strategies/:instrument")]
+    InstrumentsStrategy { instrument: String },
     #[at("/strategy/:market/:strategy/:stype/")]
     Strategy {
         market: String,
@@ -28,17 +31,18 @@ pub fn switch(routes: &Route) -> Html {
             html! { <Home /> }
         }
         Route::Strategies => {
-            html! { <Strategies /> }
-        }
-        Route::Instruments => {
-            html! { <Instruments /> }
+            html! { <Strategies  /> }
         }
         Route::Strategy {
             market,
             strategy,
             stype,
         } => {
-            html! { <Strategy market={ market } strategy={strategy } stype={stype}/> }
+            html! { <Strategy market={ market } strategy={ strategy } stype={stype} instrument= { "none" }/> }
+        }
+
+        Route::InstrumentsStrategy { instrument } => {
+            html! { <Strategy market={ "instrument_strategy" } strategy={ "strategy" } stype={"stype"} instrument={ instrument }/> }
         }
     }
 }

@@ -22,7 +22,7 @@ extern "C" {
 pub fn strategies() -> Html {
     let base_url = get_base_url();
     let strategies_url = [
-        base_url.replace("strategies", "").as_str(),
+        base_url.replace("strategies/", "").as_str(),
         "api/backtest/strategies",
     ]
     .concat();

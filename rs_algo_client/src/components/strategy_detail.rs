@@ -22,6 +22,7 @@ pub struct Props {
     pub backtested_instruments: Vec<BackTestInstrumentResult>,
     pub on_symbol_click: Callback<String>,
     pub market: String,
+    pub show_strategy_name: bool,
 }
 
 #[function_component(StrategyDetail)]
@@ -30,6 +31,7 @@ pub fn strategy_detail(props: &Props) -> Html {
         market,
         backtested_instruments,
         on_symbol_click,
+        show_strategy_name
     } = props;
     let base_url = get_base_url();
 
@@ -43,19 +45,24 @@ pub fn strategy_detail(props: &Props) -> Html {
                 let strategy = backtest_instrument.strategy.clone();
                 let strategy_type = backtest_instrument.strategy_type.clone();
 
-                let replace = ["strategy/", market, "/", &strategy, "/", &strategy_type.to_string()].concat();
+                let url = match show_strategy_name {
+                    false => base_url.replace(["strategy/", market, "/", &strategy, "/", &strategy_type.to_string()].concat().as_str(), "api/backtest/strategies/chart"),
+                    true =>  base_url.replace(["strategies/", &symbol].concat().as_str(), "api/backtest/strategies/chart/"),
+                };
 
-                let url = [
-                    base_url.replace(replace.as_str(), "api/backtest/strategies/chart"),
-                    market.to_string(),
-                    "/".to_owned(),
-                    strategy.to_string(),
-                    "/".to_owned(),
-                    strategy_type.to_string(),
-                    "?symbol=".to_string(),
-                    symbol
+                let url = 
+                    [
+                        url,
+                        backtest_instrument.market.to_string(),
+                        "/".to_owned(),
+                        strategy.to_string(),
+                        "/".to_owned(),
+                        strategy_type.to_string(),
+                        "?symbol=".to_string(),
+                        symbol
                 ]
                 .concat();
+
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
             };
 
@@ -68,7 +75,13 @@ pub fn strategy_detail(props: &Props) -> Html {
 
             html! {
                 <tr>
-                    <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.instrument.symbol.clone()}</a></td>
+                    if *show_strategy_name {
+                        <td onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.strategy.clone()}</a></td>
+                        <td>{backtest_instrument.strategy_type.clone()}</td>
+                    } else {
+                        <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.instrument.symbol.clone()}</a></td>
+                        <td><a href={format!("strategies/{}", backtest_instrument.instrument.symbol)}>{ format!("x") }</a></td>
+                    }
                     <td class={get_status_class(&profit_status)}> { format!("{}%", round(backtest_instrument.net_profit_per,2))}</td>
                     <td class={get_status_class(&profit_factor_status)}> { round(backtest_instrument.profit_factor,2) }</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(backtest_instrument.profitable_trades,2))}</td>
@@ -88,7 +101,13 @@ pub fn strategy_detail(props: &Props) -> Html {
         <table class="table is-bordered">
             <thead class="has-background-grey-lighter">
                 <tr>
-                <th><abbr>{ "Instrument" }</abbr></th>
+                 if *show_strategy_name {
+                     <th><abbr>{ "Strategy" }</abbr></th>
+                    <th><abbr>{ "Type" }</abbr></th>
+                 } else {
+                    <th><abbr>{ "Instrument" }</abbr></th>
+                    <th><abbr>{ "Rank" }</abbr></th>
+                 }
                 <th><abbr>{ "Net Profit" }</abbr></th>
                 <th><abbr>{ "Profit F." }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>

@@ -9,7 +9,7 @@ use bson::doc;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
-use rs_algo_shared::models::instrument::Instrument;
+use rs_algo_shared::models::instrument::*;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
@@ -79,6 +79,31 @@ pub async fn find_instruments(
 
     let backtest_instruments: Vec<Instrument> =
         db::back_test::find_instruments(query, offset, limit, &state)
+            .await
+            .unwrap();
+
+    println!(
+        "[BACK TEST INSTRUMENTS] {:?} instruments returned at {:?} {:?}",
+        backtest_instruments.len(),
+        Local::now(),
+        now.elapsed()
+    );
+
+    Ok(HttpResponse::Ok().json(backtest_instruments))
+}
+
+pub async fn find_compact_instruments(
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+    let env = env::var("ENV").unwrap();
+
+    let query = doc! {};
+
+    println!("[BACK TEST INSTRUMENTS] All");
+
+    let backtest_instruments: Vec<CompactInstrument> =
+        db::back_test::find_backtest_compact_instruments(query, 0, 5000, &state)
             .await
             .unwrap();
 
@@ -209,6 +234,36 @@ pub async fn find_strategies_result(
 
     let backtest_instruments: Vec<BackTestStrategyResult> =
         db::back_test::find_strategies_result(query, &state)
+            .await
+            .unwrap();
+
+    println!(
+        "[BACK TEST STRATEGIES] {:?} {:?}",
+        Local::now(),
+        now.elapsed()
+    );
+
+    Ok(HttpResponse::Ok().json(backtest_instruments))
+}
+
+pub async fn find_strategies_result_instruments(
+    instrument: web::Path<String>,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+
+    let instrument = instrument.into_inner();
+
+    println!(
+        "[BACK TEST STRATEGIES INSTRUMENT] Request for {} at {:?}",
+        instrument,
+        Local::now()
+    );
+
+    let query = doc! { "instrument.symbol": instrument};
+
+    let backtest_instruments: Vec<BackTestInstrumentResult> =
+        db::back_test::find_backtest_instruments_result(query, 100, &state)
             .await
             .unwrap();
 

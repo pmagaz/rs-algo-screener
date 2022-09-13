@@ -1,16 +1,17 @@
 use super::helpers::*;
 use crate::models::app_state::AppState;
-use crate::models::instrument::Instrument;
+use crate::models::instrument::*;
 
 use crate::models::backtest_instrument::BackTestInstrumentResult;
 use crate::models::backtest_strategy::BackTestStrategyResult;
-
 use actix_web::web;
 use bson::{doc, Document};
 use futures::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
+use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
+use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use std::env;
 
 pub async fn find_one(
@@ -58,6 +59,46 @@ pub async fn find_instruments(
     while let Some(result) = cursor.next().await {
         match result {
             Ok(instrument) => docs.push(instrument),
+            _ => {}
+        }
+    }
+    Ok(docs)
+}
+
+pub async fn find_backtest_compact_instruments(
+    query: Document,
+    offset: u64,
+    limit: i64,
+    state: &web::Data<AppState>,
+) -> Result<Vec<CompactInstrument>, Error> {
+    let collection_name = &env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
+
+    let sp500_symbols = sp500::get_symbols();
+    let forex_symbols = forex::get_symbols();
+    let crypto_symbols = crypto::get_symbols();
+
+    let collection = get_collection::<CompactInstrument>(&state.db_mem, collection_name).await;
+
+    let mut cursor = collection
+        .find(
+            query,
+            FindOptions::builder().skip(offset).limit(limit).build(),
+        )
+        .await
+        .unwrap();
+
+    let mut docs: Vec<CompactInstrument> = vec![];
+
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(instrument) => {
+                if symbol_in_list(&instrument.symbol, &sp500_symbols)
+                    || symbol_in_list(&instrument.symbol, &forex_symbols)
+                    || symbol_in_list(&instrument.symbol, &crypto_symbols)
+                {
+                    docs.push(instrument)
+                }
+            }
             _ => {}
         }
     }

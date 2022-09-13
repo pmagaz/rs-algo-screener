@@ -99,12 +99,16 @@ async fn main() -> Result<()> {
                         web::get().to(back_test::find_one),
                     )
                     .route(
+                        "/backtest/instruments/compact",
+                        web::get().to(back_test::find_compact_instruments),
+                    )
+                    .route(
                         "/backtest/instruments/{market}",
                         web::get().to(back_test::find_instruments),
                     )
                     .route(
-                        "/backtest/instruments/result",
-                        web::get().to(back_test::find_instruments_result),
+                        "/backtest/strategies/{instrument}",
+                        web::get().to(back_test::find_strategies_result_instruments),
                     )
                     .route(
                         "/backtest/strategies",

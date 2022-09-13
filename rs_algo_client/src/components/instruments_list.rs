@@ -12,8 +12,6 @@ use std::env;
 use yew::{function_component, html, Callback, Properties, Html,events::Event};
 use wasm_bindgen::prelude::*;
 
-use crate::pages::home::page::{ActionType,ListType};
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
@@ -21,6 +19,27 @@ extern "C" {
     #[wasm_bindgen(js_name = get_base_url)]
     fn get_base_url() -> String;
     fn close_modal(modal: &str);
+}
+
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum ListType {
+    PortFolio,
+    WatchList,
+    Strategy,
+    NewPatterns,
+    Activated,
+    Commodities,
+    Crypto,
+    forex,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum ActionType {
+    PortfolioAdd,
+    PortfolioDelete,
+    WatchListAdd,
+    WatchListDelete,
 }
 
 
