@@ -2,7 +2,6 @@ pub mod strategy;
 
 pub mod bollinger_bands_reversal;
 pub mod bollinger_bands_reversal_2;
-pub mod bollinger_bands_reversal_continuation;
 pub mod bollinger_bands_reversal_riding;
 pub mod bollinger_bands_reversal_riding_band_width;
 pub mod bollinger_bands_reversal_riding_rsi;

@@ -52,11 +52,14 @@ impl<'a> Strategy for BollingerBands<'a> {
 
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
-
+        let date = &instrument.data.get(prev_index).unwrap().date;
         let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
         let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
 
-        close_price < low_band && prev_close >= prev_low_band
+        let entry_condition = close_price < low_band && prev_close >= prev_low_band;
+
+        println!("111111 {} {} {}", index, entry_condition, date);
+        entry_condition
     }
 
     fn exit_long(
@@ -68,23 +71,22 @@ impl<'a> Strategy for BollingerBands<'a> {
         let prev_index = get_prev_index(index);
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let date = &instrument.data.get(prev_index).unwrap().date;
 
         let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
         let patterns = &instrument.patterns.local_patterns;
         let current_pattern = get_current_pattern(index, patterns);
-        let _low_band = instrument.indicators.bb.data_b.get(index).unwrap();
-        let _prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
-        let mut exit_condition: bool = false;
+        let exit_condition = current_pattern != PatternType::ChannelUp
+            && current_pattern != PatternType::HigherHighsHigherLows
+            && close_price > top_band;
+        // && prev_close <= prev_top_band;
 
-        if current_pattern == PatternType::ChannelUp
-            || current_pattern == PatternType::HigherHighsHigherLows
-        {
-            exit_condition = false;
-        } else {
-            exit_condition = close_price > top_band && prev_close <= prev_top_band;
-        }
+        // let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * 2.;
+        // self.update_stop_loss(StopLossType::Trailing, close_price - atr_value);
+
+        println!("222222 {} {} {}", index, date, current_pattern);
         exit_condition
     }
 
