@@ -71,7 +71,7 @@ pub async fn find_instruments(
     // }
 
     let query = match env.as_ref() {
-        "development" => doc! {"market": &market, "symbol": "AUDNZD"},
+        "development" => doc! {"market": &market, "symbol": "BITCOIN"},
         _ => doc! { "market": &market},
     };
 

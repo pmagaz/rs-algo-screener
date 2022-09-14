@@ -13,14 +13,14 @@ use rs_algo_shared::models::instrument::*;
 pub struct MacdDual<'a> {
     name: &'a str,
     strategy_type: StrategyType,
-    stop_loss: f64,
+    stop_loss: StopLoss,
 }
 
 #[async_trait]
 impl<'a> Strategy for MacdDual<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
-            stop_loss: 0.,
+            stop_loss: init_stop_loss(),
             name: "MacD_Dual",
             strategy_type: StrategyType::OnlyLongMultiTF,
         })
@@ -34,13 +34,12 @@ impl<'a> Strategy for MacdDual<'a> {
         &self.strategy_type
     }
 
-    fn update_stop_loss(&mut self, price: f64) -> bool {
-        self.stop_loss = price;
-        true
+    fn update_stop_loss(&mut self, stop_type: StopLossType, price: f64) -> &StopLoss {
+        self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
+        &self.stop_loss
     }
-
-    fn stop_loss(&self) -> f64 {
-        self.stop_loss
+    fn stop_loss(&self) -> &StopLoss {
+        &self.stop_loss
     }
 
     fn entry_long(
@@ -117,7 +116,10 @@ impl<'a> Strategy for MacdDual<'a> {
 
         let exit_condition =
             first_weekly_exit || (close_price > top_band && prev_close <= prev_top_band); //close_price > top_band && prev_close <= prev_top_band;
-        self.stop_loss_exit(exit_condition, *low_price)
+        if exit_condition {
+            self.update_stop_loss(StopLossType::Price, *low_price);
+        }
+        false
     }
 
     fn entry_short(

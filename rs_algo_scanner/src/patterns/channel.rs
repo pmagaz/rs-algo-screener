@@ -68,7 +68,6 @@ pub fn is_descendant_bottom(data: &DataPoints) -> bool {
         && data[0].1 < data[1].1
         && data[2].1 < data[3].1
     {
-        //println!("444444 {:?}", &data);
         true
     } else {
         false

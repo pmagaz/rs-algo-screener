@@ -103,11 +103,11 @@ impl Backend {
         let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.25);
         let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
         let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.25);
-        let _GREEN_LINE = &RGBColor(56, 142, 59);
+        let GREEN_LINE = &RGBColor(56, 142, 59);
 
         let bottom_point_color = match points_mode {
             PointsMode::MaximaMinima => BLUE.mix(0.15),
-            PointsMode::Trades => BLUE.mix(0.6),
+            PointsMode::Trades => BLUE.mix(0.8),
         };
 
         let top_point_color = match points_mode {

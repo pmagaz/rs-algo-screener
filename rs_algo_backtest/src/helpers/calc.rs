@@ -127,22 +127,6 @@ pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     ((max_equity - min_equity) / min_equity * 100.).abs() * 100.
 }
 
-pub fn calculate_stoploss(
-    entry_type: &TradeType,
-    instrument: &Instrument,
-    index: usize,
-    stop_loss: f64,
-) -> f64 {
-    let current_price = &instrument.data.get(index).unwrap().open;
-    let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * stop_loss;
-
-    match entry_type {
-        TradeType::EntryLong => current_price - atr_value,
-        TradeType::EntryShort => current_price + atr_value,
-        _ => current_price - atr_value,
-    }
-}
-
 // pub fn calculate_annual_return(
 //     trades_out: &Vec<TradeOut>,
 //     profit_factor: f64,

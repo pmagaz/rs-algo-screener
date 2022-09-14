@@ -13,14 +13,14 @@ use rs_algo_shared::models::instrument::*;
 pub struct MutiTimeFrameBollingerBands<'a> {
     name: &'a str,
     strategy_type: StrategyType,
-    stop_loss: f64,
+    stop_loss: StopLoss,
 }
 
 #[async_trait]
 impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
     fn new() -> Result<Self> {
         Ok(Self {
-            stop_loss: 0.,
+            stop_loss: init_stop_loss(),
             name: "Bollinger_Bands_Reversals_MT_Macd",
             strategy_type: StrategyType::OnlyLongMultiTF,
         })
@@ -34,13 +34,13 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         &self.strategy_type
     }
 
-    fn update_stop_loss(&mut self, price: f64) -> bool {
-        self.stop_loss = price;
-        true
+    fn update_stop_loss(&mut self, stop_type: StopLossType, price: f64) -> &StopLoss {
+        self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
+        &self.stop_loss
     }
 
-    fn stop_loss(&self) -> f64 {
-        self.stop_loss
+    fn stop_loss(&self) -> &StopLoss {
+        &self.stop_loss
     }
 
     fn entry_long(
@@ -78,11 +78,19 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
 
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let date = &instrument.data.get(index).unwrap().date;
 
         let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
-        first_weekly_entry || (upper_macd && close_price > top_band && prev_close <= prev_top_band)
+        let entry_condition = first_weekly_entry
+            || (upper_macd && close_price > top_band && prev_close <= prev_top_band);
+
+        if entry_condition {
+            println!("ENTRY {} {} {}", instrument.symbol, date, entry_condition);
+        }
+
+        entry_condition
     }
 
     fn exit_long(
@@ -107,6 +115,7 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
 
         let prev_index = get_prev_index(index);
         let low_price = &instrument.data.get(index).unwrap().low;
+        let date = &instrument.data.get(index).unwrap().date;
 
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
@@ -115,7 +124,12 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
         let exit_condition = close_price > top_band && prev_close <= prev_top_band;
-        self.stop_loss_exit(exit_condition, *low_price)
+
+        if exit_condition {
+            println!("EXIT {} {} {}", instrument.symbol, date, exit_condition);
+            self.update_stop_loss(StopLossType::Price, *low_price);
+        }
+        false
     }
 
     fn entry_short(

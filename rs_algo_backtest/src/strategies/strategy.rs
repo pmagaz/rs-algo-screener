@@ -3,6 +3,7 @@ use crate::trade::*;
 use async_trait::async_trait;
 use dyn_clone::DynClone;
 use rs_algo_shared::error::Result;
+use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
@@ -136,6 +137,7 @@ pub trait Strategy: DynClone {
                         order_size,
                         stop_loss,
                     );
+
                     match trade_in_result {
                         TradeResult::TradeIn(trade_in) => {
                             trades_in.push(trade_in);
@@ -179,10 +181,12 @@ pub trait Strategy: DynClone {
     ) -> TradeResult {
         let exit_type: TradeType;
 
-        let stop_loss_value = self.stop_loss();
-        if stop_loss_value > 0. {
-            trade_in.stop_loss = stop_loss_value;
-        }
+        let stop_loss = self.stop_loss();
+        trade_in.stop_loss = update_stop_loss_values(
+            &trade_in.stop_loss,
+            stop_loss.stop_type.to_owned(),
+            stop_loss.price,
+        );
 
         if self.exit_long(index, instrument, upper_tf_instrument) {
             exit_type = TradeType::ExitLong
@@ -193,21 +197,27 @@ pub trait Strategy: DynClone {
         }
         let stop_loss = true;
 
-        resolve_trade_out(index, instrument, trade_in, exit_type, stop_loss)
+        resolve_trade_out(index, instrument, trade_in, exit_type)
     }
-    fn stop_loss(&self) -> f64;
-    fn update_stop_loss(&mut self, price: f64) -> bool;
-    fn stop_loss_exit(&mut self, exit_condition: bool, price: f64) -> bool {
-        match exit_condition {
-            true => {
-                self.update_stop_loss(price);
-                false
-            }
-            false => {
-                self.update_stop_loss(0.);
-                false
-            }
-        }
+    fn stop_loss(&self) -> &StopLoss;
+    fn update_stop_loss(&mut self, stop_type: StopLossType, price: f64) -> &StopLoss;
+    // fn stop_loss_exit(&mut self, exit_condition: bool, price: f64) -> bool {
+    //     // match exit_condition {
+    //     //     true => {
+    //     //         self.update_stop_loss(price);
+    //     //         false
+    //     //     }
+    //     //     false => {
+    //     //         self.update_stop_loss(0.);
+    //     //         false
+    //     //     }
+    //     // }
+    //     false
+    // }
+    fn stop_loss_exit(&mut self, stop_type: StopLossType, price: f64) -> bool {
+        let stop_loss = self.stop_loss();
+        update_stop_loss_values(stop_loss, stop_type, price);
+        true
     }
 }
 
