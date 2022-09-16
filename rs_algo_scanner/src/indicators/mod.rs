@@ -1,4 +1,5 @@
 pub mod atr;
+pub mod adx;
 pub mod bb;
 pub mod bbw;
 pub mod ema;
@@ -10,6 +11,7 @@ pub mod tema;
 
 use crate::error::Result;
 use crate::indicators::atr::Atr;
+use crate::indicators::adx::Adx;
 use crate::indicators::bb::BollingerB;
 use crate::indicators::bbw::BollingerBW;
 use crate::indicators::ema::Ema;
@@ -41,6 +43,7 @@ pub struct Indicators {
     pub macd: Macd,
     pub stoch: Stoch,
     pub atr: Atr,
+    pub adx: Adx,
     pub rsi: Rsi,
     pub bb: BollingerB,
     pub bbw: BollingerBW,
@@ -60,6 +63,7 @@ impl Indicators {
             rsi: Rsi::new().unwrap(),
             stoch: Stoch::new().unwrap(),
             atr: Atr::new().unwrap(),
+            adx: Adx::new().unwrap(),
             bb: BollingerB::new().unwrap(),
             bbw: BollingerBW::new().unwrap(),
             ema_a: Ema::new_ema(*ema_a).unwrap(),
@@ -72,9 +76,9 @@ impl Indicators {
         &self.atr
     }
 
-    // pub fn kc(&self) -> &KeltnerC {
-    //     &self.kc
-    // }
+    pub fn adx(&self) -> &Adx {
+        &self.adx
+    }
 
     pub fn bb(&self) -> &BollingerB {
         &self.bb
@@ -114,6 +118,7 @@ impl Indicators {
             .unwrap();
         if extended_indicators {
             self.atr.next_OHLC(OHLC).unwrap();
+            self.adx.next(close).unwrap();
             self.bb.next(close).unwrap();
             self.bbw.next(close).unwrap();
             self.rsi.next(close).unwrap();

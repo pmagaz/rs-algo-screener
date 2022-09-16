@@ -35,16 +35,16 @@ use std::{thread, time};
 async fn main() -> Result<()> {
     dotenv().ok();
     let start = Instant::now();
+    let env = env::var("ENV").unwrap();
     let username = &env::var("BROKER_USERNAME").unwrap();
     let password = &env::var("BROKER_PASSWORD").unwrap();
     let num_test_bars = env::var("NUM_TEST_BARS").unwrap().parse::<i64>().unwrap();
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
     let time_frame = &env::var("BASE_TIME_FRAME").unwrap();
-    //let upper_time_frame = &env::var("UPPER_BASE_TIME_FRAME").unwrap();
+    let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
 
     let sleep = time::Duration::from_millis(*sleep_time);
     let time_frame = TimeFrame::new(time_frame);
-    //let upper_time_frame = TimeFrame::new(upper_time_frame);
 
     let base_timeframe_from = match time_frame {
         TimeFrameType::W => {
@@ -57,25 +57,11 @@ async fn main() -> Result<()> {
         _ => (Local::now() - date::Duration::days(num_test_bars)),
     };
 
-    // let upper_timeframe_from = match upper_time_frame {
-    //     TimeFrameType::W => {
-    //         let num_weeks = date::Duration::days(num_test_bars).num_weeks();
-    //         Local::now() - date::Duration::weeks(num_weeks + 1)
-    //     }
-    //     _ => (Local::now() - date::Duration::days(num_test_bars)),
-    // };
-
-    //let num_weeks = date::Duration::days(from_leches).num_weeks();
-
     let from = (Local::now() - date::Duration::days(num_test_bars)).timestamp();
 
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
     let mut symbols = screener.get_symbols().await.unwrap().symbols;
-
-    let env = env::var("ENV").unwrap();
-
-    let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
 
     let backtest_mode = env::var("SCANNER_BACKTEST_MODE")
         .unwrap()

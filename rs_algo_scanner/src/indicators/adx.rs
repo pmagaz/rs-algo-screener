@@ -2,33 +2,26 @@ use super::Indicator;
 use crate::error::Result;
 
 use serde::{Deserialize, Serialize};
-use std::env;
-use ta::indicators::ExponentialMovingAverage;
+use ta::indicators::AverageDirectionalIndex;
+use ta::test_helper::Bar;
 use ta::Next;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Macd {
-    ema_a: ExponentialMovingAverage,
-    ema_b: ExponentialMovingAverage,
-    ema_c: ExponentialMovingAverage,
+pub struct Adx {
+    adx: AverageDirectionalIndex,
     data_a: Vec<f64>,
     data_b: Vec<f64>,
 }
 
-impl Indicator for Macd {
+impl Indicator for Adx {
     fn new() -> Result<Self> {
-        let macd_a = env::var("MACD_A").unwrap().parse::<usize>().unwrap();
-        let macd_b = env::var("MACD_B").unwrap().parse::<usize>().unwrap();
-        let macd_c = env::var("MACD_C").unwrap().parse::<usize>().unwrap();
-
         Ok(Self {
-            ema_a: ExponentialMovingAverage::new(macd_a).unwrap(),
-            ema_b: ExponentialMovingAverage::new(macd_b).unwrap(),
-            ema_c: ExponentialMovingAverage::new(macd_c).unwrap(),
+            adx: AverageDirectionalIndex::new(14).unwrap(),
             data_a: vec![],
             data_b: vec![],
         })
     }
+
     fn get_data_a(&self) -> &Vec<f64> {
         &self.data_a
     }
@@ -43,7 +36,7 @@ impl Indicator for Macd {
     }
 
     fn get_current_b(&self) -> &f64 {
-        let max = self.data_b.len() - 1;
+        let max = self.data_a.len() - 1;
         &self.data_b[max]
     }
 
@@ -57,13 +50,14 @@ impl Indicator for Macd {
     }
 
     fn next(&mut self, value: f64) -> Result<()> {
-        let a = self.ema_b.next(value) - self.ema_a.next(value);
-        let b = self.ema_c.next(a);
+        let a = self.adx.next(value);
         self.data_a.push(a);
-        self.data_b.push(b);
         Ok(())
     }
+    //FIXME MONEKY PATCHING
     fn next_OHLC(&mut self, OHLC: (f64, f64, f64, f64)) -> Result<()> {
+        // let a = self.adx.next(&bar);
+        // self.data_a.push(a);
         Ok(())
     }
 }

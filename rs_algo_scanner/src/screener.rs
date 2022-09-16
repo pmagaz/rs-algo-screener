@@ -48,11 +48,20 @@ where
         F: Send + FnMut(Instrument) -> T,
         T: Future<Output = Result<()>> + Send + 'static,
     {
+
         let res = self
             .broker
             .get_instrument_data(symbol, time_frame.value(), start_date)
             .await
             .unwrap();
+
+        // let res = self
+        //     .broker
+        //     .get_instrument_streaming(symbol, time_frame.value(), start_date)
+        //     .await
+        //     .unwrap();
+
+ 
 
         let mut instrument = Instrument::new()
             .symbol(&symbol)
