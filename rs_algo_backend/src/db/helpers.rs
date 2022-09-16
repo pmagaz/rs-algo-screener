@@ -68,6 +68,15 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 prev_c: 0.,
                 status: Status::Default,
             },
+            adx: CompactIndicator {
+                current_a: *doc.indicators.adx.data_a.last().unwrap(),
+                prev_a: *doc.indicators.adx.data_a.get(second_last).unwrap(),
+                current_b: 0.,
+                prev_b: 0.,
+                current_c: 0.,
+                prev_c: 0.,
+                status: Status::Default,
+            },
             bb: CompactIndicator {
                 current_a: *doc.indicators.bb.data_a.last().unwrap(),
                 current_b: *doc.indicators.bb.data_b.last().unwrap(),

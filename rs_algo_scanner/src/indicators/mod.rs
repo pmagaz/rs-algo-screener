@@ -118,7 +118,7 @@ impl Indicators {
             .unwrap();
         if extended_indicators {
             self.atr.next_OHLC(OHLC).unwrap();
-            self.adx.next(close).unwrap();
+            //self.adx.next(close).unwrap();
             self.bb.next(close).unwrap();
             self.bbw.next(close).unwrap();
             self.rsi.next(close).unwrap();
