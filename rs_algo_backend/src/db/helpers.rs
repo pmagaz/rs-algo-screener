@@ -40,6 +40,7 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
         current_candle: doc.current_candle,
         prev_candle: doc.data.get(second_last).unwrap().candle_type.clone(),
         //FIXME ADD ARRAY
+       
         indicators: CompactIndicators {
             macd: CompactIndicator {
                 current_a: *doc.indicators.macd.data_a.last().unwrap(),
@@ -69,8 +70,10 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
                 status: Status::Default,
             },
             adx: CompactIndicator {
-                current_a: *doc.indicators.adx.data_a.last().unwrap(),
-                prev_a: *doc.indicators.adx.data_a.get(second_last).unwrap(),
+                current_a: 0., 
+                prev_a: 0., 
+                //current_a: *doc.indicators.adx.data_a.last().unwrap(),
+                //prev_a: *doc.indicators.adx.data_a.get(second_last).unwrap(),
                 current_b: 0.,
                 prev_b: 0.,
                 current_c: 0.,

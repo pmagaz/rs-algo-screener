@@ -58,7 +58,6 @@ impl<'a> Strategy for BollingerBands<'a> {
 
         let entry_condition = close_price < low_band && prev_close >= prev_low_band;
 
-        println!("111111 {} {} {}", index, entry_condition, date);
         entry_condition
     }
 
@@ -86,7 +85,6 @@ impl<'a> Strategy for BollingerBands<'a> {
         // let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * 2.;
         // self.update_stop_loss(StopLossType::Trailing, close_price - atr_value);
 
-        println!("222222 {} {} {}", index, date, current_pattern);
         exit_condition
     }
 

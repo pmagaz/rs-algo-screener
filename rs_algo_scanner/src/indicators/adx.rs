@@ -51,7 +51,6 @@ impl Indicator for Adx {
 
     fn next(&mut self, value: f64) -> Result<()> {
         let a = self.adx.next(value);
-        println!("11111 {}", a);
         self.data_a.push(a);
         Ok(())
     }

@@ -18,4 +18,4 @@ round = "0.1.2"
 dotenv = "0.15.0"
 reqwest = { version = "0.11.11", features = ["json"] }
 uuid = { version = "0.8.2", features = ["wasm-bindgen"] }
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "dd5e7b0"} 
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "63db9f0"} 

@@ -120,10 +120,10 @@ impl<'a> Strategy for Stoch<'a> {
             && current_stoch_a < current_stoch_b
             && prev_stoch_a >= prev_stoch_b;
 
-        if exit_condition {
-            self.update_stop_loss(StopLossType::Price, *low_price);
-        }
-        false
+       // if exit_condition {
+            // self.update_stop_loss(StopLossType::Price, *low_price);
+        // }
+        exit_condition
     }
 
     fn entry_short(
