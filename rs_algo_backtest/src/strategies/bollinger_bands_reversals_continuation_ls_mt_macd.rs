@@ -124,10 +124,10 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         } else {
             exit_condition = upper_macd && close_price > top_band && prev_close <= prev_top_band;
         }
-       // if exit_condition {
-            // self.update_stop_loss(StopLossType::Price, *low_price);
-        // }
-        exit_condition
+        if exit_condition {
+             self.update_stop_loss(StopLossType::Price, *low_price);
+        }
+        false
     }
 
     fn entry_short(

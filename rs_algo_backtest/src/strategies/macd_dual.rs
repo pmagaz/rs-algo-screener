@@ -116,10 +116,10 @@ impl<'a> Strategy for MacdDual<'a> {
 
         let exit_condition =
             first_weekly_exit || (close_price > top_band && prev_close <= prev_top_band); //close_price > top_band && prev_close <= prev_top_band;
-       // if exit_condition {
-            // self.update_stop_loss(StopLossType::Price, *low_price);
-        // }
-        exit_condition
+        if exit_condition {
+             self.update_stop_loss(StopLossType::Price, *low_price);
+        }
+        false
     }
 
     fn entry_short(
