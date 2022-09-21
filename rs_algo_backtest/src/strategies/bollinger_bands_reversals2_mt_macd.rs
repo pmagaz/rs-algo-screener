@@ -19,8 +19,14 @@ pub struct MutiTimeFrameBollingerBands<'a> {
 #[async_trait]
 impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
     fn new() -> Result<Self> {
+        
+        let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
+        
         Ok(Self {
-            stop_loss: init_stop_loss(),
+            stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Bollinger_Bands_Reversals2_MT_Macd",
             strategy_type: StrategyType::OnlyLongMultiTF,
         })
@@ -38,10 +44,11 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
         &self.stop_loss
     }
+    
     fn stop_loss(&self) -> &StopLoss {
         &self.stop_loss
     }
-
+   
     fn entry_long(
         &mut self,
         index: usize,
@@ -134,9 +141,11 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
             && close_price <= top_band
             && close_price <= open_price;
 
+        
         if exit_condition {
              self.update_stop_loss(StopLossType::Price, *low_price);
         }
+        
         false
     }
 

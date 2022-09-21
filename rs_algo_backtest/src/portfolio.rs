@@ -11,7 +11,6 @@ use std::env;
 #[derive(Clone)]
 pub struct PortFolio {
     pub order_size: f64,
-    pub stop_loss: f64,
     pub commission: f64,
     pub equity: f64,
     pub instruments: Vec<Instrument>,
@@ -92,7 +91,6 @@ impl PortFolio {
                             self.order_size,
                             self.equity,
                             self.commission,
-                            self.stop_loss,
                         )
                         .await;
 

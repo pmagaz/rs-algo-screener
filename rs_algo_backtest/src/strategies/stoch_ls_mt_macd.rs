@@ -18,8 +18,14 @@ pub struct Stoch<'a> {
 #[async_trait]
 impl<'a> Strategy for Stoch<'a> {
     fn new() -> Result<Self> {
+        
+        let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
+        
         Ok(Self {
-            stop_loss: init_stop_loss(),
+            stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Stoch_MT_Macd",
             strategy_type: StrategyType::LongShortMultiTF,
         })
@@ -37,10 +43,11 @@ impl<'a> Strategy for Stoch<'a> {
         self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
         &self.stop_loss
     }
+    
     fn stop_loss(&self) -> &StopLoss {
         &self.stop_loss
     }
-
+   
     fn entry_long(
         &mut self,
         index: usize,
@@ -120,9 +127,11 @@ impl<'a> Strategy for Stoch<'a> {
             && current_stoch_a < current_stoch_b
             && prev_stoch_a >= prev_stoch_b;
 
+        
         if exit_condition {
              self.update_stop_loss(StopLossType::Price, *low_price);
         }
+        
         false
     }
 

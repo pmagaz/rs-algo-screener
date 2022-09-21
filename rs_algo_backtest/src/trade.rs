@@ -12,7 +12,7 @@ pub fn resolve_trade_in(
     order_size: f64,
     instrument: &Instrument,
     entry_type: TradeType,
-    stop_loss: f64,
+    stop_loss: &StopLoss,
 ) -> TradeResult {
     if entry_type == TradeType::EntryLong || entry_type == TradeType::EntryShort {
         let nex_day_index = index + 1;
@@ -65,6 +65,8 @@ pub fn resolve_trade_out(
     let draw_down_per = calculate_drawdown_per(draw_down, price_in);
 
     let stop_loss_activated = resolve_stop_loss(current_price, &trade_in);
+
+    // println!("3333333 {:?}", trade_in);
 
     if index > trade_in.index_in
         && (exit_type == TradeType::ExitLong
@@ -226,10 +228,11 @@ pub fn resolve_backtest(
     }
 }
 
-pub fn init_stop_loss() -> StopLoss {
+pub fn init_stop_loss(stop_type: StopLossType, value: f64) -> StopLoss {
     StopLoss {
         price: 0.,
-        stop_type: StopLossType::None,
+        value,
+        stop_type,
         created_at: to_dbtime(Local::now()),
         updated_at: to_dbtime(Local::now()),
         valid_until: to_dbtime(Local::now() + Duration::days(1000)),
@@ -240,20 +243,38 @@ pub fn create_stop_loss(
     entry_type: &TradeType,
     instrument: &Instrument,
     index: usize,
-    stop_loss: f64,
+    stop_loss: &StopLoss,
 ) -> StopLoss {
     let current_price = &instrument.data.get(index).unwrap().open;
-    let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * stop_loss;
+    let stop_loss_value = stop_loss.value;
+    let stop_loss_price = stop_loss.price;
 
-    let price = match entry_type {
-        TradeType::EntryLong => current_price - atr_value,
-        TradeType::EntryShort => current_price + atr_value,
-        _ => current_price - atr_value,
+    let price = match stop_loss.stop_type {
+        StopLossType::Atr => {
+            let atr_value = instrument.indicators.atr.data_a.get(index).unwrap() * stop_loss_value;
+            let price = match entry_type {
+                TradeType::EntryLong => current_price - atr_value,
+                TradeType::EntryShort => current_price + atr_value,
+                _ => current_price - atr_value,
+            };
+            price
+        }
+        _ => {
+            stop_loss_price
+        },
     };
+
+
+    // let price = match entry_type {
+    //     TradeType::EntryLong => current_price - atr_value,
+    //     TradeType::EntryShort => current_price + atr_value,
+    //     _ => current_price - atr_value,
+    // };
 
     StopLoss {
         price,
-        stop_type: StopLossType::Price,
+        value: stop_loss_value,
+        stop_type: stop_loss.stop_type.to_owned(), 
         created_at: to_dbtime(Local::now()),
         updated_at: to_dbtime(Local::now()),
         valid_until: to_dbtime(Local::now() + Duration::days(1000)),
@@ -267,6 +288,7 @@ pub fn update_stop_loss_values(
 ) -> StopLoss {
     StopLoss {
         price,
+        value: stop_loss.value,
         stop_type,
         created_at: stop_loss.created_at,
         updated_at: to_dbtime(Local::now()),
@@ -275,7 +297,15 @@ pub fn update_stop_loss_values(
 }
 
 pub fn resolve_stop_loss(current_price: f64, trade_in: &TradeIn) -> bool {
+    
     let stop_loss_price = trade_in.stop_loss.price;
+
+    let leches = match trade_in.trade_type {
+        TradeType::EntryLong => current_price <= stop_loss_price,
+        TradeType::EntryShort => current_price >= stop_loss_price,
+        _ => current_price - current_price <= stop_loss_price,
+    };
+   println!("66666666 {} {} {:?} {}", current_price, stop_loss_price, trade_in.trade_type, current_price <= stop_loss_price); 
     match trade_in.trade_type {
         TradeType::EntryLong => current_price <= stop_loss_price,
         TradeType::EntryShort => current_price >= stop_loss_price,

@@ -89,7 +89,6 @@ pub trait Strategy: DynClone {
         order_size: f64,
         equity: f64,
         commission: f64,
-        stop_loss: f64,
     ) -> BackTestResult {
         let mut trades_in: Vec<TradeIn> = vec![];
         let mut trades_out: Vec<TradeOut> = vec![];
@@ -135,7 +134,6 @@ pub trait Strategy: DynClone {
                         instrument,
                         upper_tf_instrument,
                         order_size,
-                        stop_loss,
                     );
 
                     match trade_in_result {
@@ -157,7 +155,6 @@ pub trait Strategy: DynClone {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
         order_size: f64,
-        stop_loss: f64,
     ) -> TradeResult {
         let entry_type: TradeType;
 
@@ -168,6 +165,8 @@ pub trait Strategy: DynClone {
         } else {
             entry_type = TradeType::None
         }
+
+        let stop_loss = self.stop_loss();
 
         resolve_trade_in(index, order_size, instrument, entry_type, stop_loss)
     }
@@ -182,12 +181,17 @@ pub trait Strategy: DynClone {
         let exit_type: TradeType;
 
         let stop_loss = self.stop_loss();
-        trade_in.stop_loss = update_stop_loss_values(
-            &trade_in.stop_loss,
-            stop_loss.stop_type.to_owned(),
-            stop_loss.price,
-        );
+            //println!("111111 {:?}", stop_loss);
 
+        if stop_loss.price != 0. {
+            trade_in.stop_loss = update_stop_loss_values(
+                &trade_in.stop_loss,
+                stop_loss.stop_type.to_owned(),
+                stop_loss.price,
+            );
+        }
+
+        //println!("2222222 {:?}", trade_in.stop_loss);
         if self.exit_long(index, instrument, upper_tf_instrument) {
             exit_type = TradeType::ExitLong
         } else if self.exit_short(index, instrument, upper_tf_instrument) {

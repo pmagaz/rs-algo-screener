@@ -19,8 +19,14 @@ pub struct MacdDual<'a> {
 #[async_trait]
 impl<'a> Strategy for MacdDual<'a> {
     fn new() -> Result<Self> {
+        
+        let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
+        .unwrap()
+        .parse::<f64>()
+        .unwrap();
+        
         Ok(Self {
-            stop_loss: init_stop_loss(),
+            stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "MacD_Dual",
             strategy_type: StrategyType::OnlyLongMultiTF,
         })
@@ -38,6 +44,7 @@ impl<'a> Strategy for MacdDual<'a> {
         self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
         &self.stop_loss
     }
+
     fn stop_loss(&self) -> &StopLoss {
         &self.stop_loss
     }
@@ -110,15 +117,18 @@ impl<'a> Strategy for MacdDual<'a> {
         let close_price = &instrument.data.get(index).unwrap().close;
         let low_price = &instrument.data.get(index).unwrap().low;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
+        let date = &instrument.data.get(prev_index).unwrap().date;
 
         let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
         let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
 
         let exit_condition =
             first_weekly_exit || (close_price > top_band && prev_close <= prev_top_band); //close_price > top_band && prev_close <= prev_top_band;
+        
         if exit_condition {
              self.update_stop_loss(StopLossType::Price, *low_price);
         }
+        
         false
     }
 

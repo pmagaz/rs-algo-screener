@@ -36,7 +36,6 @@ async fn main() -> Result<()> {
 
     let portfolio = PortFolio {
         order_size,
-        stop_loss,
         commission,
         equity,
         instruments: vec![],
@@ -93,9 +92,9 @@ async fn main() -> Result<()> {
             Box::new(strategies::macd_over_zero::Macd::new().unwrap()),
 
 
-            //Box::new(strategies::stoch_ls::Stoch::new().unwrap()),
-            //Box::new(strategies::macd::Macd::new().unwrap()),
-            //Box::new(strategies::rsi::Rsi::new().unwrap()),
+            Box::new(strategies::stoch_ls::Stoch::new().unwrap()),
+            Box::new(strategies::macd::Macd::new().unwrap()),
+            Box::new(strategies::rsi::Rsi::new().unwrap()),
         ],
     };
 
