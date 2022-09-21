@@ -96,7 +96,7 @@ pub async fn find_compact_instruments(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
-    let env = env::var("ENV").unwrap();
+    let _env = env::var("ENV").unwrap();
 
     let query = doc! {};
 

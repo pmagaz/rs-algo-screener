@@ -110,7 +110,7 @@ impl Backend {
         let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.25);
         let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
         let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.25);
-        let GREEN_LINE = &RGBColor(56, 142, 59);
+        let _GREEN_LINE = &RGBColor(56, 142, 59);
 
         let bottom_point_color = match points_mode {
             PointsMode::MaximaMinima => BLUE.mix(0.15),
@@ -122,7 +122,7 @@ impl Backend {
             PointsMode::Trades => RED_LINE.mix(1.),
         };
 
-        let stop_loss_color = MAGENTA.mix(0.8);
+        let _stop_loss_color = MAGENTA.mix(0.8);
 
         let rsi = &instrument.indicators.rsi.data_a;
 
