@@ -127,7 +127,7 @@ impl<'a> Strategy for MacdDual<'a> {
              self.update_stop_loss(StopLossType::Trailing, *low_price);
         }
         
-        exit_condition
+        false
     }
 
     fn entry_short(

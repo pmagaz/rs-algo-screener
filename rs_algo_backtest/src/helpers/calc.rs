@@ -55,7 +55,7 @@ pub fn calculate_drawdown(
 }
 
 pub fn calculate_drawdown_per(draw_down: f64, price_in: f64) -> f64 {
-    (draw_down / price_in).abs() * 100.
+    (draw_down / price_in) * 100.
 }
 
 pub fn calculate_runup_per(run_up: f64, price_in: f64) -> f64 {
@@ -78,7 +78,7 @@ pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
 pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut max_acc_equity = equity;
     let mut max_equity_index: usize = 0;
-    let max_equity = trades_out
+    let mut max_equity = trades_out
         .iter()
         .enumerate()
         .map(|(idx, x)| {
@@ -88,12 +88,17 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
         })
         .fold(0. / 0., f64::max);
 
+    if max_equity < equity {
+        max_equity = equity;
+        max_equity_index = 0;
+    }
+
     let mut min_acc_equity = max_equity;
 
     let min_equity = trades_out
         .iter()
         .enumerate()
-        .filter(|(idx, x)| idx >= &max_equity_index)
+        //.filter(|(idx, x)| idx >= &max_equity_index)
         .map(|(_idx, x)| {
             min_acc_equity += x.profit;
             min_acc_equity
@@ -162,8 +167,15 @@ pub fn total_profit_per(
 ) -> f64 {
     let initial_value = equity;
     let end_value = initial_value + net_profit;
-    percentage_change(initial_value, end_value)
+
+    if net_profit.is_sign_negative(){
+        percentage_change(-initial_value, -end_value)
+    } else {
+        percentage_change(initial_value, end_value)
+    }
+
 }
+
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {
     match gross_loses {
         0.0 => 0.,

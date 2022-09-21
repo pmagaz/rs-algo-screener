@@ -92,10 +92,6 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         let entry_condition = first_weekly_entry
             || (upper_macd && close_price > top_band && prev_close <= prev_top_band);
 
-        if entry_condition {
-            println!("ENTRY {} {} {}", instrument.symbol, date, entry_condition);
-        }
-
         entry_condition
     }
 
@@ -132,9 +128,9 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         let exit_condition = close_price > top_band && prev_close <= prev_top_band;
 
         if exit_condition {
-            println!("EXIT {} {} {}", instrument.symbol, date, exit_condition);
             self.update_stop_loss(StopLossType::Trailing, *low_price);
         }
+        
         false
     }
 
