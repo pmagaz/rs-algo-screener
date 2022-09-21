@@ -114,22 +114,20 @@ impl<'a> Strategy for MacdDual<'a> {
 
         let prev_index = get_prev_index(index);
 
-        let close_price = &instrument.data.get(index).unwrap().close;
+        let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();
+        let current_macd_b = instrument.indicators.macd.data_b.get(index).unwrap();
         let low_price = &instrument.data.get(index).unwrap().low;
-        let prev_close = &instrument.data.get(prev_index).unwrap().close;
-        let date = &instrument.data.get(prev_index).unwrap().date;
-
-        let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
-        let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
+        let prev_macd_a = instrument.indicators.macd.data_a.get(prev_index).unwrap();
+        let prev_macd_b = instrument.indicators.macd.data_a.get(prev_index).unwrap();
 
         let exit_condition =
-            first_weekly_exit || (close_price > top_band && prev_close <= prev_top_band); //close_price > top_band && prev_close <= prev_top_band;
+            first_weekly_exit || current_macd_a < current_macd_b && prev_macd_b <= prev_macd_a;
         
         if exit_condition {
-             self.update_stop_loss(StopLossType::Price, *low_price);
+             self.update_stop_loss(StopLossType::Trailing, *low_price);
         }
         
-        false
+        exit_condition
     }
 
     fn entry_short(

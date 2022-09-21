@@ -121,7 +121,7 @@ impl<'a> Strategy for Ema<'a> {
         let exit_condition =
             upper_macd && current_ema_50 < current_ema_200 && prev_ema_50 >= prev_ema_200;
        // if exit_condition {
-            // self.update_stop_loss(StopLossType::Price, *low_price);
+            // self.update_stop_loss(StopLossType::Trailing, *low_price);
         // }
         exit_condition
     }

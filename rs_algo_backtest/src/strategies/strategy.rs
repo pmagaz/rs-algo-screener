@@ -181,7 +181,6 @@ pub trait Strategy: DynClone {
         let exit_type: TradeType;
 
         let stop_loss = self.stop_loss();
-            //println!("111111 {:?}", stop_loss);
 
         if stop_loss.price != 0. {
             trade_in.stop_loss = update_stop_loss_values(
@@ -191,7 +190,6 @@ pub trait Strategy: DynClone {
             );
         }
 
-        //println!("2222222 {:?}", trade_in.stop_loss);
         if self.exit_long(index, instrument, upper_tf_instrument) {
             exit_type = TradeType::ExitLong
         } else if self.exit_short(index, instrument, upper_tf_instrument) {

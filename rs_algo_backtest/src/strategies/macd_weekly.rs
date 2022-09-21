@@ -55,7 +55,7 @@ impl<'a> Strategy for MacdWeekly<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
-        get_upper_timeframe_data(
+        let first_weekly_entry = get_upper_timeframe_data(
             index,
             instrument,
             upper_tf_instrument,
@@ -67,7 +67,10 @@ impl<'a> Strategy for MacdWeekly<'a> {
                 let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
                 curr_upper_macd_a > curr_upper_macd_b && prev_upper_macd_b >= prev_upper_macd_a
             },
-        )
+        );
+
+        let entry_condition = first_weekly_entry;
+        entry_condition
     }
 
     fn exit_long(
@@ -76,19 +79,22 @@ impl<'a> Strategy for MacdWeekly<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
-        get_upper_timeframe_data(
+        let first_weekly_exit = get_upper_timeframe_data(
             index,
             instrument,
             upper_tf_instrument,
             |(idx, prev_idx, upper_inst)| {
                 let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
-
                 let prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
                 let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
                 curr_upper_macd_a < curr_upper_macd_b && prev_upper_macd_a >= prev_upper_macd_b
             },
-        )
+        );
+
+        let exit_condition = first_weekly_exit;
+        exit_condition
+
     }
 
     fn entry_short(

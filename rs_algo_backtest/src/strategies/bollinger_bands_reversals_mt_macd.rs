@@ -133,7 +133,7 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
 
         if exit_condition {
             println!("EXIT {} {} {}", instrument.symbol, date, exit_condition);
-            self.update_stop_loss(StopLossType::Price, *low_price);
+            self.update_stop_loss(StopLossType::Trailing, *low_price);
         }
         false
     }

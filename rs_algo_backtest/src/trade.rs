@@ -300,12 +300,6 @@ pub fn resolve_stop_loss(current_price: f64, trade_in: &TradeIn) -> bool {
     
     let stop_loss_price = trade_in.stop_loss.price;
 
-    let leches = match trade_in.trade_type {
-        TradeType::EntryLong => current_price <= stop_loss_price,
-        TradeType::EntryShort => current_price >= stop_loss_price,
-        _ => current_price - current_price <= stop_loss_price,
-    };
-   println!("66666666 {} {} {:?} {}", current_price, stop_loss_price, trade_in.trade_type, current_price <= stop_loss_price); 
     match trade_in.trade_type {
         TradeType::EntryLong => current_price <= stop_loss_price,
         TradeType::EntryShort => current_price >= stop_loss_price,

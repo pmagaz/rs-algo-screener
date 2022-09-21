@@ -50,6 +50,7 @@ impl Backend {
         let trades_in: &Vec<TradeIn> = trades.0;
         let trades_out: &Vec<TradeOut> = trades.1;
         let mut stop_loss: Vec<(usize, f64)> = vec![];
+        let mut stop_loss_types: Vec<(usize, StopLossType)> = vec![];
 
         let points_mode = match trades_out.len().cmp(&0) {
             Ordering::Greater => PointsMode::Trades,
@@ -90,6 +91,12 @@ impl Backend {
                 .filter(|x| x.trade_type == TradeType::StopLoss)
                 .map(|x| (x.index_out, x.price_out))
                 .collect();
+
+            stop_loss_types = trades_in
+                .iter()
+                .map(|x| (x.index_in, x.stop_loss.stop_type.to_owned()))
+                .collect();
+
         } else {
             top_points_set = instrument.peaks.local_maxima.clone();
             low_points_set = instrument.peaks.local_minima.clone();
@@ -298,11 +305,17 @@ impl Backend {
                     }
 
                     if top_points_set.contains(&(i, price)) {
-                        if stop_loss.contains(&(i, price)) {
+                        if stop_loss.contains(&(i, price)) && stop_loss_types.contains(&(i, StopLossType::Trailing ) ) {
                             TriangleMarker::new(
                                 (candle.date, price + (price * local_peaks_marker_pos)),
                                 -4,
-                                stop_loss_color,
+                                MAGENTA.mix(0.8),
+                            )
+                        } else if stop_loss.contains(&(i, price)) && stop_loss_types.contains(&(i, StopLossType::Atr ) ) {
+                            TriangleMarker::new(
+                                (candle.date, price + (price * local_peaks_marker_pos)),
+                                -4,
+                                RED.mix(0.8),
                             )
                         } else {
                             TriangleMarker::new(
