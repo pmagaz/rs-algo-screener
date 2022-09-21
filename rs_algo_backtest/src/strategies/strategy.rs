@@ -182,7 +182,7 @@ pub trait Strategy: DynClone {
 
         let stop_loss = self.stop_loss();
 
-        if stop_loss.price != 0. {
+        if stop_loss.stop_type != StopLossType::Atr && stop_loss.stop_type != StopLossType::Percentage {
             trade_in.stop_loss = update_stop_loss_values(
                 &trade_in.stop_loss,
                 stop_loss.stop_type.to_owned(),
