@@ -105,7 +105,8 @@ async fn main() -> Result<()> {
                 is_sp500 = false;
                 is_crypto = false;
                 market = Market::Forex;
-            } else if symbol_in_list(&s.symbol, &crypto_symbols) {
+            } else
+             if symbol_in_list(&s.symbol, &crypto_symbols) {
                 is_crypto = true;
                 is_sp500 = false;
                 is_forex = false;

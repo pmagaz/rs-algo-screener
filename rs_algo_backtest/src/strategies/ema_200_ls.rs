@@ -18,10 +18,12 @@ pub struct Ema<'a> {
 #[async_trait]
 impl<'a> Strategy for Ema<'a> {
     fn new() -> Result<Self> {
+        
         let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
         .unwrap()
         .parse::<f64>()
         .unwrap();
+        
         Ok(Self {
             stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "EMA_200",

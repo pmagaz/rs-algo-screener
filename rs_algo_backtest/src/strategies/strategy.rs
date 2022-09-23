@@ -3,7 +3,6 @@ use crate::trade::*;
 use async_trait::async_trait;
 use dyn_clone::DynClone;
 use rs_algo_shared::error::Result;
-use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
@@ -128,7 +127,7 @@ pub trait Strategy: DynClone {
                     };
                 }
 
-                if !open_positions {
+                if !open_positions && self.there_are_funds(&trades_out) {
                     let trade_in_result = self.market_in_fn(
                         index,
                         instrument,
@@ -220,6 +219,15 @@ pub trait Strategy: DynClone {
         let stop_loss = self.stop_loss();
         update_stop_loss_values(stop_loss, stop_type, price);
         true
+    }
+
+    fn there_are_funds(&mut self, trades_out: &Vec<TradeOut> ) -> bool {
+        let profit: f64 = trades_out.iter().map(|trade| trade.profit_per).sum();
+        if profit > -90. {
+            true
+        } else {
+            false
+        }
     }
 }
 

@@ -57,7 +57,7 @@ impl Indicator for Macd {
     }
 
     fn next(&mut self, value: f64) -> Result<()> {
-        let a = self.ema_b.next(value) - self.ema_a.next(value);
+        let a = self.ema_a.next(value) - self.ema_b.next(value);
         let b = self.ema_c.next(a);
         self.data_a.push(a);
         self.data_b.push(b);

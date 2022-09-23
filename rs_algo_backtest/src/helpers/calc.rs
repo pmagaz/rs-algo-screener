@@ -6,6 +6,8 @@ use rs_algo_shared::models::pattern::*;
 use rs_algo_shared::models::time_frame::*;
 use std::cmp::Ordering;
 
+use crate::trade;
+
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
     size * (price_out - price_in)
 }
@@ -77,35 +79,30 @@ pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
 
 pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut max_acc_equity = equity;
-    let mut max_equity_index: usize = 0;
-    let mut max_equity = trades_out
+    let mut max_equity_values: Vec<f64> = vec![equity];
+
+    let mut max_equity_peak = trades_out
         .iter()
-        .enumerate()
-        .map(|(idx, x)| {
+        .map(|x| {
             max_acc_equity += x.profit;
-            max_equity_index = idx;
+            max_equity_values.push(max_acc_equity);
             max_acc_equity
         })
         .fold(0. / 0., f64::max);
 
-    if max_equity < equity {
-        max_equity = equity;
-        max_equity_index = 0;
+    let mut max_equity_index = max_equity_values.iter().position(|&r| r == max_equity_peak).unwrap();
+
+    if max_equity_index+1 == max_equity_values.len() {
+        max_equity_values.remove(max_equity_index);
+        max_equity_peak = max_equity_values.iter().map(|x| *x).fold(0. / 0., f64::max);
+        max_equity_index = max_equity_values.iter().position(|&r| r == max_equity_peak).unwrap();
+    } else {
+        max_equity_peak = max_equity_values.iter().map(|x| *x).fold(0. / 0., f64::max);
+        max_equity_index = max_equity_values.iter().position(|&r| r == max_equity_peak).unwrap();
     }
+    let min_equity_peak = max_equity_values.iter().enumerate().filter(|(idx, x)| idx >= &max_equity_index).map(|(idx, x)| *x).fold(0. / 0., f64::min);
 
-    let mut min_acc_equity = max_equity;
-
-    let min_equity = trades_out
-        .iter()
-        .enumerate()
-        //.filter(|(idx, x)| idx >= &max_equity_index)
-        .map(|(_idx, x)| {
-            min_acc_equity += x.profit;
-            min_acc_equity
-        })
-        .fold(0. / 0., f64::min);
-
-    ((min_equity - max_equity) / max_equity * 100.).abs()
+    ((min_equity_peak - max_equity_peak) / max_equity_peak * 100.).abs()
 }
 
 pub fn total_runup(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
@@ -163,17 +160,10 @@ pub fn total_profit_per(
     equity: f64,
     net_profit: f64,
     _trades_in: &Vec<TradeIn>,
-    _trades_out: &Vec<TradeOut>,
+    trades_out: &Vec<TradeOut>,
 ) -> f64 {
     let initial_value = equity;
-    let end_value = initial_value + net_profit;
-
-    if net_profit.is_sign_negative(){
-        percentage_change(-initial_value, -end_value)
-    } else {
-        percentage_change(initial_value, end_value)
-    }
-
+    trades_out.iter().map(|trade| trade.profit_per).sum()
 }
 
 pub fn total_profit_factor(gross_profits: f64, gross_loses: f64) -> f64 {

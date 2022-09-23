@@ -112,6 +112,7 @@ impl<'a> Strategy for MacdDual<'a> {
             },
         );
 
+
         let prev_index = get_prev_index(index);
 
         let current_macd_a = instrument.indicators.macd.data_a.get(index).unwrap();
@@ -127,7 +128,7 @@ impl<'a> Strategy for MacdDual<'a> {
              self.update_stop_loss(StopLossType::Trailing, *low_price);
         }
         
-        false
+        exit_condition
     }
 
     fn entry_short(
