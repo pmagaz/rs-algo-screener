@@ -90,16 +90,15 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
         })
         .fold(0. / 0., f64::max);
 
+    max_equity_peak = max_equity_values.iter().map(|x| *x).fold(0. / 0., f64::max);
     let mut max_equity_index = max_equity_values.iter().position(|&r| r == max_equity_peak).unwrap();
 
-    if max_equity_index+1 == max_equity_values.len() {
+    if max_equity_index+1 == max_equity_values.len() && max_equity_values.len() > 1{
         max_equity_values.remove(max_equity_index);
         max_equity_peak = max_equity_values.iter().map(|x| *x).fold(0. / 0., f64::max);
         max_equity_index = max_equity_values.iter().position(|&r| r == max_equity_peak).unwrap();
-    } else {
-        max_equity_peak = max_equity_values.iter().map(|x| *x).fold(0. / 0., f64::max);
-        max_equity_index = max_equity_values.iter().position(|&r| r == max_equity_peak).unwrap();
     }
+    
     let min_equity_peak = max_equity_values.iter().enumerate().filter(|(idx, x)| idx >= &max_equity_index).map(|(idx, x)| *x).fold(0. / 0., f64::min);
 
     ((min_equity_peak - max_equity_peak) / max_equity_peak * 100.).abs()
