@@ -1,3 +1,4 @@
+use openssl::memcmp::eq;
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::candle::Candle;
@@ -79,28 +80,53 @@ pub fn avg_per_trade(trades_out: &Vec<&TradeOut>) -> f64 {
 
 pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut max_acc_equity = equity;
-    let mut max_equity_values: Vec<f64> = vec![equity];
+    let mut equity_curve: Vec<f64> = vec![];
 
-    let mut max_equity_peak = trades_out
-        .iter()
-        .map(|x| {
-            max_acc_equity += x.profit;
-            max_equity_values.push(max_acc_equity);
-            max_acc_equity
-        })
-        .fold(0. / 0., f64::max);
-
-    max_equity_peak = max_equity_values.iter().map(|x| *x).fold(0. / 0., f64::max);
-    let mut max_equity_index = max_equity_values.iter().position(|&r| r == max_equity_peak).unwrap();
-
-    if max_equity_index+1 == max_equity_values.len() && max_equity_values.len() > 1{
-        max_equity_values.remove(max_equity_index);
-        max_equity_peak = max_equity_values.iter().map(|x| *x).fold(0. / 0., f64::max);
-        max_equity_index = max_equity_values.iter().position(|&r| r == max_equity_peak).unwrap();
+    for trade in trades_out.iter() {
+        max_acc_equity += trade.profit;
+        equity_curve.push(max_acc_equity);
     }
-    
-    let min_equity_peak = max_equity_values.iter().enumerate().filter(|(idx, x)| idx >= &max_equity_index).map(|(idx, x)| *x).fold(0. / 0., f64::min);
 
+    let mut min_equity_peak = equity_curve
+        .iter()
+        .enumerate()
+        .filter(|(i,x)| {
+            if i > &0 {
+             match equity_curve.get(*i-1) {
+                Some(prev) =>  match prev < x {
+                        true => false,
+                        false => true
+                },
+                None => true,
+            } 
+        } else {
+                false
+            }
+        })
+        .map(|(_i,x)| *x)
+        .fold(f64::NAN, f64::min);
+
+    println!("33333 {:?}", min_equity_peak);
+
+   let min_equity_index = match equity_curve.iter().position(|&r| r == min_equity_peak) {
+        Some(idx) => idx,
+        None => 0,
+   };
+
+    let mut max_equity_peak = equity_curve
+        .iter()
+        .enumerate()
+        .filter(|(i,x)| i <= &min_equity_index)
+        .map(|(i,x)| {
+            *x
+        })
+         .fold(f64::NAN, f64::max);
+
+        if min_equity_peak.is_nan() || max_equity_peak.is_nan()  {
+           max_equity_peak = equity; 
+           min_equity_peak = equity; 
+        }
+  
     ((min_equity_peak - max_equity_peak) / max_equity_peak * 100.).abs()
 }
 
