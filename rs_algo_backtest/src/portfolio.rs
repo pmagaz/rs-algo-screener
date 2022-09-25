@@ -67,7 +67,7 @@ impl PortFolio {
                 ]
                 .concat();
 
-                println!(
+                log::info!(
                     "[BACKTEST] Requesting instruments from {} to {}",
                     offset,
                     offset + limit
@@ -84,7 +84,7 @@ impl PortFolio {
                 offset += limit;
 
                 for instrument in &instruments_to_test {
-                    println!("[BACKTEST] Testing {}... ", instrument.symbol);
+                    log::info!("[BACKTEST] Testing {}... ", instrument.symbol);
                     let backtest_result = dyn_clone::clone_box(strategy)
                         .test(
                             instrument,
@@ -105,7 +105,7 @@ impl PortFolio {
                                     .await
                                     .unwrap();
 
-                            println!(
+                            log::info!(
                                 "[BACKTEST] Strategy {} tested for {} instruments",
                                 &strategy.name(),
                                 avg_sessions.len()
@@ -134,7 +134,7 @@ impl PortFolio {
                 }
             }
 
-            println!(
+            log::info!(
                 "[BACKTEST] Calculating {} averages for {} instruments",
                 &strategy.name(),
                 avg_sessions.len()

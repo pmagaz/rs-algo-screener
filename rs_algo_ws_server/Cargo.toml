@@ -1,14 +1,14 @@
 [package]
-name = "rs_algo_backend"
+name = "rs_algo_ws_server"
 version = "0.1.0"
 authors = ["pmagaz <magazpablo@gmail.com>"]
 edition = "2021"
 
 [dependencies]
+actix = "0.13.0"
 actix-web = "4.1.0"
-actix-http = "3.2.1"
-actix-cors = "0.6.1"
-actix-files = "0.6.1"
+actix-web-actors = "4.1.0"
+actix-broker = "0.4.3"
 anyhow = "1.0.58"
 thiserror = "1.0.31"
 serde = { version = "1.0.139", features = ["derive"] }
@@ -17,13 +17,12 @@ chrono = {version = "0.4.19",  features = ["serde"] }
 dotenv = "0.15.0"
 bson = "2.3.0"
 futures = "0.3.21"
-env_logger = "0.9.0"
-log = "0.4"
 round = "0.1.2"
 async-trait = "0.1.56"
-mongodb = "2.2.2"
-openssl = { version = "0.10.41", features = ["vendored"] }
+env_logger = "0.9.0"
+log = "0.4"
+rand = "0.8"
 
-plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "aa8fdaa"} 
+#rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "aa8fdaa"}
+rs_algo_shared = { path = "../../rs_algo_shared", features = ["broker","websocket"] }
 

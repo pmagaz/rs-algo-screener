@@ -65,7 +65,7 @@ pub trait Strategy: DynClone {
 
             let url = [&endpoint, "/", symbol, "/", uppertimeframe].concat();
 
-            println!(
+            log::info!(
                 "[BACKTEST UPPER TIMEFRAME] {} instrument for {}",
                 &uppertimeframe, &symbol
             );
@@ -99,7 +99,7 @@ pub trait Strategy: DynClone {
             None => "".to_string(),
         };
 
-        println!(
+        log::info!(
             "[BACKTEST] Starting {} backtest for {} from {}",
             self.name(),
             &instrument.symbol,

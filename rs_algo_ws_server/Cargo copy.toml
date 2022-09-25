@@ -1,5 +1,5 @@
 [package]
-name = "rs_algo_backend"
+name = "rs_algo_bot_server"
 version = "0.1.0"
 authors = ["pmagaz <magazpablo@gmail.com>"]
 edition = "2021"
@@ -18,7 +18,6 @@ dotenv = "0.15.0"
 bson = "2.3.0"
 futures = "0.3.21"
 env_logger = "0.9.0"
-log = "0.4"
 round = "0.1.2"
 async-trait = "0.1.56"
 mongodb = "2.2.2"

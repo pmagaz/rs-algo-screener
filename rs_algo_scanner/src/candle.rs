@@ -272,7 +272,7 @@ impl CandleBuilder {
         //(C1 > O1) AND (O > C) AND (O >= C1) AND (O1 >= C) AND ((O – C) > (C1 – O1))
         let (open, _high, _low, close) = &self.get_current_ohlc();
         let (prev_open, _prev_high, _prev_low, prev_close) = &self.get_previous_ohlc(0);
-        //println!("5555555 {:?} {:?}", prev_open, open);
+        //log::info!("5555555 {:?} {:?}", prev_open, open);
         (prev_close > prev_open)
             && (open > close)
             && (open >= prev_close)

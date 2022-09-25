@@ -40,7 +40,7 @@ pub async fn find_one(
         .unwrap()
         .unwrap();
 
-    println!(
+    log::info!(
         "[FINDONE] {} {} {:?}",
         instrument.symbol,
         Local::now(),
@@ -77,7 +77,7 @@ pub async fn chart(
 
     let file = fs::NamedFile::open(image_path).unwrap();
 
-    println!(
+    log::info!(
         "[CHART RENDER] {:?} {:?} {:?}",
         symbol,
         Local::now(),
@@ -94,7 +94,7 @@ pub async fn find(params: String, state: web::Data<AppState>) -> Result<HttpResp
         .await
         .unwrap();
 
-    println!("[FIND] {:?} {:?}", Local::now(), now.elapsed());
+    log::info!("[FIND] {:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(instruments))
 }
@@ -109,7 +109,7 @@ pub async fn find_detail(
         .await
         .unwrap();
 
-    println!("[FIND] {:?} {:?}", Local::now(), now.elapsed());
+    log::info!("[FIND] {:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(instruments))
 }
@@ -121,7 +121,7 @@ pub async fn find_all(
     let now = Instant::now();
     let instruments = db::instrument::find_all(&state).await.unwrap();
 
-    println!("[FIND ALL] {:?} {:?}", Local::now(), now.elapsed());
+    log::info!("[FIND ALL] {:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(instruments))
 }
@@ -143,7 +143,7 @@ pub async fn upsert(
         instrument.symbol = symbol_str[0].to_owned();
     }
 
-    println!(
+    log::info!(
         "[INSTRUMENT] Received {} {:?} in {} mode at {:?}",
         instrument.symbol,
         time_frame,
@@ -164,7 +164,7 @@ pub async fn upsert(
                 .await
                 .unwrap();
 
-        println!(
+        log::info!(
             "{} {:?} at {:?} in {:?}",
             match mode.as_ref() {
                 "daily" => "[INSTRUMENT UPSERTED]",
@@ -191,7 +191,7 @@ pub async fn upsert(
         .await
         .unwrap();
 
-        println!(
+        log::info!(
             "[COMPACT INSTRUMENT UPSERTED] {:?} at {:?} in {:?}",
             symbol,
             Local::now(),

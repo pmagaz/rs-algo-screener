@@ -4,5 +4,7 @@ members = [
     "rs_algo_backend",
     "rs_algo_backtest",
     "rs_algo_client",
+    "rs_algo_ws_server",
+    "rs_algo_bot",
 ]
-default-members = ["rs_algo_scanner","rs_algo_backend","rs_algo_client","rs_algo_backtest"]
+default-members = ["rs_algo_scanner","rs_algo_backend","rs_algo_client","rs_algo_backtest","rs_algo_ws_server","rs_algo_bot"]

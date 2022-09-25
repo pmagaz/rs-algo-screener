@@ -461,8 +461,8 @@ impl Backend {
             ))
             .unwrap();
 
-        root.present().expect("[BACKEND] Error. Can't save file!");
-        println!("[BACKEND] File saved in {}", output_file);
+        root.present().expect(" Error. Can't save file!");
+        log::info!(" File saved in {}", output_file);
         Ok(())
     }
 }

@@ -66,7 +66,7 @@ pub fn resolve_trade_out(
 
     let stop_loss_activated = resolve_stop_loss(current_price, &trade_in);
 
-    // println!("3333333 {:?}", trade_in);
+    // log::info!("3333333 {:?}", trade_in);
 
     if index > trade_in.index_in
         && (exit_type == TradeType::ExitLong
@@ -144,6 +144,7 @@ pub fn resolve_backtest(
         //let net_profit_per = total_profit_per(equity, net_profit);
         let profitable_trades = total_profitable_trades(wining_trades, trades);
         let max_drawdown = total_drawdown(&trades_out, equity);
+
         let max_runup = total_runup(&trades_out, equity);
 
         let strategy_start_price = match instrument.data.first().map(|x| x.open) {
@@ -155,7 +156,7 @@ pub fn resolve_backtest(
             calculate_buy_hold(strategy_start_price, initial_order_amount, current_price);
         let annual_return = 100.;
 
-        println!(
+        log::info!(
             "[BACKTEST] {:} backtested for {:?} sessions",
             instrument.symbol, sessions
         );
@@ -190,7 +191,7 @@ pub fn resolve_backtest(
             annual_return,
         })
     } else {
-        println!(
+        log::info!(
             "[BACKTEST] Error! backtesing {}",
             instrument.symbol.to_owned()
         );

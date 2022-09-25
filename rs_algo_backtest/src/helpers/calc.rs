@@ -92,21 +92,19 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
         .enumerate()
         .filter(|(i,x)| {
             if i > &0 {
-             match equity_curve.get(*i-1) {
-                Some(prev) =>  match prev < x {
+                match equity_curve.get(*i-1) {
+                    Some(prev) =>  match prev < x {
                         true => false,
                         false => true
-                },
-                None => true,
-            } 
-        } else {
+                    },
+                    None => true,
+                    } 
+            } else {
                 false
             }
         })
         .map(|(_i,x)| *x)
         .fold(f64::NAN, f64::min);
-
-    println!("33333 {:?}", min_equity_peak);
 
    let min_equity_index = match equity_curve.iter().position(|&r| r == min_equity_peak) {
         Some(idx) => idx,
@@ -116,11 +114,9 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut max_equity_peak = equity_curve
         .iter()
         .enumerate()
-        .filter(|(i,x)| i <= &min_equity_index)
-        .map(|(i,x)| {
-            *x
-        })
-         .fold(f64::NAN, f64::max);
+        .filter(|(i,_x)| i <= &min_equity_index)
+        .map(|(_i,x)| *x)
+        .fold(f64::NAN, f64::max);
 
         if min_equity_peak.is_nan() || max_equity_peak.is_nan()  {
            max_equity_peak = equity; 

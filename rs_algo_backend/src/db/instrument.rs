@@ -34,7 +34,7 @@ pub async fn find_by_params(
 ) -> Result<Vec<CompactInstrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_COMPACT_COLLECTION").unwrap();
 
-    println!("[PARAMS RECEIVED] {:?} ", params);
+    log::info!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<CompactInstrument>(&state.db_mem, collection_name).await;
 
     //FIXME
@@ -64,7 +64,7 @@ pub async fn find_detail_by_params(
 ) -> Result<Vec<Instrument>, Error> {
     let collection_name = &env::var("DB_INSTRUMENTS_COLLECTION").unwrap();
 
-    println!("[PARAMS RECEIVED] {:?} ", params);
+    log::info!("[PARAMS RECEIVED] {:?} ", params);
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     //FIXME

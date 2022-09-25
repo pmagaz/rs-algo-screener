@@ -15,8 +15,9 @@ use portfolio::PortFolio;
 use strategies::strategy::Strategy;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() {
     dotenv().ok();
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     let start = Instant::now();
     let env = env::var("ENV").unwrap();
@@ -106,7 +107,6 @@ async fn main() -> Result<()> {
         portfolio.backtest(backtest_market).await;
     }
 
-    println!("[Finished] at {:?}  in {:?}", Local::now(), start.elapsed());
+    log::info!("[Finished] at {:?}  in {:?}", Local::now(), start.elapsed());
 
-    Ok(())
 }

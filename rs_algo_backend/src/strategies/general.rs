@@ -142,7 +142,7 @@ impl General {
         &self,
         mut instruments: Cursor<CompactInstrument>,
     ) -> Vec<CompactInstrument> {
-        println!("[STRATEGY] Formating ");
+        log::info!("[STRATEGY] Formating ");
         let mut docs: Vec<CompactInstrument> = vec![];
 
         while let Some(result) = instruments.next().await {

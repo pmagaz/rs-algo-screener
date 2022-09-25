@@ -28,7 +28,7 @@ pub async fn find(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoErro
     let query = doc! {"symbol": { "$in": &portfolio_symbols }};
 
     let instruments = instrument::find(query.to_string(), state).await.unwrap();
-    println!(
+    log::info!(
         "[FIND PORTFOLIO] {:?} {:?} {:?}",
         Local::now(),
         portfolio_symbols,
@@ -43,7 +43,7 @@ pub async fn upsert(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
-    println!(
+    log::info!(
         "[PORTFOLIO] Received at {:?} in {:?}",
         Local::now(),
         now.elapsed()
@@ -54,7 +54,7 @@ pub async fn upsert(
 
     let symbol = watch_instrument.symbol.clone();
 
-    println!(
+    log::info!(
         "[PORTFOLIO] Parsed {:?} at {:?} in {:?}",
         symbol,
         Local::now(),
@@ -66,7 +66,7 @@ pub async fn upsert(
         .await
         .unwrap();
 
-    println!(
+    log::info!(
         "[PORTFOLIO UPSERTED] {:?} at {:?} in {:?}",
         symbol,
         Local::now(),
@@ -85,7 +85,7 @@ pub async fn delete(watch_instrument: String, state: web::Data<AppState>) -> Res
 
     let _result = db::portfolio::delete(&watch_instrument, &state).await.unwrap();
 
-    println!(
+    log::info!(
         "[DELETED PORTFOLIO] {:?} {:?} {:?}",
         Local::now(),
         symbol,

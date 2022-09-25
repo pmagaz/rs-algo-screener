@@ -31,7 +31,7 @@ pub async fn find_one(
         .await
         .unwrap();
 
-    println!("[FINDONE] {:?} {:?}", symbol, Local::now(),);
+    log::info!("[FINDONE] {:?} {:?}", symbol, Local::now(),);
 
     Ok(instrument)
 }

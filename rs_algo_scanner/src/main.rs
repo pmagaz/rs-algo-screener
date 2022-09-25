@@ -34,6 +34,8 @@ use std::{thread, time};
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    
     let start = Instant::now();
     let env = env::var("ENV").unwrap();
     let username = &env::var("BROKER_USERNAME").unwrap();
@@ -119,7 +121,8 @@ async fn main() -> Result<()> {
         }
 
         if !backtest_mode || (backtest_mode && (is_sp500 || is_forex || is_crypto)) {
-            println!("[SCANNER] processing {} ...", &s.symbol);
+        
+            log::info!("processing {} ...", &s.symbol);
 
             screener
                 .get_instrument_data(
@@ -131,8 +134,8 @@ async fn main() -> Result<()> {
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
                         let time_frame = &env::var("BASE_TIME_FRAME").unwrap();
 
-                        println!(
-                            "[SCANNER] {} scanned {} from {} to {} in {:?}",
+                        log::info!(
+                            "{} scanned {} from {} to {} in {:?}",
                             &instrument.symbol(),
                             &time_frame,
                             &instrument.data().first().unwrap().date(),
@@ -162,7 +165,7 @@ async fn main() -> Result<()> {
                             .await
                             .map_err(|_e| RsAlgoErrorKind::RequestError)?;
 
-                        println!(
+                        log::info!(
                             "[BACKEND RESPONSE] {:?} status {:?} at {:?} in {:?}",
                             &instrument.symbol(),
                             res.status(),
@@ -178,7 +181,7 @@ async fn main() -> Result<()> {
             thread::sleep(sleep);
         }
     }
-    println!("[Finished] at {:?}  in {:?}", Local::now(), start.elapsed());
+    log::info!("[Finished] at {:?}  in {:?}", Local::now(), start.elapsed());
 
     Ok(())
 }

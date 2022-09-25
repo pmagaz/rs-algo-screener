@@ -42,7 +42,7 @@ pub async fn find_one(
         .await
         .unwrap();
 
-    println!(
+    log::info!(
         "[FINDONE] {} {} {} {:?}",
         &symbol,
         &time_frame,
@@ -75,14 +75,14 @@ pub async fn find_instruments(
         _ => doc! { "market": &market},
     };
 
-    println!("[BACK TEST INSTRUMENTS] Request for {:?}", market);
+    log::info!("[BACK TEST INSTRUMENTS] Request for {:?}", market);
 
     let backtest_instruments: Vec<Instrument> =
         db::back_test::find_instruments(query, offset, limit, &state)
             .await
             .unwrap();
 
-    println!(
+    log::info!(
         "[BACK TEST INSTRUMENTS] {:?} instruments returned at {:?} {:?}",
         backtest_instruments.len(),
         Local::now(),
@@ -100,14 +100,14 @@ pub async fn find_compact_instruments(
 
     let query = doc! {};
 
-    println!("[BACK TEST INSTRUMENTS] All");
+    log::info!("[BACK TEST INSTRUMENTS] All");
 
     let backtest_instruments: Vec<CompactInstrument> =
         db::back_test::find_backtest_compact_instruments(query, 0, 5000, &state)
             .await
             .unwrap();
 
-    println!(
+    log::info!(
         "[BACK TEST INSTRUMENTS] {:?} instruments returned at {:?} {:?}",
         backtest_instruments.len(),
         Local::now(),
@@ -122,14 +122,14 @@ pub async fn find_instruments_result(
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    println!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
+    log::info!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
     let query = doc! {};
     let backtest_instruments_result: Vec<BackTestInstrumentResult> =
         db::back_test::find_backtest_instruments_result(query, 50, &state)
             .await
             .unwrap();
 
-    println!(
+    log::info!(
         "[BACK TEST INSTRUMENTS] {:?} {:?}",
         Local::now(),
         now.elapsed()
@@ -146,7 +146,7 @@ pub async fn find_instruments_result_by_strategy(
 
     let (market, strategy, strategy_type) = params.into_inner();
 
-    println!(
+    log::info!(
         "[BACK TEST STRATEGIES] For {} Request at {:?}",
         market,
         Local::now()
@@ -159,7 +159,7 @@ pub async fn find_instruments_result_by_strategy(
             .await
             .unwrap();
 
-    println!(
+    log::info!(
         "[BACK TEST INSTRUMENTS] {:?} {:?}",
         Local::now(),
         now.elapsed()
@@ -177,7 +177,7 @@ pub async fn upsert_instruments_result(
 
     let symbol = backtested_result.instrument.symbol.clone();
 
-    println!(
+    log::info!(
         "[BACKTEST INSTRUMENT] instrument {} received at {:?} in {:?}",
         &symbol,
         Local::now(),
@@ -189,7 +189,7 @@ pub async fn upsert_instruments_result(
         .await
         .unwrap();
 
-    println!(
+    log::info!(
         "[BACKTEST RESULT UPSERTED] instrument {} at {:?} in {:?}",
         symbol,
         Local::now(),
@@ -203,7 +203,7 @@ pub async fn upsert_strategies_result(
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
-    println!(
+    log::info!(
         "[BACKTEST INSTRUMENT] Received at {:?} in {:?}",
         Local::now(),
         now
@@ -214,7 +214,7 @@ pub async fn upsert_strategies_result(
         .await
         .unwrap();
 
-    println!(
+    log::info!(
         "[BACKTEST STRATEGY UPSERTED] {:?} at {:?} in {:?}",
         backtested_strategy_result.strategy,
         Local::now(),
@@ -228,7 +228,7 @@ pub async fn find_strategies_result(
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    println!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
+    log::info!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
 
     let query = doc! {};
 
@@ -237,7 +237,7 @@ pub async fn find_strategies_result(
             .await
             .unwrap();
 
-    println!(
+    log::info!(
         "[BACK TEST STRATEGIES] {:?} {:?}",
         Local::now(),
         now.elapsed()
@@ -254,7 +254,7 @@ pub async fn find_strategies_result_instruments(
 
     let instrument = instrument.into_inner();
 
-    println!(
+    log::info!(
         "[BACK TEST STRATEGIES INSTRUMENT] Request for {} at {:?}",
         instrument,
         Local::now()
@@ -267,7 +267,7 @@ pub async fn find_strategies_result_instruments(
             .await
             .unwrap();
 
-    println!(
+    log::info!(
         "[BACK TEST STRATEGIES] {:?} {:?}",
         Local::now(),
         now.elapsed()
@@ -285,7 +285,7 @@ pub async fn chart(
     let symbol = &query.symbol;
     let (market, strategy, strategy_type) = params.into_inner();
 
-    println!(
+    log::info!(
         "[BACKTEST CHART] for {:?} / {:?} at {:?}",
         strategy,
         symbol,
@@ -325,7 +325,7 @@ pub async fn chart(
 
     let file = fs::NamedFile::open(image_path).unwrap();
 
-    println!(
+    log::info!(
         "[BACKTEST CHART RENDER] {:?} {:?} {:?}",
         strategy,
         Local::now(),
