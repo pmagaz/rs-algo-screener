@@ -36,7 +36,6 @@ async fn main() -> Result<()> {
 
     let port = env::var("BACKEND_PORT").expect("BACKEND_PORT not found");
     let app_name = env::var("BACKEND_NAME").expect("BACKEND_NAME not found");
-    //let db_name = env::var("MONGO_MEM_DB_NAME").expect("MONGO_MEM_DB_NAME not found");
 
     let username = env::var("DB_USERNAME").expect("DB_USERNAME not found");
     let password = env::var("DB_PASSWORD").expect("DB_PASSWORD not found");
@@ -58,11 +57,7 @@ async fn main() -> Result<()> {
             .map_err(|_e| RsAlgoError::NoDbConnection)
             .unwrap();
 
-     log::info!(
-        "Starting {} on port {} !",
-        app_name,
-        port.clone()
-    );
+    log::info!("Starting {} on port {} !", app_name, port.clone());
 
     HttpServer::new(move || {
         App::new()

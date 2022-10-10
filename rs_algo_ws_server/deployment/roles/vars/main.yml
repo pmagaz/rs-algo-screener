@@ -1,4 +1,0 @@
-package_name: rs_algo_bot_server
-release_name: rs-algo-backend
-local_path: /home/dev/rs-algo-screener
-chart_path: deployment/chart

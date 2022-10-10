@@ -180,8 +180,6 @@ pub fn home() -> Html {
             (x.patterns.local_patterns.len() > 0
                 && last_pattern.date > to_dbtime(Local::now() - Duration::days(5))
                 && !last_pattern.active.active)
-                && (x.current_candle != CandleType::Karakasa
-                    || x.current_candle != CandleType::Engulfing)
         })
         .map(|x| x.clone())
         .collect();
@@ -193,8 +191,6 @@ pub fn home() -> Html {
             x.patterns.local_patterns.len() > 0
                 && last_pattern.active.active
                 && last_pattern.active.date > to_dbtime(Local::now() - Duration::days(3))
-                && (x.current_candle != CandleType::Karakasa
-                    || x.current_candle != CandleType::Engulfing)
         })
         .map(|x| x.clone())
         .collect();
@@ -204,20 +200,6 @@ pub fn home() -> Html {
         .filter(|x| {
             x.current_price <= x.indicators.bb.current_b
                 && x.prev_price >= x.indicators.bb.prev_b
-                && (x.current_candle == CandleType::Karakasa
-                    || x.current_candle == CandleType::Engulfing)
-        })
-        .map(|x| x.clone())
-        .collect();
-
-    let candles: Vec<CompactInstrument> = use_instruments
-        .iter()
-        .filter(|x| {
-            x.current_candle == CandleType::Karakasa
-                || x.current_candle == CandleType::Engulfing
-                || x.current_candle == CandleType::BullishGap
-                    && (!!symbol_in_list(&x.symbol, &forex_symbols)
-                        && !!symbol_in_list(&x.symbol, &crypto_symbols))
         })
         .map(|x| x.clone())
         .collect();
@@ -272,8 +254,6 @@ pub fn home() -> Html {
                     <InstrumentsList list_type={ ListType::NewPatterns } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={suggested} />
                     <h2 class="navbar-item is-size-3">{ "Pattern activated" }</h2>
                     <InstrumentsList list_type={ ListType::Activated } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={activated} />
-                    <h2 class="navbar-item is-size-3">{ "Candles" }</h2>
-                    <InstrumentsList list_type={ ListType::Activated } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={candles} />
                     <h2 class="navbar-item is-size-3">{ "Forex" }</h2>
                     <InstrumentsList list_type={ ListType::forex } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={forex} />
                     <h2 class="navbar-item is-size-3">{ "Crypto" }</h2>
