@@ -176,10 +176,12 @@ pub fn home() -> Html {
     let suggested: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
-            let last_pattern = x.patterns.local_patterns.last().unwrap();
-            (x.patterns.local_patterns.len() > 0
-                && last_pattern.date > to_dbtime(Local::now() - Duration::days(5))
-                && !last_pattern.active.active)
+            match x.patterns.local_patterns.last() {
+                Some(last_pat) => {
+                        last_pat.date > to_dbtime(Local::now() - Duration::days(5)) && !last_pat.active.active
+                },
+                None => false
+            }
         })
         .map(|x| x.clone())
         .collect();
@@ -187,10 +189,12 @@ pub fn home() -> Html {
     let activated: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
-            let last_pattern = x.patterns.local_patterns.last().unwrap();
-            x.patterns.local_patterns.len() > 0
-                && last_pattern.active.active
-                && last_pattern.active.date > to_dbtime(Local::now() - Duration::days(3))
+            match x.patterns.local_patterns.last() {
+                Some(last_pat) => {
+                    last_pat.active.active && last_pat.active.date > to_dbtime(Local::now() - Duration::days(3))
+                },
+                None => false
+            }
         })
         .map(|x| x.clone())
         .collect();
