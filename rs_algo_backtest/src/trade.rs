@@ -1,3 +1,5 @@
+use std::env;
+
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
@@ -17,8 +19,28 @@ pub fn resolve_trade_in(
     if entry_type == TradeType::EntryLong || entry_type == TradeType::EntryShort {
         let nex_day_index = index + 1;
         let next_day_candle = instrument.data.get(nex_day_index);
+
+        let spread = match instrument.market {
+            Market::Stock => env::var("DEFAULT_SPREAD_STOCK")
+                .unwrap()
+                .parse::<f64>()
+                .unwrap(),
+            Market::Forex => env::var("DEFAULT_SPREAD_FOREX")
+                .unwrap()
+                .parse::<f64>()
+                .unwrap(),
+            Market::Crypto => env::var("DEFAULT_SPREAD_CRYPTO")
+                .unwrap()
+                .parse::<f64>()
+                .unwrap(),
+            Market::Default => env::var("DEFAULT_SPREAD_STOCK")
+                .unwrap()
+                .parse::<f64>()
+                .unwrap(),
+        };
+
         let next_day_price = match next_day_candle {
-            Some(candle) => candle.open,
+            Some(candle) => candle.open + (candle.open * spread) / 100.,
             None => -100.,
         };
         let current_date = next_day_candle.unwrap().date;
@@ -158,7 +180,8 @@ pub fn resolve_backtest(
 
         log::info!(
             "[BACKTEST] {:} backtested for {:?} sessions",
-            instrument.symbol, sessions
+            instrument.symbol,
+            sessions
         );
 
         BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
@@ -260,11 +283,8 @@ pub fn create_stop_loss(
             };
             price
         }
-        _ => {
-            stop_loss_price
-        },
+        _ => stop_loss_price,
     };
-
 
     // let price = match entry_type {
     //     TradeType::EntryLong => current_price - atr_value,
@@ -275,7 +295,7 @@ pub fn create_stop_loss(
     StopLoss {
         price,
         value: stop_loss_value,
-        stop_type: stop_loss.stop_type.to_owned(), 
+        stop_type: stop_loss.stop_type.to_owned(),
         created_at: to_dbtime(Local::now()),
         updated_at: to_dbtime(Local::now()),
         valid_until: to_dbtime(Local::now() + Duration::days(1000)),
@@ -298,7 +318,6 @@ pub fn update_stop_loss_values(
 }
 
 pub fn resolve_stop_loss(current_price: f64, trade_in: &TradeIn) -> bool {
-    
     let stop_loss_price = trade_in.stop_loss.price;
 
     match trade_in.trade_type {
