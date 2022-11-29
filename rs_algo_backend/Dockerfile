@@ -48,7 +48,7 @@ RUN addgroup -S $APP_USER \
 COPY ./fonts.conf ./
 RUN sudo mv fonts.conf /etc/fonts/
 RUN sudo rm -Rf /etc/fonts/conf.d/*.conf
-RUN sudo find /usr/share/fonts/TTF/*.ttf | grep -v OpenSans-Regular.ttf | xargs rm -r
+#RUN sudo find /usr/share/fonts/TTF/*.ttf | grep -v OpenSans-Regular.ttf | xargs rm -r
 RUN fc-cache -fv
 
 COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${APP_DIR}/$APP_NAME
