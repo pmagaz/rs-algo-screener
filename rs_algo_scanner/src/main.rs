@@ -1,10 +1,8 @@
-use crate::broker::*;
 use crate::error::Result;
 use chrono::Datelike;
 use error::RsAlgoErrorKind;
-use instrument::Instrument;
-use rs_algo_shared::broker;
 use rs_algo_shared::broker::xtb::*;
+use rs_algo_shared::broker::*;
 use rs_algo_shared::helpers::comp::symbol_in_list;
 use rs_algo_shared::helpers::date;
 use rs_algo_shared::helpers::date::*;
@@ -12,16 +10,17 @@ use rs_algo_shared::helpers::http::request;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::time_frame::*;
+use rs_algo_shared::scanner::instrument::{HigherTMInstrument, Instrument};
 use screener::Screener;
 use std::time::Instant;
 
 mod backend;
-mod candle;
+//mod candle;
 mod error;
 mod helpers;
-mod indicators;
-mod instrument;
-mod patterns;
+//mod indicators;
+//mod instrument;
+//mod patterns;
 mod prices;
 mod screener;
 
@@ -35,7 +34,7 @@ use std::{thread, time};
 async fn main() -> Result<()> {
     dotenv().ok();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-    
+
     let start = Instant::now();
     let env = env::var("ENV").unwrap();
     let username = &env::var("BROKER_USERNAME").unwrap();
@@ -107,8 +106,7 @@ async fn main() -> Result<()> {
                 is_sp500 = false;
                 is_crypto = false;
                 market = Market::Forex;
-            } else
-             if symbol_in_list(&s.symbol, &crypto_symbols) {
+            } else if symbol_in_list(&s.symbol, &crypto_symbols) {
                 is_crypto = true;
                 is_sp500 = false;
                 is_forex = false;
@@ -121,7 +119,6 @@ async fn main() -> Result<()> {
         }
 
         if !backtest_mode || (backtest_mode && (is_sp500 || is_forex || is_crypto)) {
-        
             log::info!("processing {} ...", &s.symbol);
 
             screener

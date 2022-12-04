@@ -1,10 +1,10 @@
 use crate::backend::Backend;
 use crate::error::Result;
-use crate::instrument::Instrument;
 
 use rs_algo_shared::broker::{Broker, Response, VEC_DOHLC};
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::time_frame::TimeFrameType;
+use rs_algo_shared::scanner::instrument::Instrument;
 
 use std::env;
 use std::future::Future;
@@ -28,7 +28,7 @@ where
 
     pub async fn login(&mut self, username: &str, password: &str) -> Result<()> {
         let result = self.broker.login(username, password).await.unwrap();
-        Ok(result)
+        Ok(())
     }
 
     pub async fn get_symbols(&mut self) -> Result<Response<VEC_DOHLC>> {
@@ -48,10 +48,9 @@ where
         F: Send + FnMut(Instrument) -> T,
         T: Future<Output = Result<()>> + Send + 'static,
     {
-
         let res = self
             .broker
-            .get_instrument_data(symbol, time_frame.value(), start_date)
+            .get_instrument_data(symbol, time_frame.to_number() as usize, start_date)
             .await
             .unwrap();
 
@@ -60,8 +59,6 @@ where
         //     .get_instrument_streaming(symbol, time_frame.value(), start_date)
         //     .await
         //     .unwrap();
-
- 
 
         let mut instrument = Instrument::new()
             .symbol(&symbol)

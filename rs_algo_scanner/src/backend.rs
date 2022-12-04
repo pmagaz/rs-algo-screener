@@ -1,8 +1,7 @@
-use crate::candle::CandleType;
 use crate::error::Result;
-use crate::indicators::Indicator;
-use crate::instrument::Instrument;
-use rs_algo_shared::models::pattern::PatternDirection;
+use rs_algo_shared::indicators::Indicator;
+use rs_algo_shared::scanner::instrument::Instrument;
+use rs_algo_shared::scanner::pattern::PatternDirection;
 
 use plotters::prelude::*;
 
@@ -238,9 +237,7 @@ impl Backend {
                     (0..)
                         .zip(pattern.data_points.iter())
                         .enumerate()
-                        .filter(|(key, (i, highs))| {
-                            key < &(total_len - 3) && highs.0 < total_len
-                        })
+                        .filter(|(key, (i, highs))| key < &(total_len - 3) && highs.0 < total_len)
                         .map(|(key, (i, highs))| {
                             let idx = highs.0;
                             let value = highs.1;
@@ -259,9 +256,7 @@ impl Backend {
                     (0..)
                         .zip(pattern.data_points.iter())
                         .enumerate()
-                        .filter(|(key, (i, highs))| {
-                            key < &(total_len - 3) && highs.0 < total_len
-                        })
+                        .filter(|(key, (i, highs))| key < &(total_len - 3) && highs.0 < total_len)
                         .map(|(key, (i, highs))| {
                             let idx = highs.0;
                             let value = highs.1;

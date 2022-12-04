@@ -1,9 +1,10 @@
-use crate::candle::Candle;
-
 use crate::helpers::slope_intercept::slope_intercept;
+
 use rs_algo_shared::helpers::comp::percentage_change;
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::models::pattern::*;
+use rs_algo_shared::scanner::candle::Candle;
+use rs_algo_shared::scanner::pattern::{DataPoints, PatternDirection, PatternType};
+
 use std::env;
 
 pub type PriceBreak = (bool, usize, f64, DbDateTime);
