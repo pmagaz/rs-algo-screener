@@ -3,13 +3,15 @@ use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
 use crate::render_image::Backend;
 
-use actix_files as fs;
-use actix_web::{web, HttpResponse};
-use bson::doc;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
-use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::models::trade::{TradeIn, TradeOut};
+use rs_algo_shared::scanner::instrument::*;
+
+use actix_files as fs;
+use actix_web::{web, HttpResponse};
+use bson::doc;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;

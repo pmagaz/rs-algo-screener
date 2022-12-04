@@ -5,7 +5,9 @@ authors = ["pmagaz <magazpablo@gmail.com>"]
 edition = "2021"
 
 [dependencies]
+actix = "0.13.0"
 actix-web = "4.1.0"
+actix-web-actors = "4.1.0"
 actix-http = "3.2.1"
 actix-cors = "0.6.1"
 actix-files = "0.6.1"
@@ -25,7 +27,8 @@ bson = "2.3.0"
 openssl = { version = "0.10.41", features = ["vendored"] }
 
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "aa8fdaa"} 
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "51f9501", features = ["broker","websocket"]}
+#rs_algo_shared = { path = "../../rs_algo_shared", features = ["websocket","broker"] }
 
 [profile.release]
 strip = true

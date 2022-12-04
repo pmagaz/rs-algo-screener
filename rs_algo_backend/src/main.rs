@@ -17,6 +17,7 @@ use middleware::logger::logger_middleware;
 use models::app_state::AppState;
 use models::db::Db;
 use services::back_test;
+use services::bot;
 use services::index::index;
 use services::instrument;
 use services::portfolio;
@@ -26,7 +27,7 @@ use std::env;
 #[actix_web::main]
 async fn main() -> Result<()> {
     dotenv().ok();
-    
+
     // env_logger::Builder::from_default_env()
     // .format(|buf, record| writeln!(buf, "{} - {}", record.level(), record.args()))
     // .filter(None, LevelFilter::Info)
@@ -45,6 +46,9 @@ async fn main() -> Result<()> {
     let db_hdd_name = env::var("MONGO_HDD_DB_NAME").expect("MONGO_HD_DB_NAME not found");
     let db_hdd_uri = env::var("MONGO_HDD_DB_URI").expect("MONGO_HD_DB_URI not found");
 
+    let db_bot_name = env::var("MONGO_BOT_DB_NAME").expect("MONGO_BOT_DB_NAME not found");
+    let db_bot_uri = env::var("MONGO_BOT_DB_URI").expect("MONGO_BOT_DB_URI not found");
+
     let mongodb_mem_client: mongodb::Client =
         mongo::connect(&username, &password, &db_mem_name, &db_mem_uri)
             .await
@@ -57,6 +61,12 @@ async fn main() -> Result<()> {
             .map_err(|_e| RsAlgoError::NoDbConnection)
             .unwrap();
 
+    let mongodb_bot_client: mongodb::Client =
+        mongo::connect(&username, &password, &db_bot_name, &db_bot_uri)
+            .await
+            .map_err(|_e| RsAlgoError::NoDbConnection)
+            .unwrap();
+
     log::info!("Starting {} on port {} !", app_name, port.clone());
 
     HttpServer::new(move || {
@@ -65,6 +75,10 @@ async fn main() -> Result<()> {
             .wrap(logger_middleware())
             .data(AppState {
                 app_name: String::from(&app_name),
+                db_bot: Db {
+                    client: mongodb_bot_client.clone(),
+                    name: db_bot_name.to_owned(),
+                },
                 db_mem: Db {
                     client: mongodb_mem_client.clone(),
                     name: db_mem_name.to_owned(),
@@ -78,6 +92,7 @@ async fn main() -> Result<()> {
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")
+                    .route("/bot", web::get().to(bot::subscribe))
                     .route("/instruments", web::post().to(instrument::find))
                     .route("/instruments", web::put().to(instrument::upsert))
                     .route("/instruments/{symbol}", web::get().to(instrument::find_one))

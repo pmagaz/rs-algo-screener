@@ -1,17 +1,18 @@
 use super::helpers::*;
 use crate::models::app_state::AppState;
-use crate::models::instrument::*;
-
 use crate::models::backtest_instrument::BackTestInstrumentResult;
 use crate::models::backtest_strategy::BackTestStrategyResult;
+
+use rs_algo_shared::helpers::comp::*;
+use rs_algo_shared::helpers::date::*;
+use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
+use rs_algo_shared::scanner::instrument::*;
+
 use actix_web::web;
 use bson::{doc, Document};
 use futures::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
-use rs_algo_shared::helpers::comp::*;
-use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use std::env;
 
 pub async fn find_one(

@@ -8,13 +8,44 @@ use crate::strategies::general::General;
 use rs_algo_shared::models::api::*;
 use rs_algo_shared::scanner::instrument::*;
 
+use actix::{Actor, StreamHandler};
 use actix_files as fs;
-use actix_web::{web, HttpResponse};
+use actix_web::{web, App, Error, HttpRequest, HttpResponse, HttpServer};
+use actix_web_actors::ws;
 use rs_algo_shared::helpers::date::Local;
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
 use std::time::Instant;
+
+struct MyWs;
+
+impl Actor for MyWs {
+    type Context = ws::WebsocketContext<Self>;
+}
+
+/// Handler for ws::Message message
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
+    fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
+        match msg {
+            Ok(ws::Message::Ping(msg)) => ctx.pong(&msg),
+            Ok(ws::Message::Text(text)) => ctx.text(text),
+            Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
+            _ => (),
+        }
+    }
+}
+
+pub async fn subscribe(
+    req: HttpRequest,
+    stream: web::Payload,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, Error> {
+    let resp = ws::start(MyWs {}, &req, stream);
+
+    println!("{:?}", resp);
+    resp
+}
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 pub struct Params {

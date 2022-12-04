@@ -1,8 +1,12 @@
 use crate::error::Result;
+
+use rs_algo_shared::indicators::Indicator;
+use rs_algo_shared::models::stop_loss::StopLossType;
+use rs_algo_shared::models::trade::{TradeIn, TradeOut, TradeType};
+use rs_algo_shared::scanner::instrument::*;
+use rs_algo_shared::scanner::pattern::{PatternDirection, PatternType};
+
 use plotters::prelude::*;
-use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::pattern::*;
 use std::cmp::Ordering;
 use std::env;
 
@@ -96,7 +100,6 @@ impl Backend {
                 .iter()
                 .map(|x| (x.index_in, x.stop_loss.stop_type.to_owned()))
                 .collect();
-
         } else {
             top_points_set = instrument.peaks.local_maxima.clone();
             low_points_set = instrument.peaks.local_minima.clone();
@@ -124,26 +127,26 @@ impl Backend {
 
         let _stop_loss_color = MAGENTA.mix(0.8);
 
-        let rsi = &instrument.indicators.rsi.data_a;
+        let rsi = &instrument.indicators.rsi.get_data_a();
 
         let patterns = local_patterns;
         let stoch = &instrument.indicators.stoch;
-        let stoch_a = &stoch.data_a;
-        let stoch_b = &stoch.data_b;
+        let stoch_a = &stoch.get_data_a();
+        let stoch_b = &stoch.get_data_b();
 
         let macd = &instrument.indicators.macd;
-        let _macd_a = &macd.data_a;
-        let _macd_b = &macd.data_b;
+        let _macd_a = &macd.get_data_a();
+        let _macd_b = &macd.get_data_b();
 
-        let _rsi = &instrument.indicators.rsi.data_a;
+        let _rsi = &instrument.indicators.rsi.get_data_a();
 
-        let _ema_a = &instrument.indicators.ema_a.data_a;
-        let _ema_b = &instrument.indicators.ema_b.data_a;
-        let _ema_c = &instrument.indicators.ema_c.data_a;
+        let _ema_a = &instrument.indicators.ema_a.get_data_a();
+        let _ema_b = &instrument.indicators.ema_b.get_data_a();
+        let _ema_c = &instrument.indicators.ema_c.get_data_a();
 
-        let bb_a = &instrument.indicators.bb.data_a;
-        let bb_b = &instrument.indicators.bb.data_b;
-        let bb_c = &instrument.indicators.bb.data_c;
+        let bb_a = &instrument.indicators.bb.get_data_a();
+        let bb_b = &instrument.indicators.bb.get_data_b();
+        let bb_c = &instrument.indicators.bb.get_data_c();
 
         //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
         let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
@@ -305,13 +308,17 @@ impl Backend {
                     }
 
                     if top_points_set.contains(&(i, price)) {
-                        if stop_loss.contains(&(i, price)) && stop_loss_types.contains(&(i, StopLossType::Trailing ) ) {
+                        if stop_loss.contains(&(i, price))
+                            && stop_loss_types.contains(&(i, StopLossType::Trailing))
+                        {
                             TriangleMarker::new(
                                 (candle.date, price + (price * local_peaks_marker_pos)),
                                 -4,
                                 MAGENTA.mix(0.8),
                             )
-                        } else if stop_loss.contains(&(i, price)) && stop_loss_types.contains(&(i, StopLossType::Atr ) ) {
+                        } else if stop_loss.contains(&(i, price))
+                            && stop_loss_types.contains(&(i, StopLossType::Atr))
+                        {
                             TriangleMarker::new(
                                 (candle.date, price + (price * local_peaks_marker_pos)),
                                 -4,

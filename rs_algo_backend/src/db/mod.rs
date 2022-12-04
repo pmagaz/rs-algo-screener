@@ -1,4 +1,5 @@
 pub mod back_test;
+pub mod bot;
 pub mod helpers;
 pub mod instrument;
 pub mod mongo;

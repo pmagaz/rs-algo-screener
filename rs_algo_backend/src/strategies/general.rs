@@ -1,18 +1,17 @@
+use rs_algo_shared::helpers::status::*;
+use rs_algo_shared::models::status::Status;
+use rs_algo_shared::scanner::divergence::DivergenceType;
+use rs_algo_shared::scanner::instrument::*;
+use rs_algo_shared::scanner::pattern::*;
+
 use bson::{doc, Document};
 use chrono::Duration;
 use futures::stream::StreamExt;
 use mongodb::Cursor;
-
-use rs_algo_shared::helpers::status::*;
-use rs_algo_shared::models::divergence::DivergenceType;
-use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::pattern::*;
-use rs_algo_shared::models::status::Status;
-use std::cmp::Ordering;
-
 use round::round;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::date::*;
+use std::cmp::Ordering;
 use std::env;
 
 pub struct General {

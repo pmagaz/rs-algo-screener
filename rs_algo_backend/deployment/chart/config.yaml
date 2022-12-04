@@ -33,3 +33,7 @@ MONGO_HDD_DB_URI: "@mongodb:27017/watch-db?authSource=admin&readPreference=prima
 #MONGO_HDD_DB_URI: "@mongodb:27017/watch-db?authSource=admin&readPreference=primary&retryWrites=true&directConnection=true&ssl=false"
 DB_WATCHLIST_COLLECTION: "watch-list"
 DB_PORTFOLIO_COLLECTION: "portfolio"
+
+MONGO_BOT_DB_NAME: "bot-db"
+MONGO_BOT_DB_URI: "@mongodb-bot:27017/bot-db?authSource=admin&readPreference=primary&retryWrites=true&directConnection=true&ssl=false"
+BOT_COLLECTION: "bots"

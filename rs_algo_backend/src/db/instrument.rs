@@ -2,7 +2,7 @@ use super::helpers::*;
 use crate::models::app_state::AppState;
 use crate::strategies::general::General;
 
-use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::scanner::instrument::*;
 
 use actix_web::web;
 use bson::doc;
