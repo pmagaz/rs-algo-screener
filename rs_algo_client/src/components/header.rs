@@ -36,8 +36,14 @@ pub fn header() -> Html {
               </a>
 
               <a class="navbar-item">
-            <Link<Route> classes={classes!("navbar-item")} to={Route::Strategies}>
-                { "Strategies" }
+                <Link<Route> classes={classes!("navbar-item")} to={Route::Strategies}>
+                    { "Strategies" }
+                </Link<Route>>
+              </a>
+
+              <a class="navbar-item">
+                <Link<Route> classes={classes!("navbar-item")} to={Route::Bots}>
+                  { "Bots" }
                 </Link<Route>>
               </a>
 

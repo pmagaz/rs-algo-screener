@@ -92,7 +92,7 @@ async fn main() -> Result<()> {
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")
-                    .route("/bot", web::get().to(bot::subscribe))
+                    .route("/bots", web::get().to(bot::find))
                     .route("/instruments", web::post().to(instrument::find))
                     .route("/instruments", web::put().to(instrument::upsert))
                     .route("/instruments/{symbol}", web::get().to(instrument::find_one))

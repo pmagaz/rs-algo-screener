@@ -1,3 +1,4 @@
+use crate::pages::bots::page::Bots;
 use crate::pages::home::page::Home;
 use crate::pages::strategies::page::Strategies;
 use crate::pages::strategy::page::Strategy;
@@ -13,6 +14,8 @@ pub struct Instrument {
 pub enum Route {
     #[at("/")]
     Home,
+    #[at("/bots/")]
+    Bots,
     #[at("/strategies/")]
     Strategies,
     #[at("/strategies/:instrument")]
@@ -29,6 +32,9 @@ pub fn switch(routes: &Route) -> Html {
     match routes.clone() {
         Route::Home => {
             html! { <Home /> }
+        }
+        Route::Bots => {
+            html! { <Bots /> }
         }
         Route::Strategies => {
             html! { <Strategies  /> }

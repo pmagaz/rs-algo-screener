@@ -1,13 +1,9 @@
-use reqwest::Client;
-//use rs_algo_shared::error::{Result, RsAlgoError};
 use rs_algo_shared::error::Result;
-use rs_algo_shared::error::*;
-use rs_algo_shared::helpers::http::{request, HttpMethod};
-use rs_algo_shared::models::api::ApiResponse;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
-use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::watch_instrument::*;
+
+use reqwest::Client;
+
 pub async fn get_strategies(url: &str, data: String) -> Result<Vec<BackTestStrategyResult>>
 where
 {

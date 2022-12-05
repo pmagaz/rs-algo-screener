@@ -1,16 +1,17 @@
 use crate::helpers::status::*;
 
-use round::{round};
-use rs_algo_shared::models::pattern::*;
-use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::models::status::Status;
-use rs_algo_shared::models::divergence::*;
+use rs_algo_shared::scanner::divergence::*;
 use rs_algo_shared::helpers::date::{Local, DateTime, Utc, Duration};
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::status::*;
+use rs_algo_shared::scanner::pattern::{PatternType, Pattern, PatternDirection};
+
 use std::env;
-use yew::{function_component, html, Callback, Properties, Html,events::Event};
+use yew::{function_component, html, Callback, Properties, Html};
 use wasm_bindgen::prelude::*;
+use round::{round};
 
 #[wasm_bindgen]
 extern "C" {

@@ -248,6 +248,7 @@ impl General {
             // let b_band = percentage_change(b.indicators.bb.current_b, b.indicators.bb.current_a);
             // b_band.partial_cmp(&a_band).unwrap()
         });
+
         docs
     }
 }

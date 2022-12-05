@@ -1,18 +1,17 @@
 use super::api;
+use crate::components::chart::Chart;
 use crate::components::instruments_list::*;
 use crate::components::loading::Loading;
 
-use crate::components::chart::Chart;
 use rs_algo_shared::helpers::comp::*;
-use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
-use rs_algo_shared::models::candle::*;
-use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::watch_instrument::*;
-use wasm_bindgen::prelude::*;
-
 use rs_algo_shared::helpers::date::*;
+use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
+use rs_algo_shared::models::watch_instrument::*;
+use rs_algo_shared::scanner::instrument::*;
 
+use wasm_bindgen::prelude::*;
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]
@@ -20,7 +19,6 @@ extern "C" {
     #[wasm_bindgen(js_name = get_base_url)]
     fn get_base_url() -> String;
     fn open_modal();
-
 }
 
 #[function_component(Home)]
@@ -52,7 +50,6 @@ pub fn home() -> Html {
                 let use_loading = use_loading.clone();
                 wasm_bindgen_futures::spawn_local(async move {
                     let query = get_query_value();
-
                     use_portfolio_instruments.set(
                         api::get_portfolio_instruments(&portfolio_url)
                             .await
@@ -175,26 +172,24 @@ pub fn home() -> Html {
 
     let suggested: Vec<CompactInstrument> = use_instruments
         .iter()
-        .filter(|x| {
-            match x.patterns.local_patterns.last() {
-                Some(last_pat) => {
-                        last_pat.date > to_dbtime(Local::now() - Duration::days(5)) && !last_pat.active.active
-                },
-                None => false
+        .filter(|x| match x.patterns.local_patterns.last() {
+            Some(last_pat) => {
+                last_pat.date > to_dbtime(Local::now() - Duration::days(5))
+                    && !last_pat.active.active
             }
+            None => false,
         })
         .map(|x| x.clone())
         .collect();
 
     let activated: Vec<CompactInstrument> = use_instruments
         .iter()
-        .filter(|x| {
-            match x.patterns.local_patterns.last() {
-                Some(last_pat) => {
-                    last_pat.active.active && last_pat.active.date > to_dbtime(Local::now() - Duration::days(3))
-                },
-                None => false
+        .filter(|x| match x.patterns.local_patterns.last() {
+            Some(last_pat) => {
+                last_pat.active.active
+                    && last_pat.active.date > to_dbtime(Local::now() - Duration::days(3))
             }
+            None => false,
         })
         .map(|x| x.clone())
         .collect();
@@ -202,8 +197,7 @@ pub fn home() -> Html {
     let strategy: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
-            x.current_price <= x.indicators.bb.current_b
-                && x.prev_price >= x.indicators.bb.prev_b
+            x.current_price <= x.indicators.bb.current_b && x.prev_price >= x.indicators.bb.prev_b
         })
         .map(|x| x.clone())
         .collect();
