@@ -1,12 +1,16 @@
 use super::strategy::*;
-
+use crate::helpers::backtest::resolve_backtest;
 use crate::helpers::calc::*;
-use crate::trade::*;
-use async_trait::async_trait;
+
 use rs_algo_shared::error::Result;
+use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::backtest_strategy::*;
-use rs_algo_shared::models::instrument::*;
+use rs_algo_shared::models::stop_loss::*;
+use rs_algo_shared::models::strategy::StrategyType;
+use rs_algo_shared::models::trade::{TradeIn, TradeOut};
+use rs_algo_shared::scanner::instrument::*;
+
+use async_trait::async_trait;
 
 #[derive(Clone)]
 pub struct BollingerBands<'a> {
@@ -18,12 +22,11 @@ pub struct BollingerBands<'a> {
 #[async_trait]
 impl<'a> Strategy for BollingerBands<'a> {
     fn new() -> Result<Self> {
-        
         let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
-        .unwrap()
-        .parse::<f64>()
-        .unwrap();
-        
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
         Ok(Self {
             stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Bollinger_Bands_Reversals",
@@ -43,11 +46,11 @@ impl<'a> Strategy for BollingerBands<'a> {
         self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
         &self.stop_loss
     }
-    
+
     fn stop_loss(&self) -> &StopLoss {
         &self.stop_loss
     }
-   
+
     fn entry_long(
         &mut self,
         index: usize,
@@ -59,8 +62,13 @@ impl<'a> Strategy for BollingerBands<'a> {
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
 
-        let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
-        let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+        let low_band = instrument.indicators.bb.get_data_b().get(index).unwrap();
+        let prev_low_band = instrument
+            .indicators
+            .bb
+            .get_data_b()
+            .get(prev_index)
+            .unwrap();
 
         close_price < low_band && prev_close >= prev_low_band
     }
@@ -76,8 +84,13 @@ impl<'a> Strategy for BollingerBands<'a> {
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
 
-        let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
-        let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
+        let top_band = instrument.indicators.bb.get_data_a().get(index).unwrap();
+        let prev_top_band = instrument
+            .indicators
+            .bb
+            .get_data_a()
+            .get(prev_index)
+            .unwrap();
 
         close_price > top_band && prev_close <= prev_top_band
     }

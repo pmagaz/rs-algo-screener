@@ -1,13 +1,16 @@
 use super::strategy::*;
-
+use crate::helpers::backtest::resolve_backtest;
 use crate::helpers::calc::*;
-use crate::trade::*;
+
+use rs_algo_shared::error::Result;
+use rs_algo_shared::indicators::Indicator;
+use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::stop_loss::*;
+use rs_algo_shared::models::strategy::StrategyType;
+use rs_algo_shared::models::trade::{TradeIn, TradeOut};
+use rs_algo_shared::scanner::instrument::*;
 
 use async_trait::async_trait;
-use rs_algo_shared::error::Result;
-use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::backtest_strategy::*;
-use rs_algo_shared::models::instrument::*;
 
 #[derive(Clone)]
 pub struct MutiTimeFrameBollingerBands<'a> {
@@ -19,12 +22,11 @@ pub struct MutiTimeFrameBollingerBands<'a> {
 #[async_trait]
 impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
     fn new() -> Result<Self> {
-        
         let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
-        .unwrap()
-        .parse::<f64>()
-        .unwrap();
-        
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
         Ok(Self {
             stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Bollinger_Bands_Reversals2_MT_Macd",
@@ -44,11 +46,11 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
         &self.stop_loss
     }
-    
+
     fn stop_loss(&self) -> &StopLoss {
         &self.stop_loss
     }
-   
+
     fn entry_long(
         &mut self,
         index: usize,
@@ -60,11 +62,21 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
             instrument,
             upper_tf_instrument,
             |(idx, prev_idx, upper_inst)| {
-                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
-                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
+                let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
+                let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
 
-                let prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
-                let prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
+                let prev_upper_macd_a = upper_inst
+                    .indicators
+                    .macd
+                    .get_data_a()
+                    .get(prev_idx)
+                    .unwrap();
+                let prev_upper_macd_b = upper_inst
+                    .indicators
+                    .macd
+                    .get_data_b()
+                    .get(prev_idx)
+                    .unwrap();
                 curr_upper_macd_a > curr_upper_macd_b && prev_upper_macd_b >= prev_upper_macd_a
             },
         );
@@ -74,8 +86,8 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
             instrument,
             upper_tf_instrument,
             |(idx, _prev_idx, upper_inst)| {
-                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
-                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
+                let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
+                let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
                 curr_upper_macd_a > curr_upper_macd_b
             },
         );
@@ -91,10 +103,20 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
         let _prev_high = &instrument.data.get(prev_index).unwrap().close;
 
-        let low_band = instrument.indicators.bb.data_b.get(index).unwrap();
-        let _mid_band = instrument.indicators.bb.data_c.get(index).unwrap();
-        let _prev_mid_band = instrument.indicators.bb.data_c.get(prev_index).unwrap();
-        let prev_low_band = instrument.indicators.bb.data_b.get(prev_index).unwrap();
+        let low_band = instrument.indicators.bb.get_data_b().get(index).unwrap();
+        let _mid_band = instrument.indicators.bb.get_data_c().get(index).unwrap();
+        let _prev_mid_band = instrument
+            .indicators
+            .bb
+            .get_data_c()
+            .get(prev_index)
+            .unwrap();
+        let prev_low_band = instrument
+            .indicators
+            .bb
+            .get_data_b()
+            .get(prev_index)
+            .unwrap();
 
         first_weekly_entry
             || (upper_macd
@@ -115,11 +137,21 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
             instrument,
             upper_tf_instrument,
             |(idx, prev_idx, upper_inst)| {
-                let curr_upper_macd_a = upper_inst.indicators.macd.data_a.get(idx).unwrap();
-                let curr_upper_macd_b = upper_inst.indicators.macd.data_b.get(idx).unwrap();
+                let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
+                let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
 
-                let _prev_upper_macd_a = upper_inst.indicators.macd.data_a.get(prev_idx).unwrap();
-                let _prev_upper_macd_b = upper_inst.indicators.macd.data_b.get(prev_idx).unwrap();
+                let _prev_upper_macd_a = upper_inst
+                    .indicators
+                    .macd
+                    .get_data_a()
+                    .get(prev_idx)
+                    .unwrap();
+                let _prev_upper_macd_b = upper_inst
+                    .indicators
+                    .macd
+                    .get_data_b()
+                    .get(prev_idx)
+                    .unwrap();
                 curr_upper_macd_a < curr_upper_macd_b // && prev_upper_macd_a >= prev_upper_macd_b
             },
         );
@@ -133,19 +165,23 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
         let _prev_high = &instrument.data.get(prev_index).unwrap().close;
 
-        let top_band = instrument.indicators.bb.data_a.get(index).unwrap();
-        let prev_top_band = instrument.indicators.bb.data_a.get(prev_index).unwrap();
+        let top_band = instrument.indicators.bb.get_data_a().get(index).unwrap();
+        let prev_top_band = instrument
+            .indicators
+            .bb
+            .get_data_a()
+            .get(prev_index)
+            .unwrap();
 
         let exit_condition = prev_close > prev_open
             && prev_close > prev_top_band
             && close_price <= top_band
             && close_price <= open_price;
 
-        
         if exit_condition {
-             self.update_stop_loss(StopLossType::Trailing, *low_price);
+            self.update_stop_loss(StopLossType::Trailing, *low_price);
         }
-        
+
         false
     }
 

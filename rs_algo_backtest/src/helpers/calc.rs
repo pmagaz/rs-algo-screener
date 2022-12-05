@@ -1,13 +1,14 @@
-use openssl::memcmp::eq;
 use rs_algo_shared::helpers::comp::*;
-use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::candle::Candle;
-use rs_algo_shared::models::instrument::*;
-use rs_algo_shared::models::pattern::*;
 use rs_algo_shared::models::time_frame::*;
-use std::cmp::Ordering;
+use rs_algo_shared::models::trade::TradeIn;
+use rs_algo_shared::models::trade::TradeOut;
+use rs_algo_shared::scanner::candle::Candle;
+use rs_algo_shared::scanner::instrument::HigherTMInstrument;
+use rs_algo_shared::scanner::instrument::Instrument;
+use rs_algo_shared::scanner::pattern::Pattern;
+use rs_algo_shared::scanner::pattern::PatternType;
 
-use crate::trade;
+use std::cmp::Ordering;
 
 pub fn calculate_profit(size: f64, price_in: f64, price_out: f64) -> f64 {
     size * (price_out - price_in)
@@ -90,39 +91,39 @@ pub fn total_drawdown(trades_out: &Vec<TradeOut>, equity: f64) -> f64 {
     let mut min_equity_peak = equity_curve
         .iter()
         .enumerate()
-        .filter(|(i,x)| {
+        .filter(|(i, x)| {
             if i > &0 {
-                match equity_curve.get(*i-1) {
-                    Some(prev) =>  match prev < x {
+                match equity_curve.get(*i - 1) {
+                    Some(prev) => match prev < x {
                         true => false,
-                        false => true
+                        false => true,
                     },
                     None => true,
-                    } 
+                }
             } else {
                 false
             }
         })
-        .map(|(_i,x)| *x)
+        .map(|(_i, x)| *x)
         .fold(f64::NAN, f64::min);
 
-   let min_equity_index = match equity_curve.iter().position(|&r| r == min_equity_peak) {
+    let min_equity_index = match equity_curve.iter().position(|&r| r == min_equity_peak) {
         Some(idx) => idx,
         None => 0,
-   };
+    };
 
     let mut max_equity_peak = equity_curve
         .iter()
         .enumerate()
-        .filter(|(i,_x)| i <= &min_equity_index)
-        .map(|(_i,x)| *x)
+        .filter(|(i, _x)| i <= &min_equity_index)
+        .map(|(_i, x)| *x)
         .fold(f64::NAN, f64::max);
 
-        if min_equity_peak.is_nan() || max_equity_peak.is_nan()  {
-           max_equity_peak = equity; 
-           min_equity_peak = equity; 
-        }
-  
+    if min_equity_peak.is_nan() || max_equity_peak.is_nan() {
+        max_equity_peak = equity;
+        min_equity_peak = equity;
+    }
+
     ((min_equity_peak - max_equity_peak) / max_equity_peak * 100.).abs()
 }
 

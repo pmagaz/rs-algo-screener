@@ -9,7 +9,6 @@ use std::env;
 mod helpers;
 mod portfolio;
 mod strategies;
-mod trade;
 
 use portfolio::PortFolio;
 use strategies::strategy::Strategy;

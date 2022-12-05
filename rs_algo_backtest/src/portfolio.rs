@@ -1,11 +1,13 @@
 use crate::strategies::strategy::Strategy;
+
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
-use rs_algo_shared::models::instrument::Instrument;
 use rs_algo_shared::models::market::*;
+use rs_algo_shared::scanner::instrument::Instrument;
+
 use std::env;
 
 #[derive(Clone)]
@@ -86,12 +88,7 @@ impl PortFolio {
                 for instrument in &instruments_to_test {
                     log::info!("[BACKTEST] Testing {}... ", instrument.symbol);
                     let backtest_result = dyn_clone::clone_box(strategy)
-                        .test(
-                            instrument,
-                            self.order_size,
-                            self.equity,
-                            self.commission,
-                        )
+                        .test(instrument, self.order_size, self.equity, self.commission)
                         .await;
 
                     match backtest_result {
