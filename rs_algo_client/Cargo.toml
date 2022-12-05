@@ -19,10 +19,10 @@ round = "0.1.2"
 dotenv = "0.15.0"
 reqwest = { version = "0.11.13", features = ["json"] }
 uuid = { version = "0.8.2", features = ["wasm-bindgen"] }
-#rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "51f9501", features = ["broker","websocket"]}
-rs_algo_shared = { path = "../../rs_algo_shared" }
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "14b3946"}
+#rs_algo_shared = { path = "../../rs_algo_shared" }
 
-[profile.release]
-strip = true
-lto = true
-codegen-units = 1
+# [profile.release]
+# strip = true
+# lto = true
+# codegen-units = 1
