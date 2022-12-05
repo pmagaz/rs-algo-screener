@@ -1,12 +1,13 @@
 use super::api;
+use crate::components::chart::Chart;
 use crate::components::loading::Loading;
 use crate::components::strategy_detail::StrategyDetail;
 
-use crate::components::chart::Chart;
 use rs_algo_shared::models::backtest_instrument::*;
-use wasm_bindgen::prelude::*;
 
+use wasm_bindgen::prelude::*;
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
+
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_name = get_query_value)]

@@ -320,7 +320,9 @@ pub async fn chart(
     ]
     .concat();
 
-    Backend::new().render(&instrument, trades, &output_file);
+    Backend::new()
+        .render(&instrument, trades, &output_file)
+        .unwrap();
 
     let mut image_path = PathBuf::new();
     image_path.push(output_file);

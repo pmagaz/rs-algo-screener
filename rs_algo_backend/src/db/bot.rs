@@ -1,15 +1,14 @@
 use super::helpers::*;
 use crate::models::app_state::AppState;
-use crate::strategies::general::General;
-use rs_algo_shared::models::bot::CompactBotData;
-use rs_algo_shared::scanner::instrument::*;
+
+use rs_algo_shared::helpers::uuid;
+use rs_algo_shared::models::bot::{BotData, CompactBotData};
 
 use actix_web::web;
 use bson::doc;
 use futures::stream::StreamExt;
 use mongodb::error::Error;
 use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
-
 use std::env;
 
 pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactBotData>, Error> {
@@ -32,4 +31,20 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactBotData>
         }
     }
     Ok(bots)
+}
+
+pub async fn find_by_id(id: &str, state: &web::Data<AppState>) -> Result<Option<BotData>, Error> {
+    let collection_name = &env::var("BOT_COLLECTION").unwrap();
+
+    let collection = get_collection::<BotData>(&state.db_bot, collection_name).await;
+
+    let bot = collection
+        .find_one(
+            doc! { "_id": uuid::from_str(id.to_owned())},
+            FindOneOptions::builder().build(),
+        )
+        .await
+        .unwrap();
+
+    Ok(bot)
 }

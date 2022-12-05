@@ -6,6 +6,7 @@ use crate::render_image::Backend;
 use crate::strategies::general::General;
 
 use rs_algo_shared::models::api::*;
+use rs_algo_shared::models::trade::{TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
 use actix::{Actor, StreamHandler};
@@ -48,6 +49,46 @@ pub async fn find(
     log::info!("[FIND ALL] {:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(bots))
+}
+
+pub async fn chart(
+    path: web::Path<String>,
+    state: web::Data<AppState>,
+) -> Result<fs::NamedFile, RsAlgoError> {
+    let now = Instant::now();
+
+    let id = path.into_inner();
+
+    let bot = db::bot::find_by_id(&*id, &state).await.unwrap().unwrap();
+
+    let output_file = [
+        &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap(),
+        bot.symbol(),
+        ".png",
+    ]
+    .concat();
+
+    let trades_in: &Vec<TradeIn> = bot.trades_in();
+    let trades_out: &Vec<TradeOut> = bot.trades_out();
+    let trades = &(trades_in, trades_out);
+
+    Backend::new()
+        .render(&bot.instrument(), trades, &output_file)
+        .unwrap();
+
+    let mut image_path = PathBuf::new();
+    image_path.push(output_file);
+
+    let file = fs::NamedFile::open(image_path).unwrap();
+
+    log::info!(
+        "[CHART RENDER] {:?} {:?} {:?}",
+        bot.symbol(),
+        Local::now(),
+        now.elapsed()
+    );
+
+    Ok(file.use_last_modified(true))
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
