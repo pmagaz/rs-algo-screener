@@ -1,5 +1,6 @@
 use crate::error::Result;
 
+use plotters::style::full_palette::RED;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::stop_loss::StopLossType;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut, TradeType};
@@ -21,6 +22,7 @@ impl Backend {
     pub fn render(
         &self,
         instrument: &Instrument,
+        htf_instrument: &HigherTMInstrument,
         trades: &(&Vec<TradeIn>, &Vec<TradeOut>),
         output_file: &str,
     ) -> Result<()> {
@@ -28,6 +30,8 @@ impl Backend {
         let total_len = data.len();
         let from_date = data.first().unwrap().date;
         let to_date = data.last().unwrap().date;
+
+        let current_candle = instrument.data.last().unwrap();
 
         let price_source = env::var("PRICE_SOURCE").unwrap();
 
@@ -53,6 +57,8 @@ impl Backend {
 
         let trades_in: &Vec<TradeIn> = trades.0;
         let trades_out: &Vec<TradeOut> = trades.1;
+        let last_trade_in: Option<&TradeIn>;
+        let last_trade_out: Option<&TradeOut>;
         let mut stop_loss: Vec<(usize, f64)> = vec![];
         let mut stop_loss_types: Vec<(usize, StopLossType)> = vec![];
 
@@ -82,6 +88,8 @@ impl Backend {
         let top_points_set: Vec<(usize, f64)>;
         let low_points_set: Vec<(usize, f64)>;
 
+        last_trade_in = trades_in.last();
+        last_trade_out = trades_out.last();
         if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
 
@@ -106,6 +114,7 @@ impl Backend {
         }
 
         let BACKGROUND = &RGBColor(208, 213, 222);
+        let BLACK_LINE = &RGBColor(0, 0, 0).mix(0.25);
         let CANDLE_BEARISH = &RGBColor(71, 113, 181).mix(0.95);
         let CANDLE_BULLISH = &RGBColor(255, 255, 255).mix(0.95);
         let RED_LINE = &RGBColor(235, 69, 125).mix(0.8);
@@ -113,7 +122,7 @@ impl Backend {
         let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.25);
         let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
         let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.25);
-        let _GREEN_LINE = &RGBColor(56, 142, 59);
+        let GREEN_LINE = &RGBColor(56, 142, 59).mix(0.8);
 
         let bottom_point_color = match points_mode {
             PointsMode::MaximaMinima => BLUE.mix(0.15),
@@ -135,8 +144,8 @@ impl Backend {
         let stoch_b = &stoch.get_data_b();
 
         let macd = &instrument.indicators.macd;
-        let _macd_a = &macd.get_data_a();
-        let _macd_b = &macd.get_data_b();
+        let macd_a = &macd.get_data_a();
+        let macd_b = &macd.get_data_b();
 
         let _rsi = &instrument.indicators.rsi.get_data_a();
 
@@ -167,9 +176,10 @@ impl Backend {
             .configure_mesh()
             .light_line_style(BACKGROUND)
             .x_label_formatter(&|v| format!("{:.1}", v))
-            .y_label_formatter(&|v| format!("{:.1}", v))
+            .y_label_formatter(&|v| format!("{:.3}", v))
             .draw()
             .unwrap();
+
         chart
             .draw_series(data.iter().enumerate().map(|(_id, candle)| {
                 let (bullish, bearish): (ShapeStyle, ShapeStyle) = match candle {
@@ -425,6 +435,32 @@ impl Backend {
             ))
             .unwrap();
 
+        //CURENT POSITION
+
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| match last_trade_in {
+                        Some(trade_in) => (candle.date, trade_in.price_in),
+                        None => (candle.date, 0.),
+                    }),
+                &GREEN_LINE,
+            ))
+            .unwrap();
+
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| match last_trade_in {
+                        Some(trade_in) => (candle.date, trade_in.stop_loss.price),
+                        None => (candle.date, 0.),
+                    }),
+                &RED_LINE,
+            ))
+            .unwrap();
+
         // let mut rsi_pannel = ChartBuilder::on(&indicator_1)
         //     .x_label_area_size(40)
         //     .y_label_area_size(40)
@@ -442,31 +478,58 @@ impl Backend {
 
         // //STOCH PANNEL
 
-        let mut stoch_pannel = ChartBuilder::on(&lower)
+        let mut indicator_panel = ChartBuilder::on(&lower)
             .x_label_area_size(40)
             .y_label_area_size(40)
             // .margin(2)
             //.caption("MACD", (font.as_ref(), 8.0).into_font())
             .build_cartesian_2d(from_date..to_date, -0f64..100f64)
             .unwrap();
-        //stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
-        stoch_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, stoch_a[id])),
-                BLUE_LINE3,
-            ))
-            .unwrap();
+        //indicator_panel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
 
-        stoch_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, stoch_b[id])),
-                RED_LINE,
-            ))
-            .unwrap();
+        match htf_instrument {
+            HigherTMInstrument::HigherTMInstrument(htf_instrument) => {
+                let macd = &htf_instrument.indicators.macd;
+                let macd_a = &macd.get_data_a();
+                let macd_b = &macd.get_data_b();
+                indicator_panel
+                    .draw_series(LineSeries::new(
+                        (0..)
+                            .zip(htf_instrument.data.iter())
+                            .map(|(id, candle)| (candle.date, macd_a[id])),
+                        BLUE_LINE3,
+                    ))
+                    .unwrap();
+
+                indicator_panel
+                    .draw_series(LineSeries::new(
+                        (0..)
+                            .zip(htf_instrument.data.iter())
+                            .map(|(id, candle)| (candle.date, macd_b[id])),
+                        RED_LINE,
+                    ))
+                    .unwrap();
+            }
+            HigherTMInstrument::None => {
+                indicator_panel
+                    .draw_series(LineSeries::new(
+                        (0..)
+                            .zip(data.iter())
+                            .map(|(id, candle)| (candle.date, stoch_a[id])),
+                        BLUE_LINE3,
+                    ))
+                    .unwrap();
+
+                indicator_panel
+                    .draw_series(LineSeries::new(
+                        (0..)
+                            .zip(data.iter())
+                            .map(|(id, candle)| (candle.date, stoch_b[id])),
+                        RED_LINE,
+                    ))
+                    .unwrap();
+            }
+        };
 
         root.present().expect(" Error. Can't save file!");
         log::info!(" File saved in {}", output_file);

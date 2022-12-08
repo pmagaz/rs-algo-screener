@@ -51,6 +51,7 @@ pub fn bot_list(props: &Props) -> Html {
 
             html! {
                 <tr  onclick={ on_bot_select }>
+                    <td> { bot.symbol.clone() } </td>
                     <td> { bot.strategy_name.clone() } </td>
                     <td> { bot.strategy_type.clone() } </td>
                     <td> { bot.time_frame.clone() } </td>
@@ -61,6 +62,7 @@ pub fn bot_list(props: &Props) -> Html {
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(bot.strategy_stats.profitable_trades,2))}</td>
                     <td> { bot.strategy_stats.trades } </td>
                     <td> {format!("{} / {}", bot.strategy_stats.wining_trades, bot.strategy_stats.losing_trades)}</td>
+                    <td>{ bot.strategy_stats.stop_losses }</td>
                     <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(bot.strategy_stats.won_per_trade_per,2))}</td>
                     <td class={get_status_class(&avg_lost_status)}>{ format!("{}%", round(bot.strategy_stats.lost_per_trade_per,2))}</td>
                     <td> {format!("{}", bot.last_update.to_chrono().format("%H:%M:%S"))}</td>
@@ -73,6 +75,7 @@ pub fn bot_list(props: &Props) -> Html {
         <table class="table is-bordered">
             <thead class="has-background-grey-lighter">
                 <tr>
+                <th>{ "Symbol" }</th>
                 <th>{ "Strategy" }</th>
                 <th>{ "Type" }</th>
                 <th>{ "TF" }</th>
@@ -83,6 +86,7 @@ pub fn bot_list(props: &Props) -> Html {
                 <th>{ "WinRate" }</th>
                 <th>{ "Trades" }</th>
                 <th>{ "Won/Lost" }</th>
+                <th>{ "Stops" }</th>
                 <th>{ "Avg Won" }</th>
                 <th>{ "Avg Lost" }</th>
                 <th>{ "Updated" }</th>

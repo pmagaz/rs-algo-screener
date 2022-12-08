@@ -73,7 +73,12 @@ pub async fn chart(
     let trades = &(trades_in, trades_out);
 
     Backend::new()
-        .render(&bot.instrument(), trades, &output_file)
+        .render(
+            &bot.instrument(),
+            &bot.higher_tf_instrument(),
+            trades,
+            &output_file,
+        )
         .unwrap();
 
     let mut image_path = PathBuf::new();
