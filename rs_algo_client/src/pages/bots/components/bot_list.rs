@@ -62,9 +62,9 @@ pub fn bot_list(props: &Props) -> Html {
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(bot.strategy_stats.profitable_trades,2))}</td>
                     <td> { bot.strategy_stats.trades } </td>
                     <td> {format!("{} / {}", bot.strategy_stats.wining_trades, bot.strategy_stats.losing_trades)}</td>
-                    <td>{ bot.strategy_stats.stop_losses }</td>
                     <td class={get_status_class(&avg_won_status)}>{ format!("{}%", round(bot.strategy_stats.won_per_trade_per,2))}</td>
                     <td class={get_status_class(&avg_lost_status)}>{ format!("{}%", round(bot.strategy_stats.lost_per_trade_per,2))}</td>
+                    <td>{ bot.strategy_stats.stop_losses }</td>
                     <td> {format!("{}", bot.last_update.to_chrono().format("%H:%M:%S"))}</td>
                 </tr>
             }
@@ -86,9 +86,9 @@ pub fn bot_list(props: &Props) -> Html {
                 <th>{ "WinRate" }</th>
                 <th>{ "Trades" }</th>
                 <th>{ "Won/Lost" }</th>
-                <th>{ "Stops" }</th>
                 <th>{ "Avg Won" }</th>
                 <th>{ "Avg Lost" }</th>
+                <th>{ "Stops" }</th>
                 <th>{ "Updated" }</th>
                 </tr>
             </thead>
