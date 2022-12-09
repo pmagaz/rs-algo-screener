@@ -14,6 +14,14 @@ use std::env;
 #[derive(Debug, Clone)]
 pub struct Backend;
 
+#[derive(PartialEq)]
+
+pub enum BackendMode {
+    Instrument,
+    BackTest,
+    Bot,
+}
+
 impl Backend {
     pub fn new() -> Self {
         Self {}
@@ -21,6 +29,7 @@ impl Backend {
 
     pub fn render(
         &self,
+        mode: BackendMode,
         instrument: &Instrument,
         htf_instrument: &HigherTMInstrument,
         trades: &(&Vec<TradeIn>, &Vec<TradeOut>),
@@ -90,7 +99,8 @@ impl Backend {
 
         last_trade_in = trades_in.last();
         last_trade_out = trades_out.last();
-        if !trades_out.is_empty() {
+        if mode == BackendMode::BackTest || mode == BackendMode::Bot {
+            //if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
 
             top_points_set = trades_out
@@ -118,7 +128,7 @@ impl Backend {
         let CANDLE_BEARISH = &RGBColor(71, 113, 181).mix(0.95);
         let CANDLE_BULLISH = &RGBColor(255, 255, 255).mix(0.95);
         let RED_LINE = &RGBColor(235, 69, 125).mix(0.8);
-        let _BLUE_LINE = &RGBColor(71, 113, 181).mix(0.25);
+        let BLUE_LINE = &RGBColor(71, 113, 181).mix(0.25);
         let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.25);
         let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
         let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.25);
@@ -347,65 +357,199 @@ impl Backend {
                 }))
                 .unwrap();
 
-            chart
-                .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                    let price;
+            // MARKERS
+
+            match mode {
+                BackendMode::Instrument => {
                     if points_mode == PointsMode::MaximaMinima {
-                        price = match price_source.as_ref() {
-                            "highs_lows" => candle.low,
-                            "close" => candle.close,
-                            &_ => candle.close,
-                        };
-                    } else {
-                        price = candle.open;
-                    }
+                        chart
+                            .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                                if local_pattern_breaks.contains(&(i)) {
+                                    let mut direction: (i32, f64) = (0, 0.);
 
-                    if low_points_set.contains(&(i, price)) {
-                        TriangleMarker::new(
-                            (candle.date, price - (price * local_peaks_marker_pos)),
-                            4,
-                            bottom_point_color,
-                        )
-                    } else {
-                        TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
-                    }
-                }))
-                .unwrap();
+                                    for n in
+                                        instrument.patterns.local_patterns.iter().filter(|pat| {
+                                            pat.pattern_type != PatternType::HigherHighsHigherLows
+                                                && pat.pattern_type
+                                                    != PatternType::LowerHighsLowerLows
+                                        })
+                                    {
+                                        if n.active.index == i {
+                                            let pos = match n.active.break_direction {
+                                                PatternDirection::Bottom => (4, candle.low),
+                                                PatternDirection::Top => (-4, candle.high),
+                                                PatternDirection::None => (4, candle.close),
+                                            };
+                                            direction = pos;
+                                        }
+                                    }
 
-            if points_mode == PointsMode::MaximaMinima {
-                chart
-                    .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                        if local_pattern_breaks.contains(&(i)) {
-                            let mut direction: (i32, f64) = (0, 0.);
-
-                            for n in instrument.patterns.local_patterns.iter().filter(|pat| {
-                                pat.pattern_type != PatternType::HigherHighsHigherLows
-                                    && pat.pattern_type != PatternType::LowerHighsLowerLows
-                            }) {
-                                if n.active.index == i {
-                                    let pos = match n.active.break_direction {
-                                        PatternDirection::Bottom => (4, candle.low),
-                                        PatternDirection::Top => (-4, candle.high),
-                                        PatternDirection::None => (4, candle.close),
-                                    };
-                                    direction = pos;
+                                    TriangleMarker::new(
+                                        (
+                                            candle.date,
+                                            direction.1
+                                                - (direction.1 * local_peaks_marker_pos - 2.),
+                                        ),
+                                        direction.0,
+                                        RED_LINE.mix(0.3),
+                                    )
+                                } else {
+                                    TriangleMarker::new(
+                                        (candle.date, candle.close),
+                                        0,
+                                        &TRANSPARENT,
+                                    )
                                 }
+                            }))
+                            .unwrap();
+                    }
+                }
+                BackendMode::BackTest => {
+                    chart
+                        .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                            let price;
+                            price = candle.open;
+                            if low_points_set.contains(&(i, price)) {
+                                TriangleMarker::new(
+                                    (candle.date, price - (price * local_peaks_marker_pos)),
+                                    4,
+                                    bottom_point_color,
+                                )
+                            } else {
+                                TriangleMarker::new((candle.date, price), 0, &TRANSPARENT)
                             }
+                        }))
+                        .unwrap();
+                }
+                BackendMode::Bot => {
+                    chart
+                        .draw_series(data.iter().enumerate().map(|(_i, candle)| {
+                            let index = candle.date().timestamp_millis() as usize;
+                            let price = candle.close;
 
-                            TriangleMarker::new(
-                                (
-                                    candle.date,
-                                    direction.1 - (direction.1 * local_peaks_marker_pos - 2.),
-                                ),
-                                direction.0,
-                                RED_LINE.mix(0.3),
-                            )
-                        } else {
-                            TriangleMarker::new((candle.date, candle.close), 0, &TRANSPARENT)
-                        }
-                    }))
-                    .unwrap();
-            }
+                            if low_points_set.contains(&(index, price)) {
+                                Circle::new(
+                                    (candle.date, price),
+                                    5,
+                                    Into::<ShapeStyle>::into(&GREEN_LINE).filled(),
+                                )
+                                .into_dyn()
+                            } else {
+                                Circle::new(
+                                    (candle.date, price),
+                                    0,
+                                    Into::<ShapeStyle>::into(&TRANSPARENT).filled(),
+                                )
+                                .into_dyn()
+                            }
+                        }))
+                        .unwrap();
+
+                    chart
+                        .draw_series(data.iter().enumerate().map(|(_i, candle)| {
+                            let index = candle.date().timestamp_millis() as usize;
+                            let price = candle.close;
+
+                            if top_points_set.contains(&(index, price)) {
+                                if stop_loss.contains(&(index, price)) {
+                                    Circle::new(
+                                        (candle.date, price),
+                                        5,
+                                        Into::<ShapeStyle>::into(&RED_LINE).filled(),
+                                    )
+                                    .into_dyn()
+                                } else {
+                                    Circle::new(
+                                        (candle.date, price),
+                                        5,
+                                        Into::<ShapeStyle>::into(&BLUE_LINE3).filled(),
+                                    )
+                                    .into_dyn()
+                                }
+                            } else {
+                                Circle::new(
+                                    (candle.date, price),
+                                    0,
+                                    Into::<ShapeStyle>::into(&TRANSPARENT).filled(),
+                                )
+                                .into_dyn()
+                            }
+                        }))
+                        .unwrap();
+
+                    chart
+                        .draw_series(LineSeries::new(
+                            (0..)
+                                .zip(data.iter())
+                                .map(|(id, candle)| match last_trade_in {
+                                    Some(trade_in) => match last_trade_out {
+                                        Some(trade_out) => {
+                                            if trade_out.index_in != trade_in.index_in {
+                                                (candle.date, trade_in.price_in)
+                                            } else {
+                                                (candle.date, 0.)
+                                            }
+                                        }
+                                        None => (candle.date, trade_in.price_in),
+                                    },
+                                    None => (candle.date, 0.),
+                                }),
+                            &GREEN_LINE,
+                        ))
+                        .unwrap();
+
+                    //ACTIVE STOP LOSS
+                    chart
+                        .draw_series(LineSeries::new(
+                            (0..)
+                                .zip(data.iter())
+                                .map(|(id, candle)| match last_trade_in {
+                                    Some(trade_in) => match last_trade_out {
+                                        Some(trade_out) => {
+                                            if trade_out.index_in != trade_in.index_in {
+                                                (candle.date, trade_in.stop_loss.price)
+                                            } else {
+                                                (candle.date, 0.)
+                                            }
+                                        }
+                                        None => (candle.date, trade_in.stop_loss.price),
+                                    },
+                                    None => (candle.date, 0.),
+                                }),
+                            &RED_LINE,
+                        ))
+                        .unwrap();
+
+                    // let last_trade = match last_trade_in {
+                    //     Some(trade_in) => match last_trade_out {
+                    //         Some(trade_out) => {
+                    //             if trade_out.index_in == trade_in.index_in {
+                    //                 (trade_out.trade_type.clone(), trade_out.price_out)
+                    //             } else {
+                    //                 (trade_in.trade_type.clone(), trade_in.price_in)
+                    //             }
+                    //         }
+                    //         None => (trade_in.trade_type.clone(), trade_in.price_in),
+                    //     },
+                    //     None => (TradeType::None, 0.),
+                    // };
+
+                    // let color = match last_trade.0 {
+                    //     TradeType::StopLoss => &RED_LINE,
+                    //     _ => &BLACK_LINE,
+                    // };
+
+                    // //LAST TRADE
+                    // chart
+                    //     .draw_series(LineSeries::new(
+                    //         (0..)
+                    //             .zip(data.iter())
+                    //             .map(|(id, candle)| (candle.date, last_trade.1)),
+                    //         color,
+                    //     ))
+                    //     .unwrap();
+                }
+            };
         }
 
         chart
@@ -436,78 +580,6 @@ impl Backend {
             .unwrap();
 
         //OPEN POSITION
-
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| match last_trade_in {
-                        Some(trade_in) => match last_trade_out {
-                            Some(trade_out) => {
-                                if trade_out.index_in != trade_in.index_in {
-                                    (candle.date, trade_in.price_in)
-                                } else {
-                                    (candle.date, 0.)
-                                }
-                            }
-                            None => (candle.date, trade_in.price_in),
-                        },
-                        None => (candle.date, 0.),
-                    }),
-                &GREEN_LINE,
-            ))
-            .unwrap();
-
-        //ACTIVE STOP LOSS
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| match last_trade_in {
-                        Some(trade_in) => match last_trade_out {
-                            Some(trade_out) => {
-                                if trade_out.index_in != trade_in.index_in {
-                                    (candle.date, trade_in.stop_loss.price)
-                                } else {
-                                    (candle.date, 0.)
-                                }
-                            }
-                            None => (candle.date, trade_in.stop_loss.price),
-                        },
-                        None => (candle.date, 0.),
-                    }),
-                &RED_LINE,
-            ))
-            .unwrap();
-
-        let last_trade = match last_trade_in {
-            Some(trade_in) => match last_trade_out {
-                Some(trade_out) => {
-                    if trade_out.index_in == trade_in.index_in {
-                        (trade_out.trade_type.clone(), trade_out.price_out)
-                    } else {
-                        (trade_in.trade_type.clone(), trade_in.price_in)
-                    }
-                }
-                None => (trade_in.trade_type.clone(), trade_in.price_in),
-            },
-            None => (TradeType::None, 0.),
-        };
-
-        let color = match last_trade.0 {
-            TradeType::StopLoss => &RED_LINE,
-            _ => &BLACK_LINE,
-        };
-
-        //LAST TRADE
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, last_trade.1)),
-                color,
-            ))
-            .unwrap();
 
         // let mut rsi_pannel = ChartBuilder::on(&indicator_1)
         //     .x_label_area_size(40)

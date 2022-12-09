@@ -1,7 +1,7 @@
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::render_image::Backend;
+use crate::render_image::{Backend, BackendMode};
 
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
@@ -321,7 +321,13 @@ pub async fn chart(
     .concat();
 
     Backend::new()
-        .render(&instrument, &HigherTMInstrument::None, trades, &output_file)
+        .render(
+            BackendMode::BackTest,
+            &instrument,
+            &HigherTMInstrument::None,
+            trades,
+            &output_file,
+        )
         .unwrap();
 
     let mut image_path = PathBuf::new();

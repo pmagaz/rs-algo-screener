@@ -2,7 +2,7 @@ use crate::db;
 use crate::db::helpers::compact_instrument;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::render_image::Backend;
+use crate::render_image::{Backend, BackendMode};
 use crate::strategies::general::General;
 
 use rs_algo_shared::models::api::*;
@@ -74,6 +74,7 @@ pub async fn chart(
 
     Backend::new()
         .render(
+            BackendMode::Bot,
             &bot.instrument(),
             &bot.higher_tf_instrument(),
             trades,
