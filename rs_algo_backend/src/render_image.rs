@@ -435,29 +435,77 @@ impl Backend {
             ))
             .unwrap();
 
-        //CURENT POSITION
+        //OPEN POSITION
 
         chart
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| match last_trade_in {
-                        Some(trade_in) => (candle.date, trade_in.price_in),
+                        Some(trade_in) => match last_trade_out {
+                            Some(trade_out) => {
+                                if trade_out.index_in != trade_in.index_in {
+                                    (candle.date, trade_in.price_in)
+                                } else {
+                                    (candle.date, 0.)
+                                }
+                            }
+                            None => (candle.date, trade_in.price_in),
+                        },
                         None => (candle.date, 0.),
                     }),
                 &GREEN_LINE,
             ))
             .unwrap();
 
+        //ACTIVE STOP LOSS
         chart
             .draw_series(LineSeries::new(
                 (0..)
                     .zip(data.iter())
                     .map(|(id, candle)| match last_trade_in {
-                        Some(trade_in) => (candle.date, trade_in.stop_loss.price),
+                        Some(trade_in) => match last_trade_out {
+                            Some(trade_out) => {
+                                if trade_out.index_in != trade_in.index_in {
+                                    (candle.date, trade_in.stop_loss.price)
+                                } else {
+                                    (candle.date, 0.)
+                                }
+                            }
+                            None => (candle.date, trade_in.stop_loss.price),
+                        },
                         None => (candle.date, 0.),
                     }),
                 &RED_LINE,
+            ))
+            .unwrap();
+
+        let last_trade = match last_trade_in {
+            Some(trade_in) => match last_trade_out {
+                Some(trade_out) => {
+                    if trade_out.index_in == trade_in.index_in {
+                        (trade_out.trade_type.clone(), trade_out.price_out)
+                    } else {
+                        (trade_in.trade_type.clone(), trade_in.price_in)
+                    }
+                }
+                None => (trade_in.trade_type.clone(), trade_in.price_in),
+            },
+            None => (TradeType::None, 0.),
+        };
+
+        let color = match last_trade.0 {
+            TradeType::StopLoss => &RED_LINE,
+            _ => &BLACK_LINE,
+        };
+
+        //LAST TRADE
+        chart
+            .draw_series(LineSeries::new(
+                (0..)
+                    .zip(data.iter())
+                    .map(|(id, candle)| (candle.date, last_trade.1)),
+                color,
             ))
             .unwrap();
 
