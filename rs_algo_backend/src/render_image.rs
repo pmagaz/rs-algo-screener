@@ -70,6 +70,7 @@ impl Backend {
         let last_trade_out: Option<&TradeOut>;
         let mut stop_loss: Vec<(usize, f64)> = vec![];
         let mut stop_loss_types: Vec<(usize, StopLossType)> = vec![];
+        let peaks = instrument.peaks();
 
         let points_mode = match trades_out.len().cmp(&0) {
             Ordering::Greater => PointsMode::Trades,
@@ -97,11 +98,25 @@ impl Backend {
         let top_points_set: Vec<(usize, f64)>;
         let low_points_set: Vec<(usize, f64)>;
 
+        let mut prices_in_indexes: Vec<usize> = vec![];
+        let mut prices_out_indexes: Vec<usize> = vec![];
+        let mut stop_loss_indexes: Vec<usize> = vec![];
+        let mut top_peaks_indexes: Vec<usize> = vec![];
+        let mut low_peaks_indexes: Vec<usize> = vec![];
+
         last_trade_in = trades_in.last();
         last_trade_out = trades_out.last();
         if mode == BackendMode::BackTest || mode == BackendMode::Bot {
             //if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
+            prices_in_indexes = trades_in.iter().map(|x| x.index_in).collect();
+            prices_out_indexes = trades_out.iter().map(|x| x.index_out).collect();
+            //top_peaks_indexes = peaks.local_maxima().iter().map(|x| x.).collect();
+            stop_loss_indexes = trades_out
+                .iter()
+                .filter(|x| x.trade_type == TradeType::StopLoss)
+                .map(|x| x.index_out)
+                .collect();
 
             top_points_set = trades_out
                 .iter()
@@ -168,8 +183,8 @@ impl Backend {
         let bb_c = &instrument.indicators.bb.get_data_c();
 
         //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
-        let root = BitMapBackend::new(&output_file, (1361, 1021)).into_drawing_area();
-        let (upper, lower) = root.split_vertically((85).percent());
+        let root = BitMapBackend::new(&output_file, (1321, 765)).into_drawing_area();
+        let (upper, lower) = root.split_vertically((90).percent());
         // let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
         root.fill(BACKGROUND).unwrap();
@@ -427,11 +442,11 @@ impl Backend {
                             let index = candle.date().timestamp_millis() as usize;
                             let price = candle.close;
 
-                            if low_points_set.contains(&(index, price)) {
+                            if prices_in_indexes.contains(&index) {
                                 Circle::new(
                                     (candle.date, price),
                                     5,
-                                    Into::<ShapeStyle>::into(&GREEN_LINE).filled(),
+                                    Into::<ShapeStyle>::into(&BLUE_LINE3).filled(),
                                 )
                                 .into_dyn()
                             } else {
@@ -450,8 +465,10 @@ impl Backend {
                             let index = candle.date().timestamp_millis() as usize;
                             let price = candle.close;
 
-                            if top_points_set.contains(&(index, price)) {
-                                if stop_loss.contains(&(index, price)) {
+                            println!("4444444 {:?} {}", prices_out_indexes, index);
+
+                            if prices_out_indexes.contains(&index) {
+                                if stop_loss_indexes.contains(&index) {
                                     Circle::new(
                                         (candle.date, price),
                                         5,
@@ -459,12 +476,24 @@ impl Backend {
                                     )
                                     .into_dyn()
                                 } else {
-                                    Circle::new(
-                                        (candle.date, price),
-                                        5,
-                                        Into::<ShapeStyle>::into(&BLUE_LINE3).filled(),
-                                    )
-                                    .into_dyn()
+                                    let trade_out = trades_out.get(index).unwrap();
+                                    let profit = trade_out.profit_per;
+
+                                    if profit > 0. {
+                                        Circle::new(
+                                            (candle.date, price),
+                                            5,
+                                            Into::<ShapeStyle>::into(&GREEN_LINE).filled(),
+                                        )
+                                        .into_dyn()
+                                    } else {
+                                        Circle::new(
+                                            (candle.date, price),
+                                            5,
+                                            Into::<ShapeStyle>::into(&RED_LINE).filled(),
+                                        )
+                                        .into_dyn()
+                                    }
                                 }
                             } else {
                                 Circle::new(
@@ -494,7 +523,7 @@ impl Backend {
                                     },
                                     None => (candle.date, 0.),
                                 }),
-                            &GREEN_LINE,
+                            &BLUE_LINE3,
                         ))
                         .unwrap();
 
