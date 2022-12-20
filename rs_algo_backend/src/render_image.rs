@@ -143,11 +143,14 @@ impl Backend {
         let CANDLE_BEARISH = &RGBColor(71, 113, 181).mix(0.95);
         let CANDLE_BULLISH = &RGBColor(255, 255, 255).mix(0.95);
         let RED_LINE = &RGBColor(235, 69, 125).mix(0.8);
+        let RED_LINE2 = &RGBColor(235, 69, 125).mix(0.20);
         let BLUE_LINE = &RGBColor(71, 113, 181).mix(0.25);
-        let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.25);
+        let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.20);
         let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
-        let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.25);
+        let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.18);
+        let YELLOW_LINE = &RGBColor(255, 229, 0).mix(0.18);
         let GREEN_LINE = &RGBColor(56, 142, 59).mix(0.8);
+        let GREEN_LINE2 = &RGBColor(56, 142, 59).mix(0.20);
 
         let bottom_point_color = match points_mode {
             PointsMode::MaximaMinima => BLUE.mix(0.15),
@@ -175,8 +178,8 @@ impl Backend {
         let _rsi = &instrument.indicators.rsi.get_data_a();
 
         let _ema_a = &instrument.indicators.ema_a.get_data_a();
-        let _ema_b = &instrument.indicators.ema_b.get_data_a();
-        let _ema_c = &instrument.indicators.ema_c.get_data_a();
+        let ema_b = &instrument.indicators.ema_b.get_data_a();
+        let ema_c = &instrument.indicators.ema_c.get_data_a();
 
         let bb_a = &instrument.indicators.bb.get_data_a();
         let bb_b = &instrument.indicators.bb.get_data_b();
@@ -200,7 +203,7 @@ impl Backend {
         chart
             .configure_mesh()
             .light_line_style(BACKGROUND)
-            .x_label_formatter(&|v| format!("{:.1}", v))
+            .x_label_formatter(&|v| format!("{:.3}", v))
             .y_label_formatter(&|v| format!("{:.3}", v))
             .draw()
             .unwrap();
@@ -476,23 +479,33 @@ impl Backend {
                                     )
                                     .into_dyn()
                                 } else {
-                                    let trade_out = trades_out.get(index).unwrap();
-                                    let profit = trade_out.profit_per;
+                                    let trade_out = trades_out.get(index);
 
-                                    if profit > 0. {
-                                        Circle::new(
+                                    match trade_out {
+                                        Some(val) => {
+                                            let profit = val.profit_per;
+                                            if profit > 0. {
+                                                Circle::new(
+                                                    (candle.date, price),
+                                                    5,
+                                                    Into::<ShapeStyle>::into(&GREEN_LINE).filled(),
+                                                )
+                                                .into_dyn()
+                                            } else {
+                                                Circle::new(
+                                                    (candle.date, price),
+                                                    5,
+                                                    Into::<ShapeStyle>::into(&RED_LINE).filled(),
+                                                )
+                                                .into_dyn()
+                                            }
+                                        }
+                                        None => Circle::new(
                                             (candle.date, price),
-                                            5,
-                                            Into::<ShapeStyle>::into(&GREEN_LINE).filled(),
+                                            0,
+                                            Into::<ShapeStyle>::into(TRANSPARENT).filled(),
                                         )
-                                        .into_dyn()
-                                    } else {
-                                        Circle::new(
-                                            (candle.date, price),
-                                            5,
-                                            Into::<ShapeStyle>::into(&RED_LINE).filled(),
-                                        )
-                                        .into_dyn()
+                                        .into_dyn(),
                                     }
                                 }
                             } else {
@@ -581,32 +594,69 @@ impl Backend {
             };
         }
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, bb_a[id])),
-                &BLUE_LINE2,
-            ))
-            .unwrap();
+        //BOLLINGER BANDS
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, bb_b[id])),
-                &BLUE_LINE2,
-            ))
-            .unwrap();
+        if bb_a.len() > 0 {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_a[id])),
+                    &BLUE_LINE2,
+                ))
+                .unwrap();
 
-        chart
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date, bb_c[id])),
-                &ORANGE_LINE,
-            ))
-            .unwrap();
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_b[id])),
+                    &BLUE_LINE2,
+                ))
+                .unwrap();
+
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_c[id])),
+                    &GREEN_LINE2,
+                ))
+                .unwrap();
+        }
+
+        //EMAS
+
+        if ema_c.len() > 0 && ema_b.len() <= 0 {
+            chart
+                .draw_series(LineSeries::new(
+                    data.iter()
+                        .enumerate()
+                        .map(|(id, candle)| (candle.date, ema_c[id])),
+                    RED_LINE2,
+                ))
+                .unwrap();
+        } else if ema_c.len() > 0 && ema_b.len() > 0 {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .filter(|(id, candle)| ema_c[*id] <= ema_b[*id])
+                        .map(|(id, candle)| (candle.date, ema_c[id])),
+                    ORANGE_LINE,
+                ))
+                .unwrap();
+
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .filter(|(id, candle)| ema_b[*id] < ema_c[*id])
+                        .map(|(id, candle)| (candle.date, ema_c[id])),
+                    RED_LINE2,
+                ))
+                .unwrap();
+        }
 
         //OPEN POSITION
 
