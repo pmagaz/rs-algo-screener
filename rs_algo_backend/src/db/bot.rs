@@ -17,7 +17,12 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactBotData>
     let collection = get_collection::<CompactBotData>(&state.db_bot, collection_name).await;
 
     let mut cursor = collection
-        .find(doc! {}, FindOptions::builder().build())
+        .find(
+            doc! {},
+            FindOptions::builder()
+                .sort(doc! {"symbol":1, "strategy_name":1, "time_frame": -1})
+                .build(),
+        )
         .await
         .unwrap();
 

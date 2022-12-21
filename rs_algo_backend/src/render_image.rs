@@ -150,7 +150,7 @@ impl Backend {
         let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.18);
         let YELLOW_LINE = &RGBColor(255, 229, 0).mix(0.18);
         let GREEN_LINE = &RGBColor(56, 142, 59).mix(0.8);
-        let GREEN_LINE2 = &RGBColor(56, 142, 59).mix(0.20);
+        let GREEN_LINE2 = &RGBColor(56, 142, 59).mix(0.16);
 
         let bottom_point_color = match points_mode {
             PointsMode::MaximaMinima => BLUE.mix(0.15),
@@ -468,8 +468,6 @@ impl Backend {
                             let index = candle.date().timestamp_millis() as usize;
                             let price = candle.close;
 
-                            println!("4444444 {:?} {}", prices_out_indexes, index);
-
                             if prices_out_indexes.contains(&index) {
                                 if stop_loss_indexes.contains(&index) {
                                     Circle::new(
@@ -480,7 +478,6 @@ impl Backend {
                                     .into_dyn()
                                 } else {
                                     let trade_out = trades_out.get(index);
-
                                     match trade_out {
                                         Some(val) => {
                                             let profit = val.profit_per;
