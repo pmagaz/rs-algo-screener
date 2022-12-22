@@ -256,7 +256,7 @@ impl Backend {
                             (date, value, i)
                         }),
                     0,
-                    ShapeStyle::from(&RED).filled(),
+                    ShapeStyle::from(&RED_LINE).filled(),
                     &|coord, _size: i32, _style| {
                         let new_coord = (coord.0, coord.1);
                         let pattern_name;
@@ -298,7 +298,7 @@ impl Backend {
                             let date = data[idx].date;
                             (date, value)
                         }),
-                    RED_LINE.mix(0.40),
+                    RED_LINE2,
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
@@ -324,7 +324,7 @@ impl Backend {
                             let date = data[idx].date;
                             (date, value)
                         }),
-                    RED_LINE.mix(0.40),
+                    RED_LINE2,
                 ))
                 .unwrap()
                 .label(format!("{:?}", pattern.pattern_type));
@@ -495,9 +495,9 @@ impl Backend {
                                     + Text::new(
                                         format!(
                                             "{:?} / {:?} / {:?}",
-                                            round(trade_in.price_in, 3),
-                                            round(trade_in.ask, 3),
-                                            round(trade_in.spread, 3)
+                                            round(trade_in.price_in, 4),
+                                            round(trade_in.ask, 4),
+                                            round(trade_in.spread, 4)
                                         ),
                                         (0, 20),
                                         ("sans-serif", 12),
@@ -549,8 +549,8 @@ impl Backend {
                                     + Text::new(
                                         format!(
                                             "{:?} / {:?} %",
-                                            round(trade_out.price_out, 3),
-                                            round(trade_out.profit_per, 2)
+                                            round(trade_out.price_out, 4),
+                                            round(trade_out.profit_per, 4)
                                         ),
                                         (0, 20),
                                         ("sans-serif", 12),
