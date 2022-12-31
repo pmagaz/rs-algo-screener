@@ -109,7 +109,7 @@ pub fn strategy_detail(props: &Props) -> Html {
                     <th><abbr>{ "Rank" }</abbr></th>
                  }
                 <th><abbr>{ "Net Profit" }</abbr></th>
-                <th><abbr>{ "Profit F." }</abbr></th>
+                <th><abbr>{ "P. Factor" }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
                 <th><abbr>{ "Trades" }</abbr></th>
