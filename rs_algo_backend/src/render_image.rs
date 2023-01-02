@@ -10,7 +10,7 @@ use rs_algo_shared::scanner::pattern::{PatternDirection, PatternType};
 use plotters::prelude::*;
 use round::round;
 use std::cmp::Ordering;
-use std::env;
+use std::{env, os};
 
 #[derive(Debug, Clone)]
 pub struct Backend;
@@ -40,6 +40,7 @@ impl Backend {
         let total_len = data.len();
         let from_date = data.first().unwrap().date;
         let to_date = data.last().unwrap().date;
+        let current_price = data.last().unwrap().close();
 
         let current_candle = instrument.data.last().unwrap();
 
@@ -204,8 +205,8 @@ impl Backend {
         chart
             .configure_mesh()
             .light_line_style(BACKGROUND)
-            .x_label_formatter(&|v| format!("{:.3}", v))
-            .y_label_formatter(&|v| format!("{:.3}", v))
+            .x_label_formatter(&|v| format!("{:.5}", v))
+            .y_label_formatter(&|v| format!("{:.5}", v))
             .draw()
             .unwrap();
 
@@ -464,7 +465,7 @@ impl Backend {
                         }))
                         .unwrap();
 
-                    //TRADES_IN
+                    //TRADES_IN SPREAD
 
                     chart
                         .draw_series(PointSeries::of_element(
@@ -477,10 +478,15 @@ impl Backend {
                                 .map(|(i, candle)| {
                                     let date = candle.date();
                                     let price = candle.close();
-                                    (date, price)
+                                    let index = date.timestamp_millis() as usize;
+                                    let trade_in_index =
+                                        prices_in_indexes.iter().position(|&x| x == index).unwrap();
+                                    let trade_in = trades_in.get(trade_in_index).unwrap();
+                                    (date, trade_in.ask)
+                                    //(date, price)
                                 }),
                             5,
-                            ShapeStyle::from(&BLUE_LINE3).filled(),
+                            ShapeStyle::from(&BLUE_LINE3),
                             &|coord, size: i32, style| {
                                 let new_coord = (coord.0, coord.1);
                                 let (date, price) = coord;
@@ -497,7 +503,7 @@ impl Backend {
                                             "{:?} / {:?} / {:?}",
                                             round(trade_in.price_in, 4),
                                             round(trade_in.ask, 4),
-                                            round(trade_in.spread, 4)
+                                            round(trade_in.spread, 4),
                                         ),
                                         (0, 20),
                                         ("sans-serif", 12),
@@ -559,27 +565,97 @@ impl Backend {
                         ))
                         .unwrap();
 
-                    //ACTIVE STOP LOSS
-                    chart
-                        .draw_series(LineSeries::new(
-                            (0..)
-                                .zip(data.iter())
-                                .map(|(id, candle)| match last_trade_in {
-                                    Some(trade_in) => match last_trade_out {
-                                        Some(trade_out) => {
-                                            if trade_out.index_in != trade_in.index_in {
-                                                (candle.date, trade_in.stop_loss.price)
-                                            } else {
-                                                (candle.date, 0.)
-                                            }
-                                        }
-                                        None => (candle.date, trade_in.stop_loss.price),
-                                    },
-                                    None => (candle.date, 0.),
-                                }),
-                            &RED_LINE,
-                        ))
-                        .unwrap();
+                    // //ACTIVE STOP LOSS
+                    //   chart
+                    //     .draw_series(PointSeries::of_element(
+                    //         (0..)
+                    //             .zip(data.iter())
+                    //             .map(|(id, candle)| match last_trade_in {
+                    //                 Some(trade_in) => match last_trade_out {
+                    //                     Some(trade_out) => {
+                    //                         if trade_out.index_in != trade_in.index_in {
+                    //                             (candle.date, trade_in.stop_loss.price)
+                    //                         } else {
+                    //                             (candle.date, 0.)
+                    //                         }
+                    //                     }
+                    //                     None => (candle.date, trade_in.stop_loss.price),
+                    //                 },
+                    //                 None => (candle.date, 0.),
+                    //             }),
+                    //         &RED_LINE,
+                    //     ))
+                    //     .unwrap();
+
+                    // chart
+                    //     .draw_series(PointSeries::of_element(
+                    //         (0..)
+                    //             .zip(data.iter())
+                    //             .filter(|(i, candle)| {
+                    //                 let index = candle.date().timestamp_millis() as usize;
+                    //                 prices_out_indexes.contains(&index)
+                    //             })
+                    //             .map(|(id, candle)| match last_trade_in {
+                    //                 Some(trade_in) => match last_trade_out {
+                    //                     Some(trade_out) => {
+                    //                         if trade_out.index_in != trade_in.index_in {
+                    //                             (candle.date, trade_in.ask)
+                    //                         } else {
+                    //                             (candle.date, 0.)
+                    //                         }
+                    //                     }
+                    //                     None => (candle.date, trade_in.ask),
+                    //                 },
+                    //                 None => (candle.date, 0.),
+                    //             }),
+                    //         5,
+                    //         ShapeStyle::from(&RED_LINE).filled(),
+                    //         &|coord, size: i32, style| {
+                    //             let (date, price) = coord;
+                    //             let index = date.timestamp_millis() as usize;
+                    //             let trade_out_index =
+                    //                 prices_out_indexes.iter().position(|&x| x == index).unwrap();
+
+                    //             let trade_out = trades_out.get(trade_out_index).unwrap();
+
+                    //             let style = ShapeStyle::from(&BLACK.mix(0.8)).filled();
+
+                    //             EmptyElement::at(coord)
+                    //                 + Circle::new((0, 0), size, style)
+                    //                 + Text::new(
+                    //                     format!(
+                    //                         "{:?} / {:?} %",
+                    //                         round(trade_out.price_out, 4),
+                    //                         round(trade_out.profit_per, 4)
+                    //                     ),
+                    //                     (0, 20),
+                    //                     ("sans-serif", 12),
+                    //                 )
+                    //         },
+                    //     ))
+                    //     .unwrap();
+
+                    //ACTIVE TRADE IN
+                    // chart
+                    //     .draw_series(LineSeries::new(
+                    //         (0..)
+                    //             .zip(data.iter())
+                    //             .map(|(id, candle)| match last_trade_in {
+                    //                 Some(trade_in) => match last_trade_out {
+                    //                     Some(trade_out) => {
+                    //                         if trade_out.index_in != trade_in.index_in {
+                    //                             (candle.date, (trade_in.ask - trade_in.spread))
+                    //                         } else {
+                    //                             (candle.date, 0.)
+                    //                         }
+                    //                     }
+                    //                     None => (candle.date, trade_in.ask),
+                    //                 },
+                    //                 None => (candle.date, 0.),
+                    //             }),
+                    //         &BLACK.mix(0.8),
+                    //     ))
+                    //     .unwrap();
                 }
             };
         }
@@ -610,7 +686,7 @@ impl Backend {
                     (0..)
                         .zip(data.iter())
                         .map(|(id, candle)| (candle.date, bb_c[id])),
-                    &GREEN_LINE2,
+                    &ORANGE_LINE,
                 ))
                 .unwrap();
         }
