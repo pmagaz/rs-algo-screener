@@ -69,10 +69,9 @@ pub fn bot_list(props: &Props) -> Html {
                     <td class={get_status_class(&profit_factor_status)}>  { round(bot.strategy_stats.profit_factor,2) } </td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(bot.strategy_stats.profitable_trades,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}>  { format!("{}%", round(bot.strategy_stats.max_drawdown,2) ) } </td>
-                    <td>{ bot.strategy_stats.trades }</td>
+                    <td> {format!("{} / {}", bot.strategy_stats.wining_trades, bot.strategy_stats.losing_trades)}</td>
                     <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(bot.strategy_stats.won_per_trade_per,2))}</td>
                     <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(bot.strategy_stats.lost_per_trade_per,2))}</td>
-                    <td> {format!("{} / {}", bot.strategy_stats.wining_trades, bot.strategy_stats.losing_trades)}</td>
                     <td>{ bot.strategy_stats.stop_losses }</td>
                     //bot.strategy_stats.trades
                     <td> {format!("{}", bot.last_update.to_chrono().format("%H:%M:%S"))}</td>
@@ -94,10 +93,9 @@ pub fn bot_list(props: &Props) -> Html {
                 <th>{ "P. Factor" }</th>
                 <th>{ "WinRate" }</th>
                 <th>{ "Drawdown" }</th>
-                <th>{ "Trades" }</th>
+                <th>{ "Won/Lost" }</th>
                 <th>{ "Avg Won" }</th>
                 <th>{ "Avg Lost" }</th>
-                <th>{ "Won/Lost" }</th>
                 <th>{ "Stops" }</th>
                 <th>{ "Updated" }</th>
                 </tr>

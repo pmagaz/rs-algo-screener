@@ -62,6 +62,7 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
             instrument,
             upper_tf_instrument,
             |(idx, prev_idx, upper_inst)| {
+                let curren_date = &upper_inst.data.get(idx).unwrap().date;
                 let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
 
@@ -77,6 +78,9 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
                     .get_data_b()
                     .get(prev_idx)
                     .unwrap();
+
+                //log::warn!("HTF date {:?}", curren_date);
+
                 curr_upper_macd_a > curr_upper_macd_b && prev_upper_macd_b >= prev_upper_macd_a
             },
         );
@@ -97,6 +101,8 @@ impl<'a> Strategy for MutiTimeFrameBollingerBands<'a> {
         let close_price = &instrument.data.get(index).unwrap().close;
         let prev_close = &instrument.data.get(prev_index).unwrap().close;
         let date = &instrument.data.get(index).unwrap().date;
+
+        //log::warn!("Date {:?}", date);
 
         let top_band = instrument.indicators.bb.get_data_a().get(index).unwrap();
         let prev_top_band = instrument

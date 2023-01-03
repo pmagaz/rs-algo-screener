@@ -56,31 +56,30 @@ pub async fn find_one(
 }
 
 pub async fn find_instruments(
-    market: web::Path<String>,
+    path: web::Path<(String, String)>,
     query: web::Query<Params>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
     let env = env::var("ENV").unwrap();
-
-    let market = market.into_inner();
+    let (market, time_frame) = path.into_inner();
 
     let offset = query.offset;
     let limit = query.limit;
-
-    // let market = match market.as_ref() {
-    //     "crytpo"
-    // }
 
     let query = match env.as_ref() {
         "development" => doc! {"market": &market, "symbol": "BITCOIN"},
         _ => doc! { "market": &market},
     };
 
-    log::info!("[BACK TEST INSTRUMENTS] Request for {:?}", market);
+    log::info!(
+        "[BACK TEST INSTRUMENTS] Request {:} for {}",
+        time_frame,
+        market,
+    );
 
     let backtest_instruments: Vec<Instrument> =
-        db::back_test::find_instruments(query, offset, limit, &state)
+        db::back_test::find_instruments(query, offset, limit, time_frame, &state)
             .await
             .unwrap();
 
@@ -276,6 +275,16 @@ pub async fn find_strategies_result_instruments(
     );
 
     Ok(HttpResponse::Ok().json(backtest_instruments))
+}
+
+pub async fn find_spreads(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+    let now = Instant::now();
+
+    log::info!("[BACK TEST SPREADS] Request for at {:?}", Local::now());
+
+    let spreads: Vec<BackTestSpread> = db::back_test::find_spreads(&state).await.unwrap();
+
+    Ok(HttpResponse::Ok().json(spreads))
 }
 
 pub async fn chart(

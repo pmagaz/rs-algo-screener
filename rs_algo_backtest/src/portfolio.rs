@@ -3,11 +3,11 @@ use crate::strategies::strategy::Strategy;
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
+use rs_algo_shared::models::backtest_instrument::BackTestSpread;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::scanner::instrument::Instrument;
-
 use std::env;
 
 #[derive(Clone)]
@@ -34,8 +34,21 @@ impl PortFolio {
         };
 
         let endpoint = env::var("BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT").unwrap();
-
         let instrument_result_endpoint = env::var("BACKEND_BACKTEST_ENDPOINT").unwrap().clone();
+        let spreads_endpoint = env::var("BACKEND_BACKTEST_SPREADS_ENDPOINT")
+            .unwrap()
+            .clone();
+
+        let time_frame = env::var("BASE_TIME_FRAME").unwrap().clone();
+        log::info!("[BACKTEST] Requesting spreads");
+
+        let backtest_spreads: Vec<BackTestSpread> =
+            request(&spreads_endpoint, &String::from("all"), HttpMethod::Get)
+                .await
+                .unwrap()
+                .json()
+                .await
+                .unwrap();
 
         for strategy in &self.strategies {
             let mut avg_sessions = vec![];
@@ -60,8 +73,10 @@ impl PortFolio {
             for _key in 0..500 / limit {
                 let url = [
                     &endpoint,
-                    "/",
+                    "/markets/",
                     backtest_market.as_ref(),
+                    "/",
+                    &time_frame,
                     "?offset=",
                     &offset.to_string(),
                     "&limit=",
@@ -71,7 +86,7 @@ impl PortFolio {
 
                 log::info!(
                     "[BACKTEST] Requesting instruments from {} to {}",
-                    offset,
+                    url,
                     offset + limit
                 );
 
@@ -87,8 +102,26 @@ impl PortFolio {
 
                 for instrument in &instruments_to_test {
                     log::info!("[BACKTEST] Testing {}... ", instrument.symbol);
+
+                    let spread = match backtest_spreads
+                        .iter()
+                        .position(|back_spread| back_spread.symbol == instrument.symbol)
+                    {
+                        Some(idx) => backtest_spreads.get(idx).unwrap().spread,
+                        None => {
+                            log::error!("BACKTEST] Spread not found");
+                            0.000
+                        }
+                    };
+
                     let backtest_result = dyn_clone::clone_box(strategy)
-                        .test(instrument, self.order_size, self.equity, self.commission)
+                        .test(
+                            instrument,
+                            self.order_size,
+                            self.equity,
+                            self.commission,
+                            spread,
+                        )
                         .await;
 
                     match backtest_result {

@@ -1,4 +1,5 @@
 use super::helpers::*;
+use crate::error;
 use crate::models::app_state::AppState;
 use crate::models::backtest_instrument::BackTestInstrumentResult;
 use crate::models::backtest_strategy::BackTestStrategyResult;
@@ -6,6 +7,7 @@ use crate::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
+use rs_algo_shared::models::backtest_instrument::BackTestSpread;
 use rs_algo_shared::scanner::instrument::*;
 
 use actix_web::web;
@@ -20,10 +22,14 @@ pub async fn find_one(
     time_frame: &str,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = get_collection_name(
+    let collection_name = &[
         &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
-        time_frame,
-    );
+        "_",
+        &time_frame,
+    ]
+    .concat();
+
+    log::info!("[FINDONE] from {}", collection_name);
 
     let collection = get_collection::<Instrument>(&state.db_hdd, &collection_name).await;
 
@@ -32,8 +38,6 @@ pub async fn find_one(
         .await
         .unwrap();
 
-    log::info!("[FINDONE] {:?} {:?}", symbol, Local::now(),);
-
     Ok(instrument)
 }
 
@@ -41,9 +45,15 @@ pub async fn find_instruments(
     query: Document,
     offset: u64,
     limit: i64,
+    time_frame: String,
     state: &web::Data<AppState>,
 ) -> Result<Vec<Instrument>, Error> {
-    let collection_name = &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &[
+        &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
+        "_",
+        &time_frame,
+    ]
+    .concat();
 
     let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
 
@@ -223,11 +233,52 @@ pub async fn find_backtest_instrument_by_symbol(
     symbol: &str,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
-    let collection_name = &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap();
+    let collection_name = &[
+        &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
+        "_",
+        &env::var("BASE_TIME_FRAME").unwrap(),
+    ]
+    .concat();
     let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
+        .await
+        .unwrap();
+
+    Ok(instrument)
+}
+
+pub async fn find_spreads(state: &web::Data<AppState>) -> Result<Vec<BackTestSpread>, Error> {
+    let collection_name = &env::var("DB_SPREADS_COLLECTION").unwrap();
+    let collection = get_collection::<BackTestSpread>(&state.db_hdd, collection_name).await;
+
+    let mut cursor = collection
+        .find(doc! {}, FindOptions::builder().build())
+        .await
+        .unwrap();
+
+    let mut spreads: Vec<BackTestSpread> = vec![];
+    while let Some(result) = cursor.next().await {
+        match result {
+            Ok(spread) => {
+                spreads.push(spread);
+            }
+            _ => {}
+        }
+    }
+    Ok(spreads)
+}
+
+pub async fn find_spread(
+    symbol: &str,
+    state: &web::Data<AppState>,
+) -> Result<Option<BackTestSpread>, Error> {
+    let collection_name = &env::var("DB_SPREADS_COLLECTION").unwrap();
+    let collection = get_collection::<BackTestSpread>(&state.db_hdd, collection_name).await;
+
+    let instrument = collection
+        .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())
         .await
         .unwrap();
 

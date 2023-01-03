@@ -53,13 +53,16 @@ async fn main() -> Result<()> {
             Local::now() - date::Duration::weeks(num_weeks + 1)
         }
         TimeFrameType::D => (Local::now() - date::Duration::days(num_test_bars)),
+        TimeFrameType::H4 => (Local::now() - date::Duration::hours(num_test_bars)),
         TimeFrameType::H1 => (Local::now() - date::Duration::hours(num_test_bars)),
         TimeFrameType::M30 => (Local::now() - date::Duration::minutes(num_test_bars)),
+        TimeFrameType::M15 => (Local::now() - date::Duration::minutes(num_test_bars)),
+        TimeFrameType::M5 => (Local::now() - date::Duration::minutes(num_test_bars)),
+        TimeFrameType::M1 => (Local::now() - date::Duration::minutes(num_test_bars)),
         _ => (Local::now() - date::Duration::days(num_test_bars)),
     };
 
-    let from = (Local::now() - date::Duration::days(num_test_bars)).timestamp();
-
+    log::warn!("FROM {}", base_timeframe_from);
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
     let mut symbols = screener.get_symbols().await.unwrap().symbols;
@@ -118,7 +121,7 @@ async fn main() -> Result<()> {
             }
         }
 
-        if !backtest_mode || (backtest_mode && (is_sp500 || is_forex || is_crypto)) {
+        if !backtest_mode || (backtest_mode && (is_forex)) {
             log::info!("processing {} ...", &s.symbol);
 
             screener

@@ -120,7 +120,7 @@ async fn main() -> Result<()> {
                         web::get().to(back_test::find_compact_instruments),
                     )
                     .route(
-                        "/backtest/instruments/{market}",
+                        "/backtest/instruments/markets/{market}/{time_frame}",
                         web::get().to(back_test::find_instruments),
                     )
                     .route(
@@ -135,6 +135,7 @@ async fn main() -> Result<()> {
                         "/backtest/strategies",
                         web::put().to(back_test::upsert_strategies_result),
                     )
+                    .route("/backtest/spreads", web::get().to(back_test::find_spreads))
                     .route(
                         "/backtest/strategies/{market}/{strategy}/{strategy_type}",
                         web::get().to(back_test::find_instruments_result_by_strategy),

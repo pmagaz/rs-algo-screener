@@ -234,7 +234,10 @@ where
                 .data
                 .iter()
                 .enumerate()
-                .filter(|(_id, x)| &x.date <= base_date)
+                .filter(|(_id, x)| {
+                    //log::warn!("Base Date {:?} {:?}", base_date, x.date);
+                    &x.date <= base_date
+                })
                 .map(|(id, _x)| id)
                 .collect();
 

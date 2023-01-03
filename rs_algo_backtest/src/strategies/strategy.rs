@@ -90,6 +90,7 @@ pub trait Strategy: DynClone {
         order_size: f64,
         equity: f64,
         commission: f64,
+        spread: f64,
     ) -> BackTestResult {
         let mut trades_in: Vec<TradeIn> = vec![];
         let mut trades_out: Vec<TradeOut> = vec![];
@@ -102,10 +103,11 @@ pub trait Strategy: DynClone {
         };
 
         log::info!(
-            "[BACKTEST] Starting {} backtest for {} from {}",
+            "[BACKTEST] Starting {} backtest for {} from {} using {} spread",
             self.name(),
             &instrument.symbol,
-            start_date
+            start_date,
+            spread
         );
 
         let uppertimeframe = env::var("UPPER_TIME_FRAME").unwrap();
@@ -130,8 +132,13 @@ pub trait Strategy: DynClone {
                 }
 
                 if !open_positions && self.there_are_funds(&trades_out) {
-                    let trade_in_result =
-                        self.market_in_fn(index, instrument, upper_tf_instrument, order_size);
+                    let trade_in_result = self.market_in_fn(
+                        index,
+                        instrument,
+                        upper_tf_instrument,
+                        order_size,
+                        spread,
+                    );
 
                     match trade_in_result {
                         TradeResult::TradeIn(trade_in) => {
@@ -152,6 +159,7 @@ pub trait Strategy: DynClone {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
         order_size: f64,
+        spread: f64,
     ) -> TradeResult {
         let entry_type: TradeType;
 
@@ -165,7 +173,7 @@ pub trait Strategy: DynClone {
 
         let stop_loss = self.stop_loss();
 
-        resolve_trade_in(index, order_size, instrument, entry_type, stop_loss)
+        resolve_trade_in(index, order_size, instrument, entry_type, spread, stop_loss)
     }
 
     fn market_out_fn(
