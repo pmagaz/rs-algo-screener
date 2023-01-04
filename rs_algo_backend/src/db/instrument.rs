@@ -118,6 +118,7 @@ pub async fn upsert_instrument(
     doc: &Instrument,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
+    log::warn!("MOOOODE {}", mode);
     let collection = match mode {
         "daily" => {
             let collection_name =
@@ -126,10 +127,14 @@ pub async fn upsert_instrument(
             get_collection::<Instrument>(&state.db_mem, &collection_name).await
         }
         "backtest" => {
-            let collection_name = get_collection_name(
+            let collection_name = [
                 &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
+                "_",
                 time_frame,
-            );
+            ]
+            .concat();
+
+            log::warn!("COLLLECTIOn {}", collection_name);
 
             get_collection::<Instrument>(&state.db_hdd, &collection_name).await
         }

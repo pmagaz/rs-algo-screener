@@ -21,6 +21,7 @@ pub mod macd_over_zero;
 pub mod macd_rsi;
 pub mod macd_weekly;
 pub mod rsi;
+pub mod scalping;
 pub mod stoch;
 pub mod stoch_ls;
 pub mod stoch_ls_mt_macd;

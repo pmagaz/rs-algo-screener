@@ -62,6 +62,8 @@ async fn main() -> Result<()> {
         _ => (Local::now() - date::Duration::days(num_test_bars)),
     };
 
+    let base_timeframe_from = Local::now() - date::Duration::days(160);
+
     log::warn!("FROM {}", base_timeframe_from);
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
