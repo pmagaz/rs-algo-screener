@@ -7,7 +7,9 @@ use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
+use rs_algo_shared::models::trade::OrderType;
 use rs_algo_shared::models::trade::TradeType;
+use rs_algo_shared::models::trade::TradeType2;
 use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
@@ -130,7 +132,7 @@ impl<'a> Strategy for Scalping<'a> {
                     && ema_13 > ema_21);
 
         match entry_condition {
-            true => Operation::MarketIn(entry_condition, Some(vec![])),
+            true => Operation::MarketIn(Some(vec![OrderType::StopLoss(StopLossType::Atr)])),
             false => Operation::None,
         }
     }
@@ -187,8 +189,13 @@ impl<'a> Strategy for Scalping<'a> {
                 && ema_8 < ema_13
                 && ema_13 < ema_21);
 
+        // match exit_condition {
+        //     true => Operation::MarketOut(TradeType::ExitLong, None),
+        //     false => Operation::None,
+        // }
+
         match exit_condition {
-            true => Operation::MarketOut(exit_condition, None),
+            true => Operation::MarketOut(Some(vec![OrderType::StopLoss(StopLossType::Atr)])),
             false => Operation::None,
         }
     }

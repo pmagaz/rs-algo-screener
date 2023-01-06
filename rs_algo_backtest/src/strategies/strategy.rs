@@ -1,4 +1,6 @@
+use chrono::Local;
 use rs_algo_shared::error::Result;
+use rs_algo_shared::helpers::date::to_dbtime;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::stop_loss::{StopLoss, StopLossType};
@@ -121,24 +123,24 @@ pub trait Strategy: DynClone {
 
         for (index, _candle) in data.iter().enumerate() {
             if index < len - 1 && index >= 5 {
-                let active_orders_result = self.active_orders_fn(
-                    index,
-                    instrument,
-                    upper_tf_instrument,
-                    &mut active_orders,
-                );
+                // let active_orders_result = self.active_orders_fn(
+                //     index,
+                //     instrument,
+                //     upper_tf_instrument,
+                //     &mut active_orders,
+                // );
 
-                match active_orders_result {
-                    OperationResult::MarketIn(TradeResult::TradeIn(trade_in), _) => {
-                        open_positions = true;
-                        trades_in.push(trade_in);
-                    }
-                    OperationResult::MarketOut(TradeResult::TradeOut(trade_out)) => {
-                        trades_out.push(trade_out);
-                        open_positions = false;
-                    }
-                    _ => (),
-                };
+                // match active_orders_result {
+                //     OperationResult::MarketIn(TradeResult::TradeIn(trade_in), _) => {
+                //         open_positions = true;
+                //         trades_in.push(trade_in);
+                //     }
+                //     OperationResult::MarketOut(TradeResult::TradeOut(trade_out)) => {
+                //         trades_out.push(trade_out);
+                //         open_positions = false;
+                //     }
+                //     _ => (),
+                // };
 
                 if open_positions {
                     let trade_in = trades_in.last().unwrap().to_owned();
@@ -202,41 +204,105 @@ pub trait Strategy: DynClone {
         spread: f64,
         //mut active_orders: &Vec<Order>,
     ) -> OperationResult {
-        match is_long_only(self.strategy_type()) {
-            true => match self.entry_long(index, instrument, upper_tf_instrument) {
-                Operation::MarketIn(result, orders) => {
-                    let trade_in = resolve_trade_in(
-                        index,
-                        order_size,
-                        instrument,
-                        TradeType::EntryLong,
-                        spread,
-                        //self.stop_loss(),
-                    );
-                    OperationResult::MarketIn(trade_in, orders)
+        let entry_type = match is_long_only(self.strategy_type()) {
+            true => TradeType::EntryLong,
+            false => TradeType::EntryShort,
+        };
+
+        match self.entry_long(index, instrument, upper_tf_instrument) {
+            Operation::MarketIn(order_types) => {
+                let orders = match order_types {
+                    Some(orders) => {
+                        Some(self.convert_orders(index, instrument, upper_tf_instrument, &orders))
+                    }
+                    None => None,
+                };
+                let trade_in_result =
+                    resolve_trade_in(index, order_size, instrument, entry_type, spread);
+
+                OperationResult::MarketIn(trade_in_result, orders)
+            }
+            Operation::Order(order_types) => {
+                let orders =
+                    self.convert_orders(index, instrument, upper_tf_instrument, &order_types);
+
+                OperationResult::Order(orders)
+            }
+            _ => OperationResult::None,
+        }
+    }
+
+    // let mut entry_type: TradeType = TradeType::None;
+
+    // let trade_result =
+    //     resolve_trade_in(index, order_size, instrument, entry_type, spread, stop_loss);
+
+    fn market_out_fn(
+        &mut self,
+        index: usize,
+        instrument: &Instrument,
+        upper_tf_instrument: &HigherTMInstrument,
+        mut trade_in: TradeIn,
+    ) -> OperationResult {
+        let exit_type = match is_long_only(self.strategy_type()) {
+            true => TradeType::ExitLong,
+            false => TradeType::ExitShort,
+        };
+
+        match self.exit_long(index, instrument, upper_tf_instrument) {
+            Operation::MarketOut(_) => {
+                let trade_out_result = resolve_trade_out(index, instrument, trade_in, exit_type);
+
+                OperationResult::MarketOut(trade_out_result)
+            }
+            Operation::Order(order_types) => {
+                let orders =
+                    self.convert_orders(index, instrument, upper_tf_instrument, &order_types);
+
+                OperationResult::Order(orders)
+            }
+            _ => OperationResult::None,
+        }
+    }
+
+    fn convert_orders(
+        &mut self,
+        index: usize,
+        instrument: &Instrument,
+        upper_tf_instrument: &HigherTMInstrument,
+        order_types: &Vec<OrderType>,
+    ) -> Vec<Order> {
+        //let leches = resolve_active_orders(index, instrument, upper_tf_instrument, active_orders);
+
+        let orders: Vec<Order> = vec![];
+
+        for order in order_types {
+            match order {
+                OrderType::BuyOrder(origin_price, target_price) => todo!(),
+                OrderType::SellOrder(origin_price, target_price) => todo!(),
+                OrderType::TakeProfit(origin_price, target_price) => todo!(),
+                OrderType::StopLoss(stopLoss_stype) => {
+                    let stop = match stopLoss_stype {
+                        StopLossType::Atr => todo!(),
+                        StopLossType::Price(target_price) => todo!(),
+                        StopLossType::Percentage(_) => todo!(),
+                        StopLossType::Pips(_) => todo!(),
+                        StopLossType::None => todo!(),
+                    };
                 }
-                _ => OperationResult::None,
-            },
-            false => match self.entry_short(index, instrument, upper_tf_instrument) {
-                Operation::MarketIn(result, orders) => {
-                    let trade_in = resolve_trade_in(
-                        index,
-                        order_size,
-                        instrument,
-                        TradeType::EntryShort,
-                        spread,
-                        //self.stop_loss(),
-                    );
-                    OperationResult::MarketIn(trade_in, orders)
-                }
-                _ => OperationResult::None,
-            },
+            }
         }
 
-        // let mut entry_type: TradeType = TradeType::None;
-
-        // let trade_result =
-        //     resolve_trade_in(index, order_size, instrument, entry_type, spread, stop_loss);
+        vec![Order {
+            order_type: OrderType::BuyOrder(12., 12.),
+            condition: OrderCondition::Greater,
+            active: true,
+            created_at: to_dbtime(Local::now()),
+            updated_at: to_dbtime(Local::now()),
+            valid_until: to_dbtime(Local::now()),
+            origin_price: 100.,
+            target_price: 100.,
+        }]
     }
 
     fn active_orders_fn(
@@ -250,58 +316,6 @@ pub trait Strategy: DynClone {
         OperationResult::None
     }
 
-    fn market_out_fn(
-        &mut self,
-        index: usize,
-        instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
-        mut trade_in: TradeIn,
-        //mut active_orders: &Vec<Order>,
-    ) -> OperationResult {
-        // let mut exit_type: TradeType = TradeType::None;
-
-        // let stop_loss = self.stop_loss();
-        // if stop_loss.stop_type != StopLossType::Atr
-        //     && stop_loss.stop_type != StopLossType::Percentage
-        // {
-        //     trade_in.stop_loss = update_stop_loss_values(
-        //         &trade_in.stop_loss,
-        //         stop_loss.stop_type.to_owned(),
-        //         stop_loss.price,
-        //     );
-        // }
-
-        // match self.exit_long(index, instrument, upper_tf_instrument) {
-        //     Operation::MarketOut(result) => exit_type = TradeType::ExitLong,
-        //     _ => (),
-        // };
-
-        // match self.exit_short(index, instrument, upper_tf_instrument) {
-        //     Operation::MarketOut(result) => exit_type = TradeType::ExitShort,
-        //     _ => (),
-        // };
-
-        match is_long_only(self.strategy_type()) {
-            true => match self.entry_long(index, instrument, upper_tf_instrument) {
-                Operation::MarketIn(result, orders) => {
-                    let trade_out =
-                        resolve_trade_out(index, instrument, trade_in, TradeType::ExitLong);
-                    OperationResult::MarketOut(trade_out)
-                }
-                _ => OperationResult::None,
-            },
-            false => match self.entry_short(index, instrument, upper_tf_instrument) {
-                Operation::MarketIn(result, orders) => {
-                    let trade_out =
-                        resolve_trade_out(index, instrument, trade_in, TradeType::ExitShort);
-                    OperationResult::MarketOut(trade_out)
-                }
-                _ => OperationResult::None,
-            },
-        }
-
-        // resolve_trade_out(index, instrument, trade_in, exit_type)
-    }
     // fn stop_loss(&self) -> &StopLoss;
     // fn update_stop_loss(&mut self, stop_type: StopLossType, price: f64) -> &StopLoss;
     // fn stop_loss_exit(&mut self, exit_condition: bool, price: f64) -> bool {
