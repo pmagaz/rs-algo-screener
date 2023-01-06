@@ -7,7 +7,8 @@ use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
-use rs_algo_shared::models::trade::{TradeIn, TradeOut};
+use rs_algo_shared::models::trade::TradeType;
+use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
 use async_trait::async_trait;
@@ -16,10 +17,9 @@ use async_trait::async_trait;
 pub struct Scalping<'a> {
     name: &'a str,
     strategy_type: StrategyType,
-    stop_loss: StopLoss,
+    //stop_loss: StopLoss,
 }
 
-#[async_trait]
 impl<'a> Strategy for Scalping<'a> {
     fn new() -> Result<Self> {
         let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
@@ -28,9 +28,9 @@ impl<'a> Strategy for Scalping<'a> {
             .unwrap();
 
         Ok(Self {
-            stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
+            //stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Scalping",
-            strategy_type: StrategyType::LongShortMultiTF,
+            strategy_type: StrategyType::OnlyLongMultiTF,
         })
     }
 
@@ -42,21 +42,25 @@ impl<'a> Strategy for Scalping<'a> {
         &self.strategy_type
     }
 
-    fn update_stop_loss(&mut self, stop_type: StopLossType, price: f64) -> &StopLoss {
-        self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
-        &self.stop_loss
-    }
+    // fn update_stop_loss(&mut self, stop_type: StopLossType, price: f64) -> &StopLoss {
+    //     // self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
+    //     &self.stop_loss
+    // }
 
-    fn stop_loss(&self) -> &StopLoss {
-        &self.stop_loss
-    }
+    // fn stop_loss(&self) -> &StopLoss {
+    //     &self.stop_loss
+    // }
+
+    // fn create_stop_loss() {
+    //     create_stop_loss(&entry_type, instrument, nex_candle_index, stop_loss)
+    // }
 
     fn entry_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-    ) -> bool {
+    ) -> Operation {
         let close_price = &instrument.data.get(index).unwrap().close();
 
         let first_htf_emas = get_upper_timeframe_data(
@@ -118,12 +122,17 @@ impl<'a> Strategy for Scalping<'a> {
         let close_price = &instrument.data.get(index).unwrap().close();
         let prev_close_price = &instrument.data.get(prev_index).unwrap().close();
 
-        first_htf_emas
+        let entry_condition = first_htf_emas
             || htf_emas
                 && (close_price > ema_8
                     && prev_close_price <= prev_ema_8
                     && ema_8 > ema_13
-                    && ema_13 > ema_21)
+                    && ema_13 > ema_21);
+
+        match entry_condition {
+            true => Operation::MarketIn(entry_condition, Some(vec![])),
+            false => Operation::None,
+        }
     }
 
     fn exit_long(
@@ -131,7 +140,7 @@ impl<'a> Strategy for Scalping<'a> {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-    ) -> bool {
+    ) -> Operation {
         let close_price = &instrument.data.get(index).unwrap().close();
 
         let htf_emas = get_upper_timeframe_data(
@@ -171,12 +180,17 @@ impl<'a> Strategy for Scalping<'a> {
         let close_price = &instrument.data.get(index).unwrap().close();
         let prev_close_price = &instrument.data.get(prev_index).unwrap().close();
 
-        htf_emas
+        let exit_condition = htf_emas
             || (ema_8 < ema_13 || ema_13 < ema_21 || ema_8 < ema_21)
             || (close_price < ema_8
                 && prev_close_price >= prev_ema_8
                 && ema_8 < ema_13
-                && ema_13 < ema_21)
+                && ema_13 < ema_21);
+
+        match exit_condition {
+            true => Operation::MarketOut(exit_condition, None),
+            false => Operation::None,
+        }
     }
 
     fn entry_short(
@@ -184,14 +198,12 @@ impl<'a> Strategy for Scalping<'a> {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-    ) -> bool {
+    ) -> Operation {
         match self.strategy_type {
-            StrategyType::LongShort => self.exit_long(index, instrument, upper_tf_instrument),
-            StrategyType::LongShortMultiTF => {
+            StrategyType::LongShort | StrategyType::LongShortMultiTF | StrategyType::OnlyShort => {
                 self.exit_long(index, instrument, upper_tf_instrument)
             }
-            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
-            _ => false,
+            _ => Operation::None,
         }
     }
 
@@ -200,15 +212,12 @@ impl<'a> Strategy for Scalping<'a> {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-    ) -> bool {
+    ) -> Operation {
         match self.strategy_type {
-            StrategyType::LongShort => self.entry_long(index, instrument, upper_tf_instrument),
-            StrategyType::LongShortMultiTF => {
+            StrategyType::LongShort | StrategyType::LongShortMultiTF | StrategyType::OnlyShort => {
                 self.entry_long(index, instrument, upper_tf_instrument)
             }
-            StrategyType::OnlyShort => self.entry_long(index, instrument, upper_tf_instrument),
-            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
-            _ => false,
+            _ => Operation::None,
         }
     }
 

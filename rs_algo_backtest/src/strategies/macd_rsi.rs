@@ -149,7 +149,6 @@ impl<'a> Strategy for Macd<'a> {
                 self.entry_long(index, instrument, upper_tf_instrument)
             }
             StrategyType::OnlyShort => self.entry_long(index, instrument, upper_tf_instrument),
-            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
             _ => false,
         }
     }

@@ -454,9 +454,12 @@ impl Backend {
                                 BackendMode::BackTest => i,
                                 _ => candle.date().timestamp_millis() as usize,
                             };
-                            let price = candle.close;
 
                             if prices_in_indexes.contains(&index) {
+                                let trade_in_index =
+                                    prices_in_indexes.iter().position(|&x| x == index).unwrap();
+                                let trade_in = trades_in.get(trade_in_index).unwrap();
+                                let price = trade_in.price_in;
                                 match mode {
                                     BackendMode::Bot => Circle::new(
                                         (candle.date, price),
@@ -473,7 +476,7 @@ impl Backend {
                                 }
                             } else {
                                 Circle::new(
-                                    (candle.date, price),
+                                    (candle.date, 0.),
                                     0,
                                     Into::<ShapeStyle>::into(&TRANSPARENT).filled(),
                                 )
