@@ -5,11 +5,9 @@ use crate::helpers::calc::*;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::backtest_instrument::*;
+use rs_algo_shared::models::order::OrderType;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
-use rs_algo_shared::models::trade::OrderType;
-use rs_algo_shared::models::trade::TradeType;
-use rs_algo_shared::models::trade::TradeType2;
 use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
