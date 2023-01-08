@@ -5,7 +5,7 @@ use crate::helpers::calc::*;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::order::OrderType;
+use rs_algo_shared::models::order::{Order, OrderType};
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
@@ -231,6 +231,7 @@ impl<'a> Strategy for Scalping<'a> {
         instrument: &Instrument,
         trades_in: Vec<TradeIn>,
         trades_out: Vec<TradeOut>,
+        orders: Vec<Order>,
         equity: f64,
         commission: f64,
     ) -> BackTestResult {
@@ -239,6 +240,7 @@ impl<'a> Strategy for Scalping<'a> {
             &self.strategy_type,
             trades_in,
             trades_out,
+            orders,
             self.name,
             equity,
             commission,

@@ -3,6 +3,7 @@ use crate::helpers::calc::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::market::*;
+use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::trade::TradeIn;
 use rs_algo_shared::models::trade::TradeOut;
@@ -125,6 +126,7 @@ pub fn resolve_backtest(
     strategy_type: &StrategyType,
     trades_in: Vec<TradeIn>,
     trades_out: Vec<TradeOut>,
+    orders: Vec<Order>,
     name: &str,
     equity: f64,
     commission: f64,
@@ -189,6 +191,7 @@ pub fn resolve_backtest(
                 symbol: instrument.symbol.to_owned(),
                 trades_in,
                 trades_out,
+                orders,
             },
             strategy: name.to_owned(),
             strategy_type: strategy_type.to_owned(),
@@ -225,6 +228,7 @@ pub fn resolve_backtest(
                 symbol: instrument.symbol.to_owned(),
                 trades_in: vec![],
                 trades_out: vec![],
+                orders: vec![],
             },
             strategy: name.to_owned(),
             strategy_type: strategy_type.to_owned(),

@@ -1,10 +1,8 @@
 use chrono::Local;
 use rs_algo_shared::error::Result;
-use rs_algo_shared::helpers::date::to_dbtime;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::order::*;
-use rs_algo_shared::models::stop_loss::{StopLoss, StopLossType};
 use rs_algo_shared::models::strategy::{is_long_only, StrategyType};
 use rs_algo_shared::models::trade::*;
 use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
@@ -50,6 +48,7 @@ pub trait Strategy: DynClone {
         instrument: &Instrument,
         trades_in: Vec<TradeIn>,
         trades_out: Vec<TradeOut>,
+        orders: Vec<Order>,
         equity: f64,
         commision: f64,
     ) -> BackTestResult;
@@ -96,9 +95,9 @@ pub trait Strategy: DynClone {
         commission: f64,
         spread: f64,
     ) -> BackTestResult {
+        let mut orders: Vec<Order> = vec![];
         let mut trades_in: Vec<TradeIn> = vec![];
         let mut trades_out: Vec<TradeOut> = vec![];
-        let mut active_orders: Vec<Order> = vec![];
 
         let mut open_positions = false;
         let data = &instrument.data;
@@ -122,26 +121,44 @@ pub trait Strategy: DynClone {
             .get_upper_tf_instrument(&instrument.symbol, &uppertimeframe)
             .await;
 
+        let a_orders = orders.clone();
+
         for (index, _candle) in data.iter().enumerate() {
             if index < len - 1 && index >= 5 {
-                // let active_orders_result = self.active_orders_fn(
-                //     index,
-                //     instrument,
-                //     upper_tf_instrument,
-                //     &mut active_orders,
-                // );
+                let active_orders_result = self
+                    .active_orders_fn(index, instrument, order_size, spread, &a_orders, &trades_in);
 
-                // match active_orders_result {
-                //     OperationResult::MarketIn(TradeResult::TradeIn(trade_in), _) => {
-                //         open_positions = true;
-                //         trades_in.push(trade_in);
-                //     }
-                //     OperationResult::MarketOut(TradeResult::TradeOut(trade_out)) => {
-                //         trades_out.push(trade_out);
-                //         open_positions = false;
-                //     }
-                //     _ => (),
-                // };
+                match active_orders_result {
+                    OperationResult::MarketInOrder(TradeResult::TradeIn(trade_in), order) => {
+                        let order_position = orders.iter().position(|x| x.index == order.index);
+                        match order_position {
+                            Some(x) => {
+                                log::info!("Order executed {:?}", order);
+                                open_positions = true;
+                                trades_in.push(trade_in);
+                                orders.get_mut(x).unwrap().update_order();
+                            }
+                            None => {
+                                log::warn!("Order not executed {:?}", order);
+                            }
+                        }
+                    }
+                    OperationResult::MarketOutOrder(TradeResult::TradeOut(trade_out), order) => {
+                        let order_position = orders.iter().position(|x| x.index == order.index);
+                        match order_position {
+                            Some(x) => {
+                                log::info!("Order executed {:?}", order);
+                                open_positions = false;
+                                trades_out.push(trade_out);
+                                orders.get_mut(x).unwrap().update_order();
+                            }
+                            None => {
+                                log::warn!("Order not executed {:?}", order);
+                            }
+                        }
+                    }
+                    _ => (),
+                };
 
                 if open_positions {
                     let trade_in = trades_in.last().unwrap().to_owned();
@@ -149,16 +166,16 @@ pub trait Strategy: DynClone {
                         index,
                         instrument,
                         upper_tf_instrument,
-                        trade_in,
+                        &trade_in,
                         //&mut active_orders,
                     );
                     match trade_out_result {
                         OperationResult::MarketOut(TradeResult::TradeOut(trade_out)) => {
-                            trades_out.push(trade_out);
                             open_positions = false;
+                            trades_out.push(trade_out);
                         }
-                        OperationResult::Order(orders) => {
-                            active_orders = [active_orders.clone(), orders].concat();
+                        OperationResult::PendingOrder(new_orders) => {
+                            orders = [orders.clone(), new_orders].concat();
                         }
                         _ => (),
                     };
@@ -175,16 +192,16 @@ pub trait Strategy: DynClone {
                     );
 
                     match operation_in_result {
-                        OperationResult::MarketIn(TradeResult::TradeIn(trade_in), orders) => {
+                        OperationResult::MarketIn(TradeResult::TradeIn(trade_in), new_orders) => {
                             open_positions = true;
                             trades_in.push(trade_in);
-                            match orders {
-                                Some(ord) => active_orders = [active_orders.clone(), ord].concat(),
+                            match new_orders {
+                                Some(ord) => orders = [orders.clone(), ord].concat(),
                                 None => (),
                             }
                         }
-                        OperationResult::Order(orders) => {
-                            active_orders = [active_orders.clone(), orders].concat();
+                        OperationResult::PendingOrder(new_orders) => {
+                            orders = [orders.clone(), new_orders].concat();
                         }
                         _ => (),
                     };
@@ -192,7 +209,9 @@ pub trait Strategy: DynClone {
             }
         }
 
-        self.backtest_result(instrument, trades_in, trades_out, equity, commission)
+        self.backtest_result(
+            instrument, trades_in, trades_out, orders, equity, commission,
+        )
     }
     fn market_in_fn(
         &mut self,
@@ -222,7 +241,7 @@ pub trait Strategy: DynClone {
             Operation::Order(order_types) => {
                 let orders = prepare_orders(index, instrument, &trade_type, &order_types);
 
-                OperationResult::Order(orders)
+                OperationResult::PendingOrder(orders)
             }
             _ => OperationResult::None,
         }
@@ -233,7 +252,7 @@ pub trait Strategy: DynClone {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-        mut trade_in: TradeIn,
+        trade_in: &TradeIn,
     ) -> OperationResult {
         let trade_type = match is_long_only(self.strategy_type()) {
             true => TradeType::ExitLong,
@@ -249,7 +268,7 @@ pub trait Strategy: DynClone {
             Operation::Order(order_types) => {
                 let orders = prepare_orders(index, instrument, &trade_type, &order_types);
 
-                OperationResult::Order(orders)
+                OperationResult::PendingOrder(orders)
             }
             _ => OperationResult::None,
         }
@@ -259,33 +278,33 @@ pub trait Strategy: DynClone {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
-        mut active_orders: &Vec<Order>,
+        order_size: f64,
+        spread: f64,
+        orders: &Vec<Order>,
+        trades_in: &Vec<TradeIn>,
     ) -> OperationResult {
-        let leches = resolve_active_orders(index, instrument, upper_tf_instrument, active_orders);
+        let trade_type = match is_long_only(self.strategy_type()) {
+            true => TradeType::ExitLong,
+            false => TradeType::ExitShort,
+        };
+
+        // CONTINUE HERE TAG RIGHT TRADE_TYPE
+        match resolve_active_orders(index, instrument, orders.clone()) {
+            Operation::MarketInOrder(order) => {
+                let trade_in_result =
+                    resolve_trade_in(index, order_size, instrument, trade_type, spread);
+                OperationResult::MarketInOrder(trade_in_result, order)
+            }
+            Operation::MarketOutOrder(order) => {
+                let trade_in = trades_in.last().unwrap();
+                let trade_out_result = resolve_trade_out(index, instrument, trade_in, trade_type);
+                OperationResult::MarketOutOrder(trade_out_result, order)
+            }
+            _ => OperationResult::None,
+        };
+
         OperationResult::None
     }
-
-    // fn stop_loss(&self) -> &StopLoss;
-    // fn update_stop_loss(&mut self, stop_type: StopLossType, price: f64) -> &StopLoss;
-    // fn stop_loss_exit(&mut self, exit_condition: bool, price: f64) -> bool {
-    //     // match exit_condition {
-    //     //     true => {
-    //     //         self.update_stop_loss(price);
-    //     //         false
-    //     //     }
-    //     //     false => {
-    //     //         self.update_stop_loss(0.);
-    //     //         false
-    //     //     }
-    //     // }
-    //     false
-    // }
-    // fn stop_loss_exit(&mut self, stop_type: StopLossType, price: f64) -> bool {
-    //     let stop_loss = self.stop_loss();
-    //     update_stop_loss_values(stop_loss, stop_type, price);
-    //     true
-    // }
 
     fn there_are_funds(&mut self, trades_out: &Vec<TradeOut>) -> bool {
         let profit: f64 = trades_out.iter().map(|trade| trade.profit_per).sum();
