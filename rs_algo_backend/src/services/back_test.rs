@@ -68,7 +68,7 @@ pub async fn find_instruments(
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "development" => doc! {"market": &market, "symbol": "BITCOIN"},
+        "development" => doc! {"market": &market, "symbol": "EURUSD"},
         _ => doc! { "market": &market},
     };
 

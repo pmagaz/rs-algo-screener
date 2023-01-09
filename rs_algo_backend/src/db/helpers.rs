@@ -16,7 +16,6 @@ pub fn get_collection_name(collection: &str, time_frame: &str) -> String {
     let arr_str = collection.split('_').collect::<Vec<_>>();
     let time_frame_code = arr_str.last().unwrap();
 
-    log::warn!("aaaaaaaa {:?}", arr_str);
     collection.replace(time_frame_code, time_frame)
 }
 pub async fn get_collection<T>(db: &Db, collection: &str) -> Collection<T> {

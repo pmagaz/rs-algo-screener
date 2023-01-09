@@ -136,10 +136,10 @@ impl Backend {
                 .map(|x| (x.index_out, x.price_out))
                 .collect();
 
-            stop_loss_types = trades_in
-                .iter()
-                .map(|x| (x.index_in, x.stop_loss.stop_type.to_owned()))
-                .collect();
+            // stop_loss_types = trades_in
+            //     .iter()
+            //     .map(|x| (x.index_in, x.stop_loss.stop_type.to_owned()))
+            //     .collect();
         } else {
             top_points_set = instrument.peaks.local_maxima.clone();
             low_points_set = instrument.peaks.local_minima.clone();
