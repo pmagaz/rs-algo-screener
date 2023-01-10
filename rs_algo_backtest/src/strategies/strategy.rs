@@ -24,24 +24,28 @@ pub trait Strategy: DynClone {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
+        spread: f64,
     ) -> Operation;
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
+        spread: f64,
     ) -> Operation;
     fn entry_short(
         &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
+        spread: f64,
     ) -> Operation;
     fn exit_short(
         &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
+        spread: f64,
     ) -> Operation;
     fn backtest_result(
         &self,
@@ -123,8 +127,9 @@ pub trait Strategy: DynClone {
 
         for (index, _candle) in data.iter().enumerate() {
             if index < len - 1 && index >= 5 {
-                let active_orders_result = self
-                    .active_orders_fn(index, instrument, order_size, spread, &orders, &trades_in);
+                let active_orders_result = self.resolve_pending_orders(
+                    index, instrument, order_size, spread, &orders, &trades_in,
+                );
 
                 match active_orders_result {
                     OperationResult::MarketInOrder(TradeResult::TradeIn(trade_in), order) => {
@@ -163,12 +168,13 @@ pub trait Strategy: DynClone {
                         true => TradeType::MarketOutLong,
                         false => TradeType::MarketOutShort,
                     };
-                    let trade_out_result = self.market_out_fn(
+                    let trade_out_result = self.resolve_trades_out(
                         index,
                         instrument,
                         upper_tf_instrument,
                         &trade_in,
-                        &exit_type, //&mut active_orders,
+                        &exit_type,
+                        spread,
                     );
 
                     match trade_out_result {
@@ -184,7 +190,7 @@ pub trait Strategy: DynClone {
                 }
 
                 if !open_positions && self.there_are_funds(&trades_out) {
-                    let operation_in_result = self.market_in_fn(
+                    let operation_in_result = self.resolve_trades_in(
                         index,
                         instrument,
                         upper_tf_instrument,
@@ -214,7 +220,7 @@ pub trait Strategy: DynClone {
             instrument, trades_in, trades_out, orders, equity, commission,
         )
     }
-    fn market_in_fn(
+    fn resolve_trades_in(
         &mut self,
         index: usize,
         instrument: &Instrument,
@@ -227,14 +233,16 @@ pub trait Strategy: DynClone {
             false => TradeType::MarketInShort,
         };
 
-        match self.entry_long(index, instrument, upper_tf_instrument) {
+        match self.entry_long(index, instrument, upper_tf_instrument, spread) {
             Operation::MarketIn(order_types) => {
+                let trade_in_result =
+                    resolve_trade_in(index, order_size, instrument, &trade_type, spread);
+
                 let orders = match order_types {
                     Some(orders) => Some(prepare_orders(index, instrument, &trade_type, &orders)),
                     None => None,
                 };
-                let trade_in_result =
-                    resolve_trade_in(index, order_size, instrument, trade_type, spread);
+                //UPDATE ORDER INDEXIN
 
                 OperationResult::MarketIn(trade_in_result, orders)
             }
@@ -247,20 +255,16 @@ pub trait Strategy: DynClone {
         }
     }
 
-    fn market_out_fn(
+    fn resolve_trades_out(
         &mut self,
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
         trade_in: &TradeIn,
         exit_type: &TradeType,
+        spread: f64,
     ) -> OperationResult {
-        // let trade_type = match self.strategy_type().is_long_only() {
-        //     true => TradeType::OrderInLong,
-        //     false => TradeType::OrderInShort,
-        // };
-
-        match self.exit_long(index, instrument, upper_tf_instrument) {
+        match self.exit_long(index, instrument, upper_tf_instrument, spread) {
             Operation::MarketOut(_) => {
                 let trade_out_result = resolve_trade_out(index, instrument, trade_in, exit_type);
 
@@ -275,7 +279,7 @@ pub trait Strategy: DynClone {
         }
     }
 
-    fn active_orders_fn(
+    fn resolve_pending_orders(
         &mut self,
         index: usize,
         instrument: &Instrument,
@@ -288,15 +292,21 @@ pub trait Strategy: DynClone {
             true => TradeType::OrderInLong,
             false => TradeType::OrderInShort,
         };
-        // CONTINUE HERE TAG RIGHT TRADE_TYPE
-        match resolve_active_orders(index, instrument, orders.clone()) {
-            Operation::MarketInOrder(order) => {
-                let trade_in_result =
-                    resolve_trade_in(index, order_size, instrument, trade_type, spread);
 
+        match resolve_pending_orders(index, instrument, orders.clone()) {
+            Operation::MarketInOrder(mut order) => {
+                let trade_in_result =
+                    resolve_trade_in(index, order_size, instrument, &trade_type, spread);
+
+                let trade_in_index = match &trade_in_result {
+                    TradeResult::TradeIn(trade_in) => trade_in.index_in,
+                    _ => 0,
+                };
+
+                order.set_trade_id(trade_in_index);
                 OperationResult::MarketInOrder(trade_in_result, order)
             }
-            Operation::MarketOutOrder(order) => {
+            Operation::MarketOutOrder(mut order) => {
                 let trade_in = trades_in.last().unwrap();
 
                 let trade_type = match self.strategy_type().is_long_only() {
@@ -315,6 +325,13 @@ pub trait Strategy: DynClone {
                 };
 
                 let trade_out_result = resolve_trade_out(index, instrument, trade_in, &trade_type);
+                let trade_out_index = match &trade_out_result {
+                    TradeResult::TradeOut(trade_out) => trade_out.index_out,
+                    _ => 0,
+                };
+
+                order.set_trade_id(trade_out_index);
+                //UPDATE ORDER INDEXOUT
                 OperationResult::MarketOutOrder(trade_out_result, order)
             }
             _ => OperationResult::None,
