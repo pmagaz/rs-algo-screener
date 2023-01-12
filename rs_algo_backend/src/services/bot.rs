@@ -1,18 +1,13 @@
 use crate::db;
-use crate::db::helpers::compact_instrument;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::render_image::{Backend, BackendMode};
-use crate::strategies::general::General;
-
-use rs_algo_shared::models::api::*;
+use crate::render_chart::{Backend, BackendMode};
+use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
-use rs_algo_shared::scanner::instrument::*;
 
 use actix::{Actor, StreamHandler};
 use actix_files as fs;
-use actix_web::{web, App, Error, HttpRequest, HttpResponse, HttpServer};
-use actix_web_actors::ws;
+use actix_web::{web, Error, HttpRequest, HttpResponse, HttpServer};
 use rs_algo_shared::helpers::date::Local;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -70,7 +65,8 @@ pub async fn chart(
 
     let trades_in: &Vec<TradeIn> = bot.trades_in();
     let trades_out: &Vec<TradeOut> = bot.trades_out();
-    let trades = &(trades_in, trades_out);
+    let orders: &Vec<Order> = bot.orders();
+    let trades = &(trades_in, trades_out, orders);
 
     Backend::new()
         .render(

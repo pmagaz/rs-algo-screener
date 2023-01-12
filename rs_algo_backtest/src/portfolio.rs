@@ -12,7 +12,7 @@ use std::env;
 
 #[derive(Clone)]
 pub struct PortFolio {
-    pub order_size: f64,
+    pub trade_size: f64,
     pub commission: f64,
     pub equity: f64,
     pub instruments: Vec<Instrument>,
@@ -99,7 +99,6 @@ impl PortFolio {
                         .unwrap();
 
                 offset += limit;
-
                 for instrument in &instruments_to_test {
                     log::info!("[BACKTEST] Testing {}... ", instrument.symbol);
 
@@ -117,7 +116,7 @@ impl PortFolio {
                     let backtest_result = dyn_clone::clone_box(strategy)
                         .test(
                             instrument,
-                            self.order_size,
+                            self.trade_size,
                             self.equity,
                             self.commission,
                             spread,

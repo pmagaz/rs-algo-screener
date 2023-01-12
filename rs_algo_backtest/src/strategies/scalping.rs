@@ -17,12 +17,24 @@ use async_trait::async_trait;
 pub struct Scalping<'a> {
     name: &'a str,
     strategy_type: StrategyType,
+    risk_reward_ratio: f64,
+    profit_target: f64,
     //stop_loss: StopLoss,
 }
 
 impl<'a> Strategy for Scalping<'a> {
     fn new() -> Result<Self> {
-        let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
+        let stop_loss = std::env::var("ATR_STOP_LOSS")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
+        let risk_reward_ratio = std::env::var("RISK_REWARD_RATIO")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
+
+        let profit_target = std::env::var("PROFIT_TARGET")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -31,6 +43,8 @@ impl<'a> Strategy for Scalping<'a> {
             //stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Scalping",
             strategy_type: StrategyType::OnlyLongMultiTF,
+            risk_reward_ratio,
+            profit_target,
         })
     }
 
@@ -41,19 +55,6 @@ impl<'a> Strategy for Scalping<'a> {
     fn strategy_type(&self) -> &StrategyType {
         &self.strategy_type
     }
-
-    // fn update_stop_loss(&mut self, stop_type: StopLossType, price: f64) -> &StopLoss {
-    //     // self.stop_loss = update_stop_loss_values(&self.stop_loss, stop_type, price);
-    //     &self.stop_loss
-    // }
-
-    // fn stop_loss(&self) -> &StopLoss {
-    //     &self.stop_loss
-    // }
-
-    // fn create_stop_loss() {
-    //     create_stop_loss(&entry_type, instrument, nex_candle_index, stop_loss)
-    // }
 
     fn entry_long(
         &mut self,
@@ -163,17 +164,22 @@ impl<'a> Strategy for Scalping<'a> {
         };
 
         let target_price = match self.strategy_type().is_long_only() {
-            true => buy_price + risk * 1.,
-            false => buy_price - risk * 1.,
+            true => buy_price + risk * self.risk_reward_ratio,
+            false => buy_price - risk * self.risk_reward_ratio,
         };
 
         match entry_condition {
             //true => Operation::MarketIn(Some(vec![OrderType::StopLoss(StopLossType::Atr)])),
-            true => Operation::Order(vec![
-                OrderType::BuyOrder(open_price, trigger_price),
-                OrderType::SellOrder(open_price, target_price),
-                OrderType::StopLoss(StopLossType::Pips(pips_margin)),
-            ]),
+            true => {
+                log::warn!("8888888888 {} {}", 666, trigger_price);
+
+                Operation::Order(vec![
+                    OrderType::BuyOrder(666., trigger_price),
+                    OrderType::SellOrder(666., target_price),
+                    OrderType::StopLoss(StopLossType::Pips(pips_margin)),
+                ])
+            }
+
             false => Operation::None,
         }
     }

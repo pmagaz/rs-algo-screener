@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
         _ => (Local::now() - date::Duration::days(num_test_bars)),
     };
 
-    let base_timeframe_from = Local::now() - date::Duration::days(160);
+    let base_timeframe_from = Local::now() - date::Duration::minutes(num_test_bars);
 
     log::warn!("FROM {}", base_timeframe_from);
     let mut screener = Screener::<Xtb>::new().await?;
@@ -76,7 +76,7 @@ async fn main() -> Result<()> {
 
     if env == "development" {
         symbols = vec![Symbol {
-            symbol: "BITCOIN".to_owned(),
+            symbol: "EURUSD".to_owned(),
             category: "".to_owned(),
             description: "".to_owned(),
             currency: "".to_owned(),

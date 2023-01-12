@@ -6,7 +6,7 @@ mod db;
 mod error;
 mod middleware;
 mod models;
-mod render_image;
+mod render_chart;
 mod services;
 mod strategies;
 

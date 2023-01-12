@@ -31,7 +31,7 @@ pub async fn find_one(
 
     log::info!("[FINDONE] from {}", collection_name);
 
-    let collection = get_collection::<Instrument>(&state.db_hdd, &collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_mem, &collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
@@ -55,7 +55,7 @@ pub async fn find_instruments(
     ]
     .concat();
 
-    let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
         .find(
@@ -169,7 +169,7 @@ pub async fn find_strategies_result(
     state: &web::Data<AppState>,
 ) -> Result<Vec<BackTestStrategyResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
-    let collection = get_collection::<BackTestStrategyResult>(&state.db_hdd, collection_name).await;
+    let collection = get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
         .find(
@@ -216,7 +216,7 @@ pub async fn upsert_strategies_result(
     state: &web::Data<AppState>,
 ) -> Result<Option<BackTestStrategyResult>, Error> {
     let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
-    let collection = get_collection::<BackTestStrategyResult>(&state.db_hdd, collection_name).await;
+    let collection = get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
 
     collection
         .find_one_and_replace(
@@ -239,7 +239,7 @@ pub async fn find_backtest_instrument_by_symbol(
         &env::var("BASE_TIME_FRAME").unwrap(),
     ]
     .concat();
-    let collection = get_collection::<Instrument>(&state.db_hdd, collection_name).await;
+    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
@@ -251,7 +251,7 @@ pub async fn find_backtest_instrument_by_symbol(
 
 pub async fn find_spreads(state: &web::Data<AppState>) -> Result<Vec<BackTestSpread>, Error> {
     let collection_name = &env::var("DB_SPREADS_COLLECTION").unwrap();
-    let collection = get_collection::<BackTestSpread>(&state.db_hdd, collection_name).await;
+    let collection = get_collection::<BackTestSpread>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
         .find(doc! {}, FindOptions::builder().build())
@@ -275,7 +275,7 @@ pub async fn find_spread(
     state: &web::Data<AppState>,
 ) -> Result<Option<BackTestSpread>, Error> {
     let collection_name = &env::var("DB_SPREADS_COLLECTION").unwrap();
-    let collection = get_collection::<BackTestSpread>(&state.db_hdd, collection_name).await;
+    let collection = get_collection::<BackTestSpread>(&state.db_mem, collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())

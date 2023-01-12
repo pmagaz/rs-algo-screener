@@ -2,7 +2,7 @@ use crate::db;
 use crate::db::helpers::compact_instrument;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::render_image::{Backend, BackendMode};
+use crate::render_chart::{Backend, BackendMode};
 use crate::strategies::general::General;
 
 use rs_algo_shared::models::api::*;
@@ -74,7 +74,7 @@ pub async fn chart(
             BackendMode::Instrument,
             &instrument,
             &HigherTMInstrument::None,
-            &(&vec![], &vec![]),
+            &(&vec![], &vec![], &vec![]),
             &output_file,
         )
         .unwrap();

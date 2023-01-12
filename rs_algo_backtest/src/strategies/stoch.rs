@@ -22,7 +22,7 @@ pub struct Stoch<'a> {
 #[async_trait]
 impl<'a> Strategy for Stoch<'a> {
     fn new() -> Result<Self> {
-        let stop_loss = std::env::var("BACKTEST_ATR_STOP_LOSS")
+        let stop_loss = std::env::var("ATR_STOP_LOSS")
             .unwrap()
             .parse::<f64>()
             .unwrap();

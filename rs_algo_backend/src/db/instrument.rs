@@ -133,7 +133,7 @@ pub async fn upsert_instrument(
             ]
             .concat();
 
-            get_collection::<Instrument>(&state.db_hdd, &collection_name).await
+            get_collection::<Instrument>(&state.db_mem, &collection_name).await
         }
         _ => {
             get_collection::<Instrument>(

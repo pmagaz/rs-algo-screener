@@ -20,22 +20,13 @@ async fn main() {
 
     let start = Instant::now();
     let env = env::var("ENV").unwrap();
-    let order_size = env::var("BACKTEST_ORDER_SIZE")
-        .unwrap()
-        .parse::<f64>()
-        .unwrap();
-    let stop_loss = env::var("BACKTEST_ATR_STOP_LOSS")
-        .unwrap()
-        .parse::<f64>()
-        .unwrap();
-    let commission = env::var("BACKTEST_COMISSION")
-        .unwrap()
-        .parse::<f64>()
-        .unwrap();
-    let equity = env::var("BACKTEST_EQUITY").unwrap().parse::<f64>().unwrap();
+    let trade_size = env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
+    let stop_loss = env::var("ATR_STOP_LOSS").unwrap().parse::<f64>().unwrap();
+    let commission = env::var("COMISSION").unwrap().parse::<f64>().unwrap();
+    let equity = env::var("EQUITY").unwrap().parse::<f64>().unwrap();
 
     let portfolio = PortFolio {
-        order_size,
+        trade_size,
         commission,
         equity,
         instruments: vec![],

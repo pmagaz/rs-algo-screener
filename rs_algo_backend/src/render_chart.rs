@@ -1,8 +1,9 @@
 use crate::error::Result;
 
 use chrono::DateTime;
-use plotters::style::full_palette::RED;
+use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
+use rs_algo_shared::models::order::{Order, OrderType};
 use rs_algo_shared::models::stop_loss::StopLossType;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut, TradeType};
 use rs_algo_shared::scanner::instrument::*;
@@ -10,11 +11,7 @@ use rs_algo_shared::scanner::pattern::{PatternDirection, PatternType};
 
 use plotters::prelude::*;
 use round::round;
-use std::borrow::{Borrow, BorrowMut};
-use std::cell::RefCell;
 use std::cmp::Ordering;
-use std::ops::Deref;
-use std::rc::Rc;
 use std::{env, os};
 
 #[derive(Debug, Clone)]
@@ -38,7 +35,7 @@ impl Backend {
         mode: BackendMode,
         instrument: &Instrument,
         htf_instrument: &HigherTMInstrument,
-        trades: &(&Vec<TradeIn>, &Vec<TradeOut>),
+        trades: &(&Vec<TradeIn>, &Vec<TradeOut>, &Vec<Order>),
         output_file: &str,
     ) -> Result<()> {
         let data = instrument.data.clone();
@@ -73,6 +70,8 @@ impl Backend {
 
         let trades_in: &Vec<TradeIn> = trades.0;
         let trades_out: &Vec<TradeOut> = trades.1;
+        let orders: &Vec<Order> = trades.2;
+
         let last_trade_in: Option<&TradeIn>;
         let last_trade_out: Option<&TradeOut>;
         let mut stop_loss: Vec<(usize, f64)> = vec![];
@@ -107,6 +106,7 @@ impl Backend {
 
         let mut prices_in_indexes: Vec<usize> = vec![];
         let mut prices_out_indexes: Vec<usize> = vec![];
+        let mut orders_indexes: Vec<usize> = vec![];
         let mut stop_loss_indexes: Vec<usize> = vec![];
         let mut top_peaks_indexes: Vec<usize> = vec![];
         let mut low_peaks_indexes: Vec<usize> = vec![];
@@ -118,6 +118,7 @@ impl Backend {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
             prices_in_indexes = trades_in.iter().map(|x| x.index_in).collect();
             prices_out_indexes = trades_out.iter().map(|x| x.index_out).collect();
+            orders_indexes = orders.iter().map(|x| x.id).collect();
             //top_peaks_indexes = peaks.local_maxima().iter().map(|x| x.).collect();
             stop_loss_indexes = trades_out
                 .iter()
@@ -184,7 +185,7 @@ impl Backend {
 
         let _rsi = &instrument.indicators.rsi.get_data_a();
 
-        let _ema_a = &instrument.indicators.ema_a.get_data_a();
+        let ema_a = &instrument.indicators.ema_a.get_data_a();
         let ema_b = &instrument.indicators.ema_b.get_data_a();
         let ema_c = &instrument.indicators.ema_c.get_data_a();
 
@@ -452,7 +453,7 @@ impl Backend {
                         .draw_series(data.iter().enumerate().map(|(i, candle)| {
                             let index = match mode {
                                 BackendMode::BackTest => i,
-                                _ => candle.date().timestamp_millis() as usize,
+                                _ => uuid::generate_ts_id(candle.date()),
                             };
 
                             if prices_in_indexes.contains(&index) {
@@ -494,7 +495,7 @@ impl Backend {
                                 .filter(|(i, candle)| {
                                     let index = match mode {
                                         BackendMode::BackTest => *i,
-                                        _ => candle.date().timestamp_millis() as usize,
+                                        _ => uuid::generate_ts_id(candle.date()),
                                     };
 
                                     prices_in_indexes.contains(&index)
@@ -503,7 +504,7 @@ impl Backend {
                                     let date = candle.date();
                                     let index = match mode {
                                         BackendMode::BackTest => i,
-                                        _ => candle.date().timestamp_millis() as usize,
+                                        _ => uuid::generate_ts_id(candle.date()),
                                     };
                                     let trade_in_index =
                                         prices_in_indexes.iter().position(|&x| x == index).unwrap();
@@ -517,7 +518,7 @@ impl Backend {
 
                                 let element = match mode {
                                     BackendMode::Bot => {
-                                        let index = date.timestamp_millis() as usize;
+                                        let index = uuid::generate_ts_id(date);
                                         let trade_in_index = prices_in_indexes
                                             .iter()
                                             .position(|&x| x == index)
@@ -559,7 +560,7 @@ impl Backend {
                                 (0..)
                                     .zip(data.iter())
                                     .filter(|(i, candle)| {
-                                        let index = candle.date().timestamp_millis() as usize;
+                                        let index = uuid::generate_ts_id(candle.date());
                                         prices_out_indexes.contains(&index)
                                     })
                                     .map(|(i, candle)| {
@@ -571,7 +572,7 @@ impl Backend {
                                 ShapeStyle::from(&RED_LINE).filled(),
                                 &|coord, size: i32, style| {
                                     let (date, price) = coord;
-                                    let index = date.timestamp_millis() as usize;
+                                    let index = uuid::generate_ts_id(date);
                                     let trade_out_index = prices_out_indexes
                                         .iter()
                                         .position(|&x| x == index)
@@ -644,6 +645,59 @@ impl Backend {
                     };
 
                     if mode == BackendMode::BackTest {
+                        //ORDERS
+                        chart
+                            .draw_series(PointSeries::of_element(
+                                (0..)
+                                    .zip(data.iter())
+                                    .filter(|(i, candle)| {
+                                        let index = uuid::generate_ts_id(candle.date());
+                                        orders_indexes.contains(&index)
+                                    })
+                                    .map(|(i, candle)| {
+                                        let date = candle.date();
+                                        let price = candle.close();
+                                        (date, price)
+                                    }),
+                                5,
+                                ShapeStyle::from(&RED_LINE).filled(),
+                                &|coord, size: i32, style| {
+                                    let (date, price) = coord;
+                                    let index = uuid::generate_ts_id(date);
+                                    let order_index =
+                                        orders_indexes.iter().position(|&x| x == index).unwrap();
+
+                                    let order = orders.get(order_index).unwrap();
+
+                                    let style = match order.order_type {
+                                        OrderType::BuyOrder(_, _) => {
+                                            ShapeStyle::from(&GREEN_LINE).filled()
+                                        }
+                                        OrderType::SellOrder(_, _)
+                                        | OrderType::TakeProfit(_, _) => {
+                                            ShapeStyle::from(&ORANGE_LINE).filled()
+                                        }
+                                        OrderType::StopLoss(_) => {
+                                            ShapeStyle::from(&RED_LINE).filled()
+                                        }
+                                    };
+
+                                    EmptyElement::at(coord)
+                                        +TriangleMarker::new((0,0),-6,style)
+                                       // + Circle::new((0, 0), size, style)
+                                        + Text::new(
+                                            format!(
+                                                "{:?} -> {:?}",
+                                                round(order.origin_price, 4),
+                                                round(order.target_price, 4)
+                                            ),
+                                            (0, 20),
+                                            ("sans-serif", 12),
+                                        )
+                                },
+                            ))
+                            .unwrap();
+
                         chart
                             .draw_series(data.iter().enumerate().map(|(i, candle)| {
                                 let index = i;
@@ -676,67 +730,89 @@ impl Backend {
 
         //BOLLINGER BANDS
 
-        if bb_a.len() > 0 {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .map(|(id, candle)| (candle.date, bb_a[id])),
-                    &BLUE_LINE2,
-                ))
-                .unwrap();
+        // if bb_a.len() > 0 {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(data.iter())
+        //                 .map(|(id, candle)| (candle.date, bb_a[id])),
+        //             &BLUE_LINE2,
+        //         ))
+        //         .unwrap();
 
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .map(|(id, candle)| (candle.date, bb_b[id])),
-                    &BLUE_LINE2,
-                ))
-                .unwrap();
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(data.iter())
+        //                 .map(|(id, candle)| (candle.date, bb_b[id])),
+        //             &BLUE_LINE2,
+        //         ))
+        //         .unwrap();
 
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(data.iter())
+        //                 .map(|(id, candle)| (candle.date, bb_c[id])),
+        //             &ORANGE_LINE,
+        //         ))
+        //         .unwrap();
+        // }
+
+        //EMAS
+
+        if ema_a.len() > 0 {
             chart
                 .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .map(|(id, candle)| (candle.date, bb_c[id])),
-                    &ORANGE_LINE,
+                    data.iter()
+                        .enumerate()
+                        .map(|(id, candle)| (candle.date, ema_a[id])),
+                    ORANGE_LINE.mix(4.),
                 ))
                 .unwrap();
         }
 
-        //EMAS
-
-        if ema_c.len() > 0 && ema_b.len() <= 0 {
+        if ema_c.len() > 0 {
             chart
                 .draw_series(LineSeries::new(
                     data.iter()
                         .enumerate()
                         .map(|(id, candle)| (candle.date, ema_c[id])),
-                    RED_LINE2,
-                ))
-                .unwrap();
-        } else if ema_c.len() > 0 && ema_b.len() > 0 {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .filter(|(id, candle)| ema_c[*id] <= ema_b[*id])
-                        .map(|(id, candle)| (candle.date, ema_c[id])),
-                    ORANGE_LINE,
-                ))
-                .unwrap();
-
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .filter(|(id, candle)| ema_b[*id] < ema_c[*id])
-                        .map(|(id, candle)| (candle.date, ema_c[id])),
-                    RED_LINE2,
+                    RED_LINE2.mix(4.),
                 ))
                 .unwrap();
         }
+
+        // if ema_c.len() > 0 && ema_b.len() <= 0 {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             data.iter()
+        //                 .enumerate()
+        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
+        //             RED_LINE2,
+        //         ))
+        //         .unwrap();
+        // } else if ema_c.len() > 0 && ema_b.len() > 0 {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(data.iter())
+        //                 .filter(|(id, candle)| ema_c[*id] <= ema_b[*id])
+        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
+        //             ORANGE_LINE,
+        //         ))
+        //         .unwrap();
+
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(data.iter())
+        //                 .filter(|(id, candle)| ema_b[*id] < ema_c[*id])
+        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
+        //             RED_LINE2,
+        //         ))
+        //         .unwrap();
+        // }
 
         //OPEN POSITION
 

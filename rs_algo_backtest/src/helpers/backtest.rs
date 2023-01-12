@@ -105,8 +105,8 @@ pub fn resolve_backtest(
             annual_return,
         })
     } else {
-        log::info!(
-            "[BACKTEST] Error! backtesing {}",
+        log::error!(
+            "[BACKTEST] No TradesIn for {} backtesting found!",
             instrument.symbol.to_owned()
         );
         //BackTestResult::None
@@ -116,7 +116,7 @@ pub fn resolve_backtest(
                 symbol: instrument.symbol.to_owned(),
                 trades_in: vec![],
                 trades_out: vec![],
-                orders: vec![],
+                orders: orders,
             },
             strategy: name.to_owned(),
             strategy_type: strategy_type.to_owned(),

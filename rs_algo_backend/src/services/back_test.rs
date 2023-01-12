@@ -1,11 +1,12 @@
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::render_image::{Backend, BackendMode};
+use crate::render_chart::{Backend, BackendMode};
 
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
+use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
@@ -313,7 +314,8 @@ pub async fn chart(
 
     let trades_in: Vec<TradeIn> = backtest_result.instrument.trades_in;
     let trades_out: Vec<TradeOut> = backtest_result.instrument.trades_out;
-    let trades = &(&trades_in, &trades_out);
+    let orders: Vec<Order> = backtest_result.instrument.orders;
+    let trades = &(&trades_in, &trades_out, &orders);
 
     let instrument = db::back_test::find_backtest_instrument_by_symbol(&*symbol, &state)
         .await
