@@ -322,6 +322,15 @@ pub async fn chart(
         .unwrap()
         .unwrap();
 
+    let htf_instrument = db::back_test::find_htf_backtest_instrument_by_symbol(&*symbol, &state)
+        .await
+        .unwrap();
+
+    let htf_instrument = match htf_instrument {
+        Some(htf_ins) => HigherTMInstrument::HigherTMInstrument(htf_ins),
+        None => HigherTMInstrument::None,
+    };
+
     let output_file = [
         &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap(),
         &strategy,
@@ -335,7 +344,7 @@ pub async fn chart(
         .render(
             BackendMode::BackTest,
             &instrument,
-            &HigherTMInstrument::None,
+            &htf_instrument,
             trades,
             &output_file,
         )

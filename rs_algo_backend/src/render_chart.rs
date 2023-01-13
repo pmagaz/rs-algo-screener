@@ -1,6 +1,6 @@
 use crate::error::Result;
 
-use chrono::DateTime;
+use chrono::{DateTime, Local};
 use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::order::{Order, OrderType};
@@ -9,6 +9,7 @@ use rs_algo_shared::models::trade::{TradeIn, TradeOut, TradeType};
 use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::scanner::pattern::{PatternDirection, PatternType};
 
+use chrono::Duration;
 use plotters::prelude::*;
 use round::round;
 use std::cmp::Ordering;
@@ -831,27 +832,56 @@ impl Backend {
         //     ))
         //     .unwrap();
 
-        // //STOCH PANNEL
-
-        let mut indicator_panel = ChartBuilder::on(&lower)
-            .x_label_area_size(40)
-            .y_label_area_size(40)
-            // .margin(2)
-            //.caption("MACD", (font.as_ref(), 8.0).into_font())
-            .build_cartesian_2d(from_date..to_date, -0f64..100f64)
-            .unwrap();
-        //indicator_panel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
+        // //HTF MACD PANNEL
 
         match htf_instrument {
             HigherTMInstrument::HigherTMInstrument(htf_instrument) => {
                 let macd = &htf_instrument.indicators.macd;
-                let macd_a = &macd.get_data_a();
-                let macd_b = &macd.get_data_b();
+                let macd_a = macd.get_data_a();
+                let macd_b = macd.get_data_b();
+                let max_macd = macd_a
+                    .iter()
+                    .max_by(|x, y| x.partial_cmp(&y).unwrap())
+                    .map(|x| x)
+                    .unwrap();
+                let min_macd = macd_a
+                    .iter()
+                    .min_by(|x, y| x.partial_cmp(&y).unwrap())
+                    .map(|x| x)
+                    .unwrap();
+
+                let mut indicator_panel = ChartBuilder::on(&lower)
+                    .x_label_area_size(40)
+                    .y_label_area_size(40)
+                    .build_cartesian_2d(from_date..to_date, *min_macd..*max_macd)
+                    .unwrap();
+
+                let mut result: Vec<(DateTime<Local>, usize)> = vec![];
+
+                for (htf_id, htf) in htf_instrument.data().iter().enumerate() {
+                    let htf_instrument_date = htf.date();
+                    let next_htf_id = htf_id + 1;
+                    let next_htf_instrument = htf_instrument.data().get(next_htf_id);
+                    let next_htf_instrument_date = match next_htf_instrument {
+                        Some(x) => x.date(),
+                        None => Local::now() - Duration::days(1000),
+                    };
+
+                    for (id, candle) in instrument.data().iter().enumerate() {
+                        let instrument_date = candle.date();
+                        if htf_instrument_date <= instrument_date
+                            && next_htf_instrument_date > instrument_date
+                        {
+                            result.push((instrument_date, htf_id));
+                        }
+                    }
+                }
+
                 indicator_panel
                     .draw_series(LineSeries::new(
                         (0..)
-                            .zip(htf_instrument.data.iter())
-                            .map(|(id, candle)| (candle.date, macd_a[id])),
+                            .zip(result.iter())
+                            .map(|(id, data)| (data.0, macd_a[data.1])),
                         BLUE_LINE3,
                     ))
                     .unwrap();
@@ -859,13 +889,18 @@ impl Backend {
                 indicator_panel
                     .draw_series(LineSeries::new(
                         (0..)
-                            .zip(htf_instrument.data.iter())
-                            .map(|(id, candle)| (candle.date, macd_b[id])),
+                            .zip(result.iter())
+                            .map(|(id, data)| (data.0, macd_b[data.1])),
                         RED_LINE,
                     ))
                     .unwrap();
             }
             HigherTMInstrument::None => {
+                let mut indicator_panel = ChartBuilder::on(&lower)
+                    .x_label_area_size(40)
+                    .y_label_area_size(40)
+                    .build_cartesian_2d(from_date..to_date, -0f64..100f64)
+                    .unwrap();
                 indicator_panel
                     .draw_series(LineSeries::new(
                         (0..)

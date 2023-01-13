@@ -249,6 +249,26 @@ pub async fn find_backtest_instrument_by_symbol(
     Ok(instrument)
 }
 
+pub async fn find_htf_backtest_instrument_by_symbol(
+    symbol: &str,
+    state: &web::Data<AppState>,
+) -> Result<Option<Instrument>, Error> {
+    let collection_name = &[
+        &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
+        "_",
+        &env::var("UPPER_TIME_FRAME").unwrap(),
+    ]
+    .concat();
+    let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
+
+    let instrument = collection
+        .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
+        .await
+        .unwrap();
+
+    Ok(instrument)
+}
+
 pub async fn find_spreads(state: &web::Data<AppState>) -> Result<Vec<BackTestSpread>, Error> {
     let collection_name = &env::var("DB_SPREADS_COLLECTION").unwrap();
     let collection = get_collection::<BackTestSpread>(&state.db_mem, collection_name).await;
