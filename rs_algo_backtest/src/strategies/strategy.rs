@@ -124,7 +124,7 @@ pub trait Strategy: DynClone {
             .get_upper_tf_instrument(&instrument.symbol, &uppertimeframe)
             .await;
 
-        for (index, _candle) in data.iter().enumerate() {
+        for (index, candle) in data.iter().enumerate() {
             if index < len - 1 && index >= 5 {
                 let active_orders_result = self.resolve_pending_orders(
                     index, instrument, trade_size, spread, &orders, &trades_in,
@@ -139,7 +139,10 @@ pub trait Strategy: DynClone {
                             match order_position {
                                 Some(x) => {
                                     open_positions = true;
-                                    orders.get_mut(x).unwrap().fulfill_order();
+                                    orders
+                                        .get_mut(x)
+                                        .unwrap()
+                                        .fulfill_order(index, candle.date());
                                     trades_in.push(trade_in);
                                 }
                                 None => {}
@@ -156,7 +159,10 @@ pub trait Strategy: DynClone {
                             match order_position {
                                 Some(x) => {
                                     open_positions = false;
-                                    orders.get_mut(x).unwrap().fulfill_order();
+                                    orders
+                                        .get_mut(x)
+                                        .unwrap()
+                                        .fulfill_order(index, candle.date());
                                     orders = order::cancel_pending(&trade_out, orders);
                                     trades_out.push(trade_out);
                                 }
@@ -333,15 +339,15 @@ pub trait Strategy: DynClone {
             Operation::MarketOutOrder(mut order) => {
                 let trade_type = match self.strategy_type().is_long_only() {
                     true => match order.order_type {
-                        OrderType::BuyOrder(_, _, _) => TradeType::MarketInLong,
-                        OrderType::SellOrder(_, _, _) => TradeType::MarketOutLong,
-                        OrderType::TakeProfit(_, _, _) => TradeType::MarketOutLong,
+                        OrderType::BuyOrder(_, _) => TradeType::MarketInLong,
+                        OrderType::SellOrder(_, _) => TradeType::MarketOutLong,
+                        OrderType::TakeProfit(_, _) => TradeType::MarketOutLong,
                         OrderType::StopLoss(_) => TradeType::StopLoss,
                     },
                     false => match order.order_type {
-                        OrderType::BuyOrder(_, _, _) => TradeType::MarketInShort,
-                        OrderType::SellOrder(_, _, _) => TradeType::MarketOutShort,
-                        OrderType::TakeProfit(_, _, _) => TradeType::MarketOutShort,
+                        OrderType::BuyOrder(_, _) => TradeType::MarketInShort,
+                        OrderType::SellOrder(_, _) => TradeType::MarketOutShort,
+                        OrderType::TakeProfit(_, _) => TradeType::MarketOutShort,
                         OrderType::StopLoss(_) => TradeType::StopLoss,
                     },
                 };

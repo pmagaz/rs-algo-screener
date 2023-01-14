@@ -5,13 +5,11 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::calc;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
+use rs_algo_shared::models::order::{Order, OrderCondition, OrderType};
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
-
-use async_trait::async_trait;
 
 #[derive(Clone)]
 pub struct Scalping<'a> {
@@ -177,8 +175,8 @@ impl<'a> Strategy for Scalping<'a> {
                 log::warn!("8888888888 {} {} {}", risk, close_price, trigger_price);
 
                 Operation::Order(vec![
-                    OrderType::BuyOrder(OrderDirection::Up, 666., trigger_price),
-                    OrderType::SellOrder(OrderDirection::Up, 666., target_price),
+                    OrderType::BuyOrder(666., trigger_price),
+                    OrderType::SellOrder(666., target_price),
                     OrderType::StopLoss(StopLossType::Pips(pips_margin)),
                 ])
             }
