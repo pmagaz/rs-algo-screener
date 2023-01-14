@@ -63,6 +63,7 @@ impl<'a> Strategy for Scalping<'a> {
         upper_tf_instrument: &HigherTMInstrument,
         spread: f64,
     ) -> Operation {
+        let low_price = &instrument.data.get(index).unwrap().low();
         let close_price = &instrument.data.get(index).unwrap().close();
 
         // let first_htf_emas = calc::get_upper_timeframe_data(
@@ -113,6 +114,7 @@ impl<'a> Strategy for Scalping<'a> {
         let prev_index = calc::get_prev_index(index);
         let next_index = index + 1;
         let data = &instrument.data();
+        let low_price = &data.get(index).unwrap().low();
         let close_price = &data.get(index).unwrap().close();
         let prev_close_price = &data.get(prev_index).unwrap().close();
         let open_price = data.get(next_index).unwrap().close();
@@ -127,8 +129,9 @@ impl<'a> Strategy for Scalping<'a> {
         let ema_21 = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
         let entry_condition = htf_emas
-            && (close_price < ema_8
+            && (low_price < ema_8
                 && prev_close_price >= prev_ema_8
+                && close_price > ema_21
                 && ema_8 > ema_13
                 && ema_13 > ema_21);
 
@@ -171,7 +174,7 @@ impl<'a> Strategy for Scalping<'a> {
         match entry_condition {
             //true => Operation::MarketIn(Some(vec![OrderType::StopLoss(StopLossType::Atr)])),
             true => {
-                log::warn!("8888888888 {} {}", 666, trigger_price);
+                log::warn!("8888888888 {} {} {}", risk, close_price, trigger_price);
 
                 Operation::Order(vec![
                     OrderType::BuyOrder(666., trigger_price),

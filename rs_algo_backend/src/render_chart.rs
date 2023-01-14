@@ -205,7 +205,15 @@ impl Backend {
             .x_label_area_size(40)
             .y_label_area_size(40)
             .margin(15)
-            .caption(&instrument.symbol, (font.as_ref(), 14.0).into_font())
+            .caption(
+                &[
+                    &instrument.symbol,
+                    " ",
+                    &instrument.time_frame().to_string(),
+                ]
+                .concat(),
+                (font.as_ref(), 14.0).into_font(),
+            )
             .build_cartesian_2d(from_date..to_date, min_price..max_price)
             .unwrap();
 
@@ -594,24 +602,23 @@ impl Backend {
                                         },
                                     };
 
-                                    EmptyElement::at(coord)
-                                        + Circle::new((0, 0), size, style)
-                                        + Text::new(
-                                            format!(
-                                                "{:?} / {:?} %",
-                                                round(trade_out.price_out, 4),
-                                                round(trade_out.profit_per, 4)
-                                            ),
-                                            (0, 20),
-                                            ("sans-serif", 12),
-                                        )
+                                    EmptyElement::at(coord) + Circle::new((0, 0), size, style)
+                                    // + Text::new(
+                                    //     format!(
+                                    //         "{:?} / {:?} %",
+                                    //         round(trade_out.price_out, 4),
+                                    //         round(trade_out.profit_per, 4)
+                                    //     ),
+                                    //     (0, 20),
+                                    //     ("sans-serif", 12),
+                                    // )
                                 },
                             ))
                             .unwrap(),
                         _ => chart
                             .draw_series(data.iter().enumerate().map(|(i, candle)| {
                                 let index = i;
-                                let price = candle.close;
+                                let price = candle.open();
 
                                 if prices_out_indexes.contains(&index) {
                                     let trade_out_index = prices_out_indexes
@@ -647,57 +654,100 @@ impl Backend {
 
                     if mode == BackendMode::BackTest {
                         //ORDERS
+
+                        // for (id, order) in orders.iter().enumerate() {
+                        //     for (id_candle, candle) in data.iter().enumerate() {
+                        //         let index = uuid::generate_ts_id(candle.date());
+                        //         if order.id == index {
+                        //             log::info!("666666666666666");
+                        //         }
+                        //     }
+                        // }
+
                         chart
-                            .draw_series(PointSeries::of_element(
-                                (0..)
-                                    .zip(data.iter())
-                                    .filter(|(i, candle)| {
-                                        let index = uuid::generate_ts_id(candle.date());
-                                        orders_indexes.contains(&index)
-                                    })
-                                    .map(|(i, candle)| {
-                                        let date = candle.date();
-                                        let price = candle.close();
-                                        (date, price)
-                                    }),
-                                5,
-                                ShapeStyle::from(&RED_LINE).filled(),
-                                &|coord, size: i32, style| {
-                                    let (date, price) = coord;
-                                    let index = uuid::generate_ts_id(date);
-                                    let order_index =
-                                        orders_indexes.iter().position(|&x| x == index).unwrap();
+                            .draw_series(orders.iter().enumerate().map(|(i, order)| {
+                                let candle_index = data
+                                    .iter()
+                                    .position(|x| uuid::generate_ts_id(x.date) == order.id)
+                                    .unwrap();
+                                let candle = data.get(candle_index).unwrap();
+                                let date = candle.date();
 
-                                    let order = orders.get(order_index).unwrap();
-
-                                    let style = match order.order_type {
-                                        OrderType::BuyOrder(_, _) => {
-                                            ShapeStyle::from(&GREEN_LINE).filled()
-                                        }
-                                        OrderType::SellOrder(_, _)
-                                        | OrderType::TakeProfit(_, _) => {
-                                            ShapeStyle::from(&ORANGE_LINE).filled()
-                                        }
-                                        OrderType::StopLoss(_) => {
-                                            ShapeStyle::from(&RED_LINE).filled()
-                                        }
-                                    };
-
-                                    EmptyElement::at(coord)
-                                        +TriangleMarker::new((0,0),-6,style)
-                                       // + Circle::new((0, 0), size, style)
-                                        + Text::new(
-                                            format!(
-                                                "{:?} -> {:?}",
-                                                round(order.origin_price, 4),
-                                                round(order.target_price, 4)
-                                            ),
-                                            (0, 20),
-                                            ("sans-serif", 12),
+                                let result = match order.order_type {
+                                    OrderType::BuyOrder(_, _) => TriangleMarker::new(
+                                        (date, order.target_price),
+                                        6,
+                                        &BLUE_LINE2.mix(2.),
+                                    ),
+                                    OrderType::SellOrder(_, _) | OrderType::TakeProfit(_, _) => {
+                                        TriangleMarker::new(
+                                            (date, order.target_price),
+                                            -6,
+                                            &ORANGE_LINE.mix(2.),
                                         )
-                                },
-                            ))
+                                    }
+                                    OrderType::StopLoss(_) => TriangleMarker::new(
+                                        (date, order.target_price),
+                                        6,
+                                        &RED_LINE,
+                                    ),
+                                };
+                                result
+                            }))
                             .unwrap();
+                        //TRIGERS
+
+                        // chart
+                        //     .draw_series(PointSeries::of_element(
+                        //         (0..)
+                        //             .zip(data.iter())
+                        //             .filter(|(i, candle)| {
+                        //                 let index = uuid::generate_ts_id(candle.date());
+                        //                 orders_indexes.contains(&index)
+                        //             })
+                        //             .map(|(i, candle)| {
+                        //                 let date = candle.date();
+                        //                 let price = candle.close();
+                        //                 (date, price)
+                        //             }),
+                        //         5,
+                        //         ShapeStyle::from(&RED_LINE).filled(),
+                        //         &|coord, size: i32, style| {
+                        //             log::info!("22222222222");
+                        //             let (date, price) = coord;
+                        //             let index = uuid::generate_ts_id(date);
+                        //             let order_index =
+                        //                 orders_indexes.iter().position(|&x| x == index).unwrap();
+                        //             let order = orders.get(order_index).unwrap();
+
+                        //             let style = match order.order_type {
+                        //                 OrderType::BuyOrder(_, _) => {
+                        //                     ShapeStyle::from(&ORANGE_LINE).filled()
+                        //                 }
+                        //                 OrderType::SellOrder(_, _)
+                        //                 | OrderType::TakeProfit(_, _) => {
+                        //                     ShapeStyle::from(&ORANGE_LINE).filled()
+                        //                 }
+                        //                 OrderType::StopLoss(_) => {
+                        //                     ShapeStyle::from(&RED_LINE).filled()
+                        //                 }
+                        //             };
+
+                        //             EmptyElement::at(coord)
+                        //                 +TriangleMarker::new((0,0),16,style)
+                        //                // + Circle::new((0, 0), size, style)
+                        //                 + Text::new(
+                        //                     format!(
+                        //                         "{:?} -> {:?}",
+                        //                         round(order.origin_price, 4),
+                        //                         round(order.target_price, 4)
+                        //                     ),
+                        //                     (0, 20),
+                        //                     ("sans-serif", 12),
+                        //                 )
+                        //         },
+                        //     ))
+                        //     .unwrap();
 
                         chart
                             .draw_series(data.iter().enumerate().map(|(i, candle)| {
@@ -713,14 +763,14 @@ impl Backend {
 
                                     let trade_out = trades_out.get(trade_out_index).unwrap();
                                     EmptyElement::at(coord)
-                                        + Text::new(
-                                            format!("{:?} %", round(trade_out.profit_per, 4)),
-                                            (0, 20),
-                                            ("sans-serif", 12),
-                                        )
+                                    // + Text::new(
+                                    //     format!("{:?} %", round(trade_out.profit_per, 4)),
+                                    //     (0, 20),
+                                    //     ("sans-serif", 12),
+                                    // )
                                 } else {
                                     EmptyElement::at(coord)
-                                        + Text::new(format!(""), (0, 20), ("sans-serif", 0))
+                                    //+ Text::new(format!(""), (0, 20), ("sans-serif", 0))
                                 }
                             }))
                             .unwrap();
@@ -761,28 +811,6 @@ impl Backend {
         // }
 
         //EMAS
-
-        if ema_a.len() > 0 {
-            chart
-                .draw_series(LineSeries::new(
-                    data.iter()
-                        .enumerate()
-                        .map(|(id, candle)| (candle.date, ema_a[id])),
-                    ORANGE_LINE.mix(4.),
-                ))
-                .unwrap();
-        }
-
-        if ema_c.len() > 0 {
-            chart
-                .draw_series(LineSeries::new(
-                    data.iter()
-                        .enumerate()
-                        .map(|(id, candle)| (candle.date, ema_c[id])),
-                    RED_LINE2.mix(4.),
-                ))
-                .unwrap();
-        }
 
         // if ema_c.len() > 0 && ema_b.len() <= 0 {
         //     chart
@@ -832,11 +860,35 @@ impl Backend {
         //     ))
         //     .unwrap();
 
-        // //HTF MACD PANNEL
+        if ema_a.len() > 0 {
+            chart
+                .draw_series(LineSeries::new(
+                    data.iter()
+                        .enumerate()
+                        .map(|(id, candle)| (candle.date, ema_a[id])),
+                    ORANGE_LINE.mix(4.),
+                ))
+                .unwrap();
+        }
 
+        if ema_c.len() > 0 {
+            chart
+                .draw_series(LineSeries::new(
+                    data.iter()
+                        .enumerate()
+                        .map(|(id, candle)| (candle.date, ema_c[id])),
+                    RED_LINE2.mix(4.),
+                ))
+                .unwrap();
+        }
+
+        // //HTF INDICATORS
         match htf_instrument {
             HigherTMInstrument::HigherTMInstrument(htf_instrument) => {
-                let macd = &htf_instrument.indicators.macd;
+                let macd = &htf_instrument.indicators().macd();
+                let ema_a = &htf_instrument.indicators().ema_a().get_data_a();
+                let ema_b = &htf_instrument.indicators().ema_b().get_data_a();
+                let ema_c = &htf_instrument.indicators().ema_c().get_data_a();
                 let macd_a = macd.get_data_a();
                 let macd_b = macd.get_data_b();
                 let max_macd = macd_a
@@ -853,6 +905,10 @@ impl Backend {
                 let mut indicator_panel = ChartBuilder::on(&lower)
                     .x_label_area_size(40)
                     .y_label_area_size(40)
+                    // .caption(
+                    //     &["MACD ", &htf_instrument.time_frame().to_string()].concat(),
+                    //     (font.as_ref(), 10.0).into_font(),
+                    // )
                     .build_cartesian_2d(from_date..to_date, *min_macd..*max_macd)
                     .unwrap();
 
@@ -894,6 +950,30 @@ impl Backend {
                         RED_LINE,
                     ))
                     .unwrap();
+
+                // if ema_a.len() > 0 {
+                //     chart
+                //         .draw_series(LineSeries::new(
+                //             result
+                //                 .iter()
+                //                 .enumerate()
+                //                 .map(|(id, data)| (data.0, ema_a[data.1])),
+                //             ORANGE_LINE.mix(4.),
+                //         ))
+                //         .unwrap();
+                // }
+
+                // if ema_c.len() > 0 {
+                //     chart
+                //         .draw_series(LineSeries::new(
+                //             result
+                //                 .iter()
+                //                 .enumerate()
+                //                 .map(|(id, data)| (data.0, ema_c[data.1])),
+                //             RED_LINE2.mix(4.),
+                //         ))
+                //         .unwrap();
+                // }
             }
             HigherTMInstrument::None => {
                 let mut indicator_panel = ChartBuilder::on(&lower)
