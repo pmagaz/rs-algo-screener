@@ -225,7 +225,6 @@ pub trait Strategy: DynClone {
                         }
                         OperationResult::PendingOrder(new_orders) => {
                             let leches = order::add_pending(orders, new_orders);
-                            log::warn!("77777777777 {:?}", leches.len());
                             orders = leches;
                         }
                         _ => (),
@@ -363,7 +362,6 @@ pub trait Strategy: DynClone {
                 };
 
                 order.set_trade_id(trade_id);
-                log::warn!("111111111 aaaaaaa activated at {:?}", order);
                 OperationResult::MarketOutOrder(trade_out_result, order)
             }
             _ => OperationResult::None,

@@ -157,7 +157,7 @@ impl<'a> Strategy for Scalping<'a> {
             false => trigger_price - spread,
         };
 
-        let pips_margin = 3.;
+        let pips_margin = 1.;
 
         let risk = match self.strategy_type().is_long_only() {
             true => buy_price - close_price - calc::to_pips(&pips_margin),
@@ -169,10 +169,15 @@ impl<'a> Strategy for Scalping<'a> {
             false => buy_price - risk * self.risk_reward_ratio,
         };
 
+        let target_price = match self.strategy_type().is_long_only() {
+            true => buy_price + calc::to_pips(&5.),
+            false => buy_price - calc::to_pips(&5.),
+        };
+
         match entry_condition {
             //true => Operation::MarketIn(Some(vec![OrderType::StopLoss(StopLossType::Atr)])),
             true => {
-                log::warn!("8888888888 {} {} {}", risk, close_price, trigger_price);
+                log::warn!("SCALPING {} {} {}", risk, close_price, trigger_price);
 
                 Operation::Order(vec![
                     OrderType::BuyOrder(666., trigger_price),
