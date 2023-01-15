@@ -338,16 +338,18 @@ pub trait Strategy: DynClone {
             Operation::MarketOutOrder(mut order) => {
                 let trade_type = match self.strategy_type().is_long_only() {
                     true => match order.order_type {
-                        OrderType::BuyOrder(_, _) => TradeType::MarketInLong,
-                        OrderType::SellOrder(_, _) => TradeType::MarketOutLong,
-                        OrderType::TakeProfit(_, _) => TradeType::MarketOutLong,
-                        OrderType::StopLoss(_) => TradeType::StopLoss,
+                        OrderType::BuyOrder(_, _, _) => TradeType::MarketInLong,
+                        OrderType::SellOrder(_, _, _) | OrderType::TakeProfit(_, _, _) => {
+                            TradeType::MarketOutLong
+                        }
+                        OrderType::StopLoss(_, _) => TradeType::StopLoss,
                     },
                     false => match order.order_type {
-                        OrderType::BuyOrder(_, _) => TradeType::MarketInShort,
-                        OrderType::SellOrder(_, _) => TradeType::MarketOutShort,
-                        OrderType::TakeProfit(_, _) => TradeType::MarketOutShort,
-                        OrderType::StopLoss(_) => TradeType::StopLoss,
+                        OrderType::BuyOrder(_, _, _) => TradeType::MarketInShort,
+                        OrderType::SellOrder(_, _, _) | OrderType::TakeProfit(_, _, _) => {
+                            TradeType::MarketOutShort
+                        }
+                        OrderType::StopLoss(_, _) => TradeType::StopLoss,
                     },
                 };
 

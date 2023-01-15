@@ -674,19 +674,18 @@ impl Backend {
                                 let date = candle.date();
 
                                 let result = match order.order_type {
-                                    OrderType::BuyOrder(_, _) => TriangleMarker::new(
+                                    OrderType::BuyOrder(_, _, _) => TriangleMarker::new(
                                         (date, order.target_price),
                                         6,
                                         &BLUE_LINE2.mix(2.),
                                     ),
-                                    OrderType::SellOrder(_, _) | OrderType::TakeProfit(_, _) => {
-                                        TriangleMarker::new(
-                                            (date, order.target_price),
-                                            -6,
-                                            &ORANGE_LINE.mix(2.),
-                                        )
-                                    }
-                                    OrderType::StopLoss(_) => TriangleMarker::new(
+                                    OrderType::SellOrder(_, _, _)
+                                    | OrderType::TakeProfit(_, _, _) => TriangleMarker::new(
+                                        (date, order.target_price),
+                                        -6,
+                                        &ORANGE_LINE.mix(2.),
+                                    ),
+                                    OrderType::StopLoss(_, _) => TriangleMarker::new(
                                         (date, order.target_price),
                                         6,
                                         &RED_LINE,

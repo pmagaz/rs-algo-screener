@@ -5,7 +5,7 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::calc;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::backtest_instrument::*;
-use rs_algo_shared::models::order::{Order, OrderCondition, OrderType};
+use rs_algo_shared::models::order::{Order, OrderCondition, OrderDirection, OrderType};
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
@@ -32,7 +32,7 @@ impl<'a> Strategy for Scalping<'a> {
             .parse::<f64>()
             .unwrap();
 
-        let profit_target = std::env::var("PROFIT_TARGET")
+        let profit_target = std::env::var("PIPS_PROFIT_TARGET")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -133,6 +133,8 @@ impl<'a> Strategy for Scalping<'a> {
                 && ema_8 > ema_13
                 && ema_13 > ema_21);
 
+        let pips_margin = 1.;
+
         let trigger_price = match self.strategy_type().is_long_only() {
             true => {
                 data[index - 5..index]
@@ -140,7 +142,7 @@ impl<'a> Strategy for Scalping<'a> {
                     .max_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
                     .map(|x| x.close())
                     .unwrap()
-                    + calc::to_pips(&3.)
+                    + calc::to_pips(&pips_margin)
             }
             false => {
                 data[index - 5..index]
@@ -148,7 +150,7 @@ impl<'a> Strategy for Scalping<'a> {
                     .min_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
                     .map(|x| x.close())
                     .unwrap()
-                    - calc::to_pips(&3.)
+                    - calc::to_pips(&pips_margin)
             }
         };
 
@@ -156,8 +158,6 @@ impl<'a> Strategy for Scalping<'a> {
             true => trigger_price + spread,
             false => trigger_price - spread,
         };
-
-        let pips_margin = 1.;
 
         let risk = match self.strategy_type().is_long_only() {
             true => buy_price - close_price - calc::to_pips(&pips_margin),
@@ -170,8 +170,8 @@ impl<'a> Strategy for Scalping<'a> {
         };
 
         let target_price = match self.strategy_type().is_long_only() {
-            true => buy_price + calc::to_pips(&5.),
-            false => buy_price - calc::to_pips(&5.),
+            true => buy_price + calc::to_pips(&self.profit_target),
+            false => buy_price - calc::to_pips(&self.profit_target),
         };
 
         match entry_condition {
@@ -180,9 +180,9 @@ impl<'a> Strategy for Scalping<'a> {
                 log::warn!("SCALPING {} {} {}", risk, close_price, trigger_price);
 
                 Operation::Order(vec![
-                    OrderType::BuyOrder(666., trigger_price),
-                    OrderType::SellOrder(666., target_price),
-                    OrderType::StopLoss(StopLossType::Pips(pips_margin)),
+                    OrderType::BuyOrder(OrderDirection::Up, 666., trigger_price),
+                    OrderType::SellOrder(OrderDirection::Up, 666., target_price),
+                    OrderType::StopLoss(OrderDirection::Down, StopLossType::Pips(pips_margin)),
                 ])
             }
 
