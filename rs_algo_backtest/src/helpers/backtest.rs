@@ -31,8 +31,8 @@ pub fn resolve_backtest(
         let current_candle = data.last().unwrap();
         let current_price = current_candle.close;
 
-        let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit > 0.).collect();
-        let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit <= 0.).collect();
+        let w_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit >= 0.).collect();
+        let l_trades: Vec<&TradeOut> = trades_out.iter().filter(|x| x.profit < 0.).collect();
         let wining_trades = w_trades.len();
         let losing_trades = l_trades.len();
         let trades = wining_trades + losing_trades;

@@ -3,7 +3,7 @@ use crate::error::Result;
 use chrono::{DateTime, Local};
 use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
-use rs_algo_shared::models::order::{Order, OrderType};
+use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
 use rs_algo_shared::models::stop_loss::StopLossType;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut, TradeType};
 use rs_algo_shared::scanner::instrument::*;
@@ -639,7 +639,7 @@ impl Backend {
                                             _ => ShapeStyle::from(&ORANGE_LINE.mix(100.)).filled(),
                                         },
                                     };
-                                    Circle::new((candle.date, price), 4, style).into_dyn()
+                                    Circle::new((candle.date, price), 0, style).into_dyn()
                                 } else {
                                     Circle::new(
                                         (candle.date, price),
@@ -664,36 +664,64 @@ impl Backend {
                         //     }
                         // }
 
-                        chart
-                            .draw_series(orders.iter().enumerate().map(|(i, order)| {
-                                let candle_index = data
-                                    .iter()
-                                    .position(|x| uuid::generate_ts_id(x.date) == order.id)
-                                    .unwrap();
-                                let candle = data.get(candle_index).unwrap();
-                                let date = candle.date();
+                        // chart
+                        //     .draw_series(orders.iter().enumerate().map(|(i, order)| {
+                        //         let candle_index = data
+                        //             .iter()
+                        //             .position(|x| uuid::generate_ts_id(x.date) == order.id)
+                        //             .unwrap();
+                        //         let candle = data.get(candle_index).unwrap();
+                        //         let date = candle.date();
 
-                                let result = match order.order_type {
-                                    OrderType::BuyOrder(_, _, _) => TriangleMarker::new(
-                                        (date, order.target_price),
-                                        6,
-                                        &BLUE_LINE2.mix(2.),
-                                    ),
-                                    OrderType::SellOrder(_, _, _)
-                                    | OrderType::TakeProfit(_, _, _) => TriangleMarker::new(
-                                        (date, order.target_price),
-                                        -6,
-                                        &ORANGE_LINE.mix(2.),
-                                    ),
-                                    OrderType::StopLoss(_, _) => TriangleMarker::new(
-                                        (date, order.target_price),
-                                        6,
-                                        &RED_LINE,
-                                    ),
-                                };
-                                result
-                            }))
-                            .unwrap();
+                        //         match order.order_type {
+                        //             OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
+                        //                 (date, order.target_price),
+                        //                 6,
+                        //                 &BLUE_LINE2.mix(2.),
+                        //             ),
+                        //             OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
+                        //                 (date, order.target_price),
+                        //                 -6,
+                        //                 &BLUE_LINE2.mix(2.),
+                        //             ),
+                        //             OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
+                        //                 (date, order.target_price),
+                        //                 -6,
+                        //                 &ORANGE_LINE.mix(2.),
+                        //             ),
+                        //             OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
+                        //                 (date, order.target_price),
+                        //                 6,
+                        //                 &ORANGE_LINE.mix(2.),
+                        //             ),
+                        //             OrderType::TakeProfitLong(_, _, _)
+                        //             | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
+                        //                 (date, order.target_price),
+                        //                 -6,
+                        //                 &ORANGE_LINE.mix(2.),
+                        //             ),
+                        //             OrderType::StopLoss(_, _) => match order.order_type.clone() {
+                        //                 OrderType::StopLoss(direction, _) => match direction {
+                        //                     OrderDirection::Up => TriangleMarker::new(
+                        //                         (date, order.target_price),
+                        //                         -6,
+                        //                         &RED_LINE,
+                        //                     ),
+                        //                     _ => TriangleMarker::new(
+                        //                         (date, order.target_price),
+                        //                         6,
+                        //                         &RED_LINE,
+                        //                     ),
+                        //                 },
+                        //                 _ => TriangleMarker::new(
+                        //                     (date, order.target_price),
+                        //                     6,
+                        //                     &RED_LINE,
+                        //                 ),
+                        //             },
+                        //         }
+                        //     }))
+                        //     .unwrap();
                         //TRIGERS
 
                         // chart
@@ -859,27 +887,27 @@ impl Backend {
         //     ))
         //     .unwrap();
 
-        if ema_a.len() > 0 {
-            chart
-                .draw_series(LineSeries::new(
-                    data.iter()
-                        .enumerate()
-                        .map(|(id, candle)| (candle.date, ema_a[id])),
-                    ORANGE_LINE.mix(4.),
-                ))
-                .unwrap();
-        }
+        // if ema_a.len() > 0 {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             data.iter()
+        //                 .enumerate()
+        //                 .map(|(id, candle)| (candle.date, ema_a[id])),
+        //             ORANGE_LINE.mix(4.),
+        //         ))
+        //         .unwrap();
+        // }
 
-        if ema_c.len() > 0 {
-            chart
-                .draw_series(LineSeries::new(
-                    data.iter()
-                        .enumerate()
-                        .map(|(id, candle)| (candle.date, ema_c[id])),
-                    RED_LINE2.mix(4.),
-                ))
-                .unwrap();
-        }
+        // if ema_c.len() > 0 {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             data.iter()
+        //                 .enumerate()
+        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
+        //             RED_LINE2.mix(4.),
+        //         ))
+        //         .unwrap();
+        // }
 
         // //HTF INDICATORS
         match htf_instrument {
@@ -950,29 +978,29 @@ impl Backend {
                     ))
                     .unwrap();
 
-                // if ema_a.len() > 0 {
-                //     chart
-                //         .draw_series(LineSeries::new(
-                //             result
-                //                 .iter()
-                //                 .enumerate()
-                //                 .map(|(id, data)| (data.0, ema_a[data.1])),
-                //             ORANGE_LINE.mix(4.),
-                //         ))
-                //         .unwrap();
-                // }
+                if ema_a.len() > 0 {
+                    chart
+                        .draw_series(LineSeries::new(
+                            result
+                                .iter()
+                                .enumerate()
+                                .map(|(id, data)| (data.0, ema_a[data.1])),
+                            ORANGE_LINE.mix(4.),
+                        ))
+                        .unwrap();
+                }
 
-                // if ema_c.len() > 0 {
-                //     chart
-                //         .draw_series(LineSeries::new(
-                //             result
-                //                 .iter()
-                //                 .enumerate()
-                //                 .map(|(id, data)| (data.0, ema_c[data.1])),
-                //             RED_LINE2.mix(4.),
-                //         ))
-                //         .unwrap();
-                // }
+                if ema_c.len() > 0 {
+                    chart
+                        .draw_series(LineSeries::new(
+                            result
+                                .iter()
+                                .enumerate()
+                                .map(|(id, data)| (data.0, ema_c[data.1])),
+                            RED_LINE2.mix(4.),
+                        ))
+                        .unwrap();
+                }
             }
             HigherTMInstrument::None => {
                 let mut indicator_panel = ChartBuilder::on(&lower)

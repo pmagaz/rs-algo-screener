@@ -41,6 +41,7 @@ impl<'a> Strategy for Scalping<'a> {
             //stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Scalping",
             strategy_type: StrategyType::OnlyLongMultiTF,
+            //strategy_type: StrategyType::OnlyShortMultiTF,
             risk_reward_ratio,
             profit_target,
         })
@@ -64,7 +65,7 @@ impl<'a> Strategy for Scalping<'a> {
         let low_price = &instrument.data.get(index).unwrap().low();
         let close_price = &instrument.data.get(index).unwrap().close();
 
-        // let first_htf_emas = calc::get_upper_timeframe_data(
+        // let first_anchor_htf = calc::get_upper_timeframe_data(
         //     index,
         //     instrument,
         //     upper_tf_instrument,
@@ -86,7 +87,7 @@ impl<'a> Strategy for Scalping<'a> {
         //         htf_ema_8 > htf_ema_21 && prev_htf_ema_8 <= prev_htf_ema_21
         //     },
         // );
-        let htf_emas = calc::get_upper_timeframe_data(
+        let anchor_htf = calc::get_upper_timeframe_data(
             index,
             instrument,
             upper_tf_instrument,
@@ -126,7 +127,7 @@ impl<'a> Strategy for Scalping<'a> {
         let ema_13 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
         let ema_21 = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
-        let entry_condition = htf_emas
+        let entry_condition = anchor_htf
             && (low_price < ema_8
                 && prev_close_price >= prev_ema_8
                 && close_price > ema_21
@@ -135,56 +136,31 @@ impl<'a> Strategy for Scalping<'a> {
 
         let pips_margin = 1.;
 
-        let trigger_price = match self.strategy_type().is_long_only() {
-            true => {
-                data[index - 5..index]
-                    .iter()
-                    .max_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
-                    .map(|x| x.close())
-                    .unwrap()
-                    + calc::to_pips(&pips_margin)
-            }
-            false => {
-                data[index - 5..index]
-                    .iter()
-                    .min_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
-                    .map(|x| x.close())
-                    .unwrap()
-                    - calc::to_pips(&pips_margin)
-            }
-        };
+        let stop_loss_pips = std::env::var("PIPS_STOP_LOSS")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
 
-        let buy_price = match self.strategy_type().is_long_only() {
-            true => trigger_price + spread,
-            false => trigger_price - spread,
-        };
+        let trigger_price = data[index - 5..index]
+            .iter()
+            .max_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
+            .map(|x| x.close())
+            .unwrap()
+            + calc::to_pips(&pips_margin);
 
-        let risk = match self.strategy_type().is_long_only() {
-            true => buy_price - close_price - calc::to_pips(&pips_margin),
-            false => buy_price + close_price + calc::to_pips(&pips_margin),
-        };
+        let buy_price = trigger_price + spread;
 
-        let target_price = match self.strategy_type().is_long_only() {
-            true => buy_price + risk * self.risk_reward_ratio,
-            false => buy_price - risk * self.risk_reward_ratio,
-        };
-
-        let target_price = match self.strategy_type().is_long_only() {
-            true => buy_price + calc::to_pips(&self.profit_target),
-            false => buy_price - calc::to_pips(&self.profit_target),
-        };
-
+        let risk = buy_price - close_price - calc::to_pips(&pips_margin);
+        let target_price = buy_price + calc::to_pips(&self.profit_target);
+        if index < 250 {
+            //log::info!("11111111 {} {}", index, entry_condition);
+        }
         match entry_condition {
-            //true => Operation::MarketIn(Some(vec![OrderType::StopLoss(StopLossType::Atr)])),
-            true => {
-                log::warn!("SCALPING {} {} {}", risk, close_price, trigger_price);
-
-                Operation::Order(vec![
-                    OrderType::BuyOrder(OrderDirection::Up, 666., trigger_price),
-                    OrderType::SellOrder(OrderDirection::Up, 666., target_price),
-                    OrderType::StopLoss(OrderDirection::Down, StopLossType::Pips(pips_margin)),
-                ])
-            }
+            true => Operation::Order(vec![
+                OrderType::BuyOrderLong(OrderDirection::Up, *close_price, trigger_price),
+                OrderType::SellOrderLong(OrderDirection::Up, *close_price, target_price),
+                OrderType::StopLoss(OrderDirection::Down, StopLossType::Pips(stop_loss_pips)),
+            ]),
 
             false => Operation::None,
         }
@@ -197,9 +173,41 @@ impl<'a> Strategy for Scalping<'a> {
         upper_tf_instrument: &HigherTMInstrument,
         spread: f64,
     ) -> Operation {
+        Operation::None
+    }
+
+    fn entry_short(
+        &mut self,
+        index: usize,
+        instrument: &Instrument,
+        upper_tf_instrument: &HigherTMInstrument,
+        spread: f64,
+    ) -> Operation {
         let close_price = &instrument.data.get(index).unwrap().close();
 
-        let htf_emas = calc::get_upper_timeframe_data(
+        // let first_anchor_htf = calc::get_upper_timeframe_data(
+        //     index,
+        //     instrument,
+        //     upper_tf_instrument,
+        //     |(idx, prev_idx, upper_inst)| {
+        //         let htf_ema_8 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
+        //         let prev_htf_ema_8 = upper_inst
+        //             .indicators
+        //             .ema_a
+        //             .get_data_a()
+        //             .get(prev_idx)
+        //             .unwrap();
+        //         let htf_ema_21 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
+        //         let prev_htf_ema_21 = upper_inst
+        //             .indicators
+        //             .ema_c
+        //             .get_data_a()
+        //             .get(prev_idx)
+        //             .unwrap();
+        //         htf_ema_8 > htf_ema_21 && prev_htf_ema_8 <= prev_htf_ema_21
+        //     },
+        // );
+        let anchor_htf = calc::get_upper_timeframe_data(
             index,
             instrument,
             upper_tf_instrument,
@@ -225,6 +233,7 @@ impl<'a> Strategy for Scalping<'a> {
         let prev_index = calc::get_prev_index(index);
         let next_index = index + 1;
         let data = &instrument.data();
+        let high_price = &data.get(index).unwrap().high();
         let close_price = &data.get(index).unwrap().close();
         let prev_close_price = &data.get(prev_index).unwrap().close();
         let open_price = data.get(next_index).unwrap().close();
@@ -238,71 +247,48 @@ impl<'a> Strategy for Scalping<'a> {
         let ema_13 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
         let ema_21 = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
-        let exit_condition = htf_emas
-            || (ema_8 < ema_13 || ema_13 < ema_21 || ema_8 < ema_21)
-            || (close_price > ema_8
+        let entry_condition = anchor_htf
+            && (high_price > ema_8
                 && prev_close_price <= prev_ema_8
+                && close_price < ema_21
                 && ema_8 < ema_13
                 && ema_13 < ema_21);
 
-        let trigger_price = match self.strategy_type().is_long_only() {
-            true => {
-                data[index - 5..index]
-                    .iter()
-                    .max_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
-                    .map(|x| x.close())
-                    .unwrap()
-                    + calc::to_pips(&3.)
-            }
-            false => {
-                data[index - 5..index]
-                    .iter()
-                    .min_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
-                    .map(|x| x.close())
-                    .unwrap()
-                    - calc::to_pips(&3.)
-            }
-        };
+        let pips_margin = 1.;
 
-        let buy_price = match self.strategy_type().is_long_only() {
-            true => trigger_price + spread,
-            false => trigger_price - spread,
-        };
+        let stop_loss_pips = std::env::var("PIPS_STOP_LOSS")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap();
 
-        let risk = match self.strategy_type().is_long_only() {
-            true => buy_price - close_price - calc::to_pips(&3.),
-            false => buy_price + close_price + calc::to_pips(&3.),
-        };
+        let trigger_price = data[index - 5..index]
+            .iter()
+            .min_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
+            .map(|x| x.close())
+            .unwrap()
+            - calc::to_pips(&pips_margin);
+
+        let buy_price = trigger_price - spread;
+
+        let risk = buy_price + close_price + calc::to_pips(&pips_margin);
 
         let target_price = match self.strategy_type().is_long_only() {
-            true => buy_price + risk * 1.,
-            false => buy_price - risk * 1.,
+            true => buy_price + risk * self.risk_reward_ratio,
+            false => buy_price - risk * self.risk_reward_ratio,
         };
 
-        match exit_condition {
-            //true => Operation::MarketIn(Some(vec![OrderType::StopLoss(StopLossType::Atr)])),
-            // true => Operation::Order(vec![
-            //     OrderType::BuyOrder(open_price, trigger_price),
-            //     OrderType::SellOrder(open_price, target_price),
-            //     OrderType::StopLoss(StopLossType::Pips(3.)),
-            // ]),
-            true => Operation::None,
-            false => Operation::None,
+        let target_price = buy_price - calc::to_pips(&self.profit_target);
+        if index < 250 {
+            //log::info!("22222222 {} {}", index, entry_condition);
         }
-    }
+        match entry_condition {
+            true => Operation::Order(vec![
+                OrderType::BuyOrderShort(OrderDirection::Down, *close_price, trigger_price),
+                OrderType::SellOrderShort(OrderDirection::Down, *close_price, target_price),
+                OrderType::StopLoss(OrderDirection::Up, StopLossType::Pips(stop_loss_pips)),
+            ]),
 
-    fn entry_short(
-        &mut self,
-        index: usize,
-        instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
-        spread: f64,
-    ) -> Operation {
-        match self.strategy_type {
-            StrategyType::LongShort | StrategyType::LongShortMultiTF | StrategyType::OnlyShort => {
-                self.exit_long(index, instrument, upper_tf_instrument, spread)
-            }
-            _ => Operation::None,
+            false => Operation::None,
         }
     }
 
@@ -313,12 +299,7 @@ impl<'a> Strategy for Scalping<'a> {
         upper_tf_instrument: &HigherTMInstrument,
         spread: f64,
     ) -> Operation {
-        match self.strategy_type {
-            StrategyType::LongShort | StrategyType::LongShortMultiTF | StrategyType::OnlyShort => {
-                self.entry_long(index, instrument, upper_tf_instrument, spread)
-            }
-            _ => Operation::None,
-        }
+        Operation::None
     }
 
     fn backtest_result(
