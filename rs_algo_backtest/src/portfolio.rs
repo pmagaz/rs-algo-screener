@@ -3,10 +3,10 @@ use crate::strategies::strategy::Strategy;
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
-use rs_algo_shared::models::backtest_instrument::BackTestSpread;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::market::*;
+use rs_algo_shared::models::pricing::*;
 use rs_algo_shared::scanner::instrument::Instrument;
 use std::env;
 
@@ -35,15 +35,15 @@ impl PortFolio {
 
         let endpoint = env::var("BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT").unwrap();
         let instrument_result_endpoint = env::var("BACKEND_BACKTEST_ENDPOINT").unwrap().clone();
-        let spreads_endpoint = env::var("BACKEND_BACKTEST_SPREADS_ENDPOINT")
+        let pricing_endpoint = env::var("BACKEND_BACKTEST_PRICING_ENDPOINT")
             .unwrap()
             .clone();
 
         let time_frame = env::var("BASE_TIME_FRAME").unwrap().clone();
-        log::info!("[BACKTEST] Requesting spreads");
+        log::info!("[BACKTEST] Requesting Pricing");
 
-        let backtest_spreads: Vec<BackTestSpread> =
-            request(&spreads_endpoint, &String::from("all"), HttpMethod::Get)
+        let prices: Vec<Pricing> =
+            request(&pricing_endpoint, &String::from("all"), HttpMethod::Get)
                 .await
                 .unwrap()
                 .json()
@@ -102,24 +102,23 @@ impl PortFolio {
                 for instrument in &instruments_to_test {
                     log::info!("[BACKTEST] Testing {}... ", instrument.symbol);
 
-                    let spread = match backtest_spreads
+                    let pricing = match prices
                         .iter()
-                        .position(|back_spread| back_spread.symbol == instrument.symbol)
+                        .position(|pricing| pricing.symbol() == instrument.symbol)
                     {
-                        Some(idx) => backtest_spreads.get(idx).unwrap().spread,
+                        Some(idx) => prices.get(idx).unwrap().clone(),
                         None => {
-                            log::error!("BACKTEST] Spread not found");
-                            0.000
+                            panic!("[PANIC] Pricing not found for {:?}", instrument.symbol);
                         }
                     };
 
                     let backtest_result = dyn_clone::clone_box(strategy)
                         .test(
                             instrument,
+                            &pricing,
                             self.trade_size,
                             self.equity,
                             self.commission,
-                            spread,
                         )
                         .await;
 

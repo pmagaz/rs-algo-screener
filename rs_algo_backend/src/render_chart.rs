@@ -1,6 +1,7 @@
 use crate::error::Result;
 
 use chrono::{DateTime, Local};
+use rs_algo_shared::helpers::date::{fom_dbtime, to_dbtime};
 use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
@@ -117,8 +118,8 @@ impl Backend {
         if mode == BackendMode::BackTest || mode == BackendMode::Bot {
             //if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
-            prices_in_indexes = trades_in.iter().map(|x| x.index_in).collect();
-            prices_out_indexes = trades_out.iter().map(|x| x.index_out).collect();
+            prices_in_indexes = trades_in.iter().map(|x| x.id).collect();
+            prices_out_indexes = trades_out.iter().map(|x| x.id).collect();
             orders_indexes = orders.iter().map(|x| x.id).collect();
             //top_peaks_indexes = peaks.local_maxima().iter().map(|x| x.).collect();
             stop_loss_indexes = trades_out
@@ -458,353 +459,490 @@ impl Backend {
                 //     //     .unwrap();
                 // }
                 _ => {
-                    chart
-                        .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                            let index = match mode {
-                                BackendMode::BackTest => i,
-                                _ => uuid::generate_ts_id(candle.date()),
-                            };
+                    // chart
+                    //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                    //         let index = match mode {
+                    //             BackendMode::BackTest => i,
+                    //             _ => uuid::generate_ts_id(candle.date()),
+                    //         };
 
-                            if prices_in_indexes.contains(&index) {
-                                let trade_in_index =
-                                    prices_in_indexes.iter().position(|&x| x == index).unwrap();
-                                let trade_in = trades_in.get(trade_in_index).unwrap();
-                                let price = trade_in.price_in;
-                                match mode {
-                                    BackendMode::Bot => Circle::new(
-                                        (candle.date, price),
-                                        5,
-                                        Into::<ShapeStyle>::into(&BLUE_LINE3).filled(),
-                                    )
-                                    .into_dyn(),
-                                    _ => Circle::new(
-                                        (candle.date, price),
-                                        4,
-                                        Into::<ShapeStyle>::into(&BLUE_LINE3.mix(10.)).filled(),
-                                    )
-                                    .into_dyn(),
-                                }
-                            } else {
-                                Circle::new(
-                                    (candle.date, 0.),
-                                    0,
-                                    Into::<ShapeStyle>::into(&TRANSPARENT).filled(),
-                                )
-                                .into_dyn()
-                            }
-                        }))
-                        .unwrap();
+                    //         if prices_in_indexes.contains(&index) {
+                    //             let trade_in_index =
+                    //                 prices_in_indexes.iter().position(|&x| x == index).unwrap();
+                    //             let trade_in = trades_in.get(trade_in_index).unwrap();
+                    //             let price = trade_in.price_in;
+                    //             match mode {
+                    //                 BackendMode::Bot => Circle::new(
+                    //                     (candle.date, price),
+                    //                     5,
+                    //                     Into::<ShapeStyle>::into(&BLUE_LINE3).filled(),
+                    //                 )
+                    //                 .into_dyn(),
+                    //                 _ => Circle::new(
+                    //                     (candle.date, price),
+                    //                     4,
+                    //                     Into::<ShapeStyle>::into(&BLUE_LINE3.mix(10.)).filled(),
+                    //                 )
+                    //                 .into_dyn(),
+                    //             }
+                    //         } else {
+                    //             Circle::new(
+                    //                 (candle.date, 0.),
+                    //                 0,
+                    //                 Into::<ShapeStyle>::into(&TRANSPARENT).filled(),
+                    //             )
+                    //             .into_dyn()
+                    //         }
+                    //     }))
+                    //     .unwrap();
 
                     //TRADES_IN SPREADS
 
-                    chart
-                        .draw_series(PointSeries::of_element(
-                            (0..)
-                                .zip(data.iter())
-                                .filter(|(i, candle)| {
-                                    let index = match mode {
-                                        BackendMode::BackTest => *i,
-                                        _ => uuid::generate_ts_id(candle.date()),
-                                    };
-
-                                    prices_in_indexes.contains(&index)
-                                })
-                                .map(|(i, candle)| {
-                                    let date = candle.date();
-                                    let index = match mode {
-                                        BackendMode::BackTest => i,
-                                        _ => uuid::generate_ts_id(candle.date()),
-                                    };
-                                    let trade_in_index =
-                                        prices_in_indexes.iter().position(|&x| x == index).unwrap();
-                                    let trade_in = trades_in.get(trade_in_index).unwrap();
-                                    (date, trade_in.ask)
-                                }),
-                            5,
-                            ShapeStyle::from(&BLUE_LINE3),
-                            &|coord, size: i32, style| {
-                                let (date, price) = coord;
-
-                                let element = match mode {
-                                    BackendMode::Bot => {
-                                        let index = uuid::generate_ts_id(date);
-                                        let trade_in_index = prices_in_indexes
-                                            .iter()
-                                            .position(|&x| x == index)
-                                            .unwrap();
-
-                                        let trade_in = trades_in.get(trade_in_index).unwrap();
-                                        EmptyElement::at(coord)
-                                            + Circle::new((0, 0), size, style)
-                                            + Text::new(
-                                                format!(
-                                                    "{:?} / {:?} / {:?}",
-                                                    round(trade_in.price_in, 4),
-                                                    round(trade_in.ask, 4),
-                                                    round(trade_in.spread, 4),
-                                                ),
-                                                (0, 20),
-                                                ("sans-serif", 12),
-                                            )
-                                    }
-                                    _ => {
-                                        EmptyElement::at(coord)
-                                            + Circle::new(
-                                                (0, 0),
-                                                4,
-                                                ShapeStyle::from(&BLUE_LINE.mix(1.)).filled(),
-                                            )
-                                            + Text::new(format!(""), (0, 20), ("sans-serif", 0))
-                                    }
-                                };
-                                element
-                            },
-                        ))
-                        .unwrap();
-
                     // TRADES OUT
-                    match mode {
-                        BackendMode::Bot => chart
-                            .draw_series(PointSeries::of_element(
-                                (0..)
-                                    .zip(data.iter())
-                                    .filter(|(i, candle)| {
-                                        let index = uuid::generate_ts_id(candle.date());
-                                        prices_out_indexes.contains(&index)
-                                    })
-                                    .map(|(i, candle)| {
-                                        let date = candle.date();
-                                        let price = candle.close();
-                                        (date, price)
-                                    }),
-                                5,
-                                ShapeStyle::from(&RED_LINE).filled(),
-                                &|coord, size: i32, style| {
-                                    let (date, price) = coord;
-                                    let index = uuid::generate_ts_id(date);
-                                    let trade_out_index = prices_out_indexes
-                                        .iter()
-                                        .position(|&x| x == index)
-                                        .unwrap();
+                    // match mode {
+                    //     BackendMode::Bot => {
+                    //    chart
+                    //         .draw_series(PointSeries::of_element(
+                    //             (0..)
+                    //                 .zip(data.iter())
+                    //                 .filter(|(i, candle)| {
+                    //                     let index = uuid::generate_ts_id(candle.date());
+                    //                     prices_out_indexes.contains(&index)
+                    //                 })
+                    //                 .map(|(i, candl e)| {
+                    //                     let date = candle.date();
+                    //                     let price = candle.close();
+                    //                     (date, price)
+                    //                 }),
+                    //             5,
+                    //             ShapeStyle::from(&RED_LINE).filled(),
+                    //             &|coord, size: i32, style| {
+                    //                 let (date, price) = coord;
+                    //                 let index = uuid::generate_ts_id(date);
+                    //                 let trade_out_index = prices_out_indexes
+                    //                     .iter()
+                    //                     .position(|&x| x == index)
+                    //                     .unwrap();
 
-                                    let trade_out = trades_out.get(trade_out_index).unwrap();
+                    //                 let trade_out = trades_out.get(trade_out_index).unwrap();
 
-                                    let style = match trade_out.trade_type {
-                                        TradeType::StopLoss => ShapeStyle::from(&RED_LINE).filled(),
-                                        _ => match trade_out.profit_per {
-                                            _ if trade_out.profit_per > 0. => {
-                                                ShapeStyle::from(&GREEN_LINE).filled()
-                                            }
-                                            _ if trade_out.profit_per < 0. => {
-                                                ShapeStyle::from(&RED_LINE).filled()
-                                            }
-                                            _ => ShapeStyle::from(&BLUE_LINE).filled(),
-                                        },
-                                    };
+                    //                 let style = match trade_out.trade_type {
+                    //                     TradeType::StopLoss => {
+                    //                         ShapeStyle::from(&RED_LINE).filled()
+                    //                     }
+                    //                     _ => match trade_out.profit_per {
+                    //                         _ if trade_out.profit_per > 0. => {
+                    //                             ShapeStyle::from(&GREEN_LINE).filled()
+                    //                         }
+                    //                         _ if trade_out.profit_per < 0. => {
+                    //                             ShapeStyle::from(&RED_LINE).filled()
+                    //                         }
+                    //                         _ => ShapeStyle::from(&BLUE_LINE).filled(),
+                    //                     },
+                    //                 };
 
-                                    EmptyElement::at(coord) + Circle::new((0, 0), size, style)
-                                    // + Text::new(
-                                    //     format!(
-                                    //         "{:?} / {:?} %",
-                                    //         round(trade_out.price_out, 4),
-                                    //         round(trade_out.profit_per, 4)
-                                    //     ),
-                                    //     (0, 20),
-                                    //     ("sans-serif", 12),
-                                    // )
-                                },
-                            ))
-                            .unwrap(),
-                        _ => chart
-                            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                                let index = i;
-                                let price = candle.open();
+                    //                 EmptyElement::at(coord) + Circle::new((0, 0), size, style)
+                    //                 // + Text::new(
+                    //                 //     format!(
+                    //                 //         "{:?} / {:?} %",
+                    //                 //         round(trade_out.price_out, 4),
+                    //                 //         round(trade_out.profit_per, 4)
+                    //                 //     ),
+                    //                 //     (0, 20),
+                    //                 //     ("sans-serif", 12),
+                    //                 // )
+                    //             },
+                    //         ))
+                    //         .unwrap()
+                    // }
+                    // _ => //chart
+                    // .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                    //     let index = i;
+                    //     let price = candle.open();
 
-                                if prices_out_indexes.contains(&index) {
-                                    let trade_out_index = prices_out_indexes
-                                        .iter()
-                                        .position(|&x| x == index)
-                                        .unwrap();
+                    //     if prices_out_indexes.contains(&index) {
+                    //         let trade_out_index = prices_out_indexes
+                    //             .iter()
+                    //             .position(|&x| x == index)
+                    //             .unwrap();
 
-                                    let trade_out = trades_out.get(trade_out_index).unwrap();
-                                    let style = match trade_out.trade_type {
-                                        TradeType::StopLoss => ShapeStyle::from(&RED_LINE).filled(),
-                                        _ => match trade_out.profit_per {
-                                            _ if trade_out.profit_per > 0. => {
-                                                ShapeStyle::from(&GREEN_LINE.mix(100.)).filled()
-                                            }
-                                            _ if trade_out.profit_per < 0. => {
-                                                ShapeStyle::from(&RED_LINE.mix(100.)).filled()
-                                            }
-                                            _ => ShapeStyle::from(&ORANGE_LINE.mix(100.)).filled(),
-                                        },
-                                    };
-                                    Circle::new((candle.date, price), 0, style).into_dyn()
-                                } else {
-                                    Circle::new(
-                                        (candle.date, price),
-                                        0,
-                                        Into::<ShapeStyle>::into(&TRANSPARENT).filled(),
-                                    )
-                                    .into_dyn()
-                                }
-                            }))
-                            .unwrap(),
-                    };
+                    //         let trade_out = trades_out.get(trade_out_index).unwrap();
+                    //         let style = match trade_out.trade_type {
+                    //             TradeType::StopLoss => ShapeStyle::from(&RED_LINE).filled(),
+                    //             _ => match trade_out.profit_per {
+                    //                 _ if trade_out.profit_per > 0. => {
+                    //                     ShapeStyle::from(&GREEN_LINE.mix(100.)).filled()
+                    //                 }
+                    //                 _ if trade_out.profit_per < 0. => {
+                    //                     ShapeStyle::from(&RED_LINE.mix(100.)).filled()
+                    //                 }
+                    //                 _ => ShapeStyle::from(&ORANGE_LINE.mix(100.)).filled(),
+                    //             },
+                    //         };
+                    //         Circle::new((candle.date, price), 0, style).into_dyn()
+                    //     } else {
+                    //         Circle::new(
+                    //             (candle.date, price),
+                    //             0,
+                    //             Into::<ShapeStyle>::into(&TRANSPARENT).filled(),
+                    //         )
+                    //         .into_dyn()
+                    //     }
+                    // }))
+                    // .unwrap(),
+                    //};
 
-                    if mode == BackendMode::BackTest {
-                        //ORDERS
+                    //if mode == BackendMode::BackTest {
+                    //ORDERS
 
-                        // for (id, order) in orders.iter().enumerate() {
-                        //     for (id_candle, candle) in data.iter().enumerate() {
-                        //         let index = uuid::generate_ts_id(candle.date());
-                        //         if order.id == index {
-                        //             log::info!("666666666666666");
-                        //         }
-                        //     }
-                        // }
+                    // for (id, order) in orders.iter().enumerate() {
+                    //     for (id_candle, candle) in data.iter().enumerate() {
+                    //         let index = uuid::generate_ts_id(candle.date());
+                    //         if order.id == index {
+                    //             log::info!("666666666666666");
+                    //         }
+                    //     }
+                    // }
 
-                        // chart
-                        //     .draw_series(orders.iter().enumerate().map(|(i, order)| {
-                        //         let candle_index = data
-                        //             .iter()
-                        //             .position(|x| uuid::generate_ts_id(x.date) == order.id)
-                        //             .unwrap();
-                        //         let candle = data.get(candle_index).unwrap();
-                        //         let date = candle.date();
+                    // chart
+                    //     .draw_series(orders.iter().enumerate().map(|(i, order)| {
+                    //         let candle_index = data
+                    //             .iter()
+                    //             .position(|x| uuid::generate_ts_id(x.date) == order.id)
+                    //             .unwrap();
+                    //         let candle = data.get(candle_index).unwrap();
+                    //         let date = candle.date();
 
-                        //         match order.order_type {
-                        //             OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
-                        //                 (date, order.target_price),
-                        //                 6,
-                        //                 &BLUE_LINE2.mix(2.),
-                        //             ),
-                        //             OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
-                        //                 (date, order.target_price),
-                        //                 -6,
-                        //                 &BLUE_LINE2.mix(2.),
-                        //             ),
-                        //             OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
-                        //                 (date, order.target_price),
-                        //                 -6,
-                        //                 &ORANGE_LINE.mix(2.),
-                        //             ),
-                        //             OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
-                        //                 (date, order.target_price),
-                        //                 6,
-                        //                 &ORANGE_LINE.mix(2.),
-                        //             ),
-                        //             OrderType::TakeProfitLong(_, _, _)
-                        //             | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
-                        //                 (date, order.target_price),
-                        //                 -6,
-                        //                 &ORANGE_LINE.mix(2.),
-                        //             ),
-                        //             OrderType::StopLoss(_, _) => match order.order_type.clone() {
-                        //                 OrderType::StopLoss(direction, _) => match direction {
-                        //                     OrderDirection::Up => TriangleMarker::new(
-                        //                         (date, order.target_price),
-                        //                         -6,
-                        //                         &RED_LINE,
-                        //                     ),
-                        //                     _ => TriangleMarker::new(
-                        //                         (date, order.target_price),
-                        //                         6,
-                        //                         &RED_LINE,
-                        //                     ),
-                        //                 },
-                        //                 _ => TriangleMarker::new(
-                        //                     (date, order.target_price),
-                        //                     6,
-                        //                     &RED_LINE,
-                        //                 ),
-                        //             },
-                        //         }
-                        //     }))
-                        //     .unwrap();
-                        //TRIGERS
+                    //         match order.order_type {
+                    //             OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
+                    //                 (date, order.target_price),
+                    //                 6,
+                    //                 &BLUE_LINE2.mix(2.),
+                    //             ),
+                    //             OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
+                    //                 (date, order.target_price),
+                    //                 -6,
+                    //                 &BLUE_LINE2.mix(2.),
+                    //             ),
+                    //             OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
+                    //                 (date, order.target_price),
+                    //                 -6,
+                    //                 &ORANGE_LINE.mix(2.),
+                    //             ),
+                    //             OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
+                    //                 (date, order.target_price),
+                    //                 6,
+                    //                 &ORANGE_LINE.mix(2.),
+                    //             ),
+                    //             OrderType::TakeProfitLong(_, _, _)
+                    //             | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
+                    //                 (date, order.target_price),
+                    //                 -6,
+                    //                 &ORANGE_LINE.mix(2.),
+                    //             ),
+                    //             OrderType::StopLoss(_, _) => match order.order_type.clone() {
+                    //                 OrderType::StopLoss(direction, _) => match direction {
+                    //                     OrderDirection::Up => TriangleMarker::new(
+                    //                         (date, order.target_price),
+                    //                         -6,
+                    //                         &RED_LINE,
+                    //                     ),
+                    //                     _ => TriangleMarker::new(
+                    //                         (date, order.target_price),
+                    //                         6,
+                    //                         &RED_LINE,
+                    //                     ),
+                    //                 },
+                    //                 _ => TriangleMarker::new(
+                    //                     (date, order.target_price),
+                    //                     6,
+                    //                     &RED_LINE,
+                    //                 ),
+                    //             },
+                    //         }
+                    //     }))
+                    //     .unwrap();
+                    //TRIGERS
 
-                        // chart
-                        //     .draw_series(PointSeries::of_element(
-                        //         (0..)
-                        //             .zip(data.iter())
-                        //             .filter(|(i, candle)| {
-                        //                 let index = uuid::generate_ts_id(candle.date());
-                        //                 orders_indexes.contains(&index)
-                        //             })
-                        //             .map(|(i, candle)| {
-                        //                 let date = candle.date();
-                        //                 let price = candle.close();
-                        //                 (date, price)
-                        //             }),
-                        //         5,
-                        //         ShapeStyle::from(&RED_LINE).filled(),
-                        //         &|coord, size: i32, style| {
-                        //             log::info!("22222222222");
-                        //             let (date, price) = coord;
-                        //             let index = uuid::generate_ts_id(date);
-                        //             let order_index =
-                        //                 orders_indexes.iter().position(|&x| x == index).unwrap();
-                        //             let order = orders.get(order_index).unwrap();
+                    // chart
+                    //     .draw_series(PointSeries::of_element(
+                    //         (0..)
+                    //             .zip(data.iter())
+                    //             .filter(|(i, candle)| {
+                    //                 let index = uuid::generate_ts_id(candle.date());
+                    //                 orders_indexes.contains(&index)
+                    //             })
+                    //             .map(|(i, candle)| {
+                    //                 let date = candle.date();
+                    //                 let price = candle.close();
+                    //                 (date, price)
+                    //             }),
+                    //         5,
+                    //         ShapeStyle::from(&RED_LINE).filled(),
+                    //         &|coord, size: i32, style| {
+                    //             log::info!("22222222222");
+                    //             let (date, price) = coord;
+                    //             let index = uuid::generate_ts_id(date);
+                    //             let order_index =
+                    //                 orders_indexes.iter().position(|&x| x == index).unwrap();
+                    //             let order = orders.get(order_index).unwrap();
 
-                        //             let style = match order.order_type {
-                        //                 OrderType::BuyOrder(_, _) => {
-                        //                     ShapeStyle::from(&ORANGE_LINE).filled()
-                        //                 }
-                        //                 OrderType::SellOrder(_, _)
-                        //                 | OrderType::TakeProfit(_, _) => {
-                        //                     ShapeStyle::from(&ORANGE_LINE).filled()
-                        //                 }
-                        //                 OrderType::StopLoss(_) => {
-                        //                     ShapeStyle::from(&RED_LINE).filled()
-                        //                 }
-                        //             };
+                    //             let style = match order.order_type {
+                    //                 OrderType::BuyOrder(_, _) => {
+                    //                     ShapeStyle::from(&ORANGE_LINE).filled()
+                    //                 }
+                    //                 OrderType::SellOrder(_, _)
+                    //                 | OrderType::TakeProfit(_, _) => {
+                    //                     ShapeStyle::from(&ORANGE_LINE).filled()
+                    //                 }
+                    //                 OrderType::StopLoss(_) => {
+                    //                     ShapeStyle::from(&RED_LINE).filled()
+                    //                 }
+                    //             };
 
-                        //             EmptyElement::at(coord)
-                        //                 +TriangleMarker::new((0,0),16,style)
-                        //                // + Circle::new((0, 0), size, style)
-                        //                 + Text::new(
-                        //                     format!(
-                        //                         "{:?} -> {:?}",
-                        //                         round(order.origin_price, 4),
-                        //                         round(order.target_price, 4)
-                        //                     ),
-                        //                     (0, 20),
-                        //                     ("sans-serif", 12),
-                        //                 )
-                        //         },
-                        //     ))
-                        //     .unwrap();
+                    //             EmptyElement::at(coord)
+                    //                 +TriangleMarker::new((0,0),16,style)
+                    //                // + Circle::new((0, 0), size, style)
+                    //                 + Text::new(
+                    //                     format!(
+                    //                         "{:?} -> {:?}",
+                    //                         round(order.origin_price, 4),
+                    //                         round(order.target_price, 4)
+                    //                     ),
+                    //                     (0, 20),
+                    //                     ("sans-serif", 12),
+                    //                 )
+                    //         },
+                    //     ))
+                    //     .unwrap();
 
-                        chart
-                            .draw_series(data.iter().enumerate().map(|(i, candle)| {
-                                let index = i;
-                                let price = candle.close;
-                                let coord: (DateTime<chrono::Local>, f64) = (candle.date(), price);
+                    // chart
+                    //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
+                    //         let index = i;
+                    //         let price = candle.close;
+                    //         let coord: (DateTime<chrono::Local>, f64) = (candle.date(), price);
 
-                                if prices_out_indexes.contains(&index) {
-                                    let trade_out_index = prices_out_indexes
-                                        .iter()
-                                        .position(|&x| x == index)
-                                        .unwrap();
+                    //         if prices_out_indexes.contains(&index) {
+                    //             let trade_out_index = prices_out_indexes
+                    //                 .iter()
+                    //                 .position(|&x| x == index)
+                    //                 .unwrap();
 
-                                    let trade_out = trades_out.get(trade_out_index).unwrap();
-                                    EmptyElement::at(coord)
-                                    // + Text::new(
-                                    //     format!("{:?} %", round(trade_out.profit_per, 4)),
-                                    //     (0, 20),
-                                    //     ("sans-serif", 12),
-                                    // )
-                                } else {
-                                    EmptyElement::at(coord)
-                                    //+ Text::new(format!(""), (0, 20), ("sans-serif", 0))
-                                }
-                            }))
-                            .unwrap();
-                    }
+                    //             let trade_out = trades_out.get(trade_out_index).unwrap();
+                    //             EmptyElement::at(coord)
+                    //             // + Text::new(
+                    //             //     format!("{:?} %", round(trade_out.profit_per, 4)),
+                    //             //     (0, 20),
+                    //             //     ("sans-serif", 12),
+                    //             // )
+                    //         } else {
+                    //             EmptyElement::at(coord)
+                    //             //+ Text::new(format!(""), (0, 20), ("sans-serif", 0))
+                    //         }
+                    //     }))
+                    //     .unwrap();
+                    //}
                 }
             };
         }
+
+        //TRADES_IN
+
+        let triangle_size = match mode {
+            BackendMode::Instrument => 0,
+            BackendMode::BackTest => 5,
+            BackendMode::Bot => 6,
+        };
+
+        chart
+            .draw_series(trades_in.iter().enumerate().map(|(i, trade_in)| {
+                let date = fom_dbtime(&trade_in.date_in);
+                let price = trade_in.price_in;
+                match trade_in.trade_type.is_entry() {
+                    true => match trade_in.trade_type.is_long() {
+                        true => TriangleMarker::new(
+                            (date, trade_in.price_in - trade_in.spread),
+                            triangle_size,
+                            &BLUE_LINE.mix(6.),
+                        ),
+                        false => TriangleMarker::new(
+                            (date, trade_in.price_in + trade_in.spread),
+                            -triangle_size,
+                            &BLUE_LINE.mix(6.),
+                        ),
+                    },
+                    false => todo!(),
+                }
+            }))
+            .unwrap();
+
+        //TRADES_IN SPREAD
+
+        chart
+            .draw_series(trades_in.iter().enumerate().map(|(i, trade_in)| {
+                let date = fom_dbtime(&trade_in.date_in);
+                let price = trade_in.price_in;
+                match trade_in.trade_type.is_entry() {
+                    true => match trade_in.trade_type.is_long() {
+                        true => {
+                            TriangleMarker::new((date, price), triangle_size, &BLUE_LINE.mix(2.))
+                        }
+                        false => {
+                            TriangleMarker::new((date, price), -triangle_size, &BLUE_LINE.mix(2.))
+                        }
+                    },
+                    false => todo!(),
+                }
+            }))
+            .unwrap();
+
+        //TRADES_OUT
+
+        chart
+            .draw_series(trades_out.iter().enumerate().map(|(i, trade_out)| {
+                let date = fom_dbtime(&trade_out.date_out);
+                let price = trade_out.price_out;
+                let element = match trade_out.trade_type.is_long() {
+                    true => {
+                        if trade_out.profit > 0. {
+                            TriangleMarker::new((date, price), -triangle_size, &GREEN_LINE2.mix(6.))
+                        } else {
+                            TriangleMarker::new((date, price), -triangle_size, &RED_LINE2.mix(6.))
+                        }
+                    }
+                    false => match trade_out.trade_type.is_long() {
+                        true => {
+                            TriangleMarker::new((date, price), -triangle_size, &RED_LINE2.mix(6.))
+                        }
+                        false => {
+                            TriangleMarker::new((date, price), triangle_size, &RED_LINE2.mix(6.))
+                        }
+                    },
+                };
+                element
+            }))
+            .unwrap();
+
+        //ORDERS
+
+        // chart
+        //     .draw_series(orders.iter().enumerate().map(|(i, order)| {
+        //         let candle_index = data
+        //             .iter()
+        //             .position(|x| uuid::generate_ts_id(x.date) == order.id)
+        //             .unwrap();
+        //         let candle = data.get(candle_index).unwrap();
+        //         let date = candle.date();
+
+        //         match order.order_type {
+        //             OrderType::BuyOrderLong(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), 6, &BLUE_LINE2.mix(2.))
+        //             }
+        //             OrderType::BuyOrderShort(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), -6, &BLUE_LINE2.mix(2.))
+        //             }
+        //             OrderType::SellOrderLong(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), -6, &ORANGE_LINE.mix(2.))
+        //             }
+        //             OrderType::SellOrderShort(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), 6, &ORANGE_LINE.mix(2.))
+        //             }
+        //             OrderType::TakeProfitLong(_, _, _) | OrderType::TakeProfitShort(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), -6, &ORANGE_LINE.mix(2.))
+        //             }
+        //             OrderType::StopLoss(_, _) => match order.order_type.clone() {
+        //                 OrderType::StopLoss(direction, _) => match direction {
+        //                     OrderDirection::Up => {
+        //                         TriangleMarker::new((date, order.target_price), -6, &RED_LINE)
+        //                     }
+        //                     _ => TriangleMarker::new((date, order.target_price), 6, &RED_LINE),
+        //                 },
+        //                 _ => TriangleMarker::new((date, order.target_price), 6, &RED_LINE),
+        //             },
+        //         }
+        //     }))
+        //     .unwrap();
+
+        // chart
+        //     .draw_series(trades_out.iter().enumerate().map(|(i, trade_out)| {
+        //         let candle_index = data
+        //             .iter()
+        //             .position(|x| uuid::generate_ts_id(x.date) == trade_out.id)
+        //             .unwrap();
+        //         let candle = data.get(candle_index).unwrap();
+        //         let date = fom_dbtime(&trade_out.date_out);
+        //         let price = trade_out.price_out;
+        //         //let date = candle.date();
+
+        //         match trade_out.trade_type.is_exit() {
+        //             true => match trade_out.trade_type.is_long() {
+        //                 true => TriangleMarker::new((date, price), -6, &RED_LINE2.mix(8.)),
+        //                 false => TriangleMarker::new((date, price), 6, &RED_LINE2.mix(8.)),
+        //             },
+        //             false => todo!(),
+        //         }
+        //     }))
+        //     .unwrap();
+
+        // chart
+        //     .draw_series(PointSeries::of_element(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .filter(|(i, candle)| {
+        //                 let index = uuid::generate_ts_id(candle.date());
+        //                 prices_in_indexes.contains(&index)
+        //             })
+        //             .map(|(i, candle)| {
+        //                 let date = candle.date();
+        //                 let index = uuid::generate_ts_id(candle.date());
+        //                 let trade_in_index =
+        //                     prices_in_indexes.iter().position(|&x| x == index).unwrap();
+        //                 let trade_in = trades_in.get(trade_in_index).unwrap();
+        //                 (date, trade_in.price_in)
+        //             }),
+        //         5,
+        //         ShapeStyle::from(&BLUE_LINE3),
+        //         &|coord, size: i32, style| {
+        //             let (date, price) = coord;
+        //             let index = uuid::generate_ts_id(date);
+        //             let trade_in_index =
+        //                 prices_in_indexes.iter().position(|&x| x == index).unwrap();
+
+        //             let trade_in = trades_in.get(trade_in_index).unwrap();
+
+        //             let leches = match trade_in.trade_type.is_entry() {
+        //                 true => match trade_in.trade_type.is_long() {
+        //                     true => TriangleMarker::new((0, 0), 6, &BLUE_LINE.mix(8.)),
+        //                     false => TriangleMarker::new((0, 0), -6, &BLUE_LINE.mix(8.)),
+        //                 },
+        //                 false => todo!(),
+        //             };
+        //             EmptyElement::at(coord) + leches
+        //             // + Text::new(
+        //             //     format!(
+        //             //         "{:?} / {:?} / {:?}",
+        //             //         round(trade_in.price_in, 4),
+        //             //         round(trade_in.ask, 4),
+        //             //         round(trade_in.spread, 4),
+        //             //     ),
+        //             //     (0, 20),
+        //             //     ("sans-serif", 12),
+        //             // )
+        //             //}
+        //             // _ => {
+        //             //     EmptyElement::at(coord)
+        //             //         + Circle::new(
+        //             //             (0, 0),
+        //             //             4,
+        //             //             ShapeStyle::from(&BLUE_LINE.mix(1.)).filled(),
+        //             //         )
+        //             //         + Text::new(format!(""), (0, 20), ("sans-serif", 0))
+        //             // }
+        //             //};
+        //             //element
+        //         },
+        //     ))
+        //     .unwrap();
 
         //BOLLINGER BANDS
 

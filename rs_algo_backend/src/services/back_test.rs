@@ -7,6 +7,7 @@ use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::models::order::Order;
+use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
@@ -69,7 +70,7 @@ pub async fn find_instruments(
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "development" => doc! {"market": &market, "symbol": "AUDCAD"},
+        "developmenti" => doc! {"market": &market, "symbol": "AUDCAD"},
         _ => doc! { "market": &market},
     };
 
@@ -278,14 +279,14 @@ pub async fn find_strategies_result_instruments(
     Ok(HttpResponse::Ok().json(backtest_instruments))
 }
 
-pub async fn find_spreads(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
+pub async fn find_prices(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    log::info!("[BACK TEST SPREADS] Request for at {:?}", Local::now());
+    log::info!("[BACK TEST PRICING] Request for at {:?}", Local::now());
 
-    let spreads: Vec<BackTestSpread> = db::back_test::find_spreads(&state).await.unwrap();
+    let prices: Vec<Pricing> = db::back_test::find_prices(&state).await.unwrap();
 
-    Ok(HttpResponse::Ok().json(spreads))
+    Ok(HttpResponse::Ok().json(prices))
 }
 
 pub async fn chart(

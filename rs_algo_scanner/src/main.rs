@@ -74,14 +74,14 @@ async fn main() -> Result<()> {
         .parse::<bool>()
         .unwrap();
 
-    if env == "development" {
-        symbols = vec![Symbol {
-            symbol: "EURUSD".to_owned(),
-            category: "".to_owned(),
-            description: "".to_owned(),
-            currency: "".to_owned(),
-        }]
-    };
+    // if env == "development" {
+    //     symbols = vec![Symbol {
+    //         symbol: "EURUSD".to_owned(),
+    //         category: "".to_owned(),
+    //         description: "".to_owned(),
+    //         currency: "".to_owned(),
+    //     }]
+    // };
 
     let mut market: Market = Market::Stock;
     let mut sp500_symbols = vec![];

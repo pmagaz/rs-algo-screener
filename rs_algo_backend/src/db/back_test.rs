@@ -5,9 +5,8 @@ use crate::models::backtest_instrument::BackTestInstrumentResult;
 use crate::models::backtest_strategy::BackTestStrategyResult;
 
 use rs_algo_shared::helpers::comp::*;
-use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
-use rs_algo_shared::models::backtest_instrument::BackTestSpread;
+use rs_algo_shared::models::pricing::*;
 use rs_algo_shared::scanner::instrument::*;
 
 use actix_web::web;
@@ -269,33 +268,33 @@ pub async fn find_htf_backtest_instrument_by_symbol(
     Ok(instrument)
 }
 
-pub async fn find_spreads(state: &web::Data<AppState>) -> Result<Vec<BackTestSpread>, Error> {
-    let collection_name = &env::var("DB_SPREADS_COLLECTION").unwrap();
-    let collection = get_collection::<BackTestSpread>(&state.db_mem, collection_name).await;
+pub async fn find_prices(state: &web::Data<AppState>) -> Result<Vec<Pricing>, Error> {
+    let collection_name = &env::var("DB_PRICING_COLLECTION").unwrap();
+    let collection = get_collection::<Pricing>(&state.db_mem, collection_name).await;
 
     let mut cursor = collection
         .find(doc! {}, FindOptions::builder().build())
         .await
         .unwrap();
 
-    let mut spreads: Vec<BackTestSpread> = vec![];
+    let mut prices: Vec<Pricing> = vec![];
     while let Some(result) = cursor.next().await {
         match result {
             Ok(spread) => {
-                spreads.push(spread);
+                prices.push(spread);
             }
             _ => {}
         }
     }
-    Ok(spreads)
+    Ok(prices)
 }
 
-pub async fn find_spread(
+pub async fn find_price(
     symbol: &str,
     state: &web::Data<AppState>,
-) -> Result<Option<BackTestSpread>, Error> {
-    let collection_name = &env::var("DB_SPREADS_COLLECTION").unwrap();
-    let collection = get_collection::<BackTestSpread>(&state.db_mem, collection_name).await;
+) -> Result<Option<Pricing>, Error> {
+    let collection_name = &env::var("DB_PRICING_COLLECTION").unwrap();
+    let collection = get_collection::<Pricing>(&state.db_mem, collection_name).await;
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())

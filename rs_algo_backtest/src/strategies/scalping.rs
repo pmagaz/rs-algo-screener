@@ -6,6 +6,7 @@ use rs_algo_shared::helpers::calc;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::order::{Order, OrderCondition, OrderDirection, OrderType};
+use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
@@ -60,11 +61,11 @@ impl<'a> Strategy for Scalping<'a> {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-        spread: f64,
+        pricing: &Pricing,
     ) -> Operation {
         let low_price = &instrument.data.get(index).unwrap().low();
         let close_price = &instrument.data.get(index).unwrap().close();
-
+        let spread = pricing.spread();
         // let first_anchor_htf = calc::get_upper_timeframe_data(
         //     index,
         //     instrument,
@@ -146,15 +147,12 @@ impl<'a> Strategy for Scalping<'a> {
             .max_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
             .map(|x| x.close())
             .unwrap()
-            + calc::to_pips(&pips_margin);
+            + calc::to_pips(&pips_margin, pricing);
 
         let buy_price = trigger_price + spread;
 
-        let risk = buy_price - close_price - calc::to_pips(&pips_margin);
-        let target_price = buy_price + calc::to_pips(&self.profit_target);
-        if index < 250 {
-            //log::info!("11111111 {} {}", index, entry_condition);
-        }
+        let risk = buy_price - close_price - calc::to_pips(&pips_margin, pricing);
+        let target_price = buy_price + calc::to_pips(&self.profit_target, pricing);
         match entry_condition {
             true => Operation::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, *close_price, trigger_price),
@@ -171,7 +169,7 @@ impl<'a> Strategy for Scalping<'a> {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-        spread: f64,
+        pricing: &Pricing,
     ) -> Operation {
         Operation::None
     }
@@ -181,10 +179,10 @@ impl<'a> Strategy for Scalping<'a> {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-        spread: f64,
+        pricing: &Pricing,
     ) -> Operation {
         let close_price = &instrument.data.get(index).unwrap().close();
-
+        let spread = pricing.spread();
         // let first_anchor_htf = calc::get_upper_timeframe_data(
         //     index,
         //     instrument,
@@ -266,18 +264,18 @@ impl<'a> Strategy for Scalping<'a> {
             .min_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
             .map(|x| x.close())
             .unwrap()
-            - calc::to_pips(&pips_margin);
+            - calc::to_pips(&pips_margin, pricing);
 
         let buy_price = trigger_price - spread;
 
-        let risk = buy_price + close_price + calc::to_pips(&pips_margin);
+        let risk = buy_price + close_price + calc::to_pips(&pips_margin, pricing);
 
         let target_price = match self.strategy_type().is_long_only() {
             true => buy_price + risk * self.risk_reward_ratio,
             false => buy_price - risk * self.risk_reward_ratio,
         };
 
-        let target_price = buy_price - calc::to_pips(&self.profit_target);
+        let target_price = buy_price - calc::to_pips(&self.profit_target, pricing);
         if index < 250 {
             //log::info!("22222222 {} {}", index, entry_condition);
         }
@@ -297,7 +295,7 @@ impl<'a> Strategy for Scalping<'a> {
         index: usize,
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
-        spread: f64,
+        pricing: &Pricing,
     ) -> Operation {
         Operation::None
     }
