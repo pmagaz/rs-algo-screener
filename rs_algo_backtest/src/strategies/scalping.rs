@@ -9,7 +9,7 @@ use rs_algo_shared::models::order::{Order, OrderCondition, OrderDirection, Order
 use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
-use rs_algo_shared::models::trade::{Operation, TradeIn, TradeOut};
+use rs_algo_shared::models::trade::{Position, TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
 #[derive(Clone)]
@@ -62,32 +62,11 @@ impl<'a> Strategy for Scalping<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
-    ) -> Operation {
+    ) -> Position {
         let low_price = &instrument.data.get(index).unwrap().low();
         let close_price = &instrument.data.get(index).unwrap().close();
         let spread = pricing.spread();
-        // let first_anchor_htf = calc::get_upper_timeframe_data(
-        //     index,
-        //     instrument,
-        //     upper_tf_instrument,
-        //     |(idx, prev_idx, upper_inst)| {
-        //         let htf_ema_8 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
-        //         let prev_htf_ema_8 = upper_inst
-        //             .indicators
-        //             .ema_a
-        //             .get_data_a()
-        //             .get(prev_idx)
-        //             .unwrap();
-        //         let htf_ema_21 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
-        //         let prev_htf_ema_21 = upper_inst
-        //             .indicators
-        //             .ema_c
-        //             .get_data_a()
-        //             .get(prev_idx)
-        //             .unwrap();
-        //         htf_ema_8 > htf_ema_21 && prev_htf_ema_8 <= prev_htf_ema_21
-        //     },
-        // );
+
         let anchor_htf = calc::get_upper_timeframe_data(
             index,
             instrument,
@@ -150,17 +129,16 @@ impl<'a> Strategy for Scalping<'a> {
             + calc::to_pips(&pips_margin, pricing);
 
         let buy_price = trigger_price + spread;
-
         let risk = buy_price - close_price - calc::to_pips(&pips_margin, pricing);
         let target_price = buy_price + calc::to_pips(&self.profit_target, pricing);
         match entry_condition {
-            true => Operation::Order(vec![
+            true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, *close_price, trigger_price),
                 OrderType::SellOrderLong(OrderDirection::Up, *close_price, target_price),
                 OrderType::StopLoss(OrderDirection::Down, StopLossType::Pips(stop_loss_pips)),
             ]),
 
-            false => Operation::None,
+            false => Position::None,
         }
     }
 
@@ -170,8 +148,8 @@ impl<'a> Strategy for Scalping<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
-    ) -> Operation {
-        Operation::None
+    ) -> Position {
+        Position::None
     }
 
     fn entry_short(
@@ -180,31 +158,9 @@ impl<'a> Strategy for Scalping<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
-    ) -> Operation {
+    ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
         let spread = pricing.spread();
-        // let first_anchor_htf = calc::get_upper_timeframe_data(
-        //     index,
-        //     instrument,
-        //     upper_tf_instrument,
-        //     |(idx, prev_idx, upper_inst)| {
-        //         let htf_ema_8 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
-        //         let prev_htf_ema_8 = upper_inst
-        //             .indicators
-        //             .ema_a
-        //             .get_data_a()
-        //             .get(prev_idx)
-        //             .unwrap();
-        //         let htf_ema_21 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
-        //         let prev_htf_ema_21 = upper_inst
-        //             .indicators
-        //             .ema_c
-        //             .get_data_a()
-        //             .get(prev_idx)
-        //             .unwrap();
-        //         htf_ema_8 > htf_ema_21 && prev_htf_ema_8 <= prev_htf_ema_21
-        //     },
-        // );
         let anchor_htf = calc::get_upper_timeframe_data(
             index,
             instrument,
@@ -266,27 +222,22 @@ impl<'a> Strategy for Scalping<'a> {
             .unwrap()
             - calc::to_pips(&pips_margin, pricing);
 
-        let buy_price = trigger_price - spread;
+        // let buy_price = trigger_price + spread;
+        // let risk = buy_price - close_price - calc::to_pips(&pips_margin, pricing);
+        // let target_price = buy_price + calc::to_pips(&self.profit_target, pricing);
 
-        let risk = buy_price + close_price + calc::to_pips(&pips_margin, pricing);
+        let buy_price = trigger_price;
+        //let risk = buy_price + close_price + calc::to_pips(&pips_margin, pricing);
+        let target_price = buy_price + spread - calc::to_pips(&self.profit_target, pricing);
 
-        let target_price = match self.strategy_type().is_long_only() {
-            true => buy_price + risk * self.risk_reward_ratio,
-            false => buy_price - risk * self.risk_reward_ratio,
-        };
-
-        let target_price = buy_price - calc::to_pips(&self.profit_target, pricing);
-        if index < 250 {
-            //log::info!("22222222 {} {}", index, entry_condition);
-        }
         match entry_condition {
-            true => Operation::Order(vec![
+            true => Position::Order(vec![
                 OrderType::BuyOrderShort(OrderDirection::Down, *close_price, trigger_price),
                 OrderType::SellOrderShort(OrderDirection::Down, *close_price, target_price),
                 OrderType::StopLoss(OrderDirection::Up, StopLossType::Pips(stop_loss_pips)),
             ]),
 
-            false => Operation::None,
+            false => Position::None,
         }
     }
 
@@ -296,8 +247,8 @@ impl<'a> Strategy for Scalping<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
-    ) -> Operation {
-        Operation::None
+    ) -> Position {
+        Position::None
     }
 
     fn backtest_result(

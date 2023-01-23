@@ -70,7 +70,7 @@ pub async fn find_instruments(
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "developmenti" => doc! {"market": &market, "symbol": "AUDCAD"},
+        "development" => doc! {"market": &market, "symbol": "USDCHF"},
         _ => doc! { "market": &market},
     };
 
