@@ -57,7 +57,7 @@ impl<'a> Strategy for MacdWeekly<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
-        let first_weekly_entry = get_upper_timeframe_data(
+        let first_weekly_entry = get_htf_data(
             index,
             instrument,
             upper_tf_instrument,
@@ -91,7 +91,7 @@ impl<'a> Strategy for MacdWeekly<'a> {
         instrument: &Instrument,
         upper_tf_instrument: &HigherTMInstrument,
     ) -> bool {
-        let first_weekly_exit = get_upper_timeframe_data(
+        let first_weekly_exit = get_htf_data(
             index,
             instrument,
             upper_tf_instrument,

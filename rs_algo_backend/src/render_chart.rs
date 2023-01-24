@@ -106,26 +106,26 @@ impl Backend {
         let top_points_set: Vec<(usize, f64)>;
         let low_points_set: Vec<(usize, f64)>;
 
-        let mut prices_in_indexes: Vec<usize> = vec![];
-        let mut prices_out_indexes: Vec<usize> = vec![];
-        let mut orders_indexes: Vec<usize> = vec![];
-        let mut stop_loss_indexes: Vec<usize> = vec![];
-        let mut top_peaks_indexes: Vec<usize> = vec![];
-        let mut low_peaks_indexes: Vec<usize> = vec![];
+        let mut prices_in_ids: Vec<usize> = vec![];
+        let mut prices_out_ids: Vec<usize> = vec![];
+        let mut orders_ids: Vec<usize> = vec![];
+        let mut stop_loss_ids: Vec<usize> = vec![];
+        let mut top_peaks_ids: Vec<usize> = vec![];
+        let mut low_peaks_ids: Vec<usize> = vec![];
 
         last_trade_in = trades_in.last();
         last_trade_out = trades_out.last();
         if mode == BackendMode::BackTest || mode == BackendMode::Bot {
             //if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
-            prices_in_indexes = trades_in.iter().map(|x| x.id).collect();
-            prices_out_indexes = trades_out.iter().map(|x| x.id).collect();
-            orders_indexes = orders.iter().map(|x| x.id).collect();
-            //top_peaks_indexes = peaks.local_maxima().iter().map(|x| x.).collect();
-            stop_loss_indexes = trades_out
+            prices_in_ids = trades_in.iter().map(|x| x.id).collect();
+            prices_out_ids = trades_out.iter().map(|x| x.id).collect();
+            orders_ids = orders.iter().map(|x| x.id).collect();
+            //top_peaks_ids = peaks.local_maxima().iter().map(|x| x.).collect();
+            stop_loss_ids = trades_out
                 .iter()
                 .filter(|x| x.trade_type == TradeType::StopLoss)
-                .map(|x| x.index_out)
+                .map(|x| x.id)
                 .collect();
 
             top_points_set = trades_out
@@ -136,7 +136,7 @@ impl Backend {
             stop_loss = trades_out
                 .iter()
                 .filter(|x| x.trade_type == TradeType::StopLoss)
-                .map(|x| (x.index_out, x.price_out))
+                .map(|x| (x.id, x.price_out))
                 .collect();
 
             // stop_loss_types = trades_in
@@ -466,9 +466,9 @@ impl Backend {
                     //             _ => uuid::generate_ts_id(candle.date()),
                     //         };
 
-                    //         if prices_in_indexes.contains(&index) {
+                    //         if prices_in_ids.contains(&index) {
                     //             let trade_in_index =
-                    //                 prices_in_indexes.iter().position(|&x| x == index).unwrap();
+                    //                 prices_in_ids.iter().position(|&x| x == index).unwrap();
                     //             let trade_in = trades_in.get(trade_in_index).unwrap();
                     //             let price = trade_in.price_in;
                     //             match mode {
@@ -507,7 +507,7 @@ impl Backend {
                     //                 .zip(data.iter())
                     //                 .filter(|(i, candle)| {
                     //                     let index = uuid::generate_ts_id(candle.date());
-                    //                     prices_out_indexes.contains(&index)
+                    //                     prices_out_ids.contains(&index)
                     //                 })
                     //                 .map(|(i, candl e)| {
                     //                     let date = candle.date();
@@ -519,7 +519,7 @@ impl Backend {
                     //             &|coord, size: i32, style| {
                     //                 let (date, price) = coord;
                     //                 let index = uuid::generate_ts_id(date);
-                    //                 let trade_out_index = prices_out_indexes
+                    //                 let trade_out_index = prices_out_ids
                     //                     .iter()
                     //                     .position(|&x| x == index)
                     //                     .unwrap();
@@ -560,8 +560,8 @@ impl Backend {
                     //     let index = i;
                     //     let price = candle.open();
 
-                    //     if prices_out_indexes.contains(&index) {
-                    //         let trade_out_index = prices_out_indexes
+                    //     if prices_out_ids.contains(&index) {
+                    //         let trade_out_index = prices_out_ids
                     //             .iter()
                     //             .position(|&x| x == index)
                     //             .unwrap();
@@ -670,7 +670,7 @@ impl Backend {
                     //             .zip(data.iter())
                     //             .filter(|(i, candle)| {
                     //                 let index = uuid::generate_ts_id(candle.date());
-                    //                 orders_indexes.contains(&index)
+                    //                 orders_ids.contains(&index)
                     //             })
                     //             .map(|(i, candle)| {
                     //                 let date = candle.date();
@@ -684,7 +684,7 @@ impl Backend {
                     //             let (date, price) = coord;
                     //             let index = uuid::generate_ts_id(date);
                     //             let order_index =
-                    //                 orders_indexes.iter().position(|&x| x == index).unwrap();
+                    //                 orders_ids.iter().position(|&x| x == index).unwrap();
                     //             let order = orders.get(order_index).unwrap();
 
                     //             let style = match order.order_type {
@@ -720,8 +720,8 @@ impl Backend {
                     //         let price = candle.close;
                     //         let coord: (DateTime<chrono::Local>, f64) = (candle.date(), price);
 
-                    //         if prices_out_indexes.contains(&index) {
-                    //             let trade_out_index = prices_out_indexes
+                    //         if prices_out_ids.contains(&index) {
+                    //             let trade_out_index = prices_out_ids
                     //                 .iter()
                     //                 .position(|&x| x == index)
                     //                 .unwrap();
@@ -823,43 +823,43 @@ impl Backend {
 
         //ORDERS
 
-        chart
-            .draw_series(orders.iter().enumerate().map(|(i, order)| {
-                let candle_index = data
-                    .iter()
-                    .position(|x| uuid::generate_ts_id(x.date) == order.id)
-                    .unwrap();
-                let candle = data.get(candle_index).unwrap();
-                let date = candle.date();
+        // chart
+        //     .draw_series(orders.iter().enumerate().map(|(i, order)| {
+        //         let candle_index = data
+        //             .iter()
+        //             .position(|x| uuid::generate_ts_id(x.date) == order.id)
+        //             .unwrap();
+        //         let candle = data.get(candle_index).unwrap();
+        //         let date = candle.date();
 
-                match order.order_type {
-                    OrderType::BuyOrderLong(_, _, _) => {
-                        TriangleMarker::new((date, order.target_price), 6, &ORANGE_LINE.mix(2.))
-                    }
-                    OrderType::BuyOrderShort(_, _, _) => {
-                        TriangleMarker::new((date, order.target_price), -6, &ORANGE_LINE.mix(2.))
-                    }
-                    OrderType::SellOrderLong(_, _, _) => {
-                        TriangleMarker::new((date, order.target_price), -6, &ORANGE_LINE.mix(2.))
-                    }
-                    OrderType::SellOrderShort(_, _, _) => {
-                        TriangleMarker::new((date, order.target_price), 6, &ORANGE_LINE.mix(2.))
-                    }
-                    OrderType::TakeProfitLong(_, _, _) | OrderType::TakeProfitShort(_, _, _) => {
-                        TriangleMarker::new((date, order.target_price), -6, &ORANGE_LINE.mix(2.))
-                    }
-                    OrderType::StopLoss(_, _) => match order.order_type.clone() {
-                        OrderType::StopLoss(direction, _) => match direction {
-                            OrderDirection::Up => {
-                                TriangleMarker::new((date, order.target_price), -6, &RED_LINE)
-                            }
-                            _ => TriangleMarker::new((date, order.target_price), 6, &RED_LINE),
-                        },
-                        _ => TriangleMarker::new((date, order.target_price), 6, &RED_LINE),
-                    },
-                }
-            }))
-            .unwrap();
+        //         match order.order_type {
+        //             OrderType::BuyOrderLong(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), 6, &ORANGE_LINE.mix(2.))
+        //             }
+        //             OrderType::BuyOrderShort(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), -6, &ORANGE_LINE.mix(2.))
+        //             }
+        //             OrderType::SellOrderLong(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), -6, &ORANGE_LINE.mix(2.))
+        //             }
+        //             OrderType::SellOrderShort(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), 6, &ORANGE_LINE.mix(2.))
+        //             }
+        //             OrderType::TakeProfitLong(_, _, _) | OrderType::TakeProfitShort(_, _, _) => {
+        //                 TriangleMarker::new((date, order.target_price), -6, &ORANGE_LINE.mix(2.))
+        //             }
+        //             OrderType::StopLoss(_, _) => match order.order_type.clone() {
+        //                 OrderType::StopLoss(direction, _) => match direction {
+        //                     OrderDirection::Up => {
+        //                         TriangleMarker::new((date, order.target_price), -6, &RED_LINE)
+        //                     }
+        //                     _ => TriangleMarker::new((date, order.target_price), 6, &RED_LINE),
+        //                 },
+        //                 _ => TriangleMarker::new((date, order.target_price), 6, &RED_LINE),
+        //             },
+        //         }
+        //     }))
+        //     .unwrap();
 
         // chart
         //     .draw_series(trades_out.iter().enumerate().map(|(i, trade_out)| {
@@ -888,13 +888,13 @@ impl Backend {
         //             .zip(data.iter())
         //             .filter(|(i, candle)| {
         //                 let index = uuid::generate_ts_id(candle.date());
-        //                 prices_in_indexes.contains(&index)
+        //                 prices_in_ids.contains(&index)
         //             })
         //             .map(|(i, candle)| {
         //                 let date = candle.date();
         //                 let index = uuid::generate_ts_id(candle.date());
         //                 let trade_in_index =
-        //                     prices_in_indexes.iter().position(|&x| x == index).unwrap();
+        //                     prices_in_ids.iter().position(|&x| x == index).unwrap();
         //                 let trade_in = trades_in.get(trade_in_index).unwrap();
         //                 (date, trade_in.price_in)
         //             }),
@@ -904,7 +904,7 @@ impl Backend {
         //             let (date, price) = coord;
         //             let index = uuid::generate_ts_id(date);
         //             let trade_in_index =
-        //                 prices_in_indexes.iter().position(|&x| x == index).unwrap();
+        //                 prices_in_ids.iter().position(|&x| x == index).unwrap();
 
         //             let trade_in = trades_in.get(trade_in_index).unwrap();
 
@@ -1023,27 +1023,27 @@ impl Backend {
         //     ))
         //     .unwrap();
 
-        if ema_a.len() > 0 {
-            chart
-                .draw_series(LineSeries::new(
-                    data.iter()
-                        .enumerate()
-                        .map(|(id, candle)| (candle.date, ema_a[id])),
-                    ORANGE_LINE.mix(4.),
-                ))
-                .unwrap();
-        }
+        // if ema_a.len() > 0 {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             data.iter()
+        //                 .enumerate()
+        //                 .map(|(id, candle)| (candle.date, ema_a[id])),
+        //             ORANGE_LINE.mix(4.),
+        //         ))
+        //         .unwrap();
+        // }
 
-        if ema_c.len() > 0 {
-            chart
-                .draw_series(LineSeries::new(
-                    data.iter()
-                        .enumerate()
-                        .map(|(id, candle)| (candle.date, ema_c[id])),
-                    RED_LINE2.mix(4.),
-                ))
-                .unwrap();
-        }
+        // if ema_c.len() > 0 {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             data.iter()
+        //                 .enumerate()
+        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
+        //             RED_LINE2.mix(4.),
+        //         ))
+        //         .unwrap();
+        // }
 
         // //HTF INDICATORS
         match htf_instrument {

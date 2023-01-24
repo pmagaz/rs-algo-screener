@@ -4,12 +4,12 @@ use crate::helpers::backtest::resolve_backtest;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::calc;
 use rs_algo_shared::indicators::Indicator;
-use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::order::{Order, OrderCondition, OrderDirection, OrderType};
 use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::trade::{Position, TradeIn, TradeOut};
+use rs_algo_shared::models::{backtest_instrument::*, time_frame};
 use rs_algo_shared::scanner::instrument::*;
 
 #[derive(Clone)]
@@ -42,7 +42,7 @@ impl<'a> Strategy for Scalping<'a> {
             //stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Scalping",
             strategy_type: StrategyType::OnlyLongMultiTF,
-            //strategy_type: StrategyType::OnlyShortMultiTF,
+            //strategy_type: StrategyType::LongShortMultiTF,
             risk_reward_ratio,
             profit_target,
         })
@@ -67,7 +67,7 @@ impl<'a> Strategy for Scalping<'a> {
         let close_price = &instrument.data.get(index).unwrap().close();
         let spread = pricing.spread();
 
-        let anchor_htf = calc::get_upper_timeframe_data(
+        let anchor_htf = time_frame::get_htf_data(
             index,
             instrument,
             upper_tf_instrument,
@@ -161,7 +161,7 @@ impl<'a> Strategy for Scalping<'a> {
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
         let spread = pricing.spread();
-        let anchor_htf = calc::get_upper_timeframe_data(
+        let anchor_htf = time_frame::get_htf_data(
             index,
             instrument,
             upper_tf_instrument,
