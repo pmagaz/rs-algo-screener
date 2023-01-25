@@ -131,11 +131,16 @@ impl<'a> Strategy for Scalping<'a> {
         let buy_price = trigger_price + spread;
         let risk = buy_price - close_price - calc::to_pips(&pips_margin, pricing);
         let target_price = buy_price + calc::to_pips(&self.profit_target, pricing);
+
+        // let stop_loss_price = low_price - calc::to_pips(&3., pricing);
+        // let target_price = trigger_price + (trigger_price - low_price + spread);
+
         match entry_condition {
             true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, *close_price, trigger_price),
                 OrderType::SellOrderLong(OrderDirection::Up, *close_price, target_price),
                 OrderType::StopLoss(OrderDirection::Down, StopLossType::Pips(stop_loss_pips)),
+                //OrderType::StopLoss(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
             ]),
 
             false => Position::None,
