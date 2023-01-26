@@ -37,11 +37,7 @@ pub fn strategy_list(props: &Props) -> Html {
             let profitable_trades_status = get_profitable_trades_status(strategy.avg_profitable_trades);
             let profit_status = get_profit_status(strategy.avg_net_profit_per, strategy.avg_buy_hold);
             let max_drawdown_status = get_max_drawdown_status(strategy.avg_max_drawdown);
-            let avg_won_lost_status = match strategy.avg_won_per_trade {
-                _ if strategy.avg_won_per_trade > (strategy.avg_lost_per_trade * -1.) => Status::Bullish,
-                _ if strategy.avg_won_per_trade < (strategy.avg_lost_per_trade * -1.) => Status::Bearish,
-                _  => Status::Neutral
-            };
+            let avg_won_lost_status = get_avg_won_lost_status(strategy.avg_won_per_trade ,strategy.avg_lost_per_trade);
 
             html! {
                 <tr>
@@ -53,9 +49,9 @@ pub fn strategy_list(props: &Props) -> Html {
                     <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
                     <td class={get_status_class(&max_drawdown_status)}> { format!("{}%", round(strategy.avg_max_drawdown,2))}</td>
-                    <td>{ strategy.avg_trades}</td>
                     <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(strategy.avg_won_per_trade,2))}</td>
                     <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(strategy.avg_lost_per_trade,2))}</td>
+                    <td>{ strategy.avg_trades}</td>
                     <td>{ format!("{} / {}", strategy.avg_wining_trades, strategy.avg_losing_trades)} </td>
                     <td>{ strategy.avg_stop_losses}</td>
                     <td>{ format!("{}%", round(strategy.avg_buy_hold,2))}</td>
@@ -75,10 +71,10 @@ pub fn strategy_list(props: &Props) -> Html {
                 <th><abbr>{ "Profit F." }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>
-                <th><abbr>{ "Trades" }</abbr></th>
                 <th><abbr>{ "Avg Won" }</abbr></th>
                 <th><abbr>{ "Avg Lost" }</abbr></th>
                 <th><abbr>{ "Won / Lost" }</abbr></th>
+                <th><abbr>{ "Trades" }</abbr></th>
                 <th><abbr>{ "Stops " }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
                 <th><abbr>{ "Updated" }</abbr></th>

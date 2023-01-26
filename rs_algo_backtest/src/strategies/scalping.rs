@@ -23,11 +23,6 @@ pub struct Scalping<'a> {
 
 impl<'a> Strategy for Scalping<'a> {
     fn new() -> Result<Self> {
-        let stop_loss = std::env::var("ATR_STOP_LOSS")
-            .unwrap()
-            .parse::<f64>()
-            .unwrap();
-
         let risk_reward_ratio = std::env::var("RISK_REWARD_RATIO")
             .unwrap()
             .parse::<f64>()
@@ -39,7 +34,6 @@ impl<'a> Strategy for Scalping<'a> {
             .unwrap();
 
         Ok(Self {
-            //stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "Scalping",
             strategy_type: StrategyType::OnlyLongMultiTF,
             //strategy_type: StrategyType::LongShortMultiTF,
@@ -63,7 +57,6 @@ impl<'a> Strategy for Scalping<'a> {
         upper_tf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let low_price = &instrument.data.get(index).unwrap().low();
         let close_price = &instrument.data.get(index).unwrap().close();
         let spread = pricing.spread();
 
@@ -71,32 +64,17 @@ impl<'a> Strategy for Scalping<'a> {
             index,
             instrument,
             upper_tf_instrument,
-            |(idx, prev_idx, upper_inst)| {
+            |(idx, _prev_idx, upper_inst)| {
                 let htf_ema_8 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
-                let prev_htf_ema_8 = upper_inst
-                    .indicators
-                    .ema_a
-                    .get_data_a()
-                    .get(prev_idx)
-                    .unwrap();
                 let htf_ema_21 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
-                let prev_htf_ema_21 = upper_inst
-                    .indicators
-                    .ema_c
-                    .get_data_a()
-                    .get(prev_idx)
-                    .unwrap();
                 htf_ema_8 > htf_ema_21 && close_price > htf_ema_21
             },
         );
 
         let prev_index = calc::get_prev_index(index);
-        let next_index = index + 1;
         let data = &instrument.data();
-        let low_price = &data.get(index).unwrap().low();
-        let close_price = &data.get(index).unwrap().close();
+        let trigger_price = &data.get(index).unwrap().low();
         let prev_close_price = &data.get(prev_index).unwrap().close();
-        let open_price = data.get(next_index).unwrap().close();
         let ema_8 = instrument.indicators.ema_a.get_data_a().get(index).unwrap();
         let prev_ema_8 = instrument
             .indicators
@@ -108,39 +86,33 @@ impl<'a> Strategy for Scalping<'a> {
         let ema_21 = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
         let entry_condition = anchor_htf
-            && (low_price < ema_8
+            && (trigger_price < ema_8
                 && prev_close_price >= prev_ema_8
                 && close_price > ema_21
                 && ema_8 > ema_13
                 && ema_13 > ema_21);
 
-        let pips_margin = 1.;
+        let pips_margin = 5.;
+        let previous_bars = 5;
 
-        let stop_loss_pips = std::env::var("PIPS_STOP_LOSS")
-            .unwrap()
-            .parse::<f64>()
-            .unwrap();
-
-        let trigger_price = data[index - 5..index]
+        let target_price = data[prev_index - previous_bars..prev_index]
             .iter()
             .max_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
-            .map(|x| x.close())
-            .unwrap()
-            + calc::to_pips(&pips_margin, pricing);
+            .map(|x| x.high())
+            .unwrap();
 
-        let buy_price = trigger_price + spread;
-        let risk = buy_price - close_price - calc::to_pips(&pips_margin, pricing);
-        let target_price = buy_price + calc::to_pips(&self.profit_target, pricing);
+        let buy_price = target_price + calc::to_pips(pips_margin, pricing);
+        let stop_loss_price = trigger_price - calc::to_pips(pips_margin, pricing);
+        let risk = buy_price + spread - stop_loss_price;
+        let sell_price = buy_price + (risk * self.risk_reward_ratio);
+        let price_condition = stop_loss_price < buy_price && buy_price < sell_price;
 
-        // let stop_loss_price = low_price - calc::to_pips(&3., pricing);
-        // let target_price = trigger_price + (trigger_price - low_price + spread);
-
-        match entry_condition {
+        match entry_condition && price_condition {
             true => Position::Order(vec![
-                OrderType::BuyOrderLong(OrderDirection::Up, *close_price, trigger_price),
-                OrderType::SellOrderLong(OrderDirection::Up, *close_price, target_price),
-                OrderType::StopLoss(OrderDirection::Down, StopLossType::Pips(stop_loss_pips)),
-                //OrderType::StopLoss(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
+                OrderType::BuyOrderLong(OrderDirection::Up, *close_price, buy_price),
+                OrderType::SellOrderLong(OrderDirection::Up, *close_price, sell_price),
+                //OrderType::StopLoss(OrderDirection::Down, StopLossType::Atr(atr_value)),
+                OrderType::StopLoss(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
             ]),
 
             false => Position::None,
@@ -149,10 +121,10 @@ impl<'a> Strategy for Scalping<'a> {
 
     fn exit_long(
         &mut self,
-        index: usize,
-        instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
-        pricing: &Pricing,
+        _index: usize,
+        _instrument: &Instrument,
+        _upper_tf_instrument: &HigherTMInstrument,
+        _pricing: &Pricing,
     ) -> Position {
         Position::None
     }
@@ -170,32 +142,18 @@ impl<'a> Strategy for Scalping<'a> {
             index,
             instrument,
             upper_tf_instrument,
-            |(idx, prev_idx, upper_inst)| {
+            |(idx, _prev_idx, upper_inst)| {
                 let htf_ema_8 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
-                let prev_htf_ema_8 = upper_inst
-                    .indicators
-                    .ema_a
-                    .get_data_a()
-                    .get(prev_idx)
-                    .unwrap();
                 let htf_ema_21 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
-                let prev_htf_ema_21 = upper_inst
-                    .indicators
-                    .ema_c
-                    .get_data_a()
-                    .get(prev_idx)
-                    .unwrap();
                 htf_ema_8 < htf_ema_21 && close_price < htf_ema_21
             },
         );
 
         let prev_index = calc::get_prev_index(index);
-        let next_index = index + 1;
         let data = &instrument.data();
-        let high_price = &data.get(index).unwrap().high();
+        let trigger_price = &data.get(index).unwrap().high();
         let close_price = &data.get(index).unwrap().close();
         let prev_close_price = &data.get(prev_index).unwrap().close();
-        let open_price = data.get(next_index).unwrap().close();
         let ema_8 = instrument.indicators.ema_a.get_data_a().get(index).unwrap();
         let prev_ema_8 = instrument
             .indicators
@@ -207,39 +165,32 @@ impl<'a> Strategy for Scalping<'a> {
         let ema_21 = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
         let entry_condition = anchor_htf
-            && (high_price > ema_8
+            && (trigger_price > ema_8
                 && prev_close_price <= prev_ema_8
                 && close_price < ema_21
                 && ema_8 < ema_13
                 && ema_13 < ema_21);
 
-        let pips_margin = 1.;
+        let pips_margin = 5.;
+        let previous_bars = 5;
 
-        let stop_loss_pips = std::env::var("PIPS_STOP_LOSS")
-            .unwrap()
-            .parse::<f64>()
+        let target_price = data[prev_index - previous_bars..prev_index]
+            .iter()
+            .min_by(|x, y| x.low().partial_cmp(&y.low()).unwrap())
+            .map(|x| x.low())
             .unwrap();
 
-        let trigger_price = data[index - 5..index]
-            .iter()
-            .min_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
-            .map(|x| x.close())
-            .unwrap()
-            - calc::to_pips(&pips_margin, pricing);
+        let buy_price = target_price - calc::to_pips(pips_margin, pricing);
+        let stop_loss_price = trigger_price + calc::to_pips(pips_margin, pricing);
+        let risk = stop_loss_price + spread - buy_price;
+        let sell_price = buy_price - (risk * self.risk_reward_ratio);
+        let price_condition = stop_loss_price > buy_price && buy_price > sell_price;
 
-        // let buy_price = trigger_price + spread;
-        // let risk = buy_price - close_price - calc::to_pips(&pips_margin, pricing);
-        // let target_price = buy_price + calc::to_pips(&self.profit_target, pricing);
-
-        let buy_price = trigger_price;
-        //let risk = buy_price + close_price + calc::to_pips(&pips_margin, pricing);
-        let target_price = buy_price + spread - calc::to_pips(&self.profit_target, pricing);
-
-        match entry_condition {
+        match entry_condition && price_condition {
             true => Position::Order(vec![
-                OrderType::BuyOrderShort(OrderDirection::Down, *close_price, trigger_price),
-                OrderType::SellOrderShort(OrderDirection::Down, *close_price, target_price),
-                OrderType::StopLoss(OrderDirection::Up, StopLossType::Pips(stop_loss_pips)),
+                OrderType::BuyOrderShort(OrderDirection::Down, *close_price, buy_price),
+                OrderType::SellOrderShort(OrderDirection::Down, *close_price, sell_price),
+                OrderType::StopLoss(OrderDirection::Up, StopLossType::Price(stop_loss_price)),
             ]),
 
             false => Position::None,
@@ -248,10 +199,10 @@ impl<'a> Strategy for Scalping<'a> {
 
     fn exit_short(
         &mut self,
-        index: usize,
-        instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
-        pricing: &Pricing,
+        _index: usize,
+        _instrument: &Instrument,
+        _upper_tf_instrument: &HigherTMInstrument,
+        _pricing: &Pricing,
     ) -> Position {
         Position::None
     }

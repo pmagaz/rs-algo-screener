@@ -126,7 +126,7 @@ pub trait Strategy: DynClone {
             .await;
 
         for (index, _candle) in data.iter().enumerate() {
-            if index < len - 1 && index >= 5 {
+            if index < len - 1 && index >= 10 {
                 let pending_orders = order::get_pending(&orders);
                 let active_orders_result = self.resolve_pending_orders(
                     index,
