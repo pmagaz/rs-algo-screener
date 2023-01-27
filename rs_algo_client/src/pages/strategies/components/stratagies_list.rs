@@ -73,8 +73,8 @@ pub fn strategy_list(props: &Props) -> Html {
                 <th><abbr>{ "Drawdown" }</abbr></th>
                 <th><abbr>{ "Avg Won" }</abbr></th>
                 <th><abbr>{ "Avg Lost" }</abbr></th>
-                <th><abbr>{ "Won / Lost" }</abbr></th>
                 <th><abbr>{ "Trades" }</abbr></th>
+                <th><abbr>{ "Won / Lost" }</abbr></th>
                 <th><abbr>{ "Stops " }</abbr></th>
                 <th><abbr>{ "Buy & Hold" }</abbr></th>
                 <th><abbr>{ "Updated" }</abbr></th>

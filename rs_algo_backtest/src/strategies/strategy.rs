@@ -451,7 +451,6 @@ pub trait Strategy: DynClone {
                 match self.exit_long(index, instrument, upper_tf_instrument, pricing) {
                     Position::MarketOut(_) => {
                         let trade_type = TradeType::MarketOutLong;
-                        log::info!("eeeeeeee 888888888");
                         long_exit = true;
                         short_exit = false;
                         let trade_out_result = resolve_trade_out(
@@ -469,7 +468,6 @@ pub trait Strategy: DynClone {
                         let trade_type = TradeType::OrderOutLong;
                         long_exit = true;
                         short_exit = false;
-                        log::info!("eeeeeeee 555555555 {:?}", order_types);
                         let orders =
                             prepare_orders(index, instrument, pricing, &trade_type, &order_types);
                         PositionResult::PendingOrder(orders)
@@ -505,7 +503,6 @@ pub trait Strategy: DynClone {
                         let trade_type = TradeType::OrderOutShort;
                         short_exit = true;
                         long_exit = false;
-                        log::info!("eeeeeeee 2222222 {:?}", order_types);
                         let orders =
                             prepare_orders(index, instrument, pricing, &trade_type, &order_types);
                         PositionResult::PendingOrder(orders)
