@@ -111,6 +111,11 @@ pub trait Strategy: DynClone {
             None => "".to_string(),
         };
 
+        let overwrite_orders = env::var("OVERWRITE_ORDERS")
+            .unwrap()
+            .parse::<bool>()
+            .unwrap();
+
         log::info!(
             "[BACKTEST] Starting {} backtest for {} from {} using {} spread",
             self.name(),
@@ -188,7 +193,7 @@ pub trait Strategy: DynClone {
                 }
 
                 if !open_positions && self.there_are_funds(&trades_out) {
-                    let entry_operation_result = self.resolve_entry_position(
+                    let entry_position_result = self.resolve_entry_position(
                         index,
                         instrument,
                         upper_tf_instrument,
@@ -197,7 +202,7 @@ pub trait Strategy: DynClone {
                         trade_size,
                     );
 
-                    match entry_operation_result {
+                    match entry_position_result {
                         PositionResult::MarketIn(TradeResult::TradeIn(trade_in), new_orders) => {
                             open_positions = true;
                             trades_in.push(trade_in);
@@ -208,6 +213,15 @@ pub trait Strategy: DynClone {
                             }
                         }
                         PositionResult::PendingOrder(new_orders) => {
+                            match overwrite_orders {
+                                true => {
+                                    log::warn!("OVERWRITING ORDERS {:?}", orders.len());
+                                    orders =
+                                        order::cancel_all_pending_orders(index, instrument, orders);
+                                }
+                                false => (),
+                            }
+
                             orders = order::add_pending(orders, new_orders);
                         }
                         _ => (),
@@ -220,6 +234,7 @@ pub trait Strategy: DynClone {
             instrument, trades_in, trades_out, orders, equity, commission,
         )
     }
+
     fn resolve_entry_position(
         &mut self,
         index: usize,
@@ -236,7 +251,7 @@ pub trait Strategy: DynClone {
             .unwrap()
             .parse::<bool>()
             .unwrap();
-        //IMPROVE
+
         let entry_long = match self.strategy_type() {
             StrategyType::OnlyLong
             | StrategyType::LongShort
@@ -254,42 +269,64 @@ pub trait Strategy: DynClone {
                             None,
                         );
 
-                        let new_orders = match order_types {
-                            Some(orders) => match pending_orders.len().cmp(&0) {
-                                std::cmp::Ordering::Equal => {
-                                    long_entry = true;
-                                    short_entry = false;
-                                    Some(prepare_orders(
-                                        index,
-                                        instrument,
-                                        pricing,
-                                        &trade_type,
-                                        &orders,
-                                    ))
-                                }
+                        let prepared_orders = match order_types {
+                            Some(orders) => {
+                                long_entry = true;
+                                short_entry = false;
+                                Some(prepare_orders(
+                                    index,
+                                    instrument,
+                                    pricing,
+                                    &trade_type,
+                                    &orders,
+                                ))
+                            }
+                            None => None,
+                        };
+
+                        let new_orders = match overwrite_orders {
+                            true => prepared_orders,
+                            false => match pending_orders.len().cmp(&0) {
+                                std::cmp::Ordering::Equal => prepared_orders,
                                 _ => None,
                             },
-                            None => None,
                         };
 
                         PositionResult::MarketIn(trade_in_result, new_orders)
                     }
                     Position::Order(order_types) => {
                         let trade_type = TradeType::OrderInLong;
-                        let new_orders = match pending_orders.len().cmp(&0) {
-                            std::cmp::Ordering::Equal => {
-                                long_entry = true;
-                                short_entry = false;
-                                prepare_orders(
-                                    index,
-                                    instrument,
-                                    pricing,
-                                    &trade_type,
-                                    &order_types,
-                                )
-                            }
-                            _ => vec![],
+                        // let new_orders = match pending_orders.len().cmp(&0) {
+                        //     std::cmp::Ordering::Equal => {
+                        //         long_entry = true;
+                        //         short_entry = false;
+                        //         prepare_orders(
+                        //             index,
+                        //             instrument,
+                        //             pricing,
+                        //             &trade_type,
+                        //             &order_types,
+                        //         )
+                        //     }
+                        //     _ => vec![],
+                        // };
+
+                        let prepared_orders =
+                            prepare_orders(index, instrument, pricing, &trade_type, &order_types);
+
+                        let new_orders = match overwrite_orders {
+                            true => prepared_orders,
+                            false => match pending_orders.len().cmp(&0) {
+                                std::cmp::Ordering::Equal => prepared_orders,
+                                _ => vec![],
+                            },
                         };
+
+                        if new_orders.len() > 0 {
+                            long_entry = true;
+                            short_entry = false;
+                        }
+                        //log::info!("111111111 {:?}", (orders.len(), new_orders.len()));
 
                         PositionResult::PendingOrder(new_orders)
                     }
@@ -317,41 +354,65 @@ pub trait Strategy: DynClone {
                             None,
                         );
 
-                        let new_orders = match order_types {
-                            Some(orders) => match pending_orders.len().cmp(&0) {
-                                std::cmp::Ordering::Equal => {
-                                    short_entry = true;
-                                    long_entry = false;
-                                    Some(prepare_orders(
-                                        index,
-                                        instrument,
-                                        pricing,
-                                        &trade_type,
-                                        &orders,
-                                    ))
-                                }
-                                _ => None,
-                            },
-                            None => None,
-                        };
-                        PositionResult::MarketIn(trade_in_result, new_orders)
-                    }
-                    Position::Order(order_types) => {
-                        let trade_type = TradeType::OrderInShort;
-                        let new_orders = match pending_orders.len().cmp(&0) {
-                            std::cmp::Ordering::Equal => {
-                                short_entry = true;
-                                long_entry = false;
-                                prepare_orders(
+                        let prepared_orders = match order_types {
+                            Some(orders) => {
+                                long_entry = true;
+                                short_entry = false;
+                                Some(prepare_orders(
                                     index,
                                     instrument,
                                     pricing,
                                     &trade_type,
-                                    &order_types,
-                                )
+                                    &orders,
+                                ))
                             }
-                            _ => vec![],
+                            None => None,
                         };
+
+                        let new_orders = match overwrite_orders {
+                            true => prepared_orders,
+                            false => match pending_orders.len().cmp(&0) {
+                                std::cmp::Ordering::Equal => prepared_orders,
+                                _ => None,
+                            },
+                        };
+
+                        PositionResult::MarketIn(trade_in_result, new_orders)
+                    }
+                    Position::Order(order_types) => {
+                        let trade_type = TradeType::OrderInShort;
+                        // let new_orders = match pending_orders.len().cmp(&0) {
+                        //     std::cmp::Ordering::Equal => {
+                        //         short_entry = true;
+                        //         long_entry = false;
+                        //         prepare_orders(
+                        //             index,
+                        //             instrument,
+                        //             pricing,
+                        //             &trade_type,
+                        //             &order_types,
+                        //         )
+                        //     }
+                        //     _ => vec![],
+                        // };
+
+                        let prepared_orders =
+                            prepare_orders(index, instrument, pricing, &trade_type, &order_types);
+
+                        let new_orders = match overwrite_orders {
+                            true => prepared_orders,
+                            false => match pending_orders.len().cmp(&0) {
+                                std::cmp::Ordering::Equal => prepared_orders,
+                                _ => vec![],
+                            },
+                        };
+
+                        if new_orders.len() > 0 {
+                            short_entry = true;
+                            long_entry = false;
+                        }
+
+                        //log::info!("222222222 {:?}", (orders.len(), new_orders.len()));
 
                         PositionResult::PendingOrder(new_orders)
                     }
