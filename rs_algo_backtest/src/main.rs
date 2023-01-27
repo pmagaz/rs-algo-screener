@@ -32,7 +32,10 @@ async fn main() {
         instruments: vec![],
         strategies: vec![
             /* Scalping */
-            Box::new(strategies::scalping::Scalping::new().unwrap()),
+            //Box::new(strategies::ema_scalping::EmaScalping::new().unwrap()),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new().unwrap(),
+            ),
             /* MultiTimeFrame */
             // Box::new(strategies::macd_weekly::MacdWeekly::new().unwrap()),
             // Box::new(strategies::macd_dual::MacdDual::new().unwrap()),

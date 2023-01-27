@@ -64,7 +64,7 @@ async fn main() -> Result<()> {
 
     let base_timeframe_from = Local::now() - date::Duration::minutes(num_test_bars);
 
-    log::warn!("FROM {}", base_timeframe_from);
+    log::info!("FROM {}", base_timeframe_from);
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
     let mut symbols = screener.get_symbols().await.unwrap().symbols;
