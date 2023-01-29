@@ -1,9 +1,12 @@
+use std::env;
+
 use rs_algo_shared::helpers::calc::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::strategy::StrategyType;
+use rs_algo_shared::models::time_frame::TimeFrame;
 use rs_algo_shared::models::trade::TradeIn;
 use rs_algo_shared::models::trade::TradeOut;
 use rs_algo_shared::models::trade::TradeType;
@@ -19,6 +22,7 @@ pub fn resolve_backtest(
     equity: f64,
     commission: f64,
 ) -> BackTestResult {
+    let time_frame = &env::var("BASE_TIME_FRAME").unwrap();
     let _size = 1.;
     let data = &instrument.data;
     if !trades_out.is_empty() {
@@ -83,6 +87,7 @@ pub fn resolve_backtest(
             },
             strategy: name.to_owned(),
             strategy_type: strategy_type.to_owned(),
+            time_frame: TimeFrame::new(time_frame),
             market: Market::Stock,
             date_start,
             date_end,
@@ -109,7 +114,6 @@ pub fn resolve_backtest(
             "[BACKTEST] No TradesIn for {} backtesting found!",
             instrument.symbol.to_owned()
         );
-        //BackTestResult::None
         let fake_date = to_dbtime(Local::now() - Duration::days(1000));
         BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
             instrument: BackTestInstrument {
@@ -120,6 +124,7 @@ pub fn resolve_backtest(
             },
             strategy: name.to_owned(),
             strategy_type: strategy_type.to_owned(),
+            time_frame: TimeFrame::new(time_frame),
             market: Market::Stock,
             date_start: fake_date,
             date_end: fake_date,

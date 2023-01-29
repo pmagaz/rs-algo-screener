@@ -219,7 +219,7 @@ pub async fn upsert_strategies_result(
 
     collection
         .find_one_and_replace(
-            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(), "market": doc.market.to_string(),   },
+            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(),"time_frame": doc.time_frame.to_string(), "market": doc.market.to_string(),   },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))

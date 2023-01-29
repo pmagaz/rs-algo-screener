@@ -34,8 +34,8 @@ impl<'a> Strategy for EmaScalping<'a> {
 
         Ok(Self {
             name: "Ema_Scalping",
-            //strategy_type: StrategyType::OnlyLongMultiTF,
-            strategy_type: StrategyType::LongShortMultiTF,
+            strategy_type: StrategyType::OnlyLongMultiTF,
+            //strategy_type: StrategyType::LongShortMultiTF,
             risk_reward_ratio,
             profit_target,
         })

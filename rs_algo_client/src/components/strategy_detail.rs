@@ -76,6 +76,7 @@ pub fn strategy_detail(props: &Props) -> Html {
                     if *show_strategy_name {
                         <td onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.strategy.clone()}</a></td>
                         <td>{backtest_instrument.strategy_type.clone()}</td>
+                        <td>{backtest_instrument.time_frame.clone()}</td>
                     } else {
                         <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.instrument.symbol.clone()}</a></td>
                         <td><a href={format!("strategies/{}", backtest_instrument.instrument.symbol)}>{ format!("x") }</a></td>
@@ -87,8 +88,7 @@ pub fn strategy_detail(props: &Props) -> Html {
                     <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(backtest_instrument.won_per_trade_per,2))}</td>
                     <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(backtest_instrument.lost_per_trade_per,2))}</td>
                     <td>{ backtest_instrument.trades}</td>
-                    <td>{ format!("{} / {}", backtest_instrument.wining_trades, backtest_instrument.losing_trades)} </td>
-                    <td>{ backtest_instrument.stop_losses}</td>
+                    <td>{ format!("{} / {} / {}", backtest_instrument.wining_trades, backtest_instrument.losing_trades, backtest_instrument.stop_losses)} </td>
                     <td>{ format!("{}%", round(backtest_instrument.buy_hold,2))}</td>
                 </tr>
             }
@@ -102,6 +102,7 @@ pub fn strategy_detail(props: &Props) -> Html {
                  if *show_strategy_name {
                      <th><abbr>{ "Strategy" }</abbr></th>
                     <th><abbr>{ "Type" }</abbr></th>
+                    <th><abbr>{ "TF" }</abbr></th>
                  } else {
                     <th><abbr>{ "Instrument" }</abbr></th>
                     <th><abbr>{ "Rank" }</abbr></th>
@@ -113,9 +114,8 @@ pub fn strategy_detail(props: &Props) -> Html {
                 <th><abbr>{ "Avg Won" }</abbr></th>
                 <th><abbr>{ "Avg Lost" }</abbr></th>
                 <th><abbr>{ "Trades" }</abbr></th>
-                <th><abbr>{ "Won / Lost" }</abbr></th>
-                <th><abbr>{ "Stops " }</abbr></th>
-                <th><abbr>{ "Buy & Hold" }</abbr></th>
+                <th><abbr>{ "Wo. / Lo. / St." }</abbr></th>
+                <th><abbr>{ "B & H" }</abbr></th>
                 </tr>
             </thead>
             <tbody>

@@ -7,6 +7,8 @@ use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::pricing::*;
+use rs_algo_shared::models::time_frame::TimeFrame;
+use rs_algo_shared::models::time_frame::TimeFrameType;
 use rs_algo_shared::scanner::instrument::Instrument;
 use std::env;
 
@@ -171,6 +173,7 @@ impl PortFolio {
             let strategy_result = BackTestStrategyResult {
                 strategy: strategy.name().to_owned(),
                 strategy_type: strategy.strategy_type().to_owned(),
+                time_frame: TimeFrame::new(&time_frame),
                 market: market.to_owned(),
                 date: to_dbtime(Local::now()),
                 avg_sessions: average_usize(&avg_sessions),
