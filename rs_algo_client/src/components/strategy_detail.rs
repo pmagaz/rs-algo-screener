@@ -21,17 +21,17 @@ extern "C" {
 pub struct Props {
     pub backtested_instruments: Vec<BackTestInstrumentResult>,
     pub on_symbol_click: Callback<String>,
-    pub market: String,
+    pub id: String,
     pub show_strategy_name: bool,
 }
 
 #[function_component(StrategyDetail)]
 pub fn strategy_detail(props: &Props) -> Html {
     let Props {
-        market,
+        id,
         backtested_instruments,
         on_symbol_click,
-        show_strategy_name
+        show_strategy_name,
     } = props;
     let base_url = get_base_url();
 
@@ -42,29 +42,32 @@ pub fn strategy_detail(props: &Props) -> Html {
             let on_instrument_select = {
                 let on_symbol_click = on_symbol_click.clone();
                 let symbol = backtest_instrument.instrument.symbol.clone();
-                let strategy = backtest_instrument.strategy.clone();
-                let strategy_type = backtest_instrument.strategy_type.clone();
-
                 let url = match show_strategy_name {
-                    false => base_url.replace(["strategy/", market, "/", &strategy, "/", &strategy_type.to_string()].concat().as_str(), "api/backtest/strategies/chart"),
-                    true =>  base_url.replace(["strategies/", &symbol].concat().as_str(), "api/backtest/strategies/chart/"),
-                };
-
-                let url = 
+                    true =>{
                     [
-                        url,
-                        backtest_instrument.market.to_string(),
-                        "/".to_owned(),
-                        strategy.to_string(),
-                        "/".to_owned(),
-                        strategy_type.to_string(),
-                        "?symbol=".to_string(),
+                        base_url.replace(["strategies/", id, "/", &symbol].concat().as_str(), "api/backtest/strategies/chart"),
+                        "/".to_string(),
+                        id.to_string(),
+                        "/".to_string(),
                         symbol
                 ]
-                .concat();
+                .concat()
+                    },
+                false => {
+                    [
+                        base_url.replace(&base_url, "api/backtest/strategies/chart"),
+                        "/".to_string(),
+                        id.to_string(),
+                        "/".to_string(),
+                        symbol
+                ]
+                .concat()
+                }
+                };
 
                 Callback::from(move |_| on_symbol_click.emit(url.clone()))
             };
+
 
             let profit_factor_status = get_profit_factor_status(backtest_instrument.profit_factor);
             let profitable_trades_status = get_profitable_trades_status(backtest_instrument.profitable_trades);
@@ -79,7 +82,7 @@ pub fn strategy_detail(props: &Props) -> Html {
                         <td>{backtest_instrument.time_frame.clone()}</td>
                     } else {
                         <td  onclick={ on_instrument_select }><a href={format!("javascript:void(0);")}>{backtest_instrument.instrument.symbol.clone()}</a></td>
-                        <td><a href={format!("strategies/{}", backtest_instrument.instrument.symbol)}>{ format!("x") }</a></td>
+                        <td><a href={format!("strategies/{}/{}", id,backtest_instrument.instrument.symbol)}>{ format!("x") }</a></td>
                     }
                     <td class={get_status_class(&profit_status)}> { format!("{}%", round(backtest_instrument.net_profit_per,2))}</td>
                     <td class={get_status_class(&profit_factor_status)}> { round(backtest_instrument.profit_factor,2) }</td>

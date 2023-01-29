@@ -8,14 +8,15 @@ use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
 use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
+use rs_algo_shared::models::time_frame::{TimeFrame, TimeFrameType};
 use rs_algo_shared::models::trade::{Position, TradeIn, TradeOut};
 use rs_algo_shared::models::{backtest_instrument::*, time_frame};
-use rs_algo_shared::scanner::candle::Candle;
 use rs_algo_shared::scanner::instrument::*;
 
 #[derive(Clone)]
 pub struct BollingerBandsReversals<'a> {
     name: &'a str,
+    time_frame: TimeFrameType,
     strategy_type: StrategyType,
     risk_reward_ratio: f64,
     profit_target: f64,
@@ -33,8 +34,14 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .parse::<f64>()
             .unwrap();
 
+        let time_frame = std::env::var("BASE_TIME_FRAME")
+            .unwrap()
+            .parse::<String>()
+            .unwrap();
+
         Ok(Self {
             name: "BollingerBandsReversals",
+            time_frame: TimeFrame::new(&time_frame),
             strategy_type: StrategyType::OnlyLongMultiTF,
             //strategy_type: StrategyType::LongShortMultiTF,
             risk_reward_ratio,
@@ -285,6 +292,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
     ) -> BackTestResult {
         resolve_backtest(
             instrument,
+            &self.time_frame,
             &self.strategy_type,
             trades_in,
             trades_out,

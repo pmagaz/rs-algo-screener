@@ -1,14 +1,13 @@
 use crate::strategies::strategy::Strategy;
 
 use rs_algo_shared::helpers::comp::*;
-use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
+use rs_algo_shared::helpers::{date::*, uuid};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::pricing::*;
 use rs_algo_shared::models::time_frame::TimeFrame;
-use rs_algo_shared::models::time_frame::TimeFrameType;
 use rs_algo_shared::scanner::instrument::Instrument;
 use std::env;
 
@@ -170,7 +169,17 @@ impl PortFolio {
                 avg_sessions.len()
             );
 
+            let seed = [
+                &strategy.name().to_string(),
+                &strategy.strategy_type().to_string(),
+                &time_frame,
+                &market.to_string(),
+            ];
+
+            let uuid = uuid::generate(seed);
+
             let strategy_result = BackTestStrategyResult {
+                uuid,
                 strategy: strategy.name().to_owned(),
                 strategy_type: strategy.strategy_type().to_owned(),
                 time_frame: TimeFrame::new(&time_frame),

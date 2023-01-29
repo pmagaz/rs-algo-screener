@@ -4,6 +4,7 @@ use crate::models::app_state::AppState;
 use crate::render_chart::{Backend, BackendMode};
 
 use rs_algo_shared::helpers::date::*;
+use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::models::order::Order;
@@ -70,7 +71,7 @@ pub async fn find_instruments(
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "development" => doc! {"market": &market, "symbol": "AUDCHF"},
+        "development" => doc! {"market": &market, "symbol": "EURUSD"},
         _ => doc! { "market": &market},
     };
 
@@ -142,20 +143,31 @@ pub async fn find_instruments_result(
 }
 
 pub async fn find_instruments_result_by_strategy(
-    params: web::Path<(String, String, String)>,
+    params: web::Path<(String)>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    let (market, strategy, strategy_type) = params.into_inner();
+    let uuid = params.into_inner();
+
+    let strategy_result: BackTestStrategyResult =
+        db::back_test::find_strategy_result(&uuid, &state)
+            .await
+            .unwrap()
+            .unwrap();
 
     log::info!(
-        "[BACK TEST STRATEGIES] For {} Request at {:?}",
-        market,
+        "[BACK TEST STRATEGIES] For {:?} Request at {:?}",
+        (
+            &strategy_result.market,
+            &strategy_result.strategy,
+            &strategy_result.strategy_type,
+            &strategy_result.time_frame
+        ),
         Local::now()
     );
 
-    let query = doc! {"market": market, "strategy": strategy, "strategy_type": strategy_type};
+    let query = doc! {"market": strategy_result.market.to_string(), "strategy": strategy_result.strategy, "strategy_type": strategy_result.strategy_type.to_string(), "time_frame": strategy_result.time_frame.to_string()};
 
     let backtest_instruments_result: Vec<BackTestInstrumentResult> =
         db::back_test::find_backtest_instruments_result(query, 500, &state)
@@ -163,7 +175,8 @@ pub async fn find_instruments_result_by_strategy(
             .unwrap();
 
     log::info!(
-        "[BACK TEST INSTRUMENTS] {:?} {:?}",
+        "[BACK TEST INSTRUMENTS] {} {:?} {:?}",
+        backtest_instruments_result.len(),
         Local::now(),
         now.elapsed()
     );
@@ -290,23 +303,30 @@ pub async fn find_prices(state: web::Data<AppState>) -> Result<HttpResponse, RsA
 }
 
 pub async fn chart(
-    params: web::Path<(String, String, String)>,
-    query: web::Query<SymbolQuery>,
+    params: web::Path<(String, String)>,
     state: web::Data<AppState>,
 ) -> Result<fs::NamedFile, RsAlgoError> {
     let now = Instant::now();
-    let symbol = &query.symbol;
-    let (market, strategy, strategy_type) = params.into_inner();
+    let (uuid, symbol) = params.into_inner();
+
+    let strategy_result: BackTestStrategyResult =
+        db::back_test::find_strategy_result(&uuid, &state)
+            .await
+            .unwrap()
+            .unwrap();
 
     log::info!(
-        "[BACKTEST CHART] for {:?} / {:?} at {:?}",
-        strategy,
-        symbol,
-        Local::now(),
+        "[BACKTEST CHART] For {:?} Request at {:?}",
+        (
+            &strategy_result.market,
+            &strategy_result.strategy,
+            &strategy_result.strategy_type,
+            &strategy_result.time_frame
+        ),
+        Local::now()
     );
 
-    let query = doc! {"market": market, "strategy": &strategy , "strategy_type": &strategy_type, "instrument.symbol": symbol};
-
+    let query = doc! {"instrument.symbol": symbol.clone(), "market": strategy_result.market.to_string(), "strategy": strategy_result.strategy.clone(), "strategy_type": strategy_result.strategy_type.to_string(), "time_frame": strategy_result.time_frame.to_string()};
     let backtest_result: BackTestInstrumentResult =
         db::back_test::find_strategy_instrument_result(query, &state)
             .await
@@ -318,14 +338,22 @@ pub async fn chart(
     let orders: Vec<Order> = backtest_result.instrument.orders;
     let trades = &(&trades_in, &trades_out, &orders);
 
-    let instrument = db::back_test::find_backtest_instrument_by_symbol(&*symbol, &state)
-        .await
-        .unwrap()
-        .unwrap();
+    let instrument = db::back_test::find_backtest_instrument_by_symbol_time_frame(
+        &*symbol,
+        &strategy_result.time_frame.to_string(),
+        &state,
+    )
+    .await
+    .unwrap()
+    .unwrap();
 
-    let htf_instrument = db::back_test::find_htf_backtest_instrument_by_symbol(&*symbol, &state)
-        .await
-        .unwrap();
+    let htf_instrument = db::back_test::find_htf_backtest_instrument_by_symbol_time_frame(
+        &*symbol,
+        &strategy_result.time_frame.to_string(),
+        &state,
+    )
+    .await
+    .unwrap();
 
     let htf_instrument = match htf_instrument {
         Some(htf_ins) => HigherTMInstrument::HigherTMInstrument(htf_ins),
@@ -334,9 +362,9 @@ pub async fn chart(
 
     let output_file = [
         &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap(),
-        &strategy,
+        &strategy_result.strategy,
         "_",
-        symbol,
+        &symbol,
         ".png",
     ]
     .concat();
@@ -358,7 +386,7 @@ pub async fn chart(
 
     log::info!(
         "[BACKTEST CHART RENDER] {:?} {:?} {:?}",
-        strategy,
+        &strategy_result.strategy,
         Local::now(),
         now.elapsed()
     );

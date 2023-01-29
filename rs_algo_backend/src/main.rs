@@ -124,7 +124,7 @@ async fn main() -> Result<()> {
                         web::get().to(back_test::find_instruments),
                     )
                     .route(
-                        "/backtest/strategies/{instrument}",
+                        "/backtest/strategies/instrument/{instrument}",
                         web::get().to(back_test::find_strategies_result_instruments),
                     )
                     .route(
@@ -137,11 +137,11 @@ async fn main() -> Result<()> {
                     )
                     .route("/backtest/prices", web::get().to(back_test::find_prices))
                     .route(
-                        "/backtest/strategies/{market}/{strategy}/{strategy_type}",
+                        "/backtest/strategies/{uuid}",
                         web::get().to(back_test::find_instruments_result_by_strategy),
                     )
                     .route(
-                        "/backtest/strategies/chart/{market}/{strategy}/{strategy_type}",
+                        "/backtest/strategies/chart/{uuid}/{symbol}",
                         web::get().to(back_test::chart),
                     ),
             )

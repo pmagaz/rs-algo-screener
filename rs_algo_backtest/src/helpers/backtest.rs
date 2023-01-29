@@ -6,7 +6,7 @@ use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::strategy::StrategyType;
-use rs_algo_shared::models::time_frame::TimeFrame;
+use rs_algo_shared::models::time_frame::TimeFrameType;
 use rs_algo_shared::models::trade::TradeIn;
 use rs_algo_shared::models::trade::TradeOut;
 use rs_algo_shared::models::trade::TradeType;
@@ -14,6 +14,7 @@ use rs_algo_shared::scanner::instrument::Instrument;
 
 pub fn resolve_backtest(
     instrument: &Instrument,
+    time_frame: &TimeFrameType,
     strategy_type: &StrategyType,
     trades_in: Vec<TradeIn>,
     trades_out: Vec<TradeOut>,
@@ -22,7 +23,6 @@ pub fn resolve_backtest(
     equity: f64,
     commission: f64,
 ) -> BackTestResult {
-    let time_frame = &env::var("BASE_TIME_FRAME").unwrap();
     let _size = 1.;
     let data = &instrument.data;
     if !trades_out.is_empty() {
@@ -86,8 +86,8 @@ pub fn resolve_backtest(
                 orders,
             },
             strategy: name.to_owned(),
+            time_frame: time_frame.to_owned(),
             strategy_type: strategy_type.to_owned(),
-            time_frame: TimeFrame::new(time_frame),
             market: Market::Stock,
             date_start,
             date_end,
@@ -124,7 +124,7 @@ pub fn resolve_backtest(
             },
             strategy: name.to_owned(),
             strategy_type: strategy_type.to_owned(),
-            time_frame: TimeFrame::new(time_frame),
+            time_frame: time_frame.to_owned(),
             market: Market::Stock,
             date_start: fake_date,
             date_end: fake_date,

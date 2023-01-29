@@ -8,7 +8,7 @@ use actix_web::web;
 use bson::doc;
 use futures::stream::StreamExt;
 use mongodb::error::Error;
-use mongodb::options::{FindOneAndReplaceOptions, FindOneOptions, FindOptions};
+use mongodb::options::{FindOneOptions, FindOptions};
 use std::env;
 
 pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactBotData>, Error> {

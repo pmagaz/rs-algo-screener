@@ -756,6 +756,7 @@ impl Backend {
             .draw_series(trades_in.iter().enumerate().map(|(i, trade_in)| {
                 let date = fom_dbtime(&trade_in.date_in);
                 let price = trade_in.price_in;
+
                 match trade_in.trade_type.is_long() {
                     true => TriangleMarker::new(
                         (date, trade_in.price_in - trade_in.spread),

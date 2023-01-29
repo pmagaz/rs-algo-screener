@@ -18,13 +18,13 @@ pub enum Route {
     Bots,
     #[at("/strategies/")]
     Strategies,
-    #[at("/strategies/:instrument")]
-    InstrumentsStrategy { instrument: String },
-    #[at("/strategy/:market/:strategy/:stype/")]
+    #[at("/strategies/:id/:instrument")]
+    InstrumentsStrategy { id: String, instrument: String },
+    #[at("/strategy/:id/:strategy/:time_frame")]
     Strategy {
-        market: String,
+        id: String,
         strategy: String,
-        stype: String,
+        time_frame: String,
     },
 }
 
@@ -40,15 +40,15 @@ pub fn switch(routes: &Route) -> Html {
             html! { <Strategies  /> }
         }
         Route::Strategy {
-            market,
+            id,
             strategy,
-            stype,
+            time_frame,
         } => {
-            html! { <Strategy market={ market } strategy={ strategy } stype={stype} instrument= { "none" }/> }
+            html! { <Strategy id={ id } instrument= { "none" } strategy={ strategy } time_frame={ time_frame}/> }
         }
 
-        Route::InstrumentsStrategy { instrument } => {
-            html! { <Strategy market={ "instrument_strategy" } strategy={ "strategy" } stype={"stype"} instrument={ instrument }/> }
+        Route::InstrumentsStrategy { id, instrument } => {
+            html! { <Strategy id={ id } instrument={ instrument } strategy={"none"} time_frame={"none"}/> }
         }
     }
 }

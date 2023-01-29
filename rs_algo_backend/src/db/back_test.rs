@@ -4,8 +4,8 @@ use crate::models::app_state::AppState;
 use crate::models::backtest_instrument::BackTestInstrumentResult;
 use crate::models::backtest_strategy::BackTestStrategyResult;
 
-use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
+use rs_algo_shared::helpers::{comp::*, uuid};
 use rs_algo_shared::models::pricing::*;
 use rs_algo_shared::scanner::instrument::*;
 
@@ -38,6 +38,28 @@ pub async fn find_one(
         .unwrap();
 
     Ok(instrument)
+}
+
+pub async fn find_strategy_result(
+    uuid: &str,
+    state: &web::Data<AppState>,
+) -> Result<Option<BackTestStrategyResult>, Error> {
+    let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
+
+    log::info!("[FINDONE] from {}", collection_name);
+
+    let collection =
+        get_collection::<BackTestStrategyResult>(&state.db_mem, &collection_name).await;
+
+    let result = collection
+        .find_one(
+            doc! { "_id": uuid::from_str(uuid.to_owned())},
+            FindOneOptions::builder().build(),
+        )
+        .await
+        .unwrap();
+
+    Ok(result)
 }
 
 pub async fn find_instruments(
@@ -201,7 +223,7 @@ pub async fn upsert_instruments_result(
 
     collection
         .find_one_and_replace(
-            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(), "market": doc.market.to_string(),  "instrument.symbol": doc.instrument.symbol.clone() },
+            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(), "time_frame": doc.time_frame.to_string(), "market": doc.market.to_string(),  "instrument.symbol": doc.instrument.symbol.clone() },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))
@@ -217,6 +239,7 @@ pub async fn upsert_strategies_result(
     let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
     let collection = get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
 
+    log::warn!("4444444 {:?}", doc.time_frame.to_string());
     collection
         .find_one_and_replace(
             doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(),"time_frame": doc.time_frame.to_string(), "market": doc.market.to_string(),   },
@@ -228,28 +251,30 @@ pub async fn upsert_strategies_result(
         .await
 }
 
-pub async fn find_backtest_instrument_by_symbol(
+pub async fn find_backtest_instrument_by_symbol_time_frame(
     symbol: &str,
+    time_frame: &str,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
     let collection_name = &[
         &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
         "_",
-        &env::var("BASE_TIME_FRAME").unwrap(),
+        &time_frame,
     ]
     .concat();
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let instrument = collection
-        .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
+        .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())
         .await
         .unwrap();
 
     Ok(instrument)
 }
 
-pub async fn find_htf_backtest_instrument_by_symbol(
+pub async fn find_htf_backtest_instrument_by_symbol_time_frame(
     symbol: &str,
+    time_frame: &str,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
     let collection_name = &[
@@ -261,7 +286,7 @@ pub async fn find_htf_backtest_instrument_by_symbol(
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let instrument = collection
-        .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
+        .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())
         .await
         .unwrap();
 

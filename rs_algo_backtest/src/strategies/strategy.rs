@@ -215,7 +215,7 @@ pub trait Strategy: DynClone {
                         PositionResult::PendingOrder(new_orders) => {
                             match overwrite_orders {
                                 true => {
-                                    log::info!("OVERWRITING ORDERS {:?}", orders.len());
+                                    //log::info!("OVERWRITING ORDERS {:?}", orders.len());
                                     orders =
                                         order::cancel_all_pending_orders(index, instrument, orders);
                                 }

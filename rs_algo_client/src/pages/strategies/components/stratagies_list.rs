@@ -1,9 +1,9 @@
 use crate::helpers::status::*;
 use crate::routes::Route;
 
+use rs_algo_shared::helpers::status::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::models::market::*;
-use rs_algo_shared::{helpers::status::*, models::status::Status};
 
 use round::round;
 use wasm_bindgen::prelude::*;
@@ -42,7 +42,7 @@ pub fn strategy_list(props: &Props) -> Html {
             html! {
                 <tr>
                     <td>
-                    <Link<Route> to={Route::Strategy { market: strategy.market.to_string(), strategy: strategy.strategy.to_string(), stype: strategy.strategy_type.to_string()  }}>{ strategy.strategy.clone() }</Link<Route>>
+                    <Link<Route> to={Route::Strategy { id: strategy.uuid.to_string(), strategy: strategy.strategy.to_string(), time_frame: strategy.time_frame.to_string() }}>{ strategy.strategy.clone() }</Link<Route>>
                     </td>
                     <td>{ format!(" {:?} ", strategy.strategy_type )}</td>
                     <td>{ format!(" {:?} ", strategy.time_frame )}</td>

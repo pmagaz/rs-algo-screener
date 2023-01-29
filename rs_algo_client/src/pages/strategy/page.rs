@@ -20,19 +20,19 @@ extern "C" {
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct Props {
-    pub market: String,
-    pub strategy: String,
-    pub stype: String,
+    pub id: String,
     pub instrument: String,
+    pub strategy: String,
+    pub time_frame: String,
 }
 
 #[function_component(Strategy)]
 pub fn strategy(props: &Props) -> Html {
     let Props {
-        market,
-        strategy,
-        stype,
+        id,
         instrument,
+        strategy,
+        time_frame,
     } = props;
     let base_url = get_base_url();
 
@@ -41,23 +41,18 @@ pub fn strategy(props: &Props) -> Html {
         _ => true,
     };
 
+    log::info!("44444444 {}", is_instrument_strategies);
+
     let backtested_strategy_url = match is_instrument_strategies {
-        false => [
-            base_url.replace(
-                &["strategy/", market, "/", strategy, "/", stype].concat(),
-                "api/backtest/strategies",
-            ),
-            market.to_string(),
-            "/".to_owned(),
-            strategy.to_string(),
-            "/".to_owned(),
-            stype.to_string(),
-        ]
+        false => [base_url.replace(
+            &["strategy/", id, "/", strategy, "/", time_frame].concat(),
+            &["api/backtest/strategies/", id].concat(),
+        )]
         .concat(),
         true => [
             base_url.replace(
-                &["strategies/", instrument].concat(),
-                "api/backtest/strategies/",
+                &["strategies/", id, "/", instrument].concat(),
+                "api/backtest/strategies/instrument/",
             ),
             instrument.to_string(),
         ]
@@ -107,7 +102,7 @@ pub fn strategy(props: &Props) -> Html {
                     if is_instrument_strategies {
                         <h1 class="navbar-item is-size-2">{format!("{} Backtesting", instrument) }</h1>
                     } else {
-                        <h1 class="navbar-item is-size-2">{format!("{} {}",strategy, stype) }</h1>
+                        <h1 class="navbar-item is-size-2">{format!("{} {}",strategy, time_frame) }</h1>
                     }
                         <Loading loading={ *use_loading} />
                 </div>
@@ -116,9 +111,9 @@ pub fn strategy(props: &Props) -> Html {
            <div class="container">
                 <div class="notification is-fluid ">
                 if is_instrument_strategies {
-                    <StrategyDetail market={ market.clone() } on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} show_strategy_name={ true }/>
+                    <StrategyDetail id={ id.clone() } on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} show_strategy_name={ true }/>
                 } else {
-                    <StrategyDetail market={ market.clone() } on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} show_strategy_name={ false }/>
+                    <StrategyDetail id={ id.clone() } on_symbol_click={ on_symbol_click.clone()} backtested_instruments={(*use_backtest_instruments).clone()} show_strategy_name={ false }/>
                 }
             </div>
             </div>
