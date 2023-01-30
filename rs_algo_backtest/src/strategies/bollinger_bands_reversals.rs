@@ -17,6 +17,7 @@ use rs_algo_shared::scanner::instrument::*;
 pub struct BollingerBandsReversals<'a> {
     name: &'a str,
     time_frame: TimeFrameType,
+    higher_time_frame: Option<TimeFrameType>,
     strategy_type: StrategyType,
     risk_reward_ratio: f64,
     profit_target: f64,
@@ -39,11 +40,23 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .parse::<String>()
             .unwrap();
 
+        let higher_time_frame = std::env::var("HIGHER_TIME_FRAME")
+            .unwrap()
+            .parse::<String>()
+            .unwrap();
+
+        let strategy_type = StrategyType::OnlyLongMTF;
+
+        let higher_time_frame = match strategy_type.is_multi_timeframe() {
+            true => Some(TimeFrame::new(&higher_time_frame)),
+            false => None,
+        };
+
         Ok(Self {
             name: "BollingerBandsReversals",
             time_frame: TimeFrame::new(&time_frame),
-            strategy_type: StrategyType::OnlyLongMultiTF,
-            //strategy_type: StrategyType::LongShortMultiTF,
+            higher_time_frame: higher_time_frame,
+            strategy_type,
             risk_reward_ratio,
             profit_target,
         })
@@ -61,7 +74,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position {
         let spread = pricing.spread();
@@ -69,7 +82,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let anchor_htf = time_frame::get_htf_data(
             index,
             instrument,
-            upper_tf_instrument,
+            htf_instrument,
             |(idx, _prev_idx, upper_inst)| {
                 let macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
                 let macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
@@ -109,7 +122,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .unwrap();
 
         let entry_condition = anchor_htf && close_price < low_band && prev_close >= prev_low_band;
-        let buy_price = highest_bar + calc::to_pips(pips_margin, pricing);
+        let buy_price = close_price + calc::to_pips(pips_margin, pricing);
         let stop_loss_price = candle.low() - calc::to_pips(pips_margin, pricing);
         let risk = buy_price + spread - stop_loss_price;
         let sell_price = buy_price + (risk * self.risk_reward_ratio);
@@ -130,13 +143,13 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position {
         // let _upper_macd = get_htf_data(
         //     index,
         //     instrument,
-        //     upper_tf_instrument,
+        //     htf_instrument,
         //     |(idx, prev_idx, upper_inst)| {
         //         let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
         //         let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
@@ -180,15 +193,26 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
 
         // false
         let spread = pricing.spread();
+        let close_price = &instrument.data.get(index).unwrap().close();
+        // let anchor_htf = time_frame::get_htf_data(
+        //     index,
+        //     instrument,
+        //     htf_instrument,
+        //     |(idx, _prev_idx, upper_inst)| {
+        //         let macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
+        //         let macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
+        //         macd_a < macd_b
+        //     },
+        // );
 
         let anchor_htf = time_frame::get_htf_data(
             index,
             instrument,
-            upper_tf_instrument,
+            htf_instrument,
             |(idx, _prev_idx, upper_inst)| {
-                let macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
-                let macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
-                macd_a < macd_b
+                let htf_ema_5 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
+                let htf_ema_13 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
+                htf_ema_5 > htf_ema_13 && close_price > htf_ema_13
             },
         );
 
@@ -249,15 +273,15 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position {
         // match self.strategy_type {
-        //     StrategyType::LongShort => self.exit_long(index, instrument, upper_tf_instrument),
-        //     StrategyType::LongShortMultiTF => {
-        //         self.exit_long(index, instrument, upper_tf_instrument)
+        //     StrategyType::LongShort => self.exit_long(index, instrument, htf_instrument),
+        //     StrategyType::LongShortMTF => {
+        //         self.exit_long(index, instrument, htf_instrument)
         //     }
-        //     StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
+        //     StrategyType::OnlyShort => self.exit_long(index, instrument, htf_instrument),
         //     _ => false,
         // }
         Position::None
@@ -267,15 +291,15 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position {
         // match self.strategy_type {
-        //     StrategyType::LongShort => self.entry_long(index, instrument, upper_tf_instrument),
-        //     StrategyType::LongShortMultiTF => {
-        //         self.entry_long(index, instrument, upper_tf_instrument)
+        //     StrategyType::LongShort => self.entry_long(index, instrument, htf_instrument),
+        //     StrategyType::LongShortMTF => {
+        //         self.entry_long(index, instrument, htf_instrument)
         //     }
-        //     StrategyType::OnlyShort => self.entry_long(index, instrument, upper_tf_instrument),
+        //     StrategyType::OnlyShort => self.entry_long(index, instrument, htf_instrument),
         //     _ => false,
         // }
         Position::None
@@ -293,6 +317,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         resolve_backtest(
             instrument,
             &self.time_frame,
+            &self.higher_time_frame,
             &self.strategy_type,
             trades_in,
             trades_out,

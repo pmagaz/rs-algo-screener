@@ -39,13 +39,18 @@ pub fn strategy_list(props: &Props) -> Html {
             let max_drawdown_status = get_max_drawdown_status(strategy.avg_max_drawdown);
             let avg_won_lost_status = get_avg_won_lost_status(strategy.avg_won_per_trade ,strategy.avg_lost_per_trade);
 
+            let higher_time_frame = match &strategy.higher_time_frame{
+                Some(htf) => htf.to_string(),
+                None => "".to_string()
+            };
+
             html! {
                 <tr>
                     <td>
                     <Link<Route> to={Route::Strategy { id: strategy.uuid.to_string(), strategy: strategy.strategy.to_string(), time_frame: strategy.time_frame.to_string() }}>{ strategy.strategy.clone() }</Link<Route>>
                     </td>
-                    <td>{ format!(" {:?} ", strategy.strategy_type )}</td>
-                    <td>{ format!(" {:?} ", strategy.time_frame )}</td>
+                    <td>{ format!(" {} ", strategy.strategy_type )}</td>
+                    <td>{ format!(" {} / {} ", strategy.time_frame, higher_time_frame)}</td>
                     <td class={get_status_class(&profit_status)}> { format!("{}%", round(strategy.avg_net_profit_per,2))}</td>
                     <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
                     <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
@@ -67,7 +72,7 @@ pub fn strategy_list(props: &Props) -> Html {
                 <tr>
                 <th><abbr>{ "Strategy" }</abbr></th>
                 <th><abbr>{ "Type" }</abbr></th>
-                <th><abbr>{ "TF" }</abbr></th>
+                <th><abbr>{ "T.Frame" }</abbr></th>
                 <th><abbr>{ "Net Profit" }</abbr></th>
                 <th><abbr>{ "Profit F." }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>

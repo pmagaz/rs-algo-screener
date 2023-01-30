@@ -15,6 +15,7 @@ use rs_algo_shared::scanner::instrument::Instrument;
 pub fn resolve_backtest(
     instrument: &Instrument,
     time_frame: &TimeFrameType,
+    higher_time_frame: &Option<TimeFrameType>,
     strategy_type: &StrategyType,
     trades_in: Vec<TradeIn>,
     trades_out: Vec<TradeOut>,
@@ -87,6 +88,7 @@ pub fn resolve_backtest(
             },
             strategy: name.to_owned(),
             time_frame: time_frame.to_owned(),
+            higher_time_frame: higher_time_frame.to_owned(),
             strategy_type: strategy_type.to_owned(),
             market: Market::Stock,
             date_start,
@@ -115,6 +117,7 @@ pub fn resolve_backtest(
             instrument.symbol.to_owned()
         );
         let fake_date = to_dbtime(Local::now() - Duration::days(1000));
+
         BackTestResult::BackTestInstrumentResult(BackTestInstrumentResult {
             instrument: BackTestInstrument {
                 symbol: instrument.symbol.to_owned(),
@@ -125,6 +128,7 @@ pub fn resolve_backtest(
             strategy: name.to_owned(),
             strategy_type: strategy_type.to_owned(),
             time_frame: time_frame.to_owned(),
+            higher_time_frame: higher_time_frame.to_owned(),
             market: Market::Stock,
             date_start: fake_date,
             date_end: fake_date,

@@ -239,7 +239,6 @@ pub async fn upsert_strategies_result(
     let collection_name = &env::var("DB_BACKTEST_STRATEGY_RESULT_COLLECTION").unwrap();
     let collection = get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
 
-    log::warn!("4444444 {:?}", doc.time_frame.to_string());
     collection
         .find_one_and_replace(
             doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(),"time_frame": doc.time_frame.to_string(), "market": doc.market.to_string(),   },
@@ -274,13 +273,13 @@ pub async fn find_backtest_instrument_by_symbol_time_frame(
 
 pub async fn find_htf_backtest_instrument_by_symbol_time_frame(
     symbol: &str,
-    time_frame: &str,
+    higher_time_frame: &str,
     state: &web::Data<AppState>,
 ) -> Result<Option<Instrument>, Error> {
     let collection_name = &[
         &env::var("DB_BACKTEST_INSTRUMENTS_COLLECTION").unwrap(),
         "_",
-        &env::var("UPPER_TIME_FRAME").unwrap(),
+        &higher_time_frame,
     ]
     .concat();
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;

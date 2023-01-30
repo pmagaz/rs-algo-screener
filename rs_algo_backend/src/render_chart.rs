@@ -966,34 +966,34 @@ impl Backend {
 
         //BOLLINGER BANDS
 
-        // if bb_a.len() > 0 {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(data.iter())
-        //                 .map(|(id, candle)| (candle.date, bb_a[id])),
-        //             &BLUE_LINE2,
-        //         ))
-        //         .unwrap();
+        if bb_a.len() > 0 {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_a[id])),
+                    &BLUE_LINE2,
+                ))
+                .unwrap();
 
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(data.iter())
-        //                 .map(|(id, candle)| (candle.date, bb_b[id])),
-        //             &BLUE_LINE2,
-        //         ))
-        //         .unwrap();
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_b[id])),
+                    &BLUE_LINE2,
+                ))
+                .unwrap();
 
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(data.iter())
-        //                 .map(|(id, candle)| (candle.date, bb_c[id])),
-        //             &ORANGE_LINE,
-        //         ))
-        //         .unwrap();
-        // }
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_c[id])),
+                    &ORANGE_LINE,
+                ))
+                .unwrap();
+        }
 
         //EMAS
 

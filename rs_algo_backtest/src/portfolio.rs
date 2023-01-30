@@ -41,6 +41,11 @@ impl PortFolio {
             .clone();
 
         let time_frame = env::var("BASE_TIME_FRAME").unwrap().clone();
+        let htf_time_frame = env::var("HIGHER_TIME_FRAME")
+            .unwrap()
+            .parse::<String>()
+            .unwrap();
+
         log::info!("[BACKTEST] Requesting Pricing");
 
         let prices: Vec<Pricing> =
@@ -169,10 +174,20 @@ impl PortFolio {
                 avg_sessions.len()
             );
 
+            let htf_time_frame = match strategy.strategy_type().is_multi_timeframe() {
+                true => Some(TimeFrame::new(&htf_time_frame)),
+                false => None,
+            };
+
+            let htf_str = match &htf_time_frame {
+                Some(htf) => htf.to_string(),
+                None => "".to_string(),
+            };
+
             let seed = [
                 &strategy.name().to_string(),
                 &strategy.strategy_type().to_string(),
-                &time_frame,
+                &[time_frame.clone()].concat(),
                 &market.to_string(),
             ];
 
@@ -183,6 +198,7 @@ impl PortFolio {
                 strategy: strategy.name().to_owned(),
                 strategy_type: strategy.strategy_type().to_owned(),
                 time_frame: TimeFrame::new(&time_frame),
+                higher_time_frame: htf_time_frame,
                 market: market.to_owned(),
                 date: to_dbtime(Local::now()),
                 avg_sessions: average_usize(&avg_sessions),

@@ -23,28 +23,28 @@ pub trait Strategy: DynClone {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position;
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position;
     fn entry_short(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position;
     fn exit_short(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position;
     fn backtest_result(
@@ -56,15 +56,11 @@ pub trait Strategy: DynClone {
         equity: f64,
         commision: f64,
     ) -> BackTestResult;
-    async fn get_upper_tf_instrument(
-        &self,
-        symbol: &str,
-        uppertimeframe: &str,
-    ) -> HigherTMInstrument {
+    async fn get_htf_instrument(&self, symbol: &str, uppertimeframe: &str) -> HigherTMInstrument {
         let uppertime_frame = match self.strategy_type() {
-            StrategyType::OnlyLongMultiTF => true,
-            StrategyType::LongShortMultiTF => true,
-            StrategyType::OnlyShortMultiTF => true,
+            StrategyType::OnlyLongMTF => true,
+            StrategyType::LongShortMTF => true,
+            StrategyType::OnlyShortMTF => true,
             _ => false,
         };
 
@@ -124,10 +120,10 @@ pub trait Strategy: DynClone {
             pricing.spread()
         );
 
-        let uppertimeframe = env::var("UPPER_TIME_FRAME").unwrap();
+        let uppertimeframe = env::var("HIGHER_TIME_FRAME").unwrap();
 
-        let upper_tf_instrument = &self
-            .get_upper_tf_instrument(&instrument.symbol, &uppertimeframe)
+        let htf_instrument = &self
+            .get_htf_instrument(&instrument.symbol, &uppertimeframe)
             .await;
 
         for (index, _candle) in data.iter().enumerate() {
@@ -174,7 +170,7 @@ pub trait Strategy: DynClone {
                     let exit_result = self.resolve_exit_position(
                         index,
                         instrument,
-                        upper_tf_instrument,
+                        htf_instrument,
                         pricing,
                         &trade_in,
                     );
@@ -196,7 +192,7 @@ pub trait Strategy: DynClone {
                     let entry_position_result = self.resolve_entry_position(
                         index,
                         instrument,
-                        upper_tf_instrument,
+                        htf_instrument,
                         pricing,
                         &orders,
                         trade_size,
@@ -239,7 +235,7 @@ pub trait Strategy: DynClone {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
         orders: &Vec<Order>,
         trade_size: f64,
@@ -255,9 +251,9 @@ pub trait Strategy: DynClone {
         let entry_long = match self.strategy_type() {
             StrategyType::OnlyLong
             | StrategyType::LongShort
-            | StrategyType::OnlyLongMultiTF
-            | StrategyType::LongShortMultiTF => {
-                match self.entry_long(index, instrument, upper_tf_instrument, pricing) {
+            | StrategyType::OnlyLongMTF
+            | StrategyType::LongShortMTF => {
+                match self.entry_long(index, instrument, htf_instrument, pricing) {
                     Position::MarketIn(order_types) => {
                         let trade_type = TradeType::MarketInLong;
                         let trade_in_result = resolve_trade_in(
@@ -339,9 +335,9 @@ pub trait Strategy: DynClone {
         let entry_short = match self.strategy_type() {
             StrategyType::OnlyShort
             | StrategyType::LongShort
-            | StrategyType::OnlyShortMultiTF
-            | StrategyType::LongShortMultiTF => {
-                match self.entry_short(index, instrument, upper_tf_instrument, pricing) {
+            | StrategyType::OnlyShortMTF
+            | StrategyType::LongShortMTF => {
+                match self.entry_short(index, instrument, htf_instrument, pricing) {
                     Position::MarketIn(order_types) => {
                         let trade_type = TradeType::MarketInShort;
 
@@ -435,7 +431,7 @@ pub trait Strategy: DynClone {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
         trade_in: &TradeIn,
         //exit_type: &TradeType,
@@ -446,9 +442,9 @@ pub trait Strategy: DynClone {
         let exit_long = match self.strategy_type() {
             StrategyType::OnlyLong
             | StrategyType::LongShort
-            | StrategyType::OnlyLongMultiTF
-            | StrategyType::LongShortMultiTF => {
-                match self.exit_long(index, instrument, upper_tf_instrument, pricing) {
+            | StrategyType::OnlyLongMTF
+            | StrategyType::LongShortMTF => {
+                match self.exit_long(index, instrument, htf_instrument, pricing) {
                     Position::MarketOut(_) => {
                         let trade_type = TradeType::MarketOutLong;
                         long_exit = true;
@@ -481,9 +477,9 @@ pub trait Strategy: DynClone {
         let exit_short = match self.strategy_type() {
             StrategyType::OnlyShort
             | StrategyType::LongShort
-            | StrategyType::OnlyShortMultiTF
-            | StrategyType::LongShortMultiTF => {
-                match self.exit_short(index, instrument, upper_tf_instrument, pricing) {
+            | StrategyType::OnlyShortMTF
+            | StrategyType::LongShortMTF => {
+                match self.exit_short(index, instrument, htf_instrument, pricing) {
                     Position::MarketOut(_) => {
                         let trade_type = TradeType::MarketOutShort;
                         short_exit = true;

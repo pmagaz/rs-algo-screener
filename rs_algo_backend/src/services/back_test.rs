@@ -167,7 +167,7 @@ pub async fn find_instruments_result_by_strategy(
         Local::now()
     );
 
-    let query = doc! {"market": strategy_result.market.to_string(), "strategy": strategy_result.strategy, "strategy_type": strategy_result.strategy_type.to_string(), "time_frame": strategy_result.time_frame.to_string()};
+    let query = doc! {"market": strategy_result.market.to_string(), "strategy": strategy_result.strategy, "strategy_type": strategy_result.strategy_type.to_string(), "time_frame": strategy_result.time_frame.to_string(), "higher_time_frame": strategy_result.higher_time_frame.unwrap().to_string()};
 
     let backtest_instruments_result: Vec<BackTestInstrumentResult> =
         db::back_test::find_backtest_instruments_result(query, 500, &state)
@@ -315,18 +315,17 @@ pub async fn chart(
             .unwrap()
             .unwrap();
 
-    log::info!(
-        "[BACKTEST CHART] For {:?} Request at {:?}",
-        (
-            &strategy_result.market,
-            &strategy_result.strategy,
-            &strategy_result.strategy_type,
-            &strategy_result.time_frame
-        ),
-        Local::now()
-    );
+    log::info!("[BACKTEST CHART] {:?}", (&strategy_result),);
 
-    let query = doc! {"instrument.symbol": symbol.clone(), "market": strategy_result.market.to_string(), "strategy": strategy_result.strategy.clone(), "strategy_type": strategy_result.strategy_type.to_string(), "time_frame": strategy_result.time_frame.to_string()};
+    let query = match &strategy_result.higher_time_frame {
+        Some(htf) => {
+            doc! {"instrument.symbol": symbol.clone(), "market": strategy_result.market.to_string(), "strategy": strategy_result.strategy.clone(), "strategy_type": strategy_result.strategy_type.to_string(), "time_frame": strategy_result.time_frame.to_string(), "higher_time_frame": htf.to_string()}
+        }
+        None => {
+            doc! {"instrument.symbol": symbol.clone(), "market": strategy_result.market.to_string(), "strategy": strategy_result.strategy.clone(), "strategy_type": strategy_result.strategy_type.to_string(), "time_frame": strategy_result.time_frame.to_string()}
+        }
+    };
+
     let backtest_result: BackTestInstrumentResult =
         db::back_test::find_strategy_instrument_result(query, &state)
             .await
@@ -337,19 +336,21 @@ pub async fn chart(
     let trades_out: Vec<TradeOut> = backtest_result.instrument.trades_out;
     let orders: Vec<Order> = backtest_result.instrument.orders;
     let trades = &(&trades_in, &trades_out, &orders);
+    let time_frame = strategy_result.time_frame.to_string();
+    let higher_time_frame = match &strategy_result.higher_time_frame {
+        Some(htf) => htf.to_string(),
+        None => "".to_string(),
+    };
 
-    let instrument = db::back_test::find_backtest_instrument_by_symbol_time_frame(
-        &*symbol,
-        &strategy_result.time_frame.to_string(),
-        &state,
-    )
-    .await
-    .unwrap()
-    .unwrap();
+    let instrument =
+        db::back_test::find_backtest_instrument_by_symbol_time_frame(&*symbol, &time_frame, &state)
+            .await
+            .unwrap()
+            .unwrap();
 
     let htf_instrument = db::back_test::find_htf_backtest_instrument_by_symbol_time_frame(
         &*symbol,
-        &strategy_result.time_frame.to_string(),
+        &higher_time_frame,
         &state,
     )
     .await

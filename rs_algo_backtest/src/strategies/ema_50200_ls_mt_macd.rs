@@ -30,7 +30,7 @@ impl<'a> Strategy for Ema<'a> {
         Ok(Self {
             stop_loss: init_stop_loss(StopLossType::Atr, stop_loss),
             name: "EMA_50_200_MT_Macd",
-            strategy_type: StrategyType::LongShortMultiTF,
+            strategy_type: StrategyType::LongShortMTF,
         })
     }
 
@@ -55,12 +55,12 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
     ) -> bool {
         let first_weekly_entry = get_htf_data(
             index,
             instrument,
-            upper_tf_instrument,
+            htf_instrument,
             |(idx, prev_idx, upper_inst)| {
                 let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
@@ -84,7 +84,7 @@ impl<'a> Strategy for Ema<'a> {
         let upper_macd = get_htf_data(
             index,
             instrument,
-            upper_tf_instrument,
+            htf_instrument,
             |(idx, _prev_idx, upper_inst)| {
                 let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
@@ -117,12 +117,12 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
     ) -> bool {
         let upper_macd = get_htf_data(
             index,
             instrument,
-            upper_tf_instrument,
+            htf_instrument,
             |(idx, prev_idx, upper_inst)| {
                 let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
                 let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
@@ -173,14 +173,12 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
     ) -> bool {
         match self.strategy_type {
-            StrategyType::LongShort => self.exit_long(index, instrument, upper_tf_instrument),
-            StrategyType::LongShortMultiTF => {
-                self.exit_long(index, instrument, upper_tf_instrument)
-            }
-            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
+            StrategyType::LongShort => self.exit_long(index, instrument, htf_instrument),
+            StrategyType::LongShortMTF => self.exit_long(index, instrument, htf_instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument, htf_instrument),
             _ => false,
         }
     }
@@ -189,15 +187,13 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
     ) -> bool {
         match self.strategy_type {
-            StrategyType::LongShort => self.entry_long(index, instrument, upper_tf_instrument),
-            StrategyType::LongShortMultiTF => {
-                self.entry_long(index, instrument, upper_tf_instrument)
-            }
-            StrategyType::OnlyShort => self.entry_long(index, instrument, upper_tf_instrument),
-            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
+            StrategyType::LongShort => self.entry_long(index, instrument, htf_instrument),
+            StrategyType::LongShortMTF => self.entry_long(index, instrument, htf_instrument),
+            StrategyType::OnlyShort => self.entry_long(index, instrument, htf_instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument, htf_instrument),
             _ => false,
         }
     }

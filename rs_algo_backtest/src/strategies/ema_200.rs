@@ -55,7 +55,7 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        _upper_tf_instrument: &HigherTMInstrument,
+        _htf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -77,7 +77,7 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        _upper_tf_instrument: &HigherTMInstrument,
+        _htf_instrument: &HigherTMInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
         let close_price = &instrument.data.get(index).unwrap().close;
@@ -98,14 +98,12 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
     ) -> bool {
         match self.strategy_type {
-            StrategyType::LongShort => self.exit_long(index, instrument, upper_tf_instrument),
-            StrategyType::LongShortMultiTF => {
-                self.exit_long(index, instrument, upper_tf_instrument)
-            }
-            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
+            StrategyType::LongShort => self.exit_long(index, instrument, htf_instrument),
+            StrategyType::LongShortMTF => self.exit_long(index, instrument, htf_instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument, htf_instrument),
             _ => false,
         }
     }
@@ -114,15 +112,13 @@ impl<'a> Strategy for Ema<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        upper_tf_instrument: &HigherTMInstrument,
+        htf_instrument: &HigherTMInstrument,
     ) -> bool {
         match self.strategy_type {
-            StrategyType::LongShort => self.entry_long(index, instrument, upper_tf_instrument),
-            StrategyType::LongShortMultiTF => {
-                self.entry_long(index, instrument, upper_tf_instrument)
-            }
-            StrategyType::OnlyShort => self.entry_long(index, instrument, upper_tf_instrument),
-            StrategyType::OnlyShort => self.exit_long(index, instrument, upper_tf_instrument),
+            StrategyType::LongShort => self.entry_long(index, instrument, htf_instrument),
+            StrategyType::LongShortMTF => self.entry_long(index, instrument, htf_instrument),
+            StrategyType::OnlyShort => self.entry_long(index, instrument, htf_instrument),
+            StrategyType::OnlyShort => self.exit_long(index, instrument, htf_instrument),
             _ => false,
         }
     }
