@@ -78,15 +78,15 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         pricing: &Pricing,
     ) -> Position {
         let spread = pricing.spread();
-
+        let close_price = &instrument.data.get(index).unwrap().close();
         let anchor_htf = time_frame::get_htf_data(
             index,
             instrument,
             htf_instrument,
             |(idx, _prev_idx, upper_inst)| {
-                let macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
-                let macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
-                macd_a > macd_b
+                let htf_ema_5 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
+                let htf_ema_13 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
+                htf_ema_5 > htf_ema_13 && close_price > htf_ema_13
             },
         );
 
@@ -146,52 +146,6 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         htf_instrument: &HigherTMInstrument,
         pricing: &Pricing,
     ) -> Position {
-        // let _upper_macd = get_htf_data(
-        //     index,
-        //     instrument,
-        //     htf_instrument,
-        //     |(idx, prev_idx, upper_inst)| {
-        //         let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
-        //         let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
-
-        //         let _prev_upper_macd_a = upper_inst
-        //             .indicators
-        //             .macd
-        //             .get_data_a()
-        //             .get(prev_idx)
-        //             .unwrap();
-        //         let _prev_upper_macd_b = upper_inst
-        //             .indicators
-        //             .macd
-        //             .get_data_b()
-        //             .get(prev_idx)
-        //             .unwrap();
-        //         curr_upper_macd_a < curr_upper_macd_b // && prev_upper_macd_a >= prev_upper_macd_b
-        //     },
-        // );
-
-        // let prev_index = get_prev_index(index);
-        // let low_price = &instrument.data.get(index).unwrap().low;
-        // let date = &instrument.data.get(index).unwrap().date;
-
-        // let close_price = &instrument.data.get(index).unwrap().close;
-        // let prev_close = &instrument.data.get(prev_index).unwrap().close;
-
-        // let top_band = instrument.indicators.bb.get_data_a().get(index).unwrap();
-        // let prev_top_band = instrument
-        //     .indicators
-        //     .bb
-        //     .get_data_a()
-        //     .get(prev_index)
-        //     .unwrap();
-
-        // let exit_condition = close_price > top_band && prev_close <= prev_top_band;
-
-        // if exit_condition {
-        //     self.update_stop_loss(StopLossType::Trailing, *low_price);
-        // }
-
-        // false
         let spread = pricing.spread();
         let close_price = &instrument.data.get(index).unwrap().close();
         // let anchor_htf = time_frame::get_htf_data(
@@ -212,7 +166,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             |(idx, _prev_idx, upper_inst)| {
                 let htf_ema_5 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
                 let htf_ema_13 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
-                htf_ema_5 > htf_ema_13 && close_price > htf_ema_13
+                htf_ema_5 < htf_ema_13 && close_price < htf_ema_13
             },
         );
 
