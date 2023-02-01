@@ -3,6 +3,7 @@ use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::order::*;
 use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::strategy::StrategyType;
+use rs_algo_shared::models::time_frame::TimeFrameType;
 use rs_algo_shared::models::trade::*;
 use rs_algo_shared::models::trade::{Position, TradeIn, TradeOut};
 use rs_algo_shared::models::{backtest_instrument::*, order};
@@ -14,11 +15,17 @@ use std::env;
 
 #[async_trait(?Send)]
 pub trait Strategy: DynClone {
-    fn new() -> Result<Self>
+    fn new(
+        time_frame: Option<&str>,
+        higher_time_frame: Option<&str>,
+        strategy_type: Option<StrategyType>,
+    ) -> Result<Self>
     where
         Self: Sized;
     fn name(&self) -> &str;
     fn strategy_type(&self) -> &StrategyType;
+    fn time_frame(&self) -> &TimeFrameType;
+    fn higher_time_frame(&self) -> &Option<TimeFrameType>;
     fn entry_long(
         &mut self,
         index: usize,
@@ -120,10 +127,13 @@ pub trait Strategy: DynClone {
             pricing.spread()
         );
 
-        let uppertimeframe = env::var("HIGHER_TIME_FRAME").unwrap();
+        let higher_time_frame = match self.higher_time_frame() {
+            Some(htf) => htf.to_string(),
+            None => "".to_string(),
+        };
 
         let htf_instrument = &self
-            .get_htf_instrument(&instrument.symbol, &uppertimeframe)
+            .get_htf_instrument(&instrument.symbol, &higher_time_frame)
             .await;
 
         for (index, _candle) in data.iter().enumerate() {

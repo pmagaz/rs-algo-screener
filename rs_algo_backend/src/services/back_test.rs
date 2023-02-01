@@ -315,8 +315,6 @@ pub async fn chart(
             .unwrap()
             .unwrap();
 
-    log::info!("[BACKTEST CHART] {:?}", (&strategy_result),);
-
     let query = match &strategy_result.higher_time_frame {
         Some(htf) => {
             doc! {"instrument.symbol": symbol.clone(), "market": strategy_result.market.to_string(), "strategy": strategy_result.strategy.clone(), "strategy_type": strategy_result.strategy_type.to_string(), "time_frame": strategy_result.time_frame.to_string(), "higher_time_frame": htf.to_string()}

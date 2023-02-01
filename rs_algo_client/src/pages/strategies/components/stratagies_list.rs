@@ -73,7 +73,7 @@ pub fn strategy_list(props: &Props) -> Html {
                 <th><abbr>{ "Strategy" }</abbr></th>
                 <th><abbr>{ "Type" }</abbr></th>
                 <th><abbr>{ "T.Frame" }</abbr></th>
-                <th><abbr>{ "Net Profit" }</abbr></th>
+                <th><abbr>{ "Profit" }</abbr></th>
                 <th><abbr>{ "Profit F." }</abbr></th>
                 <th><abbr>{ "Win Rate" }</abbr></th>
                 <th><abbr>{ "Drawdown" }</abbr></th>

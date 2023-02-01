@@ -6,6 +6,7 @@ use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
 use rs_algo_shared::models::stop_loss::StopLossType;
+use rs_algo_shared::models::time_frame;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut, TradeType};
 use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::scanner::pattern::{PatternDirection, PatternType};
@@ -148,6 +149,8 @@ impl Backend {
             low_points_set = instrument.peaks.local_minima.clone();
         }
 
+        log::warn!("444444444 {}", instrument.data().len());
+
         let BACKGROUND = &RGBColor(208, 213, 222);
         let BLACK_LINE = &RGBColor(0, 0, 0).mix(0.25);
         let CANDLE_BEARISH = &RGBColor(71, 113, 181).mix(0.95);
@@ -202,6 +205,10 @@ impl Backend {
 
         root.fill(BACKGROUND).unwrap();
 
+        let htf_str = match htf_instrument {
+            HigherTMInstrument::HigherTMInstrument(htf_ins) => htf_ins.time_frame().to_string(),
+            HigherTMInstrument::None => "".to_owned(),
+        };
         let mut chart = ChartBuilder::on(&upper)
             .x_label_area_size(40)
             .y_label_area_size(40)
@@ -211,6 +218,8 @@ impl Backend {
                     &instrument.symbol,
                     " ",
                     &instrument.time_frame().to_string(),
+                    " ",
+                    &htf_str,
                 ]
                 .concat(),
                 (font.as_ref(), 14.0).into_font(),
@@ -221,7 +230,20 @@ impl Backend {
         chart
             .configure_mesh()
             .light_line_style(BACKGROUND)
-            .x_label_formatter(&|v| format!("{:.5}", v))
+            //.x_label_formatter(&|v| format!("{:.5}", v))
+            .x_label_formatter(&|v| {
+                format!("{}", {
+                    match instrument.time_frame() {
+                        time_frame::TimeFrameType::D | time_frame::TimeFrameType::W => {
+                            v.format("%d-%m-%Y")
+                        }
+                        time_frame::TimeFrameType::H1 | time_frame::TimeFrameType::H4 => {
+                            v.format("%H:%M:%S")
+                        }
+                        _ => v.format("%M:%S"),
+                    }
+                })
+            })
             .y_label_formatter(&|v| format!("{:.5}", v))
             .draw()
             .unwrap();

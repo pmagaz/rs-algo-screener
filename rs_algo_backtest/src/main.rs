@@ -1,17 +1,15 @@
-use std::time::Instant;
-
-use rs_algo_shared::error::Result;
-use rs_algo_shared::helpers::date::Local;
-
-use dotenv::dotenv;
-use std::env;
-
 mod helpers;
 mod portfolio;
 mod strategies;
 
 use portfolio::PortFolio;
+use rs_algo_shared::helpers::date::Local;
+use rs_algo_shared::models::strategy::StrategyType;
 use strategies::strategy::Strategy;
+
+use dotenv::dotenv;
+use std::env;
+use std::time::Instant;
 
 #[tokio::main]
 async fn main() {
@@ -32,10 +30,101 @@ async fn main() {
         instruments: vec![],
         strategies: vec![
             /* Scalping */
-            // Box::new(strategies::ema_scalping2::EmaScalping2::new().unwrap()),
-            // Box::new(strategies::ema_scalping::EmaScalping::new().unwrap()),
+            // Box::new(
+            //     strategies::ema_scalping2::EmaScalping2::new(
+            //         Some("M5"),
+            //         Some("H1"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
+            // Box::new(
+            //     strategies::ema_scalping2::EmaScalping2::new(
+            //         Some("M15"),
+            //         Some("H4"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
+            // Box::new(
+            //     strategies::ema_scalping2::EmaScalping2::new(
+            //         Some("M30"),
+            //         Some("H4"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
+            // Box::new(
+            //     strategies::ema_scalping::EmaScalping::new(
+            //         Some("M5"),
+            //         Some("H1"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
+            // Box::new(
+            //     strategies::ema_scalping::EmaScalping::new(
+            //         Some("M15"),
+            //         Some("H4"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
+            // Box::new(
+            //     strategies::ema_scalping::EmaScalping::new(
+            //         Some("M30"),
+            //         Some("H4"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
             Box::new(
-                strategies::bollinger_bands_reversals::BollingerBandsReversals::new().unwrap(),
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M5"),
+                    Some("H1"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M15"),
+                    Some("H4"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M30"),
+                    Some("H4"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M5"),
+                    Some("H1"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M15"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M30"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
             ),
             /* MultiTimeFrame */
             // Box::new(strategies::macd_weekly::MacdWeekly::new().unwrap()),

@@ -40,11 +40,11 @@ impl PortFolio {
             .unwrap()
             .clone();
 
-        let time_frame = env::var("BASE_TIME_FRAME").unwrap().clone();
-        let htf_time_frame = env::var("HIGHER_TIME_FRAME")
-            .unwrap()
-            .parse::<String>()
-            .unwrap();
+        //let time_frame = env::var("BASE_TIME_FRAME").unwrap().clone();
+        // let htf_time_frame = env::var("HIGHER_TIME_FRAME")
+        //     .unwrap()
+        //     .parse::<String>()
+        //     .unwrap();
 
         log::info!("[BACKTEST] Requesting Pricing");
 
@@ -76,6 +76,8 @@ impl PortFolio {
             let mut avg_annual_return = vec![];
             let mut offset = 0;
 
+            let time_frame = strategy.time_frame().to_string();
+            let htf_time_frame = strategy.higher_time_frame();
             for _key in 0..500 / limit {
                 let url = [
                     &endpoint,
@@ -174,12 +176,12 @@ impl PortFolio {
                 avg_sessions.len()
             );
 
-            let htf_time_frame = match strategy.strategy_type().is_multi_timeframe() {
-                true => Some(TimeFrame::new(&htf_time_frame)),
-                false => None,
-            };
+            // let htf_time_frame = match strategy.strategy_type().is_multi_timeframe() {
+            //     true => &htf_time_frame,
+            //     false => None,
+            // };
 
-            let htf_str = match &htf_time_frame {
+            let htf_str = match htf_time_frame {
                 Some(htf) => htf.to_string(),
                 None => "".to_string(),
             };
@@ -198,7 +200,7 @@ impl PortFolio {
                 strategy: strategy.name().to_owned(),
                 strategy_type: strategy.strategy_type().to_owned(),
                 time_frame: TimeFrame::new(&time_frame),
-                higher_time_frame: htf_time_frame,
+                higher_time_frame: htf_time_frame.to_owned(),
                 market: market.to_owned(),
                 date: to_dbtime(Local::now()),
                 avg_sessions: average_usize(&avg_sessions),

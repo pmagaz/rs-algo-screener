@@ -24,7 +24,11 @@ pub struct EmaScalping<'a> {
 }
 
 impl<'a> Strategy for EmaScalping<'a> {
-    fn new() -> Result<Self> {
+    fn new(
+        time_frame: Option<&str>,
+        higher_time_frame: Option<&str>,
+        strategy_type: Option<StrategyType>,
+    ) -> Result<Self> {
         let risk_reward_ratio = std::env::var("RISK_REWARD_RATIO")
             .unwrap()
             .parse::<f64>()
@@ -35,27 +39,39 @@ impl<'a> Strategy for EmaScalping<'a> {
             .parse::<f64>()
             .unwrap();
 
-        let time_frame = std::env::var("BASE_TIME_FRAME")
+        let base_time_frame = &std::env::var("BASE_TIME_FRAME")
             .unwrap()
             .parse::<String>()
-            .unwrap();
-
-        let higher_time_frame = std::env::var("HIGHER_TIME_FRAME")
             .unwrap()
-            .parse::<String>()
-            .unwrap();
+            .clone();
 
-        let strategy_type = StrategyType::OnlyLongMTF;
+        let strategy_type = match strategy_type {
+            Some(stype) => stype,
+            None => StrategyType::OnlyLongMTF,
+        };
 
-        let higher_time_frame = match strategy_type.is_multi_timeframe() {
-            true => Some(TimeFrame::new(&higher_time_frame)),
-            false => None,
+        let time_frame = match time_frame {
+            Some(tf) => TimeFrame::new(tf),
+            None => TimeFrame::new(base_time_frame),
+        };
+
+        let higher_time_frame = match higher_time_frame {
+            Some(htf) => Some(TimeFrame::new(htf)),
+            None => match strategy_type.is_multi_timeframe() {
+                true => Some(TimeFrame::new(
+                    &std::env::var("HIGHER_TIME_FRAME")
+                        .unwrap()
+                        .parse::<String>()
+                        .unwrap(),
+                )),
+                false => None,
+            },
         };
 
         Ok(Self {
             name: "Ema_Scalping",
-            time_frame: TimeFrame::new(&time_frame),
-            higher_time_frame: higher_time_frame,
+            time_frame,
+            higher_time_frame,
             strategy_type,
             risk_reward_ratio,
             profit_target,
@@ -68,6 +84,14 @@ impl<'a> Strategy for EmaScalping<'a> {
 
     fn strategy_type(&self) -> &StrategyType {
         &self.strategy_type
+    }
+
+    fn time_frame(&self) -> &TimeFrameType {
+        &&self.time_frame
+    }
+
+    fn higher_time_frame(&self) -> &Option<TimeFrameType> {
+        &self.higher_time_frame
     }
 
     fn entry_long(
@@ -84,9 +108,9 @@ impl<'a> Strategy for EmaScalping<'a> {
             index,
             instrument,
             htf_instrument,
-            |(idx, _prev_idx, upper_inst)| {
-                let htf_ema_5 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
-                let htf_ema_13 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
+            |(idx, _prev_idx, htf_inst)| {
+                let htf_ema_5 = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
+                let htf_ema_13 = htf_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
                 htf_ema_5 > htf_ema_13 && close_price > htf_ema_13
             },
         );
@@ -163,9 +187,9 @@ impl<'a> Strategy for EmaScalping<'a> {
             index,
             instrument,
             htf_instrument,
-            |(idx, _prev_idx, upper_inst)| {
-                let htf_ema_5 = upper_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
-                let htf_ema_13 = upper_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
+            |(idx, _prev_idx, htf_inst)| {
+                let htf_ema_5 = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
+                let htf_ema_13 = htf_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
                 htf_ema_5 < htf_ema_13 && close_price < htf_ema_13
             },
         );

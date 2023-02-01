@@ -61,22 +61,14 @@ impl<'a> Strategy for Stoch<'a> {
             index,
             instrument,
             htf_instrument,
-            |(idx, prev_idx, upper_inst)| {
-                let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
-                let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
+            |(idx, prev_idx, htf_inst)| {
+                let curr_upper_macd_a = htf_inst.indicators.macd.get_data_a().get(idx).unwrap();
+                let curr_upper_macd_b = htf_inst.indicators.macd.get_data_b().get(idx).unwrap();
 
-                let prev_upper_macd_a = upper_inst
-                    .indicators
-                    .macd
-                    .get_data_a()
-                    .get(prev_idx)
-                    .unwrap();
-                let prev_upper_macd_b = upper_inst
-                    .indicators
-                    .macd
-                    .get_data_b()
-                    .get(prev_idx)
-                    .unwrap();
+                let prev_upper_macd_a =
+                    htf_inst.indicators.macd.get_data_a().get(prev_idx).unwrap();
+                let prev_upper_macd_b =
+                    htf_inst.indicators.macd.get_data_b().get(prev_idx).unwrap();
                 curr_upper_macd_a > curr_upper_macd_b && prev_upper_macd_b >= prev_upper_macd_a
             },
         );
@@ -85,9 +77,9 @@ impl<'a> Strategy for Stoch<'a> {
             index,
             instrument,
             htf_instrument,
-            |(idx, _prev_idx, upper_inst)| {
-                let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
-                let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
+            |(idx, _prev_idx, htf_inst)| {
+                let curr_upper_macd_a = htf_inst.indicators.macd.get_data_a().get(idx).unwrap();
+                let curr_upper_macd_b = htf_inst.indicators.macd.get_data_b().get(idx).unwrap();
                 curr_upper_macd_a > curr_upper_macd_b
             },
         );
@@ -126,22 +118,14 @@ impl<'a> Strategy for Stoch<'a> {
             index,
             instrument,
             htf_instrument,
-            |(idx, prev_idx, upper_inst)| {
-                let curr_upper_macd_a = upper_inst.indicators.macd.get_data_a().get(idx).unwrap();
-                let curr_upper_macd_b = upper_inst.indicators.macd.get_data_b().get(idx).unwrap();
+            |(idx, prev_idx, htf_inst)| {
+                let curr_upper_macd_a = htf_inst.indicators.macd.get_data_a().get(idx).unwrap();
+                let curr_upper_macd_b = htf_inst.indicators.macd.get_data_b().get(idx).unwrap();
 
-                let _prev_upper_macd_a = upper_inst
-                    .indicators
-                    .macd
-                    .get_data_a()
-                    .get(prev_idx)
-                    .unwrap();
-                let _prev_upper_macd_b = upper_inst
-                    .indicators
-                    .macd
-                    .get_data_b()
-                    .get(prev_idx)
-                    .unwrap();
+                let _prev_upper_macd_a =
+                    htf_inst.indicators.macd.get_data_a().get(prev_idx).unwrap();
+                let _prev_upper_macd_b =
+                    htf_inst.indicators.macd.get_data_b().get(prev_idx).unwrap();
                 curr_upper_macd_a < curr_upper_macd_b // && prev_upper_macd_a >= prev_upper_macd_b
             },
         );
