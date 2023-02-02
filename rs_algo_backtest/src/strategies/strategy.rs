@@ -38,6 +38,7 @@ pub trait Strategy: DynClone {
         index: usize,
         instrument: &Instrument,
         htf_instrument: &HigherTMInstrument,
+        trade_in: &TradeIn,
         pricing: &Pricing,
     ) -> Position;
     fn entry_short(
@@ -454,7 +455,7 @@ pub trait Strategy: DynClone {
             | StrategyType::LongShort
             | StrategyType::OnlyLongMTF
             | StrategyType::LongShortMTF => {
-                match self.exit_long(index, instrument, htf_instrument, pricing) {
+                match self.exit_long(index, instrument, htf_instrument, trade_in, pricing) {
                     Position::MarketOut(_) => {
                         let trade_type = TradeType::MarketOutLong;
                         long_exit = true;
@@ -537,7 +538,7 @@ pub trait Strategy: DynClone {
         pending_orders: &Vec<Order>,
         trades_in: &Vec<TradeIn>,
     ) -> PositionResult {
-        match resolve_active_orders(index, instrument, self.strategy_type(), pending_orders) {
+        match resolve_active_orders(index, instrument, pending_orders, pricing) {
             Position::MarketInOrder(mut order) => {
                 let trade_type = match order.order_type.is_long() {
                     true => TradeType::OrderInLong,

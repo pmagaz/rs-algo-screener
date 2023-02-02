@@ -155,7 +155,8 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, *close_price, buy_price),
                 //OrderType::SellOrderLong(OrderDirection::Up, *close_price, sell_price),
-                OrderType::StopLoss(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
+                OrderType::StopLoss(OrderDirection::Down, StopLossType::Atr(1.5)),
+                //OrderType::StopLoss(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
             ]),
 
             false => Position::None,
@@ -167,6 +168,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         index: usize,
         instrument: &Instrument,
         htf_instrument: &HigherTMInstrument,
+        trade_in: &TradeIn,
         pricing: &Pricing,
     ) -> Position {
         let spread = pricing.spread();
@@ -298,7 +300,8 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             true => Position::Order(vec![
                 OrderType::BuyOrderShort(OrderDirection::Down, *close_price, buy_price),
                 //OrderType::SellOrderLong(OrderDirection::Up, *close_price, sell_price),
-                OrderType::StopLoss(OrderDirection::Up, StopLossType::Price(stop_loss_price)),
+                //OrderType::StopLoss(OrderDirection::Up, StopLossType::Price(stop_loss_price)),
+                OrderType::StopLoss(OrderDirection::Up, StopLossType::Atr(1.5)),
             ]),
 
             false => Position::None,
