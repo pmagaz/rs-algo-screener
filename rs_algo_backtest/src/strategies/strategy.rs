@@ -30,14 +30,14 @@ pub trait Strategy: DynClone {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position;
     fn exit_long(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         trade_in: &TradeIn,
         pricing: &Pricing,
     ) -> Position;
@@ -45,14 +45,14 @@ pub trait Strategy: DynClone {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position;
     fn exit_short(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position;
     fn backtest_result(
@@ -64,7 +64,7 @@ pub trait Strategy: DynClone {
         equity: f64,
         commision: f64,
     ) -> BackTestResult;
-    async fn get_htf_instrument(&self, symbol: &str, uppertimeframe: &str) -> HigherTMInstrument {
+    async fn get_htf_instrument(&self, symbol: &str, uppertimeframe: &str) -> HTFInstrument {
         let uppertime_frame = match self.strategy_type() {
             StrategyType::OnlyLongMTF => true,
             StrategyType::LongShortMTF => true,
@@ -90,9 +90,9 @@ pub trait Strategy: DynClone {
                 .await
                 .unwrap();
 
-            HigherTMInstrument::HigherTMInstrument(instrument)
+            HTFInstrument::HTFInstrument(instrument)
         } else {
-            HigherTMInstrument::None
+            HTFInstrument::None
         }
     }
     async fn test(
@@ -246,7 +246,7 @@ pub trait Strategy: DynClone {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
         orders: &Vec<Order>,
         trade_size: f64,
@@ -442,7 +442,7 @@ pub trait Strategy: DynClone {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
         trade_in: &TradeIn,
         //exit_type: &TradeType,

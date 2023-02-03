@@ -56,7 +56,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        _htf_instrument: &HigherTMInstrument,
+        _htf_instrument: &HTFInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
 
@@ -78,7 +78,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        _htf_instrument: &HigherTMInstrument,
+        _htf_instrument: &HTFInstrument,
     ) -> bool {
         let prev_index = get_prev_index(index);
         let close_price = &instrument.data.get(index).unwrap().close;
@@ -117,7 +117,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
     ) -> bool {
         match self.strategy_type {
             StrategyType::LongShort => self.exit_long(index, instrument, htf_instrument),
@@ -131,7 +131,7 @@ impl<'a> Strategy for BollingerBands<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
     ) -> bool {
         match self.strategy_type {
             StrategyType::LongShort => self.entry_long(index, instrument, htf_instrument),

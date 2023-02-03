@@ -40,7 +40,7 @@ impl PortFolio {
             .unwrap()
             .clone();
 
-        //let time_frame = env::var("BASE_TIME_FRAME").unwrap().clone();
+        //let time_frame = env::var("TIME_FRAME").unwrap().clone();
         // let htf_time_frame = env::var("HIGHER_TIME_FRAME")
         //     .unwrap()
         //     .parse::<String>()

@@ -37,7 +37,7 @@ impl Backend {
         &self,
         mode: BackendMode,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         trades: &(&Vec<TradeIn>, &Vec<TradeOut>, &Vec<Order>),
         output_file: &str,
     ) -> Result<()> {
@@ -206,8 +206,8 @@ impl Backend {
         root.fill(BACKGROUND).unwrap();
 
         let htf_str = match htf_instrument {
-            HigherTMInstrument::HigherTMInstrument(htf_ins) => htf_ins.time_frame().to_string(),
-            HigherTMInstrument::None => "".to_owned(),
+            HTFInstrument::HTFInstrument(htf_ins) => htf_ins.time_frame().to_string(),
+            HTFInstrument::None => "".to_owned(),
         };
         let mut chart = ChartBuilder::on(&upper)
             .x_label_area_size(40)
@@ -1091,7 +1091,7 @@ impl Backend {
 
         // //HTF INDICATORS
         match htf_instrument {
-            HigherTMInstrument::HigherTMInstrument(htf_instrument) => {
+            HTFInstrument::HTFInstrument(htf_instrument) => {
                 let macd = &htf_instrument.indicators().macd();
                 let ema_a = &htf_instrument.indicators().ema_a().get_data_a();
                 let ema_b = &htf_instrument.indicators().ema_b().get_data_a();
@@ -1182,7 +1182,7 @@ impl Backend {
                         .unwrap();
                 }
             }
-            HigherTMInstrument::None => {
+            HTFInstrument::None => {
                 let mut indicator_panel = ChartBuilder::on(&lower)
                     .x_label_area_size(40)
                     .y_label_area_size(40)

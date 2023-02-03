@@ -72,7 +72,7 @@ pub async fn chart(
         .render(
             BackendMode::Bot,
             &bot.instrument(),
-            &bot.higher_tf_instrument(),
+            &bot.htf_instrument(),
             trades,
             &output_file,
         )

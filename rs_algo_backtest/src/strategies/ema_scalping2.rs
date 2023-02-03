@@ -39,7 +39,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
             .parse::<f64>()
             .unwrap();
 
-        let base_time_frame = &std::env::var("BASE_TIME_FRAME")
+        let base_time_frame = &std::env::var("TIME_FRAME")
             .unwrap()
             .parse::<String>()
             .unwrap()
@@ -99,7 +99,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
@@ -178,7 +178,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         trade_in: &TradeIn,
         pricing: &Pricing,
     ) -> Position {
@@ -230,7 +230,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
@@ -309,7 +309,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
         &mut self,
         _index: usize,
         _instrument: &Instrument,
-        _htf_instrument: &HigherTMInstrument,
+        _htf_instrument: &HTFInstrument,
         _pricing: &Pricing,
     ) -> Position {
         Position::None

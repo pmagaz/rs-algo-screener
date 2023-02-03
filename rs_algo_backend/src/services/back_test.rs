@@ -355,8 +355,8 @@ pub async fn chart(
     .unwrap();
 
     let htf_instrument = match htf_instrument {
-        Some(htf_ins) => HigherTMInstrument::HigherTMInstrument(htf_ins),
-        None => HigherTMInstrument::None,
+        Some(htf_ins) => HTFInstrument::HTFInstrument(htf_ins),
+        None => HTFInstrument::None,
     };
 
     let output_file = [

@@ -55,7 +55,7 @@ impl<'a> Strategy for MacdDual<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
     ) -> bool {
         let first_weekly_entry = get_htf_data(
             index,
@@ -110,7 +110,7 @@ impl<'a> Strategy for MacdDual<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
     ) -> bool {
         let first_weekly_exit = get_htf_data(
             index,
@@ -160,7 +160,7 @@ impl<'a> Strategy for MacdDual<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
     ) -> bool {
         match self.strategy_type {
             StrategyType::LongShort => self.exit_long(index, instrument, htf_instrument),
@@ -174,7 +174,7 @@ impl<'a> Strategy for MacdDual<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HigherTMInstrument,
+        htf_instrument: &HTFInstrument,
     ) -> bool {
         match self.strategy_type {
             StrategyType::LongShort => self.entry_long(index, instrument, htf_instrument),

@@ -73,7 +73,7 @@ pub async fn chart(
         .render(
             BackendMode::Instrument,
             &instrument,
-            &HigherTMInstrument::None,
+            &HTFInstrument::None,
             &(&vec![], &vec![], &vec![]),
             &output_file,
         )

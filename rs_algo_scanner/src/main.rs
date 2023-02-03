@@ -10,7 +10,7 @@ use rs_algo_shared::helpers::http::request;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::time_frame::*;
-use rs_algo_shared::scanner::instrument::{HigherTMInstrument, Instrument};
+use rs_algo_shared::scanner::instrument::{HTFInstrument, Instrument};
 use screener::Screener;
 use std::time::Instant;
 
@@ -41,7 +41,7 @@ async fn main() -> Result<()> {
     let password = &env::var("BROKER_PASSWORD").unwrap();
     let num_test_bars = env::var("NUM_TEST_BARS").unwrap().parse::<i64>().unwrap();
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
-    let time_frame = &env::var("BASE_TIME_FRAME").unwrap();
+    let time_frame = &env::var("TIME_FRAME").unwrap();
     let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
 
     let sleep = time::Duration::from_millis(*sleep_time);
@@ -134,7 +134,7 @@ async fn main() -> Result<()> {
                     base_timeframe_from.timestamp(),
                     |instrument: Instrument| async move {
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
-                        let time_frame = &env::var("BASE_TIME_FRAME").unwrap();
+                        let time_frame = &env::var("TIME_FRAME").unwrap();
 
                         log::info!(
                             "{} scanned {} from {} to {} in {:?}",
