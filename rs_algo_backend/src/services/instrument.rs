@@ -5,7 +5,6 @@ use crate::models::app_state::AppState;
 use crate::render_chart::{Backend, BackendMode};
 use crate::strategies::general::General;
 
-use rs_algo_shared::broker::xtb;
 use rs_algo_shared::models::api::*;
 use rs_algo_shared::scanner::instrument::*;
 
@@ -146,7 +145,13 @@ pub async fn upsert(
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
 
-    instrument.symbol = xtb::parse_symbol(&symbol).unwrap();
+    // FOR XTB
+    if symbol.contains('_') {
+        let symbol_str: Vec<&str> = symbol.split('_').collect();
+        instrument.symbol = symbol_str[0].to_owned();
+    } else {
+        log::error!("Change fucking xtb");
+    }
 
     log::info!(
         "[INSTRUMENT] Received {} {:?} in {} mode at {:?}",
