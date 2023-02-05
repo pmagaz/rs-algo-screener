@@ -27,7 +27,7 @@ bson = "2.3.0"
 openssl = { version = "0.10.41", features = ["vendored"] }
 
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "86cd7b2" }
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "3f9a38a" }
 #rs_algo_shared = { path = "../../rs_algo_shared" }
 
 # [profile.release]

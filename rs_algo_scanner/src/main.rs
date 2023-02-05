@@ -47,24 +47,20 @@ async fn main() -> Result<()> {
     let sleep = time::Duration::from_millis(*sleep_time);
     let time_frame = TimeFrame::new(time_frame);
 
-    let base_timeframe_from = match time_frame {
-        TimeFrameType::W => {
-            let num_weeks = date::Duration::days(num_test_bars).num_weeks();
-            Local::now() - date::Duration::weeks(num_weeks + 1)
-        }
-        TimeFrameType::D => (Local::now() - date::Duration::days(num_test_bars)),
-        TimeFrameType::H4 => (Local::now() - date::Duration::hours(num_test_bars)),
-        TimeFrameType::H1 => (Local::now() - date::Duration::hours(num_test_bars)),
-        TimeFrameType::M30 => (Local::now() - date::Duration::minutes(num_test_bars)),
-        TimeFrameType::M15 => (Local::now() - date::Duration::minutes(num_test_bars)),
-        TimeFrameType::M5 => (Local::now() - date::Duration::minutes(num_test_bars)),
-        TimeFrameType::M1 => (Local::now() - date::Duration::minutes(num_test_bars)),
-        _ => (Local::now() - date::Duration::days(num_test_bars)),
+    let time_frame_from = match time_frame {
+        TimeFrameType::D | TimeFrameType::W => Local::now() - date::Duration::days(num_test_bars),
+        TimeFrameType::H4 => Local::now() - date::Duration::minutes(num_test_bars),
+        TimeFrameType::H1 => Local::now() - date::Duration::minutes(num_test_bars),
+        TimeFrameType::M30 => Local::now() - date::Duration::minutes(num_test_bars),
+        TimeFrameType::M15 => Local::now() - date::Duration::minutes(num_test_bars),
+        TimeFrameType::M5 => Local::now() - date::Duration::minutes(num_test_bars),
+        TimeFrameType::M1 => Local::now() - date::Duration::minutes(num_test_bars),
+        _ => Local::now() - date::Duration::days(num_test_bars),
     };
 
-    let base_timeframe_from = Local::now() - date::Duration::minutes(num_test_bars);
+    //let time_frame_from = Local::now() - date::Duration::minutes(num_test_bars);
 
-    log::info!("FROM {}", base_timeframe_from);
+    log::info!("FROM {}", time_frame_from);
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
     let mut symbols = screener.get_symbols().await.unwrap().symbols;
@@ -131,7 +127,7 @@ async fn main() -> Result<()> {
                     &s.symbol,
                     &market,
                     &time_frame,
-                    base_timeframe_from.timestamp(),
+                    time_frame_from.timestamp(),
                     |instrument: Instrument| async move {
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
                         let time_frame = &env::var("TIME_FRAME").unwrap();

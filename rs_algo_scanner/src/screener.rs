@@ -54,12 +54,6 @@ where
             .await
             .unwrap();
 
-        // let res = self
-        //     .broker
-        //     .get_instrument_streaming(symbol, time_frame.value(), start_date)
-        //     .await
-        //     .unwrap();
-
         let mut instrument = Instrument::new()
             .symbol(&symbol)
             .market(market.to_owned())
