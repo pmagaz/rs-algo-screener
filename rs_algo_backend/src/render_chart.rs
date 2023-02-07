@@ -4,7 +4,7 @@ use chrono::{DateTime, Local};
 use rs_algo_shared::helpers::date::{fom_dbtime, to_dbtime};
 use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
-use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
+use rs_algo_shared::models::order::{Order, OrderDirection, OrderStatus, OrderType};
 use rs_algo_shared::models::stop_loss::StopLossType;
 use rs_algo_shared::models::time_frame;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut, TradeType};
@@ -148,8 +148,6 @@ impl Backend {
             top_points_set = instrument.peaks.local_maxima.clone();
             low_points_set = instrument.peaks.local_minima.clone();
         }
-
-        log::warn!("444444444 {}", instrument.data().len());
 
         let BACKGROUND = &RGBColor(208, 213, 222);
         let BLACK_LINE = &RGBColor(0, 0, 0).mix(0.25);
@@ -769,7 +767,7 @@ impl Backend {
         let triangle_size = match mode {
             BackendMode::Instrument => 0,
             BackendMode::BackTest => 5,
-            BackendMode::Bot => 6,
+            BackendMode::Bot => 7,
         };
 
         //TRADES_IN
@@ -854,32 +852,38 @@ impl Backend {
                 let candle = data.get(candle_index).unwrap();
                 let date = candle.date();
 
+                let order_opacity = match order.status {
+                    OrderStatus::Pending => 0.8,
+                    OrderStatus::Fulfilled => 1.5,
+                    _ => 0.3,
+                };
+
                 match order.order_type {
                     OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
                         (date, order.target_price),
                         triangle_size,
-                        &ORANGE_LINE.mix(1.5),
+                        &ORANGE_LINE.mix(order_opacity),
                     ),
                     OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
                         (date, order.target_price),
                         -triangle_size,
-                        &ORANGE_LINE.mix(1.5),
+                        &ORANGE_LINE.mix(order_opacity),
                     ),
                     OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
                         (date, order.target_price),
                         -triangle_size,
-                        &ORANGE_LINE.mix(1.5),
+                        &ORANGE_LINE.mix(order_opacity),
                     ),
                     OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
                         (date, order.target_price),
                         triangle_size,
-                        &ORANGE_LINE.mix(1.5),
+                        &ORANGE_LINE.mix(order_opacity),
                     ),
                     OrderType::TakeProfitLong(_, _, _) | OrderType::TakeProfitShort(_, _, _) => {
                         TriangleMarker::new(
                             (date, order.target_price),
                             -triangle_size,
-                            &ORANGE_LINE.mix(1.5),
+                            &ORANGE_LINE.mix(order_opacity),
                         )
                     }
                     OrderType::StopLoss(_, _) => match order.order_type.clone() {

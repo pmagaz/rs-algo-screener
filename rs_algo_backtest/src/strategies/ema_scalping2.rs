@@ -54,7 +54,6 @@ impl<'a> Strategy for EmaScalping2<'a> {
             Some(tf) => TimeFrame::new(tf),
             None => TimeFrame::new(base_time_frame),
         };
-        log::warn!("55555555 {:?}", time_frame);
 
         let higher_time_frame = match higher_time_frame {
             Some(htf) => Some(TimeFrame::new(htf)),

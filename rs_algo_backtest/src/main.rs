@@ -78,14 +78,14 @@ async fn main() {
             //     )
             //     .unwrap(),
             // ),
-            Box::new(
-                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-                    Some("M5"),
-                    Some("H1"),
-                    Some(StrategyType::OnlyLongMTF),
-                )
-                .unwrap(),
-            ),
+            // Box::new(
+            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+            //         Some("M5"),
+            //         Some("H1"),
+            //         Some(StrategyType::OnlyLongMTF),
+            //     )
+            //     .unwrap(),
+            // ),
             Box::new(
                 strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
                     Some("M15"),
@@ -99,14 +99,6 @@ async fn main() {
                     Some("M30"),
                     Some("H4"),
                     Some(StrategyType::OnlyLongMTF),
-                )
-                .unwrap(),
-            ),
-            Box::new(
-                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-                    Some("M5"),
-                    Some("H1"),
-                    Some(StrategyType::LongShortMTF),
                 )
                 .unwrap(),
             ),
