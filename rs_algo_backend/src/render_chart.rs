@@ -1174,6 +1174,18 @@ impl Backend {
                         .unwrap();
                 }
 
+                if ema_b.len() > 0 {
+                    chart
+                        .draw_series(LineSeries::new(
+                            result
+                                .iter()
+                                .enumerate()
+                                .map(|(id, data)| (data.0, ema_b[data.1])),
+                            RED_LINE2.mix(1.5),
+                        ))
+                        .unwrap();
+                }
+
                 if ema_c.len() > 0 {
                     chart
                         .draw_series(LineSeries::new(
