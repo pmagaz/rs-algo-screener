@@ -853,9 +853,9 @@ impl Backend {
                 let date = candle.date();
 
                 let order_opacity = match order.status {
-                    OrderStatus::Pending => 0.8,
+                    OrderStatus::Pending => 1.,
                     OrderStatus::Fulfilled => 1.5,
-                    _ => 0.3,
+                    _ => 0.6,
                 };
 
                 match order.order_type {
@@ -891,18 +891,18 @@ impl Backend {
                             OrderDirection::Up => TriangleMarker::new(
                                 (date, order.target_price),
                                 -triangle_size,
-                                &RED_LINE,
+                                &RED_LINE.mix(order_opacity),
                             ),
                             _ => TriangleMarker::new(
                                 (date, order.target_price),
                                 triangle_size,
-                                &RED_LINE,
+                                &RED_LINE.mix(order_opacity),
                             ),
                         },
                         _ => TriangleMarker::new(
                             (date, order.target_price),
                             triangle_size,
-                            &RED_LINE,
+                            &RED_LINE.mix(order_opacity),
                         ),
                     },
                 }
