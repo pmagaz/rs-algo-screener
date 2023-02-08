@@ -1097,17 +1097,17 @@ impl Backend {
         match htf_instrument {
             HTFInstrument::HTFInstrument(htf_instrument) => {
                 let macd = &htf_instrument.indicators().macd();
-                let ema_a = &htf_instrument.indicators().ema_a().get_data_a();
-                let ema_b = &htf_instrument.indicators().ema_b().get_data_a();
-                let ema_c = &htf_instrument.indicators().ema_c().get_data_a();
-                let macd_a = macd.get_data_a();
-                let macd_b = macd.get_data_b();
-                let max_macd = macd_a
+                let htf_ema_a = &htf_instrument.indicators().ema_a().get_data_a();
+                let htf_ema_b = &htf_instrument.indicators().ema_b().get_data_a();
+                let htf_ema_c = &htf_instrument.indicators().ema_c().get_data_a();
+                let htf_macd_a = macd.get_data_a();
+                let htf_macd_b = macd.get_data_b();
+                let max_macd = htf_macd_a
                     .iter()
                     .max_by(|x, y| x.partial_cmp(&y).unwrap())
                     .map(|x| x)
                     .unwrap();
-                let min_macd = macd_a
+                let min_macd = htf_macd_a
                     .iter()
                     .min_by(|x, y| x.partial_cmp(&y).unwrap())
                     .map(|x| x)
@@ -1148,7 +1148,7 @@ impl Backend {
                     .draw_series(LineSeries::new(
                         (0..)
                             .zip(result.iter())
-                            .map(|(id, data)| (data.0, macd_a[data.1])),
+                            .map(|(id, data)| (data.0, htf_macd_a[data.1])),
                         BLUE_LINE3,
                     ))
                     .unwrap();
@@ -1157,46 +1157,46 @@ impl Backend {
                     .draw_series(LineSeries::new(
                         (0..)
                             .zip(result.iter())
-                            .map(|(id, data)| (data.0, macd_b[data.1])),
+                            .map(|(id, data)| (data.0, htf_macd_b[data.1])),
                         RED_LINE,
                     ))
                     .unwrap();
 
-                if ema_a.len() > 0 {
+                if htf_ema_a.len() > 0 {
                     chart
                         .draw_series(LineSeries::new(
                             result
                                 .iter()
                                 .enumerate()
-                                .map(|(id, data)| (data.0, ema_a[data.1])),
+                                .map(|(id, data)| (data.0, htf_ema_a[data.1])),
                             ORANGE_LINE.mix(1.5),
                         ))
                         .unwrap();
                 }
 
-                if ema_b.len() > 0 {
+                if htf_ema_b.len() > 0 {
                     chart
                         .draw_series(LineSeries::new(
                             result
                                 .iter()
                                 .enumerate()
-                                .map(|(id, data)| (data.0, ema_b[data.1])),
+                                .map(|(id, data)| (data.0, htf_ema_b[data.1])),
                             RED_LINE2.mix(1.5),
                         ))
                         .unwrap();
                 }
 
-                if ema_c.len() > 0 {
-                    chart
-                        .draw_series(LineSeries::new(
-                            result
-                                .iter()
-                                .enumerate()
-                                .map(|(id, data)| (data.0, ema_c[data.1])),
-                            RED_LINE2.mix(1.5),
-                        ))
-                        .unwrap();
-                }
+                // if htf_ema_c.len() > 0 {
+                //     chart
+                //         .draw_series(LineSeries::new(
+                //             result
+                //                 .iter()
+                //                 .enumerate()
+                //                 .map(|(id, data)| (data.0, htf_ema_c[data.1])),
+                //             RED_LINE2.mix(1.5),
+                //         ))
+                //         .unwrap();
+                // }
             }
             HTFInstrument::None => {
                 let mut indicator_panel = ChartBuilder::on(&lower)
