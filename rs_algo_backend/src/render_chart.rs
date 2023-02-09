@@ -853,9 +853,9 @@ impl Backend {
                 let date = candle.date();
 
                 let order_opacity = match order.status {
-                    OrderStatus::Pending => 1.,
+                    OrderStatus::Pending => 0.7,
                     OrderStatus::Fulfilled => 1.5,
-                    _ => 0.6,
+                    _ => 0.3,
                 };
 
                 match order.order_type {
