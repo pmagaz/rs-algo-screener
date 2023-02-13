@@ -41,8 +41,6 @@ pub fn strategy(props: &Props) -> Html {
         _ => true,
     };
 
-    log::info!("44444444 {}", is_instrument_strategies);
-
     let backtested_strategy_url = match is_instrument_strategies {
         false => [base_url.replace(
             &["strategy/", id, "/", strategy, "/", time_frame].concat(),

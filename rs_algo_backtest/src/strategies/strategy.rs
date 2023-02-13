@@ -64,7 +64,7 @@ pub trait Strategy: DynClone {
         equity: f64,
         commision: f64,
     ) -> BackTestResult;
-    async fn get_htf_instrument(&self, symbol: &str, uppertimeframe: &str) -> HTFInstrument {
+    async fn get_htf_instrument(&self, symbol: &str, higher_time_frame: &str) -> HTFInstrument {
         let uppertime_frame = match self.strategy_type() {
             StrategyType::OnlyLongMTF => true,
             StrategyType::LongShortMTF => true,
@@ -75,11 +75,11 @@ pub trait Strategy: DynClone {
         if uppertime_frame {
             let endpoint = env::var("BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT").unwrap();
 
-            let url = [&endpoint, "/", symbol, "/", uppertimeframe].concat();
+            let url = [&endpoint, "/", symbol, "/", higher_time_frame].concat();
 
             log::info!(
                 "[BACKTEST UPPER TIMEFRAME] {} instrument for {}",
-                &uppertimeframe,
+                &higher_time_frame,
                 &symbol
             );
 

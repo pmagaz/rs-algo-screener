@@ -817,6 +817,7 @@ impl Backend {
         chart
             .draw_series(trades_out.iter().enumerate().map(|(i, trade_out)| {
                 let date = fom_dbtime(&trade_out.date_out);
+                log::info!("11111111 {:?}", (trades_in.len(), trades_out.len(), i));
                 let trade_in = trades_in.get(i).unwrap();
                 let price = trade_out.price_out;
                 let element = match trade_out.profit > 0. {
@@ -844,69 +845,74 @@ impl Backend {
         //ORDERS
 
         chart
-            .draw_series(orders.iter().enumerate().map(|(i, order)| {
-                let candle_index = data
+            .draw_series(
+                orders
                     .iter()
-                    .position(|x| uuid::generate_ts_id(x.date) == order.id)
-                    .unwrap();
-                let candle = data.get(candle_index).unwrap();
-                let date = candle.date();
+                    //.filter(|x| x.status != OrderStatus::Canceled)
+                    .enumerate()
+                    .map(|(i, order)| {
+                        let candle_index = data
+                            .iter()
+                            .position(|x| uuid::generate_ts_id(x.date) == order.id)
+                            .unwrap();
+                        let candle = data.get(candle_index).unwrap();
+                        let date = candle.date();
 
-                let order_opacity = match order.status {
-                    OrderStatus::Pending => 0.7,
-                    OrderStatus::Fulfilled => 1.5,
-                    _ => 0.3,
-                };
+                        let order_opacity = match order.status {
+                            OrderStatus::Pending => 1.1,
+                            OrderStatus::Fulfilled => 1.5,
+                            _ => 0.3,
+                        };
 
-                match order.order_type {
-                    OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
-                        (date, order.target_price),
-                        triangle_size,
-                        &ORANGE_LINE.mix(order_opacity),
-                    ),
-                    OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
-                        (date, order.target_price),
-                        -triangle_size,
-                        &ORANGE_LINE.mix(order_opacity),
-                    ),
-                    OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
-                        (date, order.target_price),
-                        -triangle_size,
-                        &ORANGE_LINE.mix(order_opacity),
-                    ),
-                    OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
-                        (date, order.target_price),
-                        triangle_size,
-                        &ORANGE_LINE.mix(order_opacity),
-                    ),
-                    OrderType::TakeProfitLong(_, _, _) | OrderType::TakeProfitShort(_, _, _) => {
-                        TriangleMarker::new(
-                            (date, order.target_price),
-                            -triangle_size,
-                            &ORANGE_LINE.mix(order_opacity),
-                        )
-                    }
-                    OrderType::StopLoss(_, _) => match order.order_type.clone() {
-                        OrderType::StopLoss(direction, _) => match direction {
-                            OrderDirection::Up => TriangleMarker::new(
-                                (date, order.target_price),
-                                -triangle_size,
-                                &RED_LINE.mix(order_opacity),
-                            ),
-                            _ => TriangleMarker::new(
+                        match order.order_type {
+                            OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
                                 (date, order.target_price),
                                 triangle_size,
-                                &RED_LINE.mix(order_opacity),
+                                &ORANGE_LINE.mix(order_opacity),
                             ),
-                        },
-                        _ => TriangleMarker::new(
-                            (date, order.target_price),
-                            triangle_size,
-                            &RED_LINE.mix(order_opacity),
-                        ),
-                    },
-                }
-            }))
+                            OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                -triangle_size,
+                                &ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                -triangle_size,
+                                &ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                triangle_size,
+                                &ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::TakeProfitLong(_, _, _)
+                            | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                -triangle_size,
+                                &ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::StopLoss(_, _) => match order.order_type.clone() {
+                                OrderType::StopLoss(direction, _) => match direction {
+                                    OrderDirection::Up => TriangleMarker::new(
+                                        (date, order.target_price),
+                                        -triangle_size,
+                                        &RED_LINE.mix(order_opacity),
+                                    ),
+                                    _ => TriangleMarker::new(
+                                        (date, order.target_price),
+                                        triangle_size,
+                                        &RED_LINE.mix(order_opacity),
+                                    ),
+                                },
+                                _ => TriangleMarker::new(
+                                    (date, order.target_price),
+                                    triangle_size,
+                                    &RED_LINE.mix(order_opacity),
+                                ),
+                            },
+                        }
+                    }),
+            )
             .unwrap();
 
         // chart
