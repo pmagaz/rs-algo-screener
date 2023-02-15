@@ -2,10 +2,11 @@ use crate::db;
 use crate::db::helpers::compact_instrument;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::render_chart::{Backend, BackendMode};
+use crate::render_chart::Backend;
 use crate::strategies::general::General;
 
 use rs_algo_shared::models::api::*;
+use rs_algo_shared::models::mode::*;
 use rs_algo_shared::scanner::instrument::*;
 
 use actix_files as fs;
@@ -71,7 +72,7 @@ pub async fn chart(
 
     Backend::new()
         .render(
-            BackendMode::Instrument,
+            ExecutionMode::Scanner,
             &instrument,
             &HTFInstrument::None,
             &(&vec![], &vec![], &vec![]),

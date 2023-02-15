@@ -4,6 +4,7 @@ use chrono::{DateTime, Local};
 use rs_algo_shared::helpers::date::{fom_dbtime, to_dbtime};
 use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
+use rs_algo_shared::models::mode::*;
 use rs_algo_shared::models::order::{Order, OrderDirection, OrderStatus, OrderType};
 use rs_algo_shared::models::stop_loss::StopLossType;
 use rs_algo_shared::models::time_frame;
@@ -20,13 +21,13 @@ use std::{env, os};
 #[derive(Debug, Clone)]
 pub struct Backend;
 
-#[derive(PartialEq)]
+// #[derive(PartialEq)]
 
-pub enum BackendMode {
-    Instrument,
-    BackTest,
-    Bot,
-}
+// pub enum ExecutionMode {
+//     Instrument,
+//     BackTest,
+//     Bot,
+// }
 
 impl Backend {
     pub fn new() -> Self {
@@ -35,7 +36,7 @@ impl Backend {
 
     pub fn render(
         &self,
-        mode: BackendMode,
+        mode: ExecutionMode,
         instrument: &Instrument,
         htf_instrument: &HTFInstrument,
         trades: &(&Vec<TradeIn>, &Vec<TradeOut>, &Vec<Order>),
@@ -116,7 +117,7 @@ impl Backend {
 
         last_trade_in = trades_in.last();
         last_trade_out = trades_out.last();
-        if mode == BackendMode::BackTest || mode == BackendMode::Bot {
+        if mode == ExecutionMode::BackTest || mode == ExecutionMode::Bot {
             //if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
             prices_in_ids = trades_in.iter().map(|x| x.id).collect();
@@ -272,7 +273,7 @@ impl Backend {
             .unwrap();
 
         // PATTERN NAME
-        if mode == BackendMode::Instrument {
+        if mode == ExecutionMode::Scanner {
             for (_x, pattern) in patterns
                 .iter()
                 .filter(|pat| {
@@ -417,7 +418,7 @@ impl Backend {
             // MARKERS
 
             match mode {
-                BackendMode::Instrument => {
+                ExecutionMode::Scanner => {
                     if points_mode == PointsMode::MaximaMinima {
                         chart
                             .draw_series(data.iter().enumerate().map(|(i, candle)| {
@@ -461,7 +462,7 @@ impl Backend {
                             .unwrap();
                     }
                 }
-                // BackendMode::BackTest => {
+                // ExecutionMode::BackTest => {
                 //     // chart
                 //     //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
                 //     //         let price;
@@ -482,7 +483,7 @@ impl Backend {
                     // chart
                     //     .draw_series(data.iter().enumerate().map(|(i, candle)| {
                     //         let index = match mode {
-                    //             BackendMode::BackTest => i,
+                    //             ExecutionMode::BackTest => i,
                     //             _ => uuid::generate_ts_id(candle.date()),
                     //         };
 
@@ -492,7 +493,7 @@ impl Backend {
                     //             let trade_in = trades_in.get(trade_in_index).unwrap();
                     //             let price = trade_in.price_in;
                     //             match mode {
-                    //                 BackendMode::Bot => Circle::new(
+                    //                 ExecutionMode::Bot => Circle::new(
                     //                     (candle.date, price),
                     //                     5,
                     //                     Into::<ShapeStyle>::into(&BLUE_LINE3).filled(),
@@ -520,7 +521,7 @@ impl Backend {
 
                     // TRADES OUT
                     // match mode {
-                    //     BackendMode::Bot => {
+                    //     ExecutionMode::Bot => {
                     //    chart
                     //         .draw_series(PointSeries::of_element(
                     //             (0..)
@@ -612,7 +613,7 @@ impl Backend {
                     // .unwrap(),
                     //};
 
-                    //if mode == BackendMode::BackTest {
+                    //if mode == ExecutionMode::BackTest {
                     //ORDERS
 
                     // for (id, order) in orders.iter().enumerate() {
@@ -764,82 +765,117 @@ impl Backend {
             };
         }
 
-        let triangle_size = match mode {
-            BackendMode::Instrument => 0,
-            BackendMode::BackTest => 5,
-            BackendMode::Bot => 7,
+        let orders_size = match mode {
+            ExecutionMode::Scanner => 0,
+            ExecutionMode::BackTest => 5,
+            ExecutionMode::Bot => 6,
+        };
+
+        let trades_size = match mode {
+            ExecutionMode::Scanner => 0,
+            ExecutionMode::BackTest => 6,
+            ExecutionMode::Bot => 8,
         };
 
         //TRADES_IN
 
         chart
-            .draw_series(trades_in.iter().enumerate().map(|(i, trade_in)| {
-                let date = fom_dbtime(&trade_in.date_in);
-                let price = trade_in.price_in;
+            .draw_series(
+                trades_in
+                    .iter()
+                    .filter(|x| x.date_in >= to_dbtime(data.first().unwrap().date()))
+                    .enumerate()
+                    .map(|(i, trade_in)| {
+                        let date = fom_dbtime(&trade_in.date_in);
+                        let price = trade_in.price_in;
 
-                match trade_in.trade_type.is_long() {
-                    true => TriangleMarker::new(
-                        (date, trade_in.price_in - trade_in.spread),
-                        triangle_size,
-                        &BLUE_LINE.mix(6.),
-                    ),
-                    false => TriangleMarker::new(
-                        (date, trade_in.price_in),
-                        -triangle_size,
-                        &BLUE_LINE.mix(6.),
-                    ),
-                }
-            }))
+                        match trade_in.trade_type.is_long() {
+                            true => TriangleMarker::new(
+                                (date, trade_in.price_in - trade_in.spread),
+                                trades_size,
+                                &BLUE_LINE.mix(6.),
+                            ),
+                            false => TriangleMarker::new(
+                                (date, trade_in.price_in),
+                                -trades_size,
+                                &BLUE_LINE.mix(6.),
+                            ),
+                        }
+                    }),
+            )
             .unwrap();
 
         //TRADES_IN SPREAD
 
         chart
-            .draw_series(trades_in.iter().enumerate().map(|(i, trade_in)| {
-                let date = fom_dbtime(&trade_in.date_in);
-                let price = trade_in.price_in;
-                match trade_in.trade_type.is_entry() {
-                    true => match trade_in.trade_type.is_long() {
-                        true => {
-                            TriangleMarker::new((date, price), triangle_size, &BLUE_LINE.mix(2.))
+            .draw_series(
+                trades_in
+                    .iter()
+                    .filter(|x| x.date_in >= to_dbtime(data.first().unwrap().date()))
+                    .enumerate()
+                    .map(|(i, trade_in)| {
+                        let date = fom_dbtime(&trade_in.date_in);
+                        let price = trade_in.price_in;
+                        match trade_in.trade_type.is_entry() {
+                            true => match trade_in.trade_type.is_long() {
+                                true => TriangleMarker::new(
+                                    (date, price),
+                                    trades_size,
+                                    &BLUE_LINE.mix(2.),
+                                ),
+                                false => TriangleMarker::new(
+                                    (date, price),
+                                    -trades_size,
+                                    &BLUE_LINE.mix(2.),
+                                ),
+                            },
+                            false => todo!(),
                         }
-                        false => {
-                            TriangleMarker::new((date, price), -triangle_size, &BLUE_LINE.mix(2.))
-                        }
-                    },
-                    false => todo!(),
-                }
-            }))
+                    }),
+            )
             .unwrap();
 
         //TRADES_OUT
 
         chart
-            .draw_series(trades_out.iter().enumerate().map(|(i, trade_out)| {
-                let date = fom_dbtime(&trade_out.date_out);
-                log::info!("11111111 {:?}", (trades_in.len(), trades_out.len(), i));
-                let trade_in = trades_in.get(i).unwrap();
-                let price = trade_out.price_out;
-                let element = match trade_out.profit > 0. {
-                    true => match trade_out.trade_type.is_long() {
-                        true => {
-                            TriangleMarker::new((date, price), -triangle_size, &GREEN_LINE2.mix(6.))
-                        }
-                        false => {
-                            TriangleMarker::new((date, price), triangle_size, &GREEN_LINE2.mix(6.))
-                        }
-                    },
-                    false => match trade_in.trade_type.is_long() {
-                        true => {
-                            TriangleMarker::new((date, price), triangle_size, &RED_LINE2.mix(6.))
-                        }
-                        false => {
-                            TriangleMarker::new((date, price), -triangle_size, &RED_LINE2.mix(6.))
-                        }
-                    },
-                };
-                element
-            }))
+            .draw_series(
+                trades_out
+                    .iter()
+                    .filter(|x| x.date_out > to_dbtime(data.first().unwrap().date()))
+                    .enumerate()
+                    .map(|(i, trade_out)| {
+                        let date = fom_dbtime(&trade_out.date_out);
+                        let trade_in = trades_in.get(i).unwrap();
+                        let price = trade_out.price_out;
+                        let element = match trade_out.profit > 0. {
+                            true => match trade_out.trade_type.is_long() {
+                                true => TriangleMarker::new(
+                                    (date, price),
+                                    -trades_size,
+                                    &GREEN_LINE2.mix(6.),
+                                ),
+                                false => TriangleMarker::new(
+                                    (date, price),
+                                    trades_size,
+                                    &GREEN_LINE2.mix(6.),
+                                ),
+                            },
+                            false => match trade_in.trade_type.is_long() {
+                                true => TriangleMarker::new(
+                                    (date, price),
+                                    trades_size,
+                                    &RED_LINE2.mix(6.),
+                                ),
+                                false => TriangleMarker::new(
+                                    (date, price),
+                                    -trades_size,
+                                    &RED_LINE2.mix(6.),
+                                ),
+                            },
+                        };
+                        element
+                    }),
+            )
             .unwrap();
 
         //ORDERS
@@ -848,68 +884,80 @@ impl Backend {
             .draw_series(
                 orders
                     .iter()
-                    //.filter(|x| x.status != OrderStatus::Canceled)
+                    .filter(|x| x.created_at > to_dbtime(data.first().unwrap().date()))
                     .enumerate()
                     .map(|(i, order)| {
-                        let candle_index = data
+                        let leches = match data
                             .iter()
                             .position(|x| uuid::generate_ts_id(x.date) == order.id)
-                            .unwrap();
-                        let candle = data.get(candle_index).unwrap();
-                        let date = candle.date();
-
-                        let order_opacity = match order.status {
-                            OrderStatus::Pending => 1.1,
-                            OrderStatus::Fulfilled => 1.5,
-                            _ => 0.3,
+                        {
+                            Some(x) => true,
+                            None => false,
                         };
 
-                        match order.order_type {
-                            OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
-                                (date, order.target_price),
-                                triangle_size,
-                                &ORANGE_LINE.mix(order_opacity),
-                            ),
-                            OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
-                                (date, order.target_price),
-                                -triangle_size,
-                                &ORANGE_LINE.mix(order_opacity),
-                            ),
-                            OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
-                                (date, order.target_price),
-                                -triangle_size,
-                                &ORANGE_LINE.mix(order_opacity),
-                            ),
-                            OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
-                                (date, order.target_price),
-                                triangle_size,
-                                &ORANGE_LINE.mix(order_opacity),
-                            ),
-                            OrderType::TakeProfitLong(_, _, _)
-                            | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
-                                (date, order.target_price),
-                                -triangle_size,
-                                &ORANGE_LINE.mix(order_opacity),
-                            ),
-                            OrderType::StopLoss(_, _) => match order.order_type.clone() {
-                                OrderType::StopLoss(direction, _) => match direction {
-                                    OrderDirection::Up => TriangleMarker::new(
-                                        (date, order.target_price),
-                                        -triangle_size,
-                                        &RED_LINE.mix(order_opacity),
-                                    ),
+                        if leches {
+                            let candle_index = data
+                                .iter()
+                                .position(|x| uuid::generate_ts_id(x.date) == order.id)
+                                .unwrap();
+                            let candle = data.get(candle_index).unwrap();
+                            let date = candle.date();
+
+                            let order_opacity = match order.status {
+                                OrderStatus::Pending => 1.1,
+                                OrderStatus::Fulfilled => 1.5,
+                                _ => 0.3,
+                            };
+
+                            match order.order_type {
+                                OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
+                                    (date, order.target_price),
+                                    orders_size,
+                                    &ORANGE_LINE.mix(order_opacity),
+                                ),
+                                OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
+                                    (date, order.target_price),
+                                    -orders_size,
+                                    &ORANGE_LINE.mix(order_opacity),
+                                ),
+                                OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
+                                    (date, order.target_price),
+                                    -orders_size,
+                                    &ORANGE_LINE.mix(order_opacity),
+                                ),
+                                OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
+                                    (date, order.target_price),
+                                    orders_size,
+                                    &ORANGE_LINE.mix(order_opacity),
+                                ),
+                                OrderType::TakeProfitLong(_, _, _)
+                                | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
+                                    (date, order.target_price),
+                                    -orders_size,
+                                    &ORANGE_LINE.mix(order_opacity),
+                                ),
+                                OrderType::StopLoss(_, _) => match order.order_type.clone() {
+                                    OrderType::StopLoss(direction, _) => match direction {
+                                        OrderDirection::Up => TriangleMarker::new(
+                                            (date, order.target_price),
+                                            -orders_size,
+                                            &RED_LINE.mix(order_opacity),
+                                        ),
+                                        _ => TriangleMarker::new(
+                                            (date, order.target_price),
+                                            orders_size,
+                                            &RED_LINE.mix(order_opacity),
+                                        ),
+                                    },
                                     _ => TriangleMarker::new(
                                         (date, order.target_price),
-                                        triangle_size,
+                                        orders_size,
                                         &RED_LINE.mix(order_opacity),
                                     ),
                                 },
-                                _ => TriangleMarker::new(
-                                    (date, order.target_price),
-                                    triangle_size,
-                                    &RED_LINE.mix(order_opacity),
-                                ),
-                            },
+                            }
+                        } else {
+                            TriangleMarker::new((Local::now(), 0.), 0, &TRANSPARENT)
                         }
                     }),
             )

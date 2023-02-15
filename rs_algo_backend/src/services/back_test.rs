@@ -1,12 +1,12 @@
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::render_chart::{Backend, BackendMode};
+use crate::render_chart::Backend;
 
 use rs_algo_shared::helpers::date::*;
-use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
+use rs_algo_shared::models::mode::*;
 use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
@@ -370,7 +370,7 @@ pub async fn chart(
 
     Backend::new()
         .render(
-            BackendMode::BackTest,
+            ExecutionMode::BackTest,
             &instrument,
             &htf_instrument,
             trades,

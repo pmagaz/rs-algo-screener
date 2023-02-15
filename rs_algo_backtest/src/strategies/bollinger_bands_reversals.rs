@@ -101,6 +101,11 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
+        let atr_value = std::env::var("ATR_STOP_LOSS")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap()
+            .clone();
         let spread = pricing.spread();
         let close_price = &instrument.data.get(index).unwrap().close();
         let anchor_htf = time_frame::get_htf_data(
@@ -137,7 +142,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         match entry_condition {
             true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, *close_price, buy_price),
-                OrderType::StopLoss(OrderDirection::Down, StopLossType::Atr(1.2)),
+                OrderType::StopLoss(OrderDirection::Down, StopLossType::Atr(atr_value)),
             ]),
 
             false => Position::None,
@@ -205,6 +210,11 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
+        let atr_value = std::env::var("ATR_STOP_LOSS")
+            .unwrap()
+            .parse::<f64>()
+            .unwrap()
+            .clone();
         let spread = pricing.spread();
         let close_price = &instrument.data.get(index).unwrap().close();
         let anchor_htf = time_frame::get_htf_data(
@@ -240,7 +250,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         match entry_condition {
             true => Position::Order(vec![
                 OrderType::BuyOrderShort(OrderDirection::Down, *close_price, buy_price),
-                OrderType::StopLoss(OrderDirection::Up, StopLossType::Atr(1.2)),
+                OrderType::StopLoss(OrderDirection::Up, StopLossType::Atr(atr_value)),
             ]),
 
             false => Position::None,

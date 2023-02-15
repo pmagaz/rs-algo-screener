@@ -224,7 +224,7 @@ pub trait Strategy: DynClone {
                                 true => {
                                     //log::info!("OVERWRITING ORDERS {:?}", orders.len());
                                     orders =
-                                        order::cancel_all_pending_orders(index, instrument, orders);
+                                        order::cancel_all_pending_orders(0, instrument, orders);
                                 }
                                 false => (),
                             }

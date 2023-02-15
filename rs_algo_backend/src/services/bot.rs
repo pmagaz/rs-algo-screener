@@ -1,7 +1,9 @@
 use crate::db;
 use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
-use crate::render_chart::{Backend, BackendMode};
+use crate::render_chart::Backend;
+
+use rs_algo_shared::models::mode::*;
 use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
 
@@ -70,7 +72,7 @@ pub async fn chart(
 
     Backend::new()
         .render(
-            BackendMode::Bot,
+            ExecutionMode::Bot,
             &bot.instrument(),
             &bot.htf_instrument(),
             trades,
