@@ -1,5 +1,4 @@
 use crate::error::Result;
-use chrono::Datelike;
 use error::RsAlgoErrorKind;
 use rs_algo_shared::broker::xtb::*;
 use rs_algo_shared::broker::*;
@@ -10,17 +9,13 @@ use rs_algo_shared::helpers::http::request;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use rs_algo_shared::models::market::*;
 use rs_algo_shared::models::time_frame::*;
-use rs_algo_shared::scanner::instrument::{HTFInstrument, Instrument};
+use rs_algo_shared::scanner::instrument::Instrument;
 use screener::Screener;
 use std::time::Instant;
 
 mod backend;
-//mod candle;
 mod error;
 mod helpers;
-//mod indicators;
-//mod instrument;
-//mod patterns;
 mod prices;
 mod screener;
 
@@ -41,24 +36,12 @@ async fn main() -> Result<()> {
     let password = &env::var("BROKER_PASSWORD").unwrap();
     let num_test_bars = env::var("NUM_TEST_BARS").unwrap().parse::<i64>().unwrap();
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
-    let time_frame = &env::var("TIME_FRAME").unwrap();
+    let time_frame_str = &env::var("TIME_FRAME").unwrap();
     let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
 
     let sleep = time::Duration::from_millis(*sleep_time);
-    let time_frame = TimeFrame::new(time_frame);
-
-    let time_frame_from = match time_frame {
-        TimeFrameType::D | TimeFrameType::W => Local::now() - date::Duration::days(num_test_bars),
-        TimeFrameType::H4 => Local::now() - date::Duration::minutes(num_test_bars),
-        TimeFrameType::H1 => Local::now() - date::Duration::minutes(num_test_bars),
-        TimeFrameType::M30 => Local::now() - date::Duration::minutes(num_test_bars),
-        TimeFrameType::M15 => Local::now() - date::Duration::minutes(num_test_bars),
-        TimeFrameType::M5 => Local::now() - date::Duration::minutes(num_test_bars),
-        TimeFrameType::M1 => Local::now() - date::Duration::minutes(num_test_bars),
-        _ => Local::now() - date::Duration::days(num_test_bars),
-    };
-
-    //let time_frame_from = Local::now() - date::Duration::minutes(num_test_bars);
+    let time_frame = TimeFrame::new(time_frame_str);
+    let time_frame_from = TimeFrame::get_starting_bar(num_test_bars, &time_frame); // stupid
 
     log::info!("FROM {}", time_frame_from);
     let mut screener = Screener::<Xtb>::new().await?;

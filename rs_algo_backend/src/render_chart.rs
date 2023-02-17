@@ -239,13 +239,19 @@ impl Backend {
                         time_frame::TimeFrameType::H1 | time_frame::TimeFrameType::H4 => {
                             v.format("%H:%M:%S")
                         }
-                        _ => v.format("%M:%S"),
+                        _ => v.format("%H:%M:%S"),
                     }
                 })
             })
             .y_label_formatter(&|v| format!("{:.5}", v))
             .draw()
             .unwrap();
+
+        let candle_with = match mode {
+            ExecutionMode::Scanner => 3,
+            ExecutionMode::BackTest => 2,
+            ExecutionMode::Bot => 4,
+        };
 
         chart
             .draw_series(data.iter().enumerate().map(|(_id, candle)| {
@@ -267,7 +273,7 @@ impl Backend {
                     candle.close,
                     bullish,
                     bearish,
-                    2,
+                    candle_with,
                 )
             }))
             .unwrap();
@@ -1203,7 +1209,7 @@ impl Backend {
                         (0..)
                             .zip(result.iter())
                             .map(|(id, data)| (data.0, htf_macd_a[data.1])),
-                        BLUE_LINE3,
+                        BLUE_LINE3.mix(0.8),
                     ))
                     .unwrap();
 
@@ -1212,7 +1218,7 @@ impl Backend {
                         (0..)
                             .zip(result.iter())
                             .map(|(id, data)| (data.0, htf_macd_b[data.1])),
-                        RED_LINE,
+                        RED_LINE.mix(0.8),
                     ))
                     .unwrap();
 
@@ -1223,7 +1229,7 @@ impl Backend {
                                 .iter()
                                 .enumerate()
                                 .map(|(id, data)| (data.0, htf_ema_a[data.1])),
-                            ORANGE_LINE.mix(1.5),
+                            ORANGE_LINE.mix(1.4),
                         ))
                         .unwrap();
                 }
@@ -1235,7 +1241,7 @@ impl Backend {
                                 .iter()
                                 .enumerate()
                                 .map(|(id, data)| (data.0, htf_ema_b[data.1])),
-                            RED_LINE2.mix(1.5),
+                            RED_LINE2.mix(1.4),
                         ))
                         .unwrap();
                 }
