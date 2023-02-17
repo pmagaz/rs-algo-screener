@@ -77,8 +77,8 @@ pub fn bot_list(props: &Props) -> Html {
                     <td class={get_status_class(&max_drawdown_status)}>  { format!("{}%", round(bot.strategy_stats.max_drawdown,2) ) } </td>
                     <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(bot.strategy_stats.won_per_trade_per,2))}</td>
                     <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(bot.strategy_stats.lost_per_trade_per,2))}</td>
-                    <td> {format!("{} / {} / {}", bot.strategy_stats.wining_trades, bot.strategy_stats.losing_trades, bot.strategy_stats.stop_losses )}</td>
                     <td>{ bot.strategy_stats.trades }</td>
+                    <td> {format!("{} / {} / {}", bot.strategy_stats.wining_trades, bot.strategy_stats.losing_trades, bot.strategy_stats.stop_losses )}</td>
                     <td> {format!("{}", bot.last_update.to_chrono().format("%H:%M:%S"))}</td>
                 </tr>
             }
