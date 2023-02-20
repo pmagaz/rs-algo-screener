@@ -9,7 +9,6 @@ use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::time_frame::TimeFrameType;
 use rs_algo_shared::models::trade::TradeIn;
 use rs_algo_shared::models::trade::TradeOut;
-use rs_algo_shared::models::trade::TradeType;
 use rs_algo_shared::scanner::instrument::Instrument;
 
 pub fn resolve_backtest(
@@ -43,10 +42,7 @@ pub fn resolve_backtest(
         let trades = wining_trades + losing_trades;
         let won_per_trade_per = avg_per_trade(&w_trades);
         let lost_per_trade_per = avg_per_trade(&l_trades);
-        let stop_losses = trades_out
-            .iter()
-            .filter(|x| x.trade_type == TradeType::StopLoss)
-            .count();
+        let stop_losses = trades_out.iter().filter(|x| x.trade_type.is_stop()).count();
         let gross_profits = total_gross(&w_trades);
         let gross_loses = total_gross(&l_trades);
         let gross_profit = gross_profits + gross_loses;

@@ -126,7 +126,7 @@ impl Backend {
             //top_peaks_ids = peaks.local_maxima().iter().map(|x| x.).collect();
             stop_loss_ids = trades_out
                 .iter()
-                .filter(|x| x.trade_type == TradeType::StopLoss)
+                .filter(|x| x.trade_type.is_stop())
                 .map(|x| x.id)
                 .collect();
 
@@ -137,7 +137,7 @@ impl Backend {
 
             stop_loss = trades_out
                 .iter()
-                .filter(|x| x.trade_type == TradeType::StopLoss)
+                .filter(|x| x.trade_type.is_stop())
                 .map(|x| (x.id, x.price_out))
                 .collect();
 
@@ -211,7 +211,7 @@ impl Backend {
         let mut chart = ChartBuilder::on(&upper)
             .x_label_area_size(40)
             .y_label_area_size(40)
-            .margin(15)
+            .margin(30)
             .caption(
                 &[
                     &instrument.symbol,
@@ -799,12 +799,12 @@ impl Backend {
                             true => TriangleMarker::new(
                                 (date, trade_in.price_in - trade_in.spread),
                                 trades_size,
-                                &BLUE_LINE.mix(6.),
+                                &ORANGE_LINE.mix(5.),
                             ),
                             false => TriangleMarker::new(
                                 (date, trade_in.price_in),
                                 -trades_size,
-                                &BLUE_LINE.mix(6.),
+                                &ORANGE_LINE.mix(5.),
                             ),
                         }
                     }),
@@ -827,12 +827,12 @@ impl Backend {
                                 true => TriangleMarker::new(
                                     (date, price),
                                     trades_size,
-                                    &BLUE_LINE.mix(2.),
+                                    &ORANGE_LINE.mix(1.8),
                                 ),
                                 false => TriangleMarker::new(
                                     (date, price),
                                     -trades_size,
-                                    &BLUE_LINE.mix(2.),
+                                    &ORANGE_LINE.mix(1.8),
                                 ),
                             },
                             false => todo!(),
@@ -853,29 +853,30 @@ impl Backend {
                         let date = fom_dbtime(&trade_out.date_out);
                         let trade_in = trades_in.get(i).unwrap();
                         let price = trade_out.price_out;
+                        log::info!("66666666 {:?}", (trade_out.date_out));
                         let element = match trade_out.profit > 0. {
                             true => match trade_out.trade_type.is_long() {
                                 true => TriangleMarker::new(
                                     (date, price),
                                     -trades_size,
-                                    &GREEN_LINE2.mix(6.),
+                                    &GREEN_LINE2.mix(5.),
                                 ),
                                 false => TriangleMarker::new(
                                     (date, price),
                                     trades_size,
-                                    &GREEN_LINE2.mix(6.),
+                                    &GREEN_LINE2.mix(5.),
                                 ),
                             },
                             false => match trade_in.trade_type.is_long() {
                                 true => TriangleMarker::new(
                                     (date, price),
                                     trades_size,
-                                    &RED_LINE2.mix(6.),
+                                    &RED_LINE2.mix(5.),
                                 ),
                                 false => TriangleMarker::new(
                                     (date, price),
                                     -trades_size,
-                                    &RED_LINE2.mix(6.),
+                                    &RED_LINE2.mix(5.),
                                 ),
                             },
                         };
@@ -912,7 +913,7 @@ impl Backend {
                             let order_opacity = match order.status {
                                 OrderStatus::Pending => 1.1,
                                 OrderStatus::Fulfilled => 1.5,
-                                _ => 0.3,
+                                _ => 0.6,
                             };
 
                             match order.order_type {
@@ -942,25 +943,17 @@ impl Backend {
                                     -orders_size,
                                     &ORANGE_LINE.mix(order_opacity),
                                 ),
-                                OrderType::StopLoss(_, _) => match order.order_type.clone() {
-                                    OrderType::StopLoss(direction, _) => match direction {
-                                        OrderDirection::Up => TriangleMarker::new(
-                                            (date, order.target_price),
-                                            -orders_size,
-                                            &RED_LINE.mix(order_opacity),
-                                        ),
-                                        _ => TriangleMarker::new(
-                                            (date, order.target_price),
-                                            orders_size,
-                                            &RED_LINE.mix(order_opacity),
-                                        ),
-                                    },
-                                    _ => TriangleMarker::new(
-                                        (date, order.target_price),
-                                        orders_size,
-                                        &RED_LINE.mix(order_opacity),
-                                    ),
-                                },
+                                OrderType::StopLossLong(_, _) => TriangleMarker::new(
+                                    (date, order.target_price),
+                                    orders_size,
+                                    &RED_LINE.mix(order_opacity),
+                                ),
+
+                                OrderType::StopLossShort(_, _) => TriangleMarker::new(
+                                    (date, order.target_price),
+                                    -orders_size,
+                                    &RED_LINE.mix(order_opacity),
+                                ),
                             }
                         } else {
                             TriangleMarker::new((Local::now(), 0.), 0, &TRANSPARENT)
@@ -968,87 +961,6 @@ impl Backend {
                     }),
             )
             .unwrap();
-
-        // chart
-        //     .draw_series(trades_out.iter().enumerate().map(|(i, trade_out)| {
-        //         let candle_index = data
-        //             .iter()
-        //             .position(|x| uuid::generate_ts_id(x.date) == trade_out.id)
-        //             .unwrap();
-        //         let candle = data.get(candle_index).unwrap();
-        //         let date = fom_dbtime(&trade_out.date_out);
-        //         let price = trade_out.price_out;
-        //         //let date = candle.date();
-
-        //         match trade_out.trade_type.is_exit() {
-        //             true => match trade_out.trade_type.is_long() {
-        //                 true => TriangleMarker::new((date, price), -6, &RED_LINE2.mix(8.)),
-        //                 false => TriangleMarker::new((date, price), 6, &RED_LINE2.mix(8.)),
-        //             },
-        //             false => todo!(),
-        //         }
-        //     }))
-        //     .unwrap();
-
-        // chart
-        //     .draw_series(PointSeries::of_element(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .filter(|(i, candle)| {
-        //                 let index = uuid::generate_ts_id(candle.date());
-        //                 prices_in_ids.contains(&index)
-        //             })
-        //             .map(|(i, candle)| {
-        //                 let date = candle.date();
-        //                 let index = uuid::generate_ts_id(candle.date());
-        //                 let trade_in_index =
-        //                     prices_in_ids.iter().position(|&x| x == index).unwrap();
-        //                 let trade_in = trades_in.get(trade_in_index).unwrap();
-        //                 (date, trade_in.price_in)
-        //             }),
-        //         5,
-        //         ShapeStyle::from(&BLUE_LINE3),
-        //         &|coord, size: i32, style| {
-        //             let (date, price) = coord;
-        //             let index = uuid::generate_ts_id(date);
-        //             let trade_in_index =
-        //                 prices_in_ids.iter().position(|&x| x == index).unwrap();
-
-        //             let trade_in = trades_in.get(trade_in_index).unwrap();
-
-        //             let leches = match trade_in.trade_type.is_entry() {
-        //                 true => match trade_in.trade_type.is_long() {
-        //                     true => TriangleMarker::new((0, 0), 6, &BLUE_LINE.mix(8.)),
-        //                     false => TriangleMarker::new((0, 0), -6, &BLUE_LINE.mix(8.)),
-        //                 },
-        //                 false => todo!(),
-        //             };
-        //             EmptyElement::at(coord) + leches
-        //             // + Text::new(
-        //             //     format!(
-        //             //         "{:?} / {:?} / {:?}",
-        //             //         round(trade_in.price_in, 4),
-        //             //         round(trade_in.ask, 4),
-        //             //         round(trade_in.spread, 4),
-        //             //     ),
-        //             //     (0, 20),
-        //             //     ("sans-serif", 12),
-        //             // )
-        //             //}
-        //             // _ => {
-        //             //     EmptyElement::at(coord)
-        //             //         + Circle::new(
-        //             //             (0, 0),
-        //             //             4,
-        //             //             ShapeStyle::from(&BLUE_LINE.mix(1.)).filled(),
-        //             //         )
-        //             //         + Text::new(format!(""), (0, 20), ("sans-serif", 0))
-        //             // }
-        //             //};
-        //             //element
-        //         },
-        //     ))
-        //     .unwrap();
 
         //BOLLINGER BANDS
 
@@ -1080,78 +992,6 @@ impl Backend {
                 ))
                 .unwrap();
         }
-
-        //EMAS
-
-        // if ema_c.len() > 0 && ema_b.len() <= 0 {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             data.iter()
-        //                 .enumerate()
-        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
-        //             RED_LINE2,
-        //         ))
-        //         .unwrap();
-        // } else if ema_c.len() > 0 && ema_b.len() > 0 {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(data.iter())
-        //                 .filter(|(id, candle)| ema_c[*id] <= ema_b[*id])
-        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
-        //             ORANGE_LINE,
-        //         ))
-        //         .unwrap();
-
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(data.iter())
-        //                 .filter(|(id, candle)| ema_b[*id] < ema_c[*id])
-        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
-        //             RED_LINE2,
-        //         ))
-        //         .unwrap();
-        // }
-
-        //OPEN POSITION
-
-        // let mut rsi_pannel = ChartBuilder::on(&indicator_1)
-        //     .x_label_area_size(40)
-        //     .y_label_area_size(40)
-        //     .build_cartesian_2d(from_date..to_date, -0f64..100f64)
-        //     .unwrap();
-
-        // rsi_pannel
-        //     .draw_series(LineSeries::new(
-        //         (0..)
-        //             .zip(data.iter())
-        //             .map(|(id, candle)| (candle.date, rsi[id])),
-        //         RED_LINE,
-        //     ))
-        //     .unwrap();
-
-        // if ema_a.len() > 0 {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             data.iter()
-        //                 .enumerate()
-        //                 .map(|(id, candle)| (candle.date, ema_a[id])),
-        //             ORANGE_LINE.mix(4.),
-        //         ))
-        //         .unwrap();
-        // }
-
-        // if ema_c.len() > 0 {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             data.iter()
-        //                 .enumerate()
-        //                 .map(|(id, candle)| (candle.date, ema_c[id])),
-        //             RED_LINE2.mix(4.),
-        //         ))
-        //         .unwrap();
-        // }
 
         // //HTF INDICATORS
         match htf_instrument {

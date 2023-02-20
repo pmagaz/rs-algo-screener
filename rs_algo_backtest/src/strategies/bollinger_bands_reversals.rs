@@ -19,6 +19,7 @@ pub struct BollingerBandsReversals<'a> {
     time_frame: TimeFrameType,
     higher_time_frame: Option<TimeFrameType>,
     strategy_type: StrategyType,
+    order_size: f64,
     risk_reward_ratio: f64,
     profit_target: f64,
 }
@@ -44,6 +45,8 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .parse::<String>()
             .unwrap()
             .clone();
+
+        let order_size = std::env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
         let strategy_type = match strategy_type {
             Some(stype) => stype,
@@ -72,6 +75,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             name: "BollingerBandsReversals",
             time_frame,
             higher_time_frame,
+            order_size,
             strategy_type,
             risk_reward_ratio,
             profit_target,
@@ -141,8 +145,8 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
 
         match entry_condition {
             true => Position::Order(vec![
-                OrderType::BuyOrderLong(OrderDirection::Up, *close_price, buy_price),
-                OrderType::StopLoss(OrderDirection::Down, StopLossType::Atr(atr_value)),
+                OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
+                OrderType::StopLossLong(OrderDirection::Down, StopLossType::Atr(atr_value)),
             ]),
 
             false => Position::None,
@@ -188,7 +192,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
 
         let previous_bars = 3;
         let mut ridding_bars = 0;
-        for candle in data[prev_index - previous_bars..prev_index].iter() {
+        for candle in data[index - previous_bars..index + 1].iter() {
             if candle.close() > *top_band {
                 ridding_bars += 1;
             }
@@ -249,8 +253,8 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
 
         match entry_condition {
             true => Position::Order(vec![
-                OrderType::BuyOrderShort(OrderDirection::Down, *close_price, buy_price),
-                OrderType::StopLoss(OrderDirection::Up, StopLossType::Atr(atr_value)),
+                OrderType::BuyOrderShort(OrderDirection::Down, self.order_size, buy_price),
+                OrderType::StopLossShort(OrderDirection::Up, StopLossType::Atr(atr_value)),
             ]),
 
             false => Position::None,
@@ -295,7 +299,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
 
         let previous_bars = 3;
         let mut ridding_bars = 0;
-        for candle in data[prev_index - previous_bars..prev_index].iter() {
+        for candle in data[index - previous_bars..index + 1].iter() {
             if candle.close() < *low_band {
                 ridding_bars += 1;
             }

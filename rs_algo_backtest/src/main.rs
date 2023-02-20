@@ -30,150 +30,150 @@ async fn main() {
         instruments: vec![],
         strategies: vec![
             /* Scalping */
-            // Box::new(
-            //     strategies::ema_scalping::EmaScalping::new(
-            //         Some("M5"),
-            //         Some("H1"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping::EmaScalping::new(
-            //         Some("M15"),
-            //         Some("H4"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping::EmaScalping::new(
-            //         Some("M30"),
-            //         Some("H4"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping::EmaScalping::new(
-            //         Some("M5"),
-            //         Some("H1"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping::EmaScalping::new(
-            //         Some("M15"),
-            //         Some("H4"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping::EmaScalping::new(
-            //         Some("M30"),
-            //         Some("H4"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping2::EmaScalping2::new(
-            //         Some("M5"),
-            //         Some("H1"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping2::EmaScalping2::new(
-            //         Some("M15"),
-            //         Some("H4"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping2::EmaScalping2::new(
-            //         Some("M30"),
-            //         Some("H4"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping2::EmaScalping2::new(
-            //         Some("M5"),
-            //         Some("H1"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping2::EmaScalping2::new(
-            //         Some("M15"),
-            //         Some("H4"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::ema_scalping2::EmaScalping2::new(
-            //         Some("M30"),
-            //         Some("H4"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-            //         Some("M5"),
-            //         Some("H1"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-            //         Some("M15"),
-            //         Some("H4"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-            //         Some("M30"),
-            //         Some("H4"),
-            //         Some(StrategyType::OnlyLongMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-            //         Some("M5"),
-            //         Some("H1"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-            //         Some("M15"),
-            //         Some("H4"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
-            // Box::new(
-            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-            //         Some("M30"),
-            //         Some("H4"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
+            Box::new(
+                strategies::ema_scalping::EmaScalping::new(
+                    Some("M5"),
+                    Some("H1"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping::EmaScalping::new(
+                    Some("M15"),
+                    Some("H4"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping::EmaScalping::new(
+                    Some("M30"),
+                    Some("H4"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping::EmaScalping::new(
+                    Some("M5"),
+                    Some("H1"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping::EmaScalping::new(
+                    Some("M15"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping::EmaScalping::new(
+                    Some("M30"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping2::EmaScalping2::new(
+                    Some("M5"),
+                    Some("H1"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping2::EmaScalping2::new(
+                    Some("M15"),
+                    Some("H4"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping2::EmaScalping2::new(
+                    Some("M30"),
+                    Some("H4"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping2::EmaScalping2::new(
+                    Some("M5"),
+                    Some("H1"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping2::EmaScalping2::new(
+                    Some("M15"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::ema_scalping2::EmaScalping2::new(
+                    Some("M30"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M5"),
+                    Some("H1"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M15"),
+                    Some("H4"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M30"),
+                    Some("H4"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M5"),
+                    Some("H1"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M15"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("M30"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
             Box::new(
                 strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
                     Some("M5"),

@@ -19,6 +19,7 @@ pub struct EmaScalping<'a> {
     time_frame: TimeFrameType,
     higher_time_frame: Option<TimeFrameType>,
     strategy_type: StrategyType,
+    order_size: f64,
     risk_reward_ratio: f64,
     profit_target: f64,
 }
@@ -44,6 +45,8 @@ impl<'a> Strategy for EmaScalping<'a> {
             .parse::<String>()
             .unwrap()
             .clone();
+
+        let order_size = std::env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
         let strategy_type = match strategy_type {
             Some(stype) => stype,
@@ -73,6 +76,7 @@ impl<'a> Strategy for EmaScalping<'a> {
             time_frame,
             higher_time_frame,
             strategy_type,
+            order_size,
             risk_reward_ratio,
             profit_target,
         })
@@ -102,7 +106,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         pricing: &Pricing,
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
-        let spread = pricing.spread();
+        let spread = 0.;
 
         let anchor_htf = time_frame::get_htf_data(
             index,
@@ -141,7 +145,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         let pips_margin = 5.;
         let previous_bars = 5;
 
-        let highest_bar = data[prev_index - previous_bars..prev_index]
+        let highest_bar = data[index - previous_bars..index + 1]
             .iter()
             .max_by(|x, y| x.high().partial_cmp(&y.high()).unwrap())
             .map(|x| x.high())
@@ -154,10 +158,10 @@ impl<'a> Strategy for EmaScalping<'a> {
 
         match entry_condition {
             true => Position::Order(vec![
-                OrderType::BuyOrderLong(OrderDirection::Up, *close_price, buy_price),
-                OrderType::SellOrderLong(OrderDirection::Up, *close_price, sell_price),
+                OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
+                OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
                 //OrderType::StopLoss(OrderDirection::Down, StopLossType::Atr(atr_value)),
-                OrderType::StopLoss(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
+                OrderType::StopLossLong(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
             ]),
 
             false => Position::None,
@@ -183,7 +187,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         pricing: &Pricing,
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
-        let spread = pricing.spread();
+        let spread = 0.;
         let anchor_htf = time_frame::get_htf_data(
             index,
             instrument,
@@ -222,7 +226,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         let pips_margin = 5.;
         let previous_bars = 5;
 
-        let lowest_bar = data[prev_index - previous_bars..prev_index]
+        let lowest_bar = data[index - previous_bars..index + 1]
             .iter()
             .min_by(|x, y| x.low().partial_cmp(&y.low()).unwrap())
             .map(|x| x.low())
@@ -235,9 +239,9 @@ impl<'a> Strategy for EmaScalping<'a> {
 
         match entry_condition {
             true => Position::Order(vec![
-                OrderType::BuyOrderShort(OrderDirection::Down, *close_price, buy_price),
-                OrderType::SellOrderShort(OrderDirection::Down, *close_price, sell_price),
-                OrderType::StopLoss(OrderDirection::Up, StopLossType::Price(stop_loss_price)),
+                OrderType::BuyOrderShort(OrderDirection::Down, self.order_size, buy_price),
+                OrderType::SellOrderShort(OrderDirection::Down, self.order_size, sell_price),
+                OrderType::StopLossShort(OrderDirection::Up, StopLossType::Price(stop_loss_price)),
             ]),
 
             false => Position::None,

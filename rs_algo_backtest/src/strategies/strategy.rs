@@ -220,16 +220,18 @@ pub trait Strategy: DynClone {
                             }
                         }
                         PositionResult::PendingOrder(new_orders) => {
-                            match overwrite_orders {
-                                true => {
-                                    //log::info!("OVERWRITING ORDERS {:?}", orders.len());
-                                    orders =
-                                        order::cancel_all_pending_orders(0, instrument, orders);
+                            if !open_positions {
+                                match overwrite_orders {
+                                    true => {
+                                        orders = order::cancel_all_pending_orders(
+                                            index, instrument, orders,
+                                        );
+                                    }
+                                    false => (),
                                 }
-                                false => (),
-                            }
 
-                            orders = order::add_pending(orders, new_orders);
+                                orders = order::add_pending(orders, new_orders);
+                            }
                         }
                         _ => (),
                     };
@@ -540,10 +542,7 @@ pub trait Strategy: DynClone {
     ) -> PositionResult {
         match resolve_active_orders(index, instrument, pending_orders, pricing) {
             Position::MarketInOrder(mut order) => {
-                let trade_type = match order.order_type.is_long() {
-                    true => TradeType::OrderInLong,
-                    false => TradeType::OrderInShort,
-                };
+                let trade_type = order.to_trade_type();
                 let trade_in_result = resolve_trade_in(
                     index,
                     trade_size,
@@ -562,28 +561,7 @@ pub trait Strategy: DynClone {
                 PositionResult::MarketInOrder(trade_in_result, order)
             }
             Position::MarketOutOrder(order) => {
-                let trade_type =
-                    match self.strategy_type().is_long_only() {
-                        true => match order.order_type {
-                            OrderType::BuyOrderLong(_, _, _)
-                            | OrderType::BuyOrderShort(_, _, _) => TradeType::MarketInLong,
-                            OrderType::SellOrderLong(_, _, _)
-                            | OrderType::SellOrderShort(_, _, _)
-                            | OrderType::TakeProfitLong(_, _, _)
-                            | OrderType::TakeProfitShort(_, _, _) => TradeType::MarketOutLong,
-                            OrderType::StopLoss(_, _) => TradeType::StopLoss,
-                        },
-                        false => match order.order_type {
-                            OrderType::BuyOrderLong(_, _, _)
-                            | OrderType::BuyOrderShort(_, _, _) => TradeType::MarketInShort,
-                            OrderType::SellOrderLong(_, _, _)
-                            | OrderType::SellOrderShort(_, _, _)
-                            | OrderType::TakeProfitLong(_, _, _)
-                            | OrderType::TakeProfitShort(_, _, _) => TradeType::MarketOutShort,
-                            OrderType::StopLoss(_, _) => TradeType::StopLoss,
-                        },
-                    };
-
+                let trade_type = order.to_trade_type();
                 let trade_out_result = match trades_in.last() {
                     Some(trade_in) => resolve_trade_out(
                         index,
