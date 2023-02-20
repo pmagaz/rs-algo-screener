@@ -20,7 +20,7 @@ async fn main() {
     let env = env::var("ENV").unwrap();
     let trade_size = env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
     let stop_loss = env::var("ATR_STOP_LOSS").unwrap().parse::<f64>().unwrap();
-    let commission = env::var("COMISSION").unwrap().parse::<f64>().unwrap();
+    let commission = env::var("COMMISSION").unwrap().parse::<f64>().unwrap();
     let equity = env::var("EQUITY").unwrap().parse::<f64>().unwrap();
 
     let portfolio = PortFolio {
