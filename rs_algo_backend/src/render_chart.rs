@@ -198,7 +198,7 @@ impl Backend {
         let bb_c = &instrument.indicators.bb.get_data_c();
 
         //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
-        let root = BitMapBackend::new(&output_file, (1321, 765)).into_drawing_area();
+        let root = BitMapBackend::new(&output_file, (1821, 865)).into_drawing_area();
         let (upper, lower) = root.split_vertically((90).percent());
         // let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
