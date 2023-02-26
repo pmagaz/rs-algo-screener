@@ -179,9 +179,6 @@ impl Backend {
         let rsi = &instrument.indicators.rsi.get_data_a();
 
         let patterns = local_patterns;
-        let stoch = &instrument.indicators.stoch;
-        let stoch_a = &stoch.get_data_a();
-        let stoch_b = &stoch.get_data_b();
 
         let macd = &instrument.indicators.macd;
         let macd_a = &macd.get_data_a();
@@ -249,8 +246,8 @@ impl Backend {
 
         let candle_with = match mode {
             ExecutionMode::Scanner => 3,
-            ExecutionMode::BackTest => 2,
             ExecutionMode::Bot => 4,
+            _ => 2,
         };
 
         chart
@@ -773,14 +770,14 @@ impl Backend {
 
         let orders_size = match mode {
             ExecutionMode::Scanner => 0,
-            ExecutionMode::BackTest => 5,
             ExecutionMode::Bot => 6,
+            _ => 5,
         };
 
         let trades_size = match mode {
             ExecutionMode::Scanner => 0,
-            ExecutionMode::BackTest => 6,
             ExecutionMode::Bot => 8,
+            _ => 6,
         };
 
         //TRADES_IN
@@ -1108,7 +1105,7 @@ impl Backend {
                     .draw_series(LineSeries::new(
                         (0..)
                             .zip(data.iter())
-                            .map(|(id, candle)| (candle.date, stoch_a[id])),
+                            .map(|(id, candle)| (candle.date, macd_a[id])),
                         BLUE_LINE3,
                     ))
                     .unwrap();
@@ -1117,7 +1114,7 @@ impl Backend {
                     .draw_series(LineSeries::new(
                         (0..)
                             .zip(data.iter())
-                            .map(|(id, candle)| (candle.date, stoch_b[id])),
+                            .map(|(id, candle)| (candle.date, macd_b[id])),
                         RED_LINE,
                     ))
                     .unwrap();

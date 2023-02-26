@@ -295,21 +295,25 @@ pub async fn find_htf_backtest_instrument_by_symbol_time_frame(
 pub async fn find_prices(state: &web::Data<AppState>) -> Result<Vec<Pricing>, Error> {
     let collection_name = &env::var("DB_PRICING_COLLECTION").unwrap();
     let collection = get_collection::<Pricing>(&state.db_mem, collection_name).await;
-
     let mut cursor = collection
-        .find(doc! {}, FindOptions::builder().build())
+        .find(
+            doc! {},
+            FindOptions::builder()
+                .limit(100)
+                .sort(doc! {"symbol":1})
+                .build(),
+        )
         .await
         .unwrap();
 
     let mut prices: Vec<Pricing> = vec![];
     while let Some(result) = cursor.next().await {
         match result {
-            Ok(spread) => {
-                prices.push(spread);
-            }
+            Ok(pricing) => prices.push(pricing),
             _ => {}
         }
     }
+    log::info!("111 {:?}", prices.len());
     Ok(prices)
 }
 

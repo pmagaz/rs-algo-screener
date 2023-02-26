@@ -109,8 +109,7 @@ impl PortFolio {
                 offset += limit;
                 for instrument in &instruments_to_test {
                     log::info!("[BACKTEST] Testing {}... ", instrument.symbol);
-
-                    let pricing = match prices
+                    let mut pricing = match prices
                         .iter()
                         .position(|pricing| pricing.symbol() == instrument.symbol)
                     {
@@ -123,7 +122,7 @@ impl PortFolio {
                     let backtest_result = dyn_clone::clone_box(strategy)
                         .test(
                             instrument,
-                            &pricing,
+                            &mut pricing,
                             self.trade_size,
                             self.equity,
                             self.commission,

@@ -74,10 +74,6 @@ impl Backend {
         let ORANGE_LINE = &RGBColor(245, 127, 22);
         let GREEN_LINE = &RGBColor(56, 142, 59);
 
-        let stoch = instrument.indicators().stoch();
-        let stoch_a = stoch.get_data_a();
-        let stoch_b = stoch.get_data_b();
-
         let rsi = instrument.indicators().rsi().get_data_a();
 
         let bb_a = instrument.indicators().bb.get_data_a();
@@ -469,31 +465,31 @@ impl Backend {
 
         //STOCH PANNEL
 
-        let mut stoch_pannel = ChartBuilder::on(&indicator_2)
-            .x_label_area_size(40)
-            .y_label_area_size(40)
-            // .margin(2)
-            //.caption("MACD", (font.as_ref(), 8.0).into_font())
-            .build_cartesian_2d(from_date..to_date, -0f64..100f64)
-            .unwrap();
-        //stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
-        stoch_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), stoch_a[id])),
-                BLUE_LINE3,
-            ))
-            .unwrap();
+        // let mut stoch_pannel = ChartBuilder::on(&indicator_2)
+        //     .x_label_area_size(40)
+        //     .y_label_area_size(40)
+        //     // .margin(2)
+        //     //.caption("MACD", (font.as_ref(), 8.0).into_font())
+        //     .build_cartesian_2d(from_date..to_date, -0f64..100f64)
+        //     .unwrap();
+        // //stoch_pannel.configure_mesh().light_line_style(&WHITE).draw().unwrap();
+        // stoch_pannel
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date(), stoch_a[id])),
+        //         BLUE_LINE3,
+        //     ))
+        //     .unwrap();
 
-        stoch_pannel
-            .draw_series(LineSeries::new(
-                (0..)
-                    .zip(data.iter())
-                    .map(|(id, candle)| (candle.date(), stoch_b[id])),
-                RED_LINE,
-            ))
-            .unwrap();
+        // stoch_pannel
+        //     .draw_series(LineSeries::new(
+        //         (0..)
+        //             .zip(data.iter())
+        //             .map(|(id, candle)| (candle.date(), stoch_b[id])),
+        //         RED_LINE,
+        //     ))
+        //     .unwrap();
 
         root.present().expect("[BACKEND] Error. Can't save file!");
         Ok(())

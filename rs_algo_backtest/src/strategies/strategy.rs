@@ -98,7 +98,7 @@ pub trait Strategy: DynClone {
     async fn test(
         &mut self,
         instrument: &Instrument,
-        pricing: &Pricing,
+        pricing: &mut Pricing,
         trade_size: f64,
         equity: f64,
         commission: f64,
@@ -106,7 +106,6 @@ pub trait Strategy: DynClone {
         let mut orders: Vec<Order> = vec![];
         let mut trades_in: Vec<TradeIn> = vec![];
         let mut trades_out: Vec<TradeOut> = vec![];
-
         let mut open_positions = false;
         let data = &instrument.data;
         let len = data.len();
@@ -139,6 +138,8 @@ pub trait Strategy: DynClone {
 
         for (index, _candle) in data.iter().enumerate() {
             if index < len - 1 && index >= 10 {
+                let current_close = instrument.data().get(index).unwrap().close();
+                let pricing = pricing.calculate_spread(current_close);
                 let pending_orders = order::get_pending(&orders);
                 let active_orders_result = self.resolve_pending_orders(
                     index,

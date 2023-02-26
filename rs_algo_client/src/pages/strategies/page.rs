@@ -89,12 +89,12 @@ pub fn strategies() -> Html {
             <Chart url={(*use_strategies_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid ">
-                    <h2 class="navbar-item is-size-3">{ "Stocks" }</h2>
-                    <StrategiesList market={ Market::Stock } strategies={(stock_strategies)} />
                     <h2 class="navbar-item is-size-3">{ "Forex" }</h2>
                     <StrategiesList market={ Market::Forex } strategies={(forex_strategies)} />
                     <h2 class="navbar-item is-size-3">{ "Crytpo" }</h2>
                     <StrategiesList market={ Market::Crypto } strategies={(crypto_strategies)} />
+                    <h2 class="navbar-item is-size-3">{ "Stocks" }</h2>
+                    <StrategiesList market={ Market::Stock } strategies={(stock_strategies)} />
             </div>
             </div>
         </div>

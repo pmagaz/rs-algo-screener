@@ -7,8 +7,9 @@ use rs_algo_shared::helpers::date;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::request;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
-use rs_algo_shared::models::market::*;
+use rs_algo_shared::models::mode::ExecutionMode;
 use rs_algo_shared::models::time_frame::*;
+use rs_algo_shared::models::{market::*, mode};
 use rs_algo_shared::scanner::instrument::Instrument;
 use screener::Screener;
 use std::time::Instant;
@@ -34,24 +35,29 @@ async fn main() -> Result<()> {
     let env = env::var("ENV").unwrap();
     let username = &env::var("BROKER_USERNAME").unwrap();
     let password = &env::var("BROKER_PASSWORD").unwrap();
-    let num_test_bars = env::var("NUM_TEST_BARS").unwrap().parse::<i64>().unwrap();
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
     let time_frame_str = &env::var("TIME_FRAME").unwrap();
-    let filter = env::var("SYMBOLS_FILTER_LIST").unwrap();
+    let execution_mode = mode::from_str(&env::var("EXECUTION_MODE").unwrap());
 
     let sleep = time::Duration::from_millis(*sleep_time);
     let time_frame = TimeFrame::new(time_frame_str);
-    let time_frame_from = TimeFrame::get_starting_bar(num_test_bars, &time_frame); // stupid
 
-    log::info!("FROM {}", time_frame_from);
+    let num_bars = match execution_mode {
+        mode::ExecutionMode::Scanner => env::var("NUM_BARS").unwrap().parse::<i64>().unwrap(),
+        _ => env::var("NUM_TEST_BARS").unwrap().parse::<i64>().unwrap(),
+    };
+
+    let time_frame_from = TimeFrame::get_starting_bar(num_bars, &time_frame, &execution_mode); // stupid
+
+    log::info!("Preparing Scanner from {}", time_frame_from);
     let mut screener = Screener::<Xtb>::new().await?;
     screener.login(username, password).await?;
     let mut symbols = screener.get_symbols().await.unwrap().symbols;
 
-    let backtest_mode = env::var("SCANNER_BACKTEST_MODE")
-        .unwrap()
-        .parse::<bool>()
-        .unwrap();
+    let backtest_mode = match execution_mode {
+        ExecutionMode::ScannerBackTest => true,
+        _ => false,
+    };
 
     if env == "development" {
         symbols = vec![Symbol {
@@ -102,7 +108,7 @@ async fn main() -> Result<()> {
             }
         }
 
-        if !backtest_mode || (backtest_mode && (is_forex)) {
+        if !backtest_mode || (backtest_mode && (is_forex || is_crypto)) {
             log::info!("processing {} ...", &s.symbol);
 
             screener

@@ -147,7 +147,7 @@ impl General {
         while let Some(result) = instruments.next().await {
             match result {
                 Ok(mut instrument) => {
-                    let stoch = instrument.indicators.stoch.clone();
+                    //let stoch = instrument.indicators.stoch.clone();
                     let macd = instrument.indicators.macd.clone();
                     let rsi = instrument.indicators.rsi.clone();
                     let bb = instrument.indicators.bb.clone();
@@ -214,7 +214,7 @@ impl General {
                             last_pattern_status.clone();
                     }
 
-                    instrument.indicators.stoch.status = get_stoch_status(&stoch);
+                    //instrument.indicators.stoch.status = get_stoch_status(&stoch);
                     instrument.indicators.macd.status = get_macd_status(&macd);
                     instrument.indicators.rsi.status = get_rsi_status(&rsi);
                     instrument.indicators.bb.status = get_bb_status(&bb, &instrument);

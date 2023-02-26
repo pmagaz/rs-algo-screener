@@ -202,7 +202,6 @@ pub fn instrument_list(props: &Props
             let local_pattern = pattern_info(&current_pattern); 
 
             let macd = instrument.indicators.macd.clone();
-            let stoch = instrument.indicators.stoch.clone();
             let rsi = instrument.indicators.rsi.clone();
             let bb = instrument.indicators.bb.clone(); //9
             let date = instrument.date.to_chrono();
