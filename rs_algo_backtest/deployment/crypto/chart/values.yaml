@@ -14,6 +14,7 @@ jobs:
     resources:
       requests:
         cpu: 50m
+        memory: 1Mi
       limits:
         cpu: 800m
         memory: 256Mi
