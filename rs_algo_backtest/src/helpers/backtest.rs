@@ -28,10 +28,12 @@ pub fn resolve_backtest(
     if !trades_out.is_empty() {
         let date_start = trades_out[0].date_in;
         let date_end = trades_out.last().unwrap().date_out;
-        let sessions: usize = trades_out.iter().fold(0, |mut acc, x| {
-            acc += x.index_out - x.index_in;
-            acc
-        });
+        let sessions = instrument.data().len();
+        // let sessions: usize = trades_out.iter().fold(0, |mut acc, x| {
+        //     acc += x.index_out - x.index_in;
+        //     acc
+        // });
+
         let current_candle = data.last().unwrap();
         let current_price = current_candle.close;
 
