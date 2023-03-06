@@ -23,7 +23,7 @@ log = "0.4"
 
 ta = {git = "https://github.com/pmagaz/ta-rs", features = ["serde"], rev="3b2d78c"}
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "81e3fe9", features = ["broker","websocket"]}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "fe25129", features = ["broker","websocket"]}
 #rs_algo_shared = { path = "../../rs_algo_shared", features = ["websocket","broker"] }
 
 # [profile.release]

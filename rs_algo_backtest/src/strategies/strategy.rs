@@ -297,20 +297,6 @@ pub trait Strategy: DynClone {
                     }
                     Position::Order(order_types) => {
                         let trade_type = TradeType::OrderInLong;
-                        // let new_orders = match pending_orders.len().cmp(&0) {
-                        //     std::cmp::Ordering::Equal => {
-                        //         long_entry = true;
-                        //         short_entry = false;
-                        //         prepare_orders(
-                        //             index,
-                        //             instrument,
-                        //             pricing,
-                        //             &trade_type,
-                        //             &order_types,
-                        //         )
-                        //     }
-                        //     _ => vec![],
-                        // };
 
                         let prepared_orders =
                             prepare_orders(index, instrument, pricing, &trade_type, &order_types);
@@ -327,7 +313,6 @@ pub trait Strategy: DynClone {
                             long_entry = true;
                             short_entry = false;
                         }
-                        //log::info!("111111111 {:?}", (orders.len(), new_orders.len()));
 
                         PositionResult::PendingOrder(new_orders)
                     }
@@ -336,7 +321,6 @@ pub trait Strategy: DynClone {
             }
             _ => PositionResult::None,
         };
-
         let entry_short = match self.strategy_type() {
             StrategyType::OnlyShort
             | StrategyType::LongShort
@@ -357,8 +341,8 @@ pub trait Strategy: DynClone {
 
                         let prepared_orders = match order_types {
                             Some(orders) => {
-                                long_entry = true;
-                                short_entry = false;
+                                short_entry = true;
+                                long_entry = false;
                                 Some(prepare_orders(
                                     index,
                                     instrument,
@@ -382,20 +366,6 @@ pub trait Strategy: DynClone {
                     }
                     Position::Order(order_types) => {
                         let trade_type = TradeType::OrderInShort;
-                        // let new_orders = match pending_orders.len().cmp(&0) {
-                        //     std::cmp::Ordering::Equal => {
-                        //         short_entry = true;
-                        //         long_entry = false;
-                        //         prepare_orders(
-                        //             index,
-                        //             instrument,
-                        //             pricing,
-                        //             &trade_type,
-                        //             &order_types,
-                        //         )
-                        //     }
-                        //     _ => vec![],
-                        // };
 
                         let prepared_orders =
                             prepare_orders(index, instrument, pricing, &trade_type, &order_types);
@@ -412,8 +382,6 @@ pub trait Strategy: DynClone {
                             short_entry = true;
                             long_entry = false;
                         }
-
-                        //log::info!("222222222 {:?}", (orders.len(), new_orders.len()));
 
                         PositionResult::PendingOrder(new_orders)
                     }

@@ -141,7 +141,12 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let pips_margin = 3.;
 
         let entry_condition = anchor_htf && close_price < low_band && prev_close >= prev_low_band;
+
         let buy_price = candle.high() + calc::to_pips(pips_margin, pricing);
+
+        if entry_condition {
+            log::info!("Entry Long {} {:?}", index, candle.date());
+        }
 
         match entry_condition {
             true => Position::Order(vec![
@@ -250,6 +255,10 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
 
         let entry_condition = anchor_htf && close_price < top_band && prev_high >= prev_top_band;
         let buy_price = candle.close() - calc::to_pips(pips_margin, pricing);
+
+        if entry_condition {
+            log::info!("Entry short {} {:?}", index, candle.date());
+        }
 
         match entry_condition {
             true => Position::Order(vec![

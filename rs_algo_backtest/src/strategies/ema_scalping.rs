@@ -156,6 +156,8 @@ impl<'a> Strategy for EmaScalping<'a> {
         let risk = buy_price + spread - stop_loss_price;
         let sell_price = buy_price + (risk * self.risk_reward_ratio);
 
+        log::info!("EMA SCALPING {:?}", (buy_price, sell_price));
+
         match entry_condition {
             true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
