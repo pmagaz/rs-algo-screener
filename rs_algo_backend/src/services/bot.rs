@@ -16,30 +16,11 @@ use std::env;
 use std::path::PathBuf;
 use std::time::Instant;
 
-// struct MyWs;
-
-// impl Actor for MyWs {
-//     type Context = ws::WebsocketContext<Self>;
-// }
-
-// /// Handler for ws::Message message
-// impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
-//     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-//         match msg {
-//             Ok(ws::Message::Ping(msg)) => ctx.pong(&msg),
-//             Ok(ws::Message::Text(text)) => ctx.text(text),
-//             Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
-//             _ => (),
-//         }
-//     }
-// }
-
 pub async fn find(
     req: HttpRequest,
     stream: web::Payload,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
-    //let resp = ws::start(MyWs {}, &req, stream);
     let now = Instant::now();
     let bots = db::bot::find_all(&state).await.unwrap();
 

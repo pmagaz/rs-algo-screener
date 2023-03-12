@@ -9,7 +9,7 @@ use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::time_frame::{TimeFrame, TimeFrameType};
-use rs_algo_shared::models::trade::{Position, TradeIn, TradeOut};
+use rs_algo_shared::models::trade::{Position, TradeDirection, TradeIn, TradeOut};
 use rs_algo_shared::models::{backtest_instrument::*, time_frame};
 use rs_algo_shared::scanner::instrument::*;
 
@@ -19,6 +19,7 @@ pub struct EmaScalping<'a> {
     time_frame: TimeFrameType,
     higher_time_frame: Option<TimeFrameType>,
     strategy_type: StrategyType,
+    trading_direction: TradeDirection,
     order_size: f64,
     risk_reward_ratio: f64,
     profit_target: f64,
@@ -71,11 +72,14 @@ impl<'a> Strategy for EmaScalping<'a> {
             },
         };
 
+        let trading_direction = TradeDirection::Long;
+
         Ok(Self {
             name: "Ema_Scalping",
             time_frame,
             higher_time_frame,
             strategy_type,
+            trading_direction,
             order_size,
             risk_reward_ratio,
             profit_target,
@@ -98,6 +102,37 @@ impl<'a> Strategy for EmaScalping<'a> {
         &self.higher_time_frame
     }
 
+    fn trading_direction(
+        &mut self,
+        index: usize,
+        instrument: &Instrument,
+        htf_instrument: &HTFInstrument,
+    ) -> &TradeDirection {
+        let close_price = &instrument.data.get(index).unwrap().close();
+
+        self.trading_direction = time_frame::get_htf_trading_direction(
+            index,
+            instrument,
+            htf_instrument,
+            |(idx, _prev_idx, htf_inst)| {
+                let htf_ema_5 = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
+                let htf_ema_13 = htf_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
+
+                let is_long = htf_ema_5 > htf_ema_13 && close_price > htf_ema_13;
+                let is_short = htf_ema_5 < htf_ema_13 && close_price < htf_ema_13;
+
+                if is_long {
+                    TradeDirection::Long
+                } else if is_short {
+                    TradeDirection::Short
+                } else {
+                    TradeDirection::None
+                }
+            },
+        );
+        &self.trading_direction
+    }
+
     fn entry_long(
         &mut self,
         index: usize,
@@ -105,20 +140,8 @@ impl<'a> Strategy for EmaScalping<'a> {
         htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let close_price = &instrument.data.get(index).unwrap().close();
         let spread = 0.;
-
-        let anchor_htf = time_frame::get_htf_data(
-            index,
-            instrument,
-            htf_instrument,
-            |(idx, _prev_idx, htf_inst)| {
-                let htf_ema_5 = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
-                let htf_ema_13 = htf_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
-                htf_ema_5 > htf_ema_13 && close_price > htf_ema_13
-            },
-        );
-
+        let close_price = &instrument.data.get(index).unwrap().close();
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
@@ -135,7 +158,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         let ema_8 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
         let ema_13 = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
-        let entry_condition = anchor_htf
+        let entry_condition = self.trading_direction == TradeDirection::Long
             && (low_price < ema_5
                 && prev_close_price >= prev_ema_5
                 && close_price > ema_13
@@ -190,16 +213,6 @@ impl<'a> Strategy for EmaScalping<'a> {
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
         let spread = 0.;
-        let anchor_htf = time_frame::get_htf_data(
-            index,
-            instrument,
-            htf_instrument,
-            |(idx, _prev_idx, htf_inst)| {
-                let htf_ema_5 = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
-                let htf_ema_13 = htf_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
-                htf_ema_5 < htf_ema_13 && close_price < htf_ema_13
-            },
-        );
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -218,7 +231,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         let ema_8 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
         let ema_8 = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
-        let entry_condition = anchor_htf
+        let entry_condition = self.trading_direction == TradeDirection::Short
             && (trigger_price > ema_5
                 && prev_close_price <= prev_ema_5
                 && close_price < ema_8

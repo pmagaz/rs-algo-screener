@@ -1,7 +1,7 @@
 use crate::error::Result;
 
 use chrono::{DateTime, Local};
-use rs_algo_shared::helpers::date::{fom_dbtime, to_dbtime};
+use rs_algo_shared::helpers::date::{from_dbtime, to_dbtime};
 use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::mode::*;
@@ -43,12 +43,12 @@ impl Backend {
         output_file: &str,
     ) -> Result<()> {
         let data = instrument.data.clone();
+
+        let current_candle = data.last().unwrap();
         let total_len = data.len();
         let from_date = data.first().unwrap().date;
-        let to_date = data.last().unwrap().date;
-        let current_price = data.last().unwrap().close();
-
-        let current_candle = instrument.data.last().unwrap();
+        let to_date = current_candle.date();
+        let current_price = current_candle.close();
 
         let price_source = env::var("PRICE_SOURCE").unwrap();
 
@@ -108,27 +108,27 @@ impl Backend {
         let top_points_set: Vec<(usize, f64)>;
         let low_points_set: Vec<(usize, f64)>;
 
-        let mut prices_in_ids: Vec<usize> = vec![];
-        let mut prices_out_ids: Vec<usize> = vec![];
-        let mut orders_ids: Vec<usize> = vec![];
-        let mut stop_loss_ids: Vec<usize> = vec![];
-        let mut top_peaks_ids: Vec<usize> = vec![];
-        let mut low_peaks_ids: Vec<usize> = vec![];
+        // let mut prices_in_ids: Vec<usize> = vec![];
+        // let mut prices_out_ids: Vec<usize> = vec![];
+        // let mut orders_ids: Vec<usize> = vec![];
+        // let mut stop_loss_ids: Vec<usize> = vec![];
+        // let mut top_peaks_ids: Vec<usize> = vec![];
+        // let mut low_peaks_ids: Vec<usize> = vec![];
 
         last_trade_in = trades_in.last();
         last_trade_out = trades_out.last();
         if mode == ExecutionMode::BackTest || mode == ExecutionMode::Bot {
             //if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
-            prices_in_ids = trades_in.iter().map(|x| x.id).collect();
-            prices_out_ids = trades_out.iter().map(|x| x.id).collect();
-            orders_ids = orders.iter().map(|x| x.id).collect();
-            //top_peaks_ids = peaks.local_maxima().iter().map(|x| x.).collect();
-            stop_loss_ids = trades_out
-                .iter()
-                .filter(|x| x.trade_type.is_stop())
-                .map(|x| x.id)
-                .collect();
+            // prices_in_ids = trades_in.iter().map(|x| x.id).collect();
+            // prices_out_ids = trades_out.iter().map(|x| x.id).collect();
+            // orders_ids = orders.iter().map(|x| x.id).collect();
+            // //top_peaks_ids = peaks.local_maxima().iter().map(|x| x.).collect();
+            // stop_loss_ids = trades_out
+            //     .iter()
+            //     .filter(|x| x.trade_type.is_stop())
+            //     .map(|x| x.id)
+            //     .collect();
 
             top_points_set = trades_out
                 .iter()
@@ -140,11 +140,6 @@ impl Backend {
                 .filter(|x| x.trade_type.is_stop())
                 .map(|x| (x.id, x.price_out))
                 .collect();
-
-            // stop_loss_types = trades_in
-            //     .iter()
-            //     .map(|x| (x.index_in, x.stop_loss.stop_type.to_owned()))
-            //     .collect();
         } else {
             top_points_set = instrument.peaks.local_maxima.clone();
             low_points_set = instrument.peaks.local_minima.clone();
@@ -194,10 +189,8 @@ impl Backend {
         let bb_b = &instrument.indicators.bb.get_data_b();
         let bb_c = &instrument.indicators.bb.get_data_c();
 
-        //let root = BitMapBackend::new(&output_file, (1536, 1152)).into_drawing_area();
         let root = BitMapBackend::new(&output_file, (1821, 865)).into_drawing_area();
         let (upper, lower) = root.split_vertically((90).percent());
-        // let (indicator_1, indicator_2) = lower.split_vertically((50).percent());
 
         root.fill(BACKGROUND).unwrap();
 
@@ -208,6 +201,8 @@ impl Backend {
         let mut chart = ChartBuilder::on(&upper)
             .x_label_area_size(40)
             .y_label_area_size(40)
+            .set_label_area_size(LabelAreaPosition::Left, 40)
+            .set_label_area_size(LabelAreaPosition::Bottom, 40)
             .margin(30)
             .caption(
                 &[
@@ -226,7 +221,6 @@ impl Backend {
         chart
             .configure_mesh()
             .light_line_style(BACKGROUND)
-            //.x_label_formatter(&|v| format!("{:.5}", v))
             .x_label_formatter(&|v| {
                 format!("{}", {
                     match instrument.time_frame() {
@@ -247,7 +241,7 @@ impl Backend {
         let candle_with = match mode {
             ExecutionMode::Scanner => 3,
             ExecutionMode::Bot => 4,
-            _ => 2,
+            _ => 4,
         };
 
         chart
@@ -491,7 +485,7 @@ impl Backend {
                     .filter(|x| x.date_in >= to_dbtime(data.first().unwrap().date()))
                     .enumerate()
                     .map(|(i, trade_in)| {
-                        let date = fom_dbtime(&trade_in.date_in);
+                        let date = from_dbtime(&trade_in.date_in);
                         let price = trade_in.price_in;
 
                         match trade_in.trade_type.is_long() {
@@ -519,7 +513,7 @@ impl Backend {
                     .filter(|x| x.date_in >= to_dbtime(data.first().unwrap().date()))
                     .enumerate()
                     .map(|(i, trade_in)| {
-                        let date = fom_dbtime(&trade_in.date_in);
+                        let date = from_dbtime(&trade_in.date_in);
                         let price = trade_in.price_in;
                         match trade_in.trade_type.is_entry() {
                             true => match trade_in.trade_type.is_long() {
@@ -549,7 +543,7 @@ impl Backend {
                     .filter(|x| x.date_out > to_dbtime(data.first().unwrap().date()))
                     .enumerate()
                     .map(|(i, trade_out)| {
-                        let date = fom_dbtime(&trade_out.date_out);
+                        let date = from_dbtime(&trade_out.date_out);
                         let trade_in = trades_in.get(i).unwrap();
                         let price = trade_out.price_out;
                         let element = match trade_out.profit > 0. {
@@ -607,8 +601,6 @@ impl Backend {
                                 .unwrap();
                             let candle = data.get(candle_index).unwrap();
                             let date = candle.date();
-
-                            log::info!("11111111 {:?}", (date, order.id, &order.order_type));
 
                             let order_opacity = match order.status {
                                 OrderStatus::Pending => 1.1,

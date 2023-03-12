@@ -28,11 +28,6 @@ use std::env;
 async fn main() -> Result<()> {
     dotenv().ok();
 
-    // env_logger::Builder::from_default_env()
-    // .format(|buf, record| writeln!(buf, "{} - {}", record.level(), record.args()))
-    // .filter(None, LevelFilter::Info)
-    // .init();
-
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     let port = env::var("BACKEND_PORT").expect("BACKEND_PORT not found");

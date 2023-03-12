@@ -1,12 +1,13 @@
+use chrono::Local;
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
-use rs_algo_shared::models::order::*;
 use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::time_frame::TimeFrameType;
 use rs_algo_shared::models::trade::*;
 use rs_algo_shared::models::trade::{Position, TradeIn, TradeOut};
 use rs_algo_shared::models::{backtest_instrument::*, order};
+use rs_algo_shared::models::{order::*, trade};
 use rs_algo_shared::scanner::instrument::*;
 
 use async_trait::async_trait;
@@ -64,6 +65,30 @@ pub trait Strategy: DynClone {
         equity: f64,
         commision: f64,
     ) -> BackTestResult;
+    fn trading_direction(
+        &mut self,
+        index: usize,
+        instrument: &Instrument,
+        htf_instrument: &HTFInstrument,
+    ) -> &TradeDirection;
+    fn is_long_strategy(&self) -> bool {
+        match self.strategy_type() {
+            StrategyType::OnlyLong
+            | StrategyType::LongShort
+            | StrategyType::OnlyLongMTF
+            | StrategyType::LongShortMTF => true,
+            _ => false,
+        }
+    }
+    fn is_short_strategy(&self) -> bool {
+        match self.strategy_type() {
+            StrategyType::OnlyShort
+            | StrategyType::LongShort
+            | StrategyType::OnlyShortMTF
+            | StrategyType::LongShortMTF => true,
+            _ => false,
+        }
+    }
     async fn get_htf_instrument(&self, symbol: &str, higher_time_frame: &str) -> HTFInstrument {
         let uppertime_frame = match self.strategy_type() {
             StrategyType::OnlyLongMTF => true,
@@ -138,8 +163,12 @@ pub trait Strategy: DynClone {
 
         for (index, _candle) in data.iter().enumerate() {
             if index < len - 1 && index >= 10 {
-                let current_close = instrument.data().get(index).unwrap().close();
+                let current_candle = instrument.data().get(index).unwrap();
+                let current_close = current_candle.close();
+                let current_date = current_candle.date();
                 let pricing = pricing.calculate_spread(current_close);
+                orders = order::cancel_pending_expired_orders(index, &instrument, &mut orders);
+
                 let pending_orders = order::get_pending(&orders);
                 let active_orders_result = self.resolve_pending_orders(
                     index,
@@ -149,20 +178,26 @@ pub trait Strategy: DynClone {
                     &pending_orders,
                     &trades_in,
                 );
+
+                let trading_direction = &self
+                    .trading_direction(index, instrument, htf_instrument)
+                    .clone();
+
                 match active_orders_result {
                     PositionResult::MarketInOrder(TradeResult::TradeIn(trade_in), order) => {
                         if !open_positions {
                             order::fulfill_trade_order(index, &trade_in, &order, &mut orders);
-                            open_positions = true;
+                            order::extend_all_pending_orders(&mut orders);
                             trades_in.push(trade_in);
+                            open_positions = true;
                         }
                     }
                     PositionResult::MarketOutOrder(TradeResult::TradeOut(trade_out), order) => {
                         if open_positions {
                             order::fulfill_trade_order(index, &trade_out, &order, &mut orders);
-                            open_positions = false;
-                            orders = order::cancel_trade_pending_orders(&trade_out, orders);
+                            order::cancel_trade_pending_orders(&trade_out, &mut orders);
                             trades_out.push(trade_out);
+                            open_positions = false;
                         }
                     }
                     _ => (),
@@ -181,7 +216,7 @@ pub trait Strategy: DynClone {
                     match exit_result {
                         PositionResult::MarketOut(TradeResult::TradeOut(trade_out)) => {
                             open_positions = false;
-                            orders = order::cancel_trade_pending_orders(&trade_out, orders);
+                            order::cancel_trade_pending_orders(&trade_out, &mut orders);
                             trades_out.push(trade_out.clone());
                         }
                         PositionResult::PendingOrder(new_orders) => {
@@ -199,6 +234,7 @@ pub trait Strategy: DynClone {
                         pricing,
                         &orders,
                         trade_size,
+                        trading_direction,
                     );
 
                     match entry_position_result {
@@ -213,14 +249,16 @@ pub trait Strategy: DynClone {
                         }
                         PositionResult::PendingOrder(new_orders) => {
                             if !open_positions {
-                                match overwrite_orders {
-                                    true => {
-                                        orders = order::cancel_all_pending_orders(
-                                            index, instrument, orders,
-                                        );
-                                    }
-                                    false => (),
-                                }
+                                // match overwrite_orders {
+                                //     true => {
+                                //         order::cancel_pending_expired_orders(
+                                //             index,
+                                //             instrument,
+                                //             &mut orders,
+                                //         );
+                                //     }
+                                //     false => (),
+                                // }
 
                                 orders = order::add_pending(orders, new_orders);
                             }
@@ -244,24 +282,21 @@ pub trait Strategy: DynClone {
         pricing: &Pricing,
         orders: &Vec<Order>,
         trade_size: f64,
+        trading_direction: &TradeDirection,
     ) -> PositionResult {
-        let mut long_entry: bool = false;
-        let mut short_entry: bool = false;
-        let pending_orders = order::get_pending(orders);
+        let pending_orders = order::get_pending(&orders);
+
         let overwrite_orders = env::var("OVERWRITE_ORDERS")
             .unwrap()
             .parse::<bool>()
             .unwrap();
 
-        let entry_long = match self.strategy_type() {
-            StrategyType::OnlyLong
-            | StrategyType::LongShort
-            | StrategyType::OnlyLongMTF
-            | StrategyType::LongShortMTF => {
-                match self.entry_long(index, instrument, htf_instrument, pricing) {
+        let entry_result = match trading_direction.is_long() {
+            true => match self.is_long_strategy() {
+                true => match self.entry_long(index, instrument, htf_instrument, pricing) {
                     Position::MarketIn(order_types) => {
                         let trade_type = TradeType::MarketInLong;
-                        let trade_in_result = resolve_trade_in(
+                        let trade_in_result = trade::resolve_trade_in(
                             index,
                             trade_size,
                             instrument,
@@ -271,17 +306,13 @@ pub trait Strategy: DynClone {
                         );
 
                         let prepared_orders = match order_types {
-                            Some(orders) => {
-                                long_entry = true;
-                                short_entry = false;
-                                Some(prepare_orders(
-                                    index,
-                                    instrument,
-                                    pricing,
-                                    &trade_type,
-                                    &orders,
-                                ))
-                            }
+                            Some(orders) => Some(order::prepare_orders(
+                                index,
+                                instrument,
+                                pricing,
+                                &trade_type,
+                                &orders,
+                            )),
                             None => None,
                         };
 
@@ -298,8 +329,13 @@ pub trait Strategy: DynClone {
                     Position::Order(order_types) => {
                         let trade_type = TradeType::OrderInLong;
 
-                        let prepared_orders =
-                            prepare_orders(index, instrument, pricing, &trade_type, &order_types);
+                        let prepared_orders = order::prepare_orders(
+                            index,
+                            instrument,
+                            pricing,
+                            &trade_type,
+                            &order_types,
+                        );
 
                         let new_orders = match overwrite_orders {
                             true => prepared_orders,
@@ -309,28 +345,20 @@ pub trait Strategy: DynClone {
                             },
                         };
 
-                        if new_orders.len() > 0 {
-                            long_entry = true;
-                            short_entry = false;
-                        }
-
                         PositionResult::PendingOrder(new_orders)
                     }
                     _ => PositionResult::None,
-                }
-            }
-            _ => PositionResult::None,
-        };
-        let entry_short = match self.strategy_type() {
-            StrategyType::OnlyShort
-            | StrategyType::LongShort
-            | StrategyType::OnlyShortMTF
-            | StrategyType::LongShortMTF => {
-                match self.entry_short(index, instrument, htf_instrument, pricing) {
+                },
+                false => PositionResult::None,
+
+                _ => PositionResult::None,
+            },
+            false => match self.is_short_strategy() {
+                true => match self.entry_short(index, instrument, htf_instrument, pricing) {
                     Position::MarketIn(order_types) => {
                         let trade_type = TradeType::MarketInShort;
 
-                        let trade_in_result = resolve_trade_in(
+                        let trade_in_result = trade::resolve_trade_in(
                             index,
                             trade_size,
                             instrument,
@@ -340,17 +368,13 @@ pub trait Strategy: DynClone {
                         );
 
                         let prepared_orders = match order_types {
-                            Some(orders) => {
-                                short_entry = true;
-                                long_entry = false;
-                                Some(prepare_orders(
-                                    index,
-                                    instrument,
-                                    pricing,
-                                    &trade_type,
-                                    &orders,
-                                ))
-                            }
+                            Some(orders) => Some(order::prepare_orders(
+                                index,
+                                instrument,
+                                pricing,
+                                &trade_type,
+                                &orders,
+                            )),
                             None => None,
                         };
 
@@ -367,8 +391,13 @@ pub trait Strategy: DynClone {
                     Position::Order(order_types) => {
                         let trade_type = TradeType::OrderInShort;
 
-                        let prepared_orders =
-                            prepare_orders(index, instrument, pricing, &trade_type, &order_types);
+                        let prepared_orders = order::prepare_orders(
+                            index,
+                            instrument,
+                            pricing,
+                            &trade_type,
+                            &order_types,
+                        );
 
                         let new_orders = match overwrite_orders {
                             true => prepared_orders,
@@ -378,26 +407,16 @@ pub trait Strategy: DynClone {
                             },
                         };
 
-                        if new_orders.len() > 0 {
-                            short_entry = true;
-                            long_entry = false;
-                        }
-
                         PositionResult::PendingOrder(new_orders)
                     }
                     _ => PositionResult::None,
-                }
-            }
-            _ => PositionResult::None,
+                },
+                false => PositionResult::None,
+                _ => PositionResult::None,
+            },
+            false => PositionResult::None,
         };
-
-        if long_entry && !short_entry {
-            entry_long
-        } else if !long_entry && short_entry {
-            entry_short
-        } else {
-            PositionResult::None
-        }
+        entry_result
     }
 
     fn resolve_exit_position(
@@ -407,88 +426,65 @@ pub trait Strategy: DynClone {
         htf_instrument: &HTFInstrument,
         pricing: &Pricing,
         trade_in: &TradeIn,
-        //exit_type: &TradeType,
     ) -> PositionResult {
-        let mut long_exit: bool = false;
-        let mut short_exit: bool = false;
+        let exit_result = match self.is_long_strategy() {
+            true => match self.exit_long(index, instrument, htf_instrument, trade_in, pricing) {
+                Position::MarketOut(_) => {
+                    let trade_type = TradeType::MarketOutLong;
+                    let trade_out_result = trade::resolve_trade_out(
+                        index,
+                        instrument,
+                        pricing,
+                        trade_in,
+                        &trade_type,
+                        None,
+                    );
 
-        let exit_long = match self.strategy_type() {
-            StrategyType::OnlyLong
-            | StrategyType::LongShort
-            | StrategyType::OnlyLongMTF
-            | StrategyType::LongShortMTF => {
-                match self.exit_long(index, instrument, htf_instrument, trade_in, pricing) {
-                    Position::MarketOut(_) => {
-                        let trade_type = TradeType::MarketOutLong;
-                        long_exit = true;
-                        short_exit = false;
-                        let trade_out_result = resolve_trade_out(
-                            index,
-                            instrument,
-                            pricing,
-                            trade_in,
-                            &trade_type,
-                            None,
-                        );
-
-                        PositionResult::MarketOut(trade_out_result)
-                    }
-                    Position::Order(order_types) => {
-                        let trade_type = TradeType::OrderOutLong;
-                        long_exit = true;
-                        short_exit = false;
-                        let orders =
-                            prepare_orders(index, instrument, pricing, &trade_type, &order_types);
-                        PositionResult::PendingOrder(orders)
-                    }
-                    _ => PositionResult::None,
+                    PositionResult::MarketOut(trade_out_result)
                 }
-            }
-            _ => PositionResult::None,
+                Position::Order(order_types) => {
+                    let trade_type = TradeType::OrderOutLong;
+                    let orders = order::prepare_orders(
+                        index,
+                        instrument,
+                        pricing,
+                        &trade_type,
+                        &order_types,
+                    );
+                    PositionResult::PendingOrder(orders)
+                }
+                _ => PositionResult::None,
+            },
+            false => match self.exit_short(index, instrument, htf_instrument, pricing) {
+                Position::MarketOut(_) => {
+                    let trade_type = TradeType::MarketOutShort;
+                    let trade_out_result = trade::resolve_trade_out(
+                        index,
+                        instrument,
+                        pricing,
+                        trade_in,
+                        &trade_type,
+                        None,
+                    );
+
+                    PositionResult::MarketOut(trade_out_result)
+                }
+                Position::Order(order_types) => {
+                    let trade_type = TradeType::OrderOutShort;
+                    let orders = order::prepare_orders(
+                        index,
+                        instrument,
+                        pricing,
+                        &trade_type,
+                        &order_types,
+                    );
+                    PositionResult::PendingOrder(orders)
+                }
+                _ => PositionResult::None,
+            },
         };
 
-        let exit_short = match self.strategy_type() {
-            StrategyType::OnlyShort
-            | StrategyType::LongShort
-            | StrategyType::OnlyShortMTF
-            | StrategyType::LongShortMTF => {
-                match self.exit_short(index, instrument, htf_instrument, pricing) {
-                    Position::MarketOut(_) => {
-                        let trade_type = TradeType::MarketOutShort;
-                        short_exit = true;
-                        long_exit = false;
-                        let trade_out_result = resolve_trade_out(
-                            index,
-                            instrument,
-                            pricing,
-                            trade_in,
-                            &trade_type,
-                            None,
-                        );
-
-                        PositionResult::MarketOut(trade_out_result)
-                    }
-                    Position::Order(order_types) => {
-                        let trade_type = TradeType::OrderOutShort;
-                        short_exit = true;
-                        long_exit = false;
-                        let orders =
-                            prepare_orders(index, instrument, pricing, &trade_type, &order_types);
-                        PositionResult::PendingOrder(orders)
-                    }
-                    _ => PositionResult::None,
-                }
-            }
-            _ => PositionResult::None,
-        };
-
-        if long_exit && !short_exit {
-            exit_long
-        } else if !long_exit && short_exit {
-            exit_short
-        } else {
-            PositionResult::None
-        }
+        exit_result
     }
 
     fn resolve_pending_orders(
@@ -503,7 +499,7 @@ pub trait Strategy: DynClone {
         match resolve_active_orders(index, instrument, pending_orders, pricing) {
             Position::MarketInOrder(mut order) => {
                 let trade_type = order.to_trade_type();
-                let trade_in_result = resolve_trade_in(
+                let trade_in_result = trade::resolve_trade_in(
                     index,
                     trade_size,
                     instrument,
@@ -523,7 +519,7 @@ pub trait Strategy: DynClone {
             Position::MarketOutOrder(order) => {
                 let trade_type = order.to_trade_type();
                 let trade_out_result = match trades_in.last() {
-                    Some(trade_in) => resolve_trade_out(
+                    Some(trade_in) => trade::resolve_trade_out(
                         index,
                         instrument,
                         pricing,
