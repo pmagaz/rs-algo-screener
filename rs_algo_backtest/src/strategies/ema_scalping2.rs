@@ -45,7 +45,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
             .unwrap()
             .parse::<String>()
             .unwrap()
-            .clone();
+            ;
 
         let order_size = std::env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
@@ -95,7 +95,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
     }
 
     fn time_frame(&self) -> &TimeFrameType {
-        &&self.time_frame
+        &self.time_frame
     }
 
     fn higher_time_frame(&self) -> &Option<TimeFrameType> {
@@ -137,18 +137,18 @@ impl<'a> Strategy for EmaScalping2<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
+        _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let close_price = &instrument.data.get(index).unwrap().close();
+        let _close_price = &instrument.data.get(index).unwrap().close();
         let spread = 0.;
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
-        let trigger_price = &candle.low();
-        let low_price = &candle.low();
-        let prev_close_price = &data.get(prev_index).unwrap().close();
+        let _trigger_price = &candle.low();
+        let _low_price = &candle.low();
+        let _prev_close_price = &data.get(prev_index).unwrap().close();
 
         let ema_5 = instrument.indicators.ema_a.get_data_a().get(index).unwrap();
         let ema_8 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
@@ -159,7 +159,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
             .get_data_a()
             .get(prev_index)
             .unwrap();
-        let prev_ema_8 = instrument
+        let _prev_ema_8 = instrument
             .indicators
             .ema_b
             .get_data_a()
@@ -203,11 +203,11 @@ impl<'a> Strategy for EmaScalping2<'a> {
 
     fn exit_long(
         &mut self,
-        index: usize,
-        instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
-        trade_in: &TradeIn,
-        pricing: &Pricing,
+        _index: usize,
+        _instrument: &Instrument,
+        _htf_instrument: &HTFInstrument,
+        _trade_in: &TradeIn,
+        _pricing: &Pricing,
     ) -> Position {
         // let prev_index = calc::get_prev_index(index);
         // let close_price = &instrument.data.get(index).unwrap().close();
@@ -257,18 +257,18 @@ impl<'a> Strategy for EmaScalping2<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
+        _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let close_price = &instrument.data.get(index).unwrap().close();
+        let _close_price = &instrument.data.get(index).unwrap().close();
         let spread = 0.;
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
-        let trigger_price = &candle.low();
-        let low_price = &candle.low();
-        let prev_close_price = &data.get(prev_index).unwrap().close();
+        let _trigger_price = &candle.low();
+        let _low_price = &candle.low();
+        let _prev_close_price = &data.get(prev_index).unwrap().close();
 
         let ema_5 = instrument.indicators.ema_a.get_data_a().get(index).unwrap();
         let ema_8 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
@@ -279,7 +279,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
             .get_data_a()
             .get(prev_index)
             .unwrap();
-        let prev_ema_8 = instrument
+        let _prev_ema_8 = instrument
             .indicators
             .ema_b
             .get_data_a()

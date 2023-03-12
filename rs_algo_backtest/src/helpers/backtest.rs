@@ -1,4 +1,4 @@
-use std::env;
+
 
 use rs_algo_shared::helpers::calc::*;
 use rs_algo_shared::helpers::date::*;
@@ -121,7 +121,7 @@ pub fn resolve_backtest(
                 symbol: instrument.symbol.to_owned(),
                 trades_in: vec![],
                 trades_out: vec![],
-                orders: orders,
+                orders,
             },
             strategy: name.to_owned(),
             strategy_type: strategy_type.to_owned(),

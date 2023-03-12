@@ -5,18 +5,18 @@ use rs_algo_shared::helpers::date::{from_dbtime, to_dbtime};
 use rs_algo_shared::helpers::uuid;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::mode::*;
-use rs_algo_shared::models::order::{Order, OrderDirection, OrderStatus, OrderType};
+use rs_algo_shared::models::order::{Order, OrderStatus, OrderType};
 use rs_algo_shared::models::stop_loss::StopLossType;
 use rs_algo_shared::models::time_frame;
-use rs_algo_shared::models::trade::{TradeIn, TradeOut, TradeType};
+use rs_algo_shared::models::trade::{TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::scanner::pattern::{PatternDirection, PatternType};
 
 use chrono::Duration;
 use plotters::prelude::*;
-use round::round;
+
 use std::cmp::Ordering;
-use std::{env, os};
+use std::{env};
 
 #[derive(Debug, Clone)]
 pub struct Backend;
@@ -48,9 +48,9 @@ impl Backend {
         let total_len = data.len();
         let from_date = data.first().unwrap().date;
         let to_date = current_candle.date();
-        let current_price = current_candle.close();
+        let _current_price = current_candle.close();
 
-        let price_source = env::var("PRICE_SOURCE").unwrap();
+        let _price_source = env::var("PRICE_SOURCE").unwrap();
 
         let font = env::var("PLOTTER_FONT").unwrap();
 
@@ -76,11 +76,11 @@ impl Backend {
         let trades_out: &Vec<TradeOut> = trades.1;
         let orders: &Vec<Order> = trades.2;
 
-        let last_trade_in: Option<&TradeIn>;
-        let last_trade_out: Option<&TradeOut>;
+        
+        
         let mut stop_loss: Vec<(usize, f64)> = vec![];
-        let mut stop_loss_types: Vec<(usize, StopLossType)> = vec![];
-        let peaks = instrument.peaks();
+        let _stop_loss_types: Vec<(usize, StopLossType)> = vec![];
+        let _peaks = instrument.peaks();
 
         let points_mode = match trades_out.len().cmp(&0) {
             Ordering::Greater => PointsMode::Trades,
@@ -115,8 +115,8 @@ impl Backend {
         // let mut top_peaks_ids: Vec<usize> = vec![];
         // let mut low_peaks_ids: Vec<usize> = vec![];
 
-        last_trade_in = trades_in.last();
-        last_trade_out = trades_out.last();
+        let _last_trade_in: Option<&TradeIn> = trades_in.last();
+        let _last_trade_out: Option<&TradeOut> = trades_out.last();
         if mode == ExecutionMode::BackTest || mode == ExecutionMode::Bot {
             //if !trades_out.is_empty() {
             low_points_set = trades_in.iter().map(|x| (x.index_in, x.price_in)).collect();
@@ -146,32 +146,32 @@ impl Backend {
         }
 
         let BACKGROUND = &RGBColor(208, 213, 222);
-        let BLACK_LINE = &RGBColor(0, 0, 0).mix(0.25);
+        let _BLACK_LINE = &RGBColor(0, 0, 0).mix(0.25);
         let CANDLE_BEARISH = &RGBColor(71, 113, 181).mix(0.95);
         let CANDLE_BULLISH = &RGBColor(255, 255, 255).mix(0.95);
         let RED_LINE = &RGBColor(235, 69, 125).mix(0.8);
         let RED_LINE2 = &RGBColor(235, 69, 125).mix(0.20);
-        let BLUE_LINE = &RGBColor(71, 113, 181).mix(0.25);
+        let _BLUE_LINE = &RGBColor(71, 113, 181).mix(0.25);
         let BLUE_LINE2 = &RGBColor(42, 98, 255).mix(0.20);
         let BLUE_LINE3 = &RGBColor(71, 113, 181).mix(0.8);
         let ORANGE_LINE = &RGBColor(245, 127, 22).mix(0.18);
-        let YELLOW_LINE = &RGBColor(255, 229, 0).mix(0.18);
-        let GREEN_LINE = &RGBColor(56, 142, 59).mix(0.8);
+        let _YELLOW_LINE = &RGBColor(255, 229, 0).mix(0.18);
+        let _GREEN_LINE = &RGBColor(56, 142, 59).mix(0.8);
         let GREEN_LINE2 = &RGBColor(56, 142, 59).mix(0.16);
 
-        let bottom_point_color = match points_mode {
+        let _bottom_point_color = match points_mode {
             PointsMode::MaximaMinima => BLUE.mix(0.15),
             PointsMode::Trades => BLUE.mix(0.8),
         };
 
-        let top_point_color = match points_mode {
+        let _top_point_color = match points_mode {
             PointsMode::MaximaMinima => BLUE.mix(0.10),
             PointsMode::Trades => RED_LINE.mix(1.),
         };
 
         let _stop_loss_color = MAGENTA.mix(0.8);
 
-        let rsi = &instrument.indicators.rsi.get_data_a();
+        let _rsi = &instrument.indicators.rsi.get_data_a();
 
         let patterns = local_patterns;
 
@@ -181,9 +181,9 @@ impl Backend {
 
         let _rsi = &instrument.indicators.rsi.get_data_a();
 
-        let ema_a = &instrument.indicators.ema_a.get_data_a();
-        let ema_b = &instrument.indicators.ema_b.get_data_a();
-        let ema_c = &instrument.indicators.ema_c.get_data_a();
+        let _ema_a = &instrument.indicators.ema_a.get_data_a();
+        let _ema_b = &instrument.indicators.ema_b.get_data_a();
+        let _ema_c = &instrument.indicators.ema_c.get_data_a();
 
         let bb_a = &instrument.indicators.bb.get_data_a();
         let bb_b = &instrument.indicators.bb.get_data_b();
@@ -452,7 +452,7 @@ impl Backend {
                                     TriangleMarker::new(
                                         (candle.date, candle.close),
                                         0,
-                                        &TRANSPARENT,
+                                        TRANSPARENT,
                                     )
                                 }
                             }))
@@ -484,20 +484,20 @@ impl Backend {
                     .iter()
                     .filter(|x| x.date_in >= to_dbtime(data.first().unwrap().date()))
                     .enumerate()
-                    .map(|(i, trade_in)| {
+                    .map(|(_i, trade_in)| {
                         let date = from_dbtime(&trade_in.date_in);
-                        let price = trade_in.price_in;
+                        let _price = trade_in.price_in;
 
                         match trade_in.trade_type.is_long() {
                             true => TriangleMarker::new(
                                 (date, trade_in.price_in - trade_in.spread),
                                 trades_size,
-                                &ORANGE_LINE.mix(5.),
+                                ORANGE_LINE.mix(5.),
                             ),
                             false => TriangleMarker::new(
                                 (date, trade_in.price_in),
                                 -trades_size,
-                                &ORANGE_LINE.mix(5.),
+                                ORANGE_LINE.mix(5.),
                             ),
                         }
                     }),
@@ -512,7 +512,7 @@ impl Backend {
                     .iter()
                     .filter(|x| x.date_in >= to_dbtime(data.first().unwrap().date()))
                     .enumerate()
-                    .map(|(i, trade_in)| {
+                    .map(|(_i, trade_in)| {
                         let date = from_dbtime(&trade_in.date_in);
                         let price = trade_in.price_in;
                         match trade_in.trade_type.is_entry() {
@@ -520,12 +520,12 @@ impl Backend {
                                 true => TriangleMarker::new(
                                     (date, price),
                                     trades_size,
-                                    &ORANGE_LINE.mix(1.8),
+                                    ORANGE_LINE.mix(1.8),
                                 ),
                                 false => TriangleMarker::new(
                                     (date, price),
                                     -trades_size,
-                                    &ORANGE_LINE.mix(1.8),
+                                    ORANGE_LINE.mix(1.8),
                                 ),
                             },
                             false => todo!(),
@@ -546,33 +546,33 @@ impl Backend {
                         let date = from_dbtime(&trade_out.date_out);
                         let trade_in = trades_in.get(i).unwrap();
                         let price = trade_out.price_out;
-                        let element = match trade_out.profit > 0. {
+                        
+                        match trade_out.profit > 0. {
                             true => match trade_out.trade_type.is_long() {
                                 true => TriangleMarker::new(
                                     (date, price),
                                     -trades_size,
-                                    &GREEN_LINE2.mix(5.),
+                                    GREEN_LINE2.mix(5.),
                                 ),
                                 false => TriangleMarker::new(
                                     (date, price),
                                     trades_size,
-                                    &GREEN_LINE2.mix(5.),
+                                    GREEN_LINE2.mix(5.),
                                 ),
                             },
                             false => match trade_in.trade_type.is_long() {
                                 true => TriangleMarker::new(
                                     (date, price),
                                     trades_size,
-                                    &RED_LINE2.mix(5.),
+                                    RED_LINE2.mix(5.),
                                 ),
                                 false => TriangleMarker::new(
                                     (date, price),
                                     -trades_size,
-                                    &RED_LINE2.mix(5.),
+                                    RED_LINE2.mix(5.),
                                 ),
                             },
-                        };
-                        element
+                        }
                     }),
             )
             .unwrap();
@@ -585,12 +585,12 @@ impl Backend {
                     .iter()
                     .filter(|x| x.created_at > to_dbtime(data.first().unwrap().date()))
                     .enumerate()
-                    .map(|(i, order)| {
+                    .map(|(_i, order)| {
                         let leches = match data
                             .iter()
                             .position(|x| uuid::generate_ts_id(x.date) == order.id)
                         {
-                            Some(x) => true,
+                            Some(_x) => true,
                             None => false,
                         };
 
@@ -612,43 +612,43 @@ impl Backend {
                                 OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     orders_size,
-                                    &ORANGE_LINE.mix(order_opacity),
+                                    ORANGE_LINE.mix(order_opacity),
                                 ),
                                 OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     -orders_size,
-                                    &ORANGE_LINE.mix(order_opacity),
+                                    ORANGE_LINE.mix(order_opacity),
                                 ),
                                 OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     -orders_size,
-                                    &ORANGE_LINE.mix(order_opacity),
+                                    ORANGE_LINE.mix(order_opacity),
                                 ),
                                 OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     orders_size,
-                                    &ORANGE_LINE.mix(order_opacity),
+                                    ORANGE_LINE.mix(order_opacity),
                                 ),
                                 OrderType::TakeProfitLong(_, _, _)
                                 | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     -orders_size,
-                                    &ORANGE_LINE.mix(order_opacity),
+                                    ORANGE_LINE.mix(order_opacity),
                                 ),
                                 OrderType::StopLossLong(_, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     orders_size,
-                                    &RED_LINE.mix(order_opacity),
+                                    RED_LINE.mix(order_opacity),
                                 ),
 
                                 OrderType::StopLossShort(_, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     -orders_size,
-                                    &RED_LINE.mix(order_opacity),
+                                    RED_LINE.mix(order_opacity),
                                 ),
                             }
                         } else {
-                            TriangleMarker::new((Local::now(), 0.), 0, &TRANSPARENT)
+                            TriangleMarker::new((Local::now(), 0.), 0, TRANSPARENT)
                         }
                     }),
             )
@@ -656,7 +656,7 @@ impl Backend {
 
         //BOLLINGER BANDS
 
-        if bb_a.len() > 0 {
+        if !bb_a.is_empty() {
             chart
                 .draw_series(LineSeries::new(
                     (0..)
@@ -691,18 +691,16 @@ impl Backend {
                 let macd = &htf_instrument.indicators().macd();
                 let htf_ema_a = &htf_instrument.indicators().ema_a().get_data_a();
                 let htf_ema_b = &htf_instrument.indicators().ema_b().get_data_a();
-                let htf_ema_c = &htf_instrument.indicators().ema_c().get_data_a();
+                let _htf_ema_c = &htf_instrument.indicators().ema_c().get_data_a();
                 let htf_macd_a = macd.get_data_a();
                 let htf_macd_b = macd.get_data_b();
                 let max_macd = htf_macd_a
                     .iter()
-                    .max_by(|x, y| x.partial_cmp(&y).unwrap())
-                    .map(|x| x)
+                    .max_by(|x, y| x.partial_cmp(y).unwrap())
                     .unwrap();
                 let min_macd = htf_macd_a
                     .iter()
-                    .min_by(|x, y| x.partial_cmp(&y).unwrap())
-                    .map(|x| x)
+                    .min_by(|x, y| x.partial_cmp(y).unwrap())
                     .unwrap();
 
                 let mut indicator_panel = ChartBuilder::on(&lower)
@@ -726,7 +724,7 @@ impl Backend {
                         None => Local::now() - Duration::days(1000),
                     };
 
-                    for (id, candle) in instrument.data().iter().enumerate() {
+                    for (_id, candle) in instrument.data().iter().enumerate() {
                         let instrument_date = candle.date();
                         if htf_instrument_date <= instrument_date
                             && next_htf_instrument_date > instrument_date
@@ -740,7 +738,7 @@ impl Backend {
                     .draw_series(LineSeries::new(
                         (0..)
                             .zip(result.iter())
-                            .map(|(id, data)| (data.0, htf_macd_a[data.1])),
+                            .map(|(_id, data)| (data.0, htf_macd_a[data.1])),
                         BLUE_LINE3.mix(0.8),
                     ))
                     .unwrap();
@@ -749,30 +747,30 @@ impl Backend {
                     .draw_series(LineSeries::new(
                         (0..)
                             .zip(result.iter())
-                            .map(|(id, data)| (data.0, htf_macd_b[data.1])),
+                            .map(|(_id, data)| (data.0, htf_macd_b[data.1])),
                         RED_LINE.mix(0.8),
                     ))
                     .unwrap();
 
-                if htf_ema_a.len() > 0 {
+                if !htf_ema_a.is_empty() {
                     chart
                         .draw_series(LineSeries::new(
                             result
                                 .iter()
                                 .enumerate()
-                                .map(|(id, data)| (data.0, htf_ema_a[data.1])),
+                                .map(|(_id, data)| (data.0, htf_ema_a[data.1])),
                             ORANGE_LINE.mix(1.4),
                         ))
                         .unwrap();
                 }
 
-                if htf_ema_b.len() > 0 {
+                if !htf_ema_b.is_empty() {
                     chart
                         .draw_series(LineSeries::new(
                             result
                                 .iter()
                                 .enumerate()
-                                .map(|(id, data)| (data.0, htf_ema_b[data.1])),
+                                .map(|(_id, data)| (data.0, htf_ema_b[data.1])),
                             RED_LINE2.mix(1.4),
                         ))
                         .unwrap();

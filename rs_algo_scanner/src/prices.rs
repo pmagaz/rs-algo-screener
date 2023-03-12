@@ -12,7 +12,7 @@ pub type PriceBreak = (bool, usize, f64, DbDateTime);
 pub fn price_is_upperupper_band_top(
     data: &DataPoints,
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let points = vec![data[2], data[4]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
@@ -22,7 +22,7 @@ pub fn price_is_upperupper_band_top(
 pub fn price_is_upperupper_band_bottom(
     data: &DataPoints,
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let points = vec![data[3], data[5]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
@@ -32,7 +32,7 @@ pub fn price_is_upperupper_band_bottom(
 pub fn price_is_lower_low_band_bottom(
     data: &DataPoints,
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let points = vec![data[3], data[5]];
     let bottom_break = |price: f64, price_break: f64| price < price_break;
@@ -42,7 +42,7 @@ pub fn price_is_lower_low_band_bottom(
 pub fn price_is_lower_low_band_top(
     data: &DataPoints,
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let points = vec![data[2], data[4]];
     let break_price_comparator = |price: f64, price_break: f64| price < price_break;
@@ -52,7 +52,7 @@ pub fn price_is_lower_low_band_top(
 pub fn price_is_upperlast_high_top(
     data: &DataPoints,
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let points = vec![data[2]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
@@ -62,7 +62,7 @@ pub fn price_is_upperlast_high_top(
 pub fn price_is_upperlast_high_bottom(
     data: &DataPoints,
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let points = vec![data[3]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
@@ -72,7 +72,7 @@ pub fn price_is_upperlast_high_bottom(
 pub fn price_is_lower_last_low_top(
     data: &DataPoints,
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let points = vec![data[3]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
@@ -82,7 +82,7 @@ pub fn price_is_lower_last_low_top(
 pub fn price_is_lower_last_low_bottom(
     data: &DataPoints,
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let points = vec![data[2]];
     let break_price_comparator = |price: f64, price_break: f64| price > price_break;
@@ -92,7 +92,7 @@ pub fn price_is_lower_last_low_bottom(
 pub fn price_is_upperpeak(
     peak: (usize, f64),
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let mut band = vec![];
     band.push(peak);
@@ -103,7 +103,7 @@ pub fn price_is_upperpeak(
 pub fn price_is_lower_peak(
     peak: (usize, f64),
     candles: &Vec<Candle>,
-    pattern_type: &PatternType,
+    _pattern_type: &PatternType,
 ) -> PriceBreak {
     let mut band = vec![];
     band.push(peak);
@@ -146,7 +146,7 @@ pub fn search_price_break(
         let start = points[0];
         let end = points[1];
 
-        let start_index = start.0 as usize;
+        let start_index = start.0;
         let end_index = candles.len(); //end.0 as usize;
 
         let (slope, y_intercept) = slope_intercept(start.0 as f64, start.1, end.0 as f64, end.1);
@@ -166,5 +166,5 @@ pub fn search_price_break(
         }
     }
 
-    return (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000)));
+    (false, 0, 0., to_dbtime(Local::now() - Duration::days(1000)))
 }

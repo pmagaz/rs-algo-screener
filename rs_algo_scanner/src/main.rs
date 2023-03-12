@@ -3,7 +3,7 @@ use error::RsAlgoErrorKind;
 use rs_algo_shared::broker::xtb::*;
 use rs_algo_shared::broker::*;
 use rs_algo_shared::helpers::comp::symbol_in_list;
-use rs_algo_shared::helpers::date;
+
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::http::request;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
@@ -135,14 +135,14 @@ async fn main() -> Result<()> {
                                 endpoint.as_ref(),
                                 "?mode=backtest",
                                 "&time_frame=",
-                                &time_frame,
+                                time_frame,
                             ]
                             .concat(),
                             false => [
                                 endpoint.as_ref(),
                                 "?mode=daily",
                                 "&time_frame=",
-                                &time_frame,
+                                time_frame,
                             ]
                             .concat(),
                         };

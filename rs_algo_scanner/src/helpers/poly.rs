@@ -14,16 +14,16 @@ pub fn eval_polynomial(p: &[f64], x: &[f64]) -> Vec<f64> {
         i += 1;
         result = zu;
     }
-    return result;
+    result
 }
 
 pub fn poly_fit(x_values: &[f64], y_values: &[f64], degree: usize) -> Vec<(usize, f64)> {
-    let mut poly = polyfit(&x_values, &y_values, degree).unwrap();
+    let mut poly = polyfit(x_values, y_values, degree).unwrap();
     poly.reverse();
     let mut result: Vec<(usize, f64)> = vec![];
     let mut foo = 0;
     for i in x_values {
-        let polyval = eval_polynomial(&poly, &x_values);
+        let polyval = eval_polynomial(&poly, x_values);
         result.push((*i as usize, polyval[foo]));
         foo += 1;
     }

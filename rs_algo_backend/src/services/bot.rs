@@ -7,9 +7,9 @@ use rs_algo_shared::models::mode::*;
 use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
 
-use actix::{Actor, StreamHandler};
+
 use actix_files as fs;
-use actix_web::{web, Error, HttpRequest, HttpResponse, HttpServer};
+use actix_web::{web, Error, HttpRequest, HttpResponse};
 use rs_algo_shared::helpers::date::Local;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -17,8 +17,8 @@ use std::path::PathBuf;
 use std::time::Instant;
 
 pub async fn find(
-    req: HttpRequest,
-    stream: web::Payload,
+    _req: HttpRequest,
+    _stream: web::Payload,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, Error> {
     let now = Instant::now();
@@ -37,7 +37,7 @@ pub async fn chart(
 
     let id = path.into_inner();
 
-    let bot = db::bot::find_by_id(&*id, &state).await.unwrap().unwrap();
+    let bot = db::bot::find_by_id(&id, &state).await.unwrap().unwrap();
 
     let output_file = [
         &env::var("BACKEND_PLOTTER_OUTPUT_FOLDER").unwrap(),
@@ -54,8 +54,8 @@ pub async fn chart(
     Backend::new()
         .render(
             ExecutionMode::Bot,
-            &bot.instrument(),
-            &bot.htf_instrument(),
+            bot.instrument(),
+            bot.htf_instrument(),
             trades,
             &output_file,
         )

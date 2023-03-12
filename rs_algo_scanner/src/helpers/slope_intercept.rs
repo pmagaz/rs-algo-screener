@@ -5,7 +5,7 @@ pub fn slope_intercept(x1: f64, y1: f64, x2: f64, y2: f64) -> (f64, f64) {
     let x = x2 - x1;
     let slope = y / x;
     let y_intercept = y1 - (slope * x1);
-    return (slope, y_intercept);
+    (slope, y_intercept)
 }
 
 pub fn next_intercept(x1: f64, y1: f64, x2: f64, y2: f64) -> (f64, f64) {

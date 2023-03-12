@@ -1,4 +1,4 @@
-use chrono::Local;
+
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::pricing::Pricing;
@@ -139,7 +139,7 @@ pub trait Strategy: DynClone {
             None => "".to_string(),
         };
 
-        let overwrite_orders = env::var("OVERWRITE_ORDERS")
+        let _overwrite_orders = env::var("OVERWRITE_ORDERS")
             .unwrap()
             .parse::<bool>()
             .unwrap();
@@ -165,9 +165,9 @@ pub trait Strategy: DynClone {
             if index < len - 1 && index >= 10 {
                 let current_candle = instrument.data().get(index).unwrap();
                 let current_close = current_candle.close();
-                let current_date = current_candle.date();
+                let _current_date = current_candle.date();
                 let pricing = pricing.calculate_spread(current_close);
-                orders = order::cancel_pending_expired_orders(index, &instrument, &mut orders);
+                orders = order::cancel_pending_expired_orders(index, instrument, &mut orders);
 
                 let pending_orders = order::get_pending(&orders);
                 let active_orders_result = self.resolve_pending_orders(
@@ -284,14 +284,15 @@ pub trait Strategy: DynClone {
         trade_size: f64,
         trading_direction: &TradeDirection,
     ) -> PositionResult {
-        let pending_orders = order::get_pending(&orders);
+        let pending_orders = order::get_pending(orders);
 
         let overwrite_orders = env::var("OVERWRITE_ORDERS")
             .unwrap()
             .parse::<bool>()
             .unwrap();
 
-        let entry_result = match trading_direction.is_long() {
+        
+        match trading_direction.is_long() {
             true => match self.is_long_strategy() {
                 true => match self.entry_long(index, instrument, htf_instrument, pricing) {
                     Position::MarketIn(order_types) => {
@@ -305,16 +306,13 @@ pub trait Strategy: DynClone {
                             None,
                         );
 
-                        let prepared_orders = match order_types {
-                            Some(orders) => Some(order::prepare_orders(
+                        let prepared_orders = order_types.map(|orders| order::prepare_orders(
                                 index,
                                 instrument,
                                 pricing,
                                 &trade_type,
                                 &orders,
-                            )),
-                            None => None,
-                        };
+                            ));
 
                         let new_orders = match overwrite_orders {
                             true => prepared_orders,
@@ -367,16 +365,13 @@ pub trait Strategy: DynClone {
                             None,
                         );
 
-                        let prepared_orders = match order_types {
-                            Some(orders) => Some(order::prepare_orders(
+                        let prepared_orders = order_types.map(|orders| order::prepare_orders(
                                 index,
                                 instrument,
                                 pricing,
                                 &trade_type,
                                 &orders,
-                            )),
-                            None => None,
-                        };
+                            ));
 
                         let new_orders = match overwrite_orders {
                             true => prepared_orders,
@@ -415,8 +410,7 @@ pub trait Strategy: DynClone {
                 _ => PositionResult::None,
             },
             false => PositionResult::None,
-        };
-        entry_result
+        }
     }
 
     fn resolve_exit_position(
@@ -427,7 +421,9 @@ pub trait Strategy: DynClone {
         pricing: &Pricing,
         trade_in: &TradeIn,
     ) -> PositionResult {
-        let exit_result = match self.is_long_strategy() {
+        
+
+        match self.is_long_strategy() {
             true => match self.exit_long(index, instrument, htf_instrument, trade_in, pricing) {
                 Position::MarketOut(_) => {
                     let trade_type = TradeType::MarketOutLong;
@@ -482,9 +478,7 @@ pub trait Strategy: DynClone {
                 }
                 _ => PositionResult::None,
             },
-        };
-
-        exit_result
+        }
     }
 
     fn resolve_pending_orders(
@@ -538,11 +532,7 @@ pub trait Strategy: DynClone {
 
     fn there_are_funds(&mut self, trades_out: &Vec<TradeOut>) -> bool {
         let profit: f64 = trades_out.iter().map(|trade| trade.profit_per).sum();
-        if profit > -90. {
-            true
-        } else {
-            false
-        }
+        profit > -90.
     }
 }
 

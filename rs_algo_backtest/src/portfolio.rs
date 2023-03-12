@@ -180,7 +180,7 @@ impl PortFolio {
             //     false => None,
             // };
 
-            let htf_str = match htf_time_frame {
+            let _htf_str = match htf_time_frame {
                 Some(htf) => htf.to_string(),
                 None => "".to_string(),
             };

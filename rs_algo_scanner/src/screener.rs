@@ -27,7 +27,7 @@ where
     }
 
     pub async fn login(&mut self, username: &str, password: &str) -> Result<()> {
-        let result = self.broker.login(username, password).await.unwrap();
+        let _result = self.broker.login(username, password).await.unwrap();
         Ok(())
     }
 
@@ -55,7 +55,7 @@ where
             .unwrap();
 
         let mut instrument = Instrument::new()
-            .symbol(&symbol)
+            .symbol(symbol)
             .market(market.to_owned())
             .time_frame(time_frame.to_owned())
             .build()

@@ -9,7 +9,7 @@ use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::time_frame::{TimeFrame, TimeFrameType};
-use rs_algo_shared::models::trade::{Position, Trade, TradeDirection, TradeIn, TradeOut};
+use rs_algo_shared::models::trade::{Position, TradeDirection, TradeIn, TradeOut};
 use rs_algo_shared::models::{backtest_instrument::*, time_frame};
 use rs_algo_shared::scanner::instrument::*;
 
@@ -45,7 +45,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .unwrap()
             .parse::<String>()
             .unwrap()
-            .clone();
+            ;
 
         let order_size = std::env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
@@ -95,7 +95,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
     }
 
     fn time_frame(&self) -> &TimeFrameType {
-        &&self.time_frame
+        &self.time_frame
     }
 
     fn higher_time_frame(&self) -> &Option<TimeFrameType> {
@@ -138,16 +138,15 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
+        _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
         let atr_value = std::env::var("ATR_STOP_LOSS")
             .unwrap()
             .parse::<f64>()
-            .unwrap()
-            .clone();
-        let spread = pricing.spread();
-        let close_price = &instrument.data.get(index).unwrap().close();
+            .unwrap();
+        let _spread = pricing.spread();
+        let _close_price = &instrument.data.get(index).unwrap().close();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -190,12 +189,12 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
-        trade_in: &TradeIn,
+        _htf_instrument: &HTFInstrument,
+        _trade_in: &TradeIn,
         pricing: &Pricing,
     ) -> Position {
-        let spread = pricing.spread();
-        let close_price = &instrument.data.get(index).unwrap().close();
+        let _spread = pricing.spread();
+        let _close_price = &instrument.data.get(index).unwrap().close();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -233,16 +232,15 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
+        _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
         let atr_value = std::env::var("ATR_STOP_LOSS")
             .unwrap()
             .parse::<f64>()
-            .unwrap()
-            .clone();
-        let spread = pricing.spread();
-        let close_price = &instrument.data.get(index).unwrap().close();
+            .unwrap();
+        let _spread = pricing.spread();
+        let _close_price = &instrument.data.get(index).unwrap().close();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -283,11 +281,11 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
+        _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let spread = pricing.spread();
-        let close_price = &instrument.data.get(index).unwrap().close();
+        let _spread = pricing.spread();
+        let _close_price = &instrument.data.get(index).unwrap().close();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();

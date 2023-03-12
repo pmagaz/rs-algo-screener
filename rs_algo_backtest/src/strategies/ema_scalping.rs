@@ -45,7 +45,7 @@ impl<'a> Strategy for EmaScalping<'a> {
             .unwrap()
             .parse::<String>()
             .unwrap()
-            .clone();
+            ;
 
         let order_size = std::env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
@@ -95,7 +95,7 @@ impl<'a> Strategy for EmaScalping<'a> {
     }
 
     fn time_frame(&self) -> &TimeFrameType {
-        &&self.time_frame
+        &self.time_frame
     }
 
     fn higher_time_frame(&self) -> &Option<TimeFrameType> {
@@ -137,7 +137,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
+        _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
         let spread = 0.;
@@ -208,10 +208,10 @@ impl<'a> Strategy for EmaScalping<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        htf_instrument: &HTFInstrument,
+        _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let close_price = &instrument.data.get(index).unwrap().close();
+        let _close_price = &instrument.data.get(index).unwrap().close();
         let spread = 0.;
 
         let prev_index = calc::get_prev_index(index);
@@ -228,7 +228,7 @@ impl<'a> Strategy for EmaScalping<'a> {
             .get_data_a()
             .get(prev_index)
             .unwrap();
-        let ema_8 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
+        let _ema_8 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
         let ema_8 = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
         let entry_condition = self.trading_direction == TradeDirection::Short

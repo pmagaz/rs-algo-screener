@@ -143,7 +143,7 @@ pub async fn find_instruments_result(
 }
 
 pub async fn find_instruments_result_by_strategy(
-    params: web::Path<(String)>,
+    params: web::Path<String>,
     state: web::Data<AppState>,
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
@@ -293,7 +293,7 @@ pub async fn find_strategies_result_instruments(
 }
 
 pub async fn find_prices(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
-    let now = Instant::now();
+    let _now = Instant::now();
 
     log::info!("[BACK TEST PRICING] Request for at {:?}", Local::now());
 
@@ -341,13 +341,13 @@ pub async fn chart(
     };
 
     let instrument =
-        db::back_test::find_backtest_instrument_by_symbol_time_frame(&*symbol, &time_frame, &state)
+        db::back_test::find_backtest_instrument_by_symbol_time_frame(&symbol, &time_frame, &state)
             .await
             .unwrap()
             .unwrap();
 
     let htf_instrument = db::back_test::find_htf_backtest_instrument_by_symbol_time_frame(
-        &*symbol,
+        &symbol,
         &higher_time_frame,
         &state,
     )

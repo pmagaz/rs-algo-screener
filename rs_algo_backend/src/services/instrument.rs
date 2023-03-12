@@ -58,7 +58,7 @@ pub async fn chart(
 
     let symbol = path.into_inner();
 
-    let instrument = db::instrument::find_by_symbol(&*symbol, &state)
+    let instrument = db::instrument::find_by_symbol(&symbol, &state)
         .await
         .unwrap()
         .unwrap();

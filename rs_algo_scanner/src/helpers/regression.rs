@@ -36,6 +36,6 @@ fn weights(bandwidth: f64, x: f64, data: &Vec<f64>, logarithmic: bool) -> Vec<f6
 
 pub fn kernel_regression(bandwidth: f64, x: f64, data: &Vec<f64>) -> f64 {
     let logarithmic = env::var("LOGARITHMIC_SCANNER").unwrap().parse::<bool>().unwrap();
-    let w = weights(bandwidth, x, &data, logarithmic);
+    let w = weights(bandwidth, x, data, logarithmic);
     data.iter().zip(w.iter()).map(|(a, b)| (a * b)).sum()
 }
