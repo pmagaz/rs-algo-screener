@@ -1,4 +1,3 @@
-
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::pricing::Pricing;
@@ -291,7 +290,6 @@ pub trait Strategy: DynClone {
             .parse::<bool>()
             .unwrap();
 
-        
         match trading_direction.is_long() {
             true => match self.is_long_strategy() {
                 true => match self.entry_long(index, instrument, htf_instrument, pricing) {
@@ -306,13 +304,9 @@ pub trait Strategy: DynClone {
                             None,
                         );
 
-                        let prepared_orders = order_types.map(|orders| order::prepare_orders(
-                                index,
-                                instrument,
-                                pricing,
-                                &trade_type,
-                                &orders,
-                            ));
+                        let prepared_orders = order_types.map(|orders| {
+                            order::prepare_orders(index, instrument, pricing, &trade_type, &orders)
+                        });
 
                         let new_orders = match overwrite_orders {
                             true => prepared_orders,
@@ -365,13 +359,9 @@ pub trait Strategy: DynClone {
                             None,
                         );
 
-                        let prepared_orders = order_types.map(|orders| order::prepare_orders(
-                                index,
-                                instrument,
-                                pricing,
-                                &trade_type,
-                                &orders,
-                            ));
+                        let prepared_orders = order_types.map(|orders| {
+                            order::prepare_orders(index, instrument, pricing, &trade_type, &orders)
+                        });
 
                         let new_orders = match overwrite_orders {
                             true => prepared_orders,
@@ -421,8 +411,6 @@ pub trait Strategy: DynClone {
         pricing: &Pricing,
         trade_in: &TradeIn,
     ) -> PositionResult {
-        
-
         match self.is_long_strategy() {
             true => match self.exit_long(index, instrument, htf_instrument, trade_in, pricing) {
                 Position::MarketOut(_) => {

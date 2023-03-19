@@ -188,7 +188,8 @@ impl PortFolio {
             let seed = [
                 &strategy.name().to_string(),
                 &strategy.strategy_type().to_string(),
-                &[time_frame.clone()].concat(),
+                &time_frame.clone(),
+                &htf_time_frame.clone().unwrap().to_string(),
                 &market.to_string(),
             ];
 

@@ -27,6 +27,7 @@ pub mod strategy;
 // pub mod bollinger_bands_reversal_continuation_ls;
 // pub mod bollinger_bands_reversal_ls;
 // pub mod bollinger_bands_reversal_riding_rsi_ls;
+pub mod bollinger_bands_middle_band;
 pub mod bollinger_bands_reversals;
 pub mod ema_scalping;
 pub mod ema_scalping2;

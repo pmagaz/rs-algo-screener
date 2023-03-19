@@ -48,8 +48,7 @@ pub async fn find_strategy_result(
 
     log::info!("[FINDONE] from {}", collection_name);
 
-    let collection =
-        get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
+    let collection = get_collection::<BackTestStrategyResult>(&state.db_mem, collection_name).await;
 
     let result = collection
         .find_one(
@@ -223,7 +222,7 @@ pub async fn upsert_instruments_result(
 
     collection
         .find_one_and_replace(
-            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(), "time_frame": doc.time_frame.to_string(), "market": doc.market.to_string(),  "instrument.symbol": doc.instrument.symbol.clone() },
+            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(), "time_frame": doc.time_frame.to_string(), "higher_time_frame": doc.higher_time_frame.clone().unwrap().to_string(), "market": doc.market.to_string(),  "instrument.symbol": doc.instrument.symbol.clone() },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))
@@ -241,7 +240,7 @@ pub async fn upsert_strategies_result(
 
     collection
         .find_one_and_replace(
-            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(),"time_frame": doc.time_frame.to_string(), "market": doc.market.to_string(),   },
+            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(),"time_frame": doc.time_frame.to_string(), "higher_time_frame": doc.higher_time_frame.clone().unwrap().to_string(), "market": doc.market.to_string(),   },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))

@@ -16,7 +16,7 @@ use chrono::Duration;
 use plotters::prelude::*;
 
 use std::cmp::Ordering;
-use std::{env};
+use std::env;
 
 #[derive(Debug, Clone)]
 pub struct Backend;
@@ -76,8 +76,6 @@ impl Backend {
         let trades_out: &Vec<TradeOut> = trades.1;
         let orders: &Vec<Order> = trades.2;
 
-        
-        
         let mut stop_loss: Vec<(usize, f64)> = vec![];
         let _stop_loss_types: Vec<(usize, StopLossType)> = vec![];
         let _peaks = instrument.peaks();
@@ -449,11 +447,7 @@ impl Backend {
                                         RED_LINE.mix(0.3),
                                     )
                                 } else {
-                                    TriangleMarker::new(
-                                        (candle.date, candle.close),
-                                        0,
-                                        TRANSPARENT,
-                                    )
+                                    TriangleMarker::new((candle.date, candle.close), 0, TRANSPARENT)
                                 }
                             }))
                             .unwrap();
@@ -546,7 +540,6 @@ impl Backend {
                         let date = from_dbtime(&trade_out.date_out);
                         let trade_in = trades_in.get(i).unwrap();
                         let price = trade_out.price_out;
-                        
                         match trade_out.profit > 0. {
                             true => match trade_out.trade_type.is_long() {
                                 true => TriangleMarker::new(
@@ -595,13 +588,7 @@ impl Backend {
                         };
 
                         if leches {
-                            let candle_index = data
-                                .iter()
-                                .position(|x| uuid::generate_ts_id(x.date) == order.id)
-                                .unwrap();
-                            let candle = data.get(candle_index).unwrap();
-                            let date = candle.date();
-
+                            let date = from_dbtime(&order.created_at);
                             let order_opacity = match order.status {
                                 OrderStatus::Pending => 1.1,
                                 OrderStatus::Fulfilled => 1.5,

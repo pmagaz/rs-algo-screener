@@ -63,6 +63,7 @@ async fn main() -> Result<()> {
             .unwrap();
 
     log::info!("Starting {} on port {} !", app_name, port.clone());
+    let payload_limit = 1024 * 1024 * 64;
 
     HttpServer::new(move || {
         App::new()
@@ -83,7 +84,8 @@ async fn main() -> Result<()> {
                     name: db_hdd_name.to_owned(),
                 },
             })
-            .app_data(web::PayloadConfig::new(100000000))
+            .app_data(web::PayloadConfig::new(payload_limit))
+            .app_data(web::JsonConfig::default().limit(payload_limit))
             .route("/", web::get().to(index))
             .service(
                 web::scope("/api")
