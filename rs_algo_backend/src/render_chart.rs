@@ -667,7 +667,7 @@ impl Backend {
                     (0..)
                         .zip(data.iter())
                         .map(|(id, candle)| (candle.date, bb_c[id])),
-                    &ORANGE_LINE,
+                    &BLUE_LINE2,
                 ))
                 .unwrap();
         }
@@ -693,10 +693,6 @@ impl Backend {
                 let mut indicator_panel = ChartBuilder::on(&lower)
                     .x_label_area_size(40)
                     .y_label_area_size(40)
-                    // .caption(
-                    //     &["MACD ", &htf_instrument.time_frame().to_string()].concat(),
-                    //     (font.as_ref(), 10.0).into_font(),
-                    // )
                     .build_cartesian_2d(from_date..to_date, *min_macd..*max_macd)
                     .unwrap();
 
@@ -746,7 +742,7 @@ impl Backend {
                                 .iter()
                                 .enumerate()
                                 .map(|(_id, data)| (data.0, htf_ema_a[data.1])),
-                            ORANGE_LINE.mix(1.4),
+                            ORANGE_LINE.mix(0.8),
                         ))
                         .unwrap();
                 }
@@ -758,7 +754,7 @@ impl Backend {
                                 .iter()
                                 .enumerate()
                                 .map(|(_id, data)| (data.0, htf_ema_b[data.1])),
-                            RED_LINE2.mix(1.4),
+                            RED_LINE2.mix(0.8),
                         ))
                         .unwrap();
                 }

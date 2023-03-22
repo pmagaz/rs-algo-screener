@@ -44,8 +44,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         let base_time_frame = &std::env::var("TIME_FRAME")
             .unwrap()
             .parse::<String>()
-            .unwrap()
-            ;
+            .unwrap();
 
         let order_size = std::env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
@@ -268,6 +267,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         _index: usize,
         _instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
+        trade_in: &TradeIn,
         _pricing: &Pricing,
     ) -> Position {
         Position::None

@@ -44,8 +44,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let base_time_frame = &std::env::var("TIME_FRAME")
             .unwrap()
             .parse::<String>()
-            .unwrap()
-            ;
+            .unwrap();
 
         let order_size = std::env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
@@ -75,7 +74,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let trading_direction = TradeDirection::Long;
 
         Ok(Self {
-            name: "BollingerBandsReversals",
+            name: "Bollinger_Bands_Reversals",
             time_frame,
             higher_time_frame,
             order_size,
@@ -154,6 +153,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let prev_candle = &data.get(prev_index).unwrap();
         let close_price = &candle.close();
         let prev_close = &prev_candle.close();
+        let is_closed = candle.is_closed();
 
         let low_band = instrument.indicators.bb.get_data_b().get(index).unwrap();
         let prev_low_band = instrument
@@ -163,9 +163,10 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .get(prev_index)
             .unwrap();
 
-        let pips_margin = 3.;
+        let pips_margin = 0.1;
 
         let entry_condition = self.trading_direction == TradeDirection::Long
+            && is_closed
             && close_price < low_band
             && prev_close >= prev_low_band;
 
@@ -202,6 +203,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let prev_candle = &data.get(prev_index).unwrap();
         let close_price = &candle.close();
         let prev_high = &prev_candle.high();
+        let is_closed = candle.is_closed();
 
         let top_band = instrument.indicators.bb.get_data_a().get(index).unwrap();
         let prev_top_band = instrument
@@ -220,7 +222,14 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         }
 
         let exit_condition = self.trading_direction == TradeDirection::Short
-            || (ridding_bars < 3 && close_price < top_band && prev_high > prev_top_band);
+            || (is_closed
+                && ridding_bars < 3
+                && close_price < top_band
+                && prev_high > prev_top_band);
+
+        if exit_condition {
+            log::info!("Exit Long {:?}", (index, close_price, candle));
+        }
 
         match exit_condition {
             true => Position::MarketOut(None),
@@ -248,8 +257,9 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let prev_candle = &data.get(prev_index).unwrap();
         let close_price = &candle.close();
         let prev_high = &prev_candle.high();
+        let is_closed = candle.is_closed();
 
-        let pips_margin = 3.;
+        let pips_margin = 0.5;
         let top_band = instrument.indicators.bb.get_data_a().get(index).unwrap();
         let prev_top_band = instrument
             .indicators
@@ -259,8 +269,10 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .unwrap();
 
         let entry_condition = self.trading_direction == TradeDirection::Short
+            && is_closed
             && close_price < top_band
             && prev_high >= prev_top_band;
+
         let buy_price = candle.close() - calc::to_pips(pips_margin, pricing);
 
         if entry_condition {
@@ -282,6 +294,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         index: usize,
         instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
+        trade_in: &TradeIn,
         pricing: &Pricing,
     ) -> Position {
         let _spread = pricing.spread();
@@ -293,6 +306,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let prev_candle = &data.get(prev_index).unwrap();
         let close_price = &candle.close();
         let prev_close = &prev_candle.close();
+        let is_closed = candle.is_closed();
 
         let low_band = instrument.indicators.bb.get_data_b().get(index).unwrap();
         let prev_low_band = instrument
@@ -310,7 +324,14 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             }
         }
         let exit_condition = self.trading_direction == TradeDirection::Long
-            || (ridding_bars < 3 && close_price < low_band && prev_close >= prev_low_band);
+            || (is_closed
+                && ridding_bars < 3
+                && close_price < low_band
+                && prev_close >= prev_low_band);
+
+        if exit_condition {
+            log::info!("Exit Short {:?}", (index, candle));
+        }
 
         match exit_condition {
             true => Position::MarketOut(None),
