@@ -118,7 +118,7 @@ impl<'a> Strategy for BollingerBandsMiddleBand<'a> {
                 let htf_ema_5 = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
                 let htf_ema_8 = htf_inst.indicators.ema_b.get_data_a().get(idx).unwrap();
 
-                let is_long = macd_a > macd_b;
+                let is_long = htf_ema_5 > htf_ema_8;
                 let is_short = htf_ema_5 < htf_ema_8;
 
                 if is_long && !is_short {
@@ -172,10 +172,6 @@ impl<'a> Strategy for BollingerBandsMiddleBand<'a> {
 
         let buy_price = candle.high() + calc::to_pips(pips_margin, pricing);
 
-        if entry_condition {
-            log::info!("Entry Long {:?}", (index, buy_price, candle));
-        }
-
         match entry_condition {
             true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
@@ -215,10 +211,6 @@ impl<'a> Strategy for BollingerBandsMiddleBand<'a> {
 
         let exit_condition = self.trading_direction == TradeDirection::Short
             || (is_closed && close_price < middle_band && prev_close >= prev_middle_band);
-
-        if exit_condition {
-            log::info!("Exit Long {:?}", (index, close_price, candle));
-        }
 
         match exit_condition {
             true => Position::MarketOut(None),
@@ -264,10 +256,6 @@ impl<'a> Strategy for BollingerBandsMiddleBand<'a> {
 
         let buy_price = candle.low() - calc::to_pips(pips_margin, pricing);
 
-        if entry_condition {
-            log::info!("Entry Short {:?}", (index, buy_price, candle));
-        }
-
         match entry_condition {
             true => Position::Order(vec![
                 OrderType::BuyOrderShort(OrderDirection::Down, self.order_size, buy_price),
@@ -307,10 +295,6 @@ impl<'a> Strategy for BollingerBandsMiddleBand<'a> {
 
         let exit_condition = self.trading_direction == TradeDirection::Long
             || (is_closed && close_price > middle_band && prev_close <= prev_middle_band);
-
-        if exit_condition {
-            log::info!("Exit Short {:?}", (index, candle));
-        }
 
         match exit_condition {
             true => Position::MarketOut(None),

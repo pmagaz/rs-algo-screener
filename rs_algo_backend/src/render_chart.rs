@@ -595,6 +595,7 @@ impl Backend {
                                 _ => 0.6,
                             };
 
+                            let order_opacity = 1.1;
                             match order.order_type {
                                 OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
                                     (date, order.target_price),
@@ -625,13 +626,13 @@ impl Backend {
                                 OrderType::StopLossLong(_, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     orders_size,
-                                    RED_LINE.mix(order_opacity),
+                                    RED_LINE.mix(0.5),
                                 ),
 
                                 OrderType::StopLossShort(_, _) => TriangleMarker::new(
                                     (date, order.target_price),
                                     -orders_size,
-                                    RED_LINE.mix(order_opacity),
+                                    RED_LINE.mix(0.5),
                                 ),
                             }
                         } else {
@@ -640,6 +641,29 @@ impl Backend {
                     }),
             )
             .unwrap();
+
+        //STOPLOSS
+        // chart
+        //     .draw_series(
+        //         orders
+        //             .iter()
+        //             .filter(|x| x.order_type.is_stop())
+        //             //.filter(|x| x.created_at > to_dbtime(data.first().unwrap().date()))
+        //             .enumerate()
+        //             .map(|(_i, order)| {
+        //                 let date = from_dbtime(&order.created_at);
+        //                 let price = order.target_price;
+        //                 match order.order_type.is_long() {
+        //                     true => {
+        //                         TriangleMarker::new((date, price), -trades_size, RED_LINE2.mix(5.))
+        //                     }
+        //                     false => {
+        //                         TriangleMarker::new((date, price), trades_size, RED_LINE2.mix(5.))
+        //                     }
+        //                 }
+        //             }),
+        //     )
+        //     .unwrap();
 
         //BOLLINGER BANDS
 
@@ -722,7 +746,7 @@ impl Backend {
                         (0..)
                             .zip(result.iter())
                             .map(|(_id, data)| (data.0, htf_macd_a[data.1])),
-                        BLUE_LINE3.mix(0.8),
+                        BLUE_LINE3.mix(0.6),
                     ))
                     .unwrap();
 
@@ -731,7 +755,7 @@ impl Backend {
                         (0..)
                             .zip(result.iter())
                             .map(|(_id, data)| (data.0, htf_macd_b[data.1])),
-                        RED_LINE.mix(0.8),
+                        RED_LINE.mix(0.6),
                     ))
                     .unwrap();
 
@@ -742,7 +766,7 @@ impl Backend {
                                 .iter()
                                 .enumerate()
                                 .map(|(_id, data)| (data.0, htf_ema_a[data.1])),
-                            ORANGE_LINE.mix(0.8),
+                            ORANGE_LINE.mix(1.1),
                         ))
                         .unwrap();
                 }
@@ -754,7 +778,7 @@ impl Backend {
                                 .iter()
                                 .enumerate()
                                 .map(|(_id, data)| (data.0, htf_ema_b[data.1])),
-                            RED_LINE2.mix(0.8),
+                            RED_LINE2.mix(1.1),
                         ))
                         .unwrap();
                 }
@@ -782,7 +806,7 @@ impl Backend {
                         (0..)
                             .zip(data.iter())
                             .map(|(id, candle)| (candle.date, macd_a[id])),
-                        BLUE_LINE3,
+                        BLUE_LINE3.mix(0.5),
                     ))
                     .unwrap();
 
@@ -791,7 +815,7 @@ impl Backend {
                         (0..)
                             .zip(data.iter())
                             .map(|(id, candle)| (candle.date, macd_b[id])),
-                        RED_LINE,
+                        RED_LINE.mix(0.5),
                     ))
                     .unwrap();
             }

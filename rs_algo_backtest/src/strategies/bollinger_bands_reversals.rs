@@ -118,7 +118,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
                 let htf_ema_5 = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
                 let htf_ema_8 = htf_inst.indicators.ema_b.get_data_a().get(idx).unwrap();
 
-                let is_long = macd_a > macd_b;
+                let is_long = htf_ema_5 > htf_ema_8;
                 let is_short = htf_ema_5 < htf_ema_8;
 
                 if is_long && !is_short {
@@ -172,10 +172,6 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
 
         let buy_price = candle.high() + calc::to_pips(pips_margin, pricing);
 
-        if entry_condition {
-            log::info!("Entry Long {} {:?}", index, candle.date());
-        }
-
         match entry_condition {
             true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
@@ -227,10 +223,6 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
                 && close_price < top_band
                 && prev_high > prev_top_band);
 
-        if exit_condition {
-            log::info!("Exit Long {:?}", (index, close_price, candle));
-        }
-
         match exit_condition {
             true => Position::MarketOut(None),
             false => Position::None,
@@ -274,10 +266,6 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             && prev_high >= prev_top_band;
 
         let buy_price = candle.close() - calc::to_pips(pips_margin, pricing);
-
-        if entry_condition {
-            log::info!("Entry short {} {:?}", index, candle.date());
-        }
 
         match entry_condition {
             true => Position::Order(vec![
@@ -328,10 +316,6 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
                 && ridding_bars < 3
                 && close_price < low_band
                 && prev_close >= prev_low_band);
-
-        if exit_condition {
-            log::info!("Exit Short {:?}", (index, candle));
-        }
 
         match exit_condition {
             true => Position::MarketOut(None),

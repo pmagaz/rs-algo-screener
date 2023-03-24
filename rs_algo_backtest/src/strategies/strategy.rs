@@ -166,7 +166,6 @@ pub trait Strategy: DynClone {
                 let current_candle = instrument.data().get(index).unwrap();
                 let current_close = current_candle.close();
                 let pricing = pricing.calculate_spread(current_close);
-                orders = order::cancel_pending_expired_orders(index, instrument, &mut orders);
 
                 let pending_orders = order::get_pending(&orders);
                 let active_orders_result = self.resolve_pending_orders(
@@ -265,6 +264,7 @@ pub trait Strategy: DynClone {
                         _ => (),
                     };
                 }
+                orders = order::cancel_pending_expired_orders(index, instrument, &mut orders);
             }
         }
 
@@ -424,7 +424,6 @@ pub trait Strategy: DynClone {
                         &trade_type,
                         None,
                     );
-
                     PositionResult::MarketOut(trade_out_result)
                 }
                 Position::Order(order_types) => {
