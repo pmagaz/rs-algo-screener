@@ -138,13 +138,8 @@ async fn main() -> Result<()> {
                                 time_frame,
                             ]
                             .concat(),
-                            false => [
-                                endpoint.as_ref(),
-                                "?mode=daily",
-                                "&time_frame=",
-                                time_frame,
-                            ]
-                            .concat(),
+                            false => [endpoint.as_ref(), "?mode=daily", "&time_frame=", time_frame]
+                                .concat(),
                         };
 
                         let now = Instant::now();

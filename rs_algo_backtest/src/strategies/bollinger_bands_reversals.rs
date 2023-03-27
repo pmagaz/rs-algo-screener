@@ -112,8 +112,8 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             instrument,
             htf_instrument,
             |(idx, _prev_idx, htf_inst)| {
-                let macd_a = htf_inst.indicators.macd.get_data_a().get(idx).unwrap();
-                let macd_b = htf_inst.indicators.macd.get_data_b().get(idx).unwrap();
+                // let macd_a = htf_inst.indicators.macd.get_data_a().get(idx).unwrap();
+                // let macd_b = htf_inst.indicators.macd.get_data_b().get(idx).unwrap();
 
                 let htf_ema_5 = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
                 let htf_ema_8 = htf_inst.indicators.ema_b.get_data_a().get(idx).unwrap();
@@ -144,8 +144,6 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .unwrap()
             .parse::<f64>()
             .unwrap();
-        let _spread = pricing.spread();
-        let _close_price = &instrument.data.get(index).unwrap().close();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -168,7 +166,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let entry_condition = self.trading_direction == TradeDirection::Long
             && is_closed
             && close_price < low_band
-            && prev_close >= prev_low_band;
+            && (prev_close >= prev_low_band);
 
         let buy_price = candle.high() + calc::to_pips(pips_margin, pricing);
 
@@ -188,11 +186,8 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
         _trade_in: &TradeIn,
-        pricing: &Pricing,
+        _pricing: &Pricing,
     ) -> Position {
-        let _spread = pricing.spread();
-        let _close_price = &instrument.data.get(index).unwrap().close();
-
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
@@ -209,9 +204,10 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .get(prev_index)
             .unwrap();
 
-        let previous_bars = 3;
+        let num_ridding_bars = 3;
         let mut ridding_bars = 0;
-        for candle in data[index - previous_bars..index + 1].iter() {
+        let previous_bars = num_ridding_bars;
+        for candle in data[index - previous_bars..index].iter() {
             if candle.close() > *top_band {
                 ridding_bars += 1;
             }
@@ -219,9 +215,9 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
 
         let exit_condition = self.trading_direction == TradeDirection::Short
             || (is_closed
-                && ridding_bars < 3
+                && ridding_bars < num_ridding_bars
                 && close_price < top_band
-                && prev_high > prev_top_band);
+                && (prev_high > prev_top_band));
 
         match exit_condition {
             true => Position::MarketOut(None),
@@ -240,8 +236,6 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .unwrap()
             .parse::<f64>()
             .unwrap();
-        let _spread = pricing.spread();
-        let _close_price = &instrument.data.get(index).unwrap().close();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -263,7 +257,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let entry_condition = self.trading_direction == TradeDirection::Short
             && is_closed
             && close_price < top_band
-            && prev_high >= prev_top_band;
+            && (prev_high >= prev_top_band);
 
         let buy_price = candle.close() - calc::to_pips(pips_margin, pricing);
 
@@ -282,12 +276,9 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         index: usize,
         instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
-        trade_in: &TradeIn,
-        pricing: &Pricing,
+        _trade_in: &TradeIn,
+        _pricing: &Pricing,
     ) -> Position {
-        let _spread = pricing.spread();
-        let _close_price = &instrument.data.get(index).unwrap().close();
-
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
@@ -304,18 +295,20 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .get(prev_index)
             .unwrap();
 
-        let previous_bars = 3;
+        let num_ridding_bars = 3;
         let mut ridding_bars = 0;
-        for candle in data[index - previous_bars..index + 1].iter() {
+        let previous_bars = num_ridding_bars;
+
+        for candle in data[index - previous_bars..index].iter() {
             if candle.close() < *low_band {
                 ridding_bars += 1;
             }
         }
         let exit_condition = self.trading_direction == TradeDirection::Long
             || (is_closed
-                && ridding_bars < 3
+                && ridding_bars < num_ridding_bars
                 && close_price < low_band
-                && prev_close >= prev_low_band);
+                && (prev_close >= prev_low_band));
 
         match exit_condition {
             true => Position::MarketOut(None),

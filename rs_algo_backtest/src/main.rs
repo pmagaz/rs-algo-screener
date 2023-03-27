@@ -14,7 +14,8 @@ use std::time::Instant;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    //env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    env_logger::init_from_env(env_logger::Env::new().filter("WARN"));
 
     let start = Instant::now();
     let env = env::var("ENV").unwrap();
