@@ -579,64 +579,54 @@ impl Backend {
                     .filter(|x| x.created_at > to_dbtime(data.first().unwrap().date()))
                     .enumerate()
                     .map(|(_i, order)| {
-                        let leches = match data
-                            .iter()
-                            .position(|x| uuid::generate_ts_id(x.date) == order.id)
-                        {
-                            Some(_x) => true,
-                            None => false,
+                        let date = from_dbtime(&order.created_at);
+
+                        log::info!("111111111 {:?}", date);
+                        let order_opacity = match order.status {
+                            OrderStatus::Pending => 1.1,
+                            OrderStatus::Fulfilled => 1.5,
+                            _ => 0.6,
                         };
 
-                        if leches {
-                            let date = from_dbtime(&order.created_at);
-                            let order_opacity = match order.status {
-                                OrderStatus::Pending => 1.1,
-                                OrderStatus::Fulfilled => 1.5,
-                                _ => 0.6,
-                            };
+                        let order_opacity = 1.1;
+                        match order.order_type {
+                            OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                orders_size,
+                                ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                -orders_size,
+                                ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                -orders_size,
+                                ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                orders_size,
+                                ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::TakeProfitLong(_, _, _)
+                            | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                -orders_size,
+                                ORANGE_LINE.mix(order_opacity),
+                            ),
+                            OrderType::StopLossLong(_, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                orders_size,
+                                RED_LINE.mix(0.5),
+                            ),
 
-                            let order_opacity = 1.1;
-                            match order.order_type {
-                                OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
-                                    (date, order.target_price),
-                                    orders_size,
-                                    ORANGE_LINE.mix(order_opacity),
-                                ),
-                                OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
-                                    (date, order.target_price),
-                                    -orders_size,
-                                    ORANGE_LINE.mix(order_opacity),
-                                ),
-                                OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
-                                    (date, order.target_price),
-                                    -orders_size,
-                                    ORANGE_LINE.mix(order_opacity),
-                                ),
-                                OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
-                                    (date, order.target_price),
-                                    orders_size,
-                                    ORANGE_LINE.mix(order_opacity),
-                                ),
-                                OrderType::TakeProfitLong(_, _, _)
-                                | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
-                                    (date, order.target_price),
-                                    -orders_size,
-                                    ORANGE_LINE.mix(order_opacity),
-                                ),
-                                OrderType::StopLossLong(_, _) => TriangleMarker::new(
-                                    (date, order.target_price),
-                                    orders_size,
-                                    RED_LINE.mix(0.5),
-                                ),
-
-                                OrderType::StopLossShort(_, _) => TriangleMarker::new(
-                                    (date, order.target_price),
-                                    -orders_size,
-                                    RED_LINE.mix(0.5),
-                                ),
-                            }
-                        } else {
-                            TriangleMarker::new((Local::now(), 0.), 0, TRANSPARENT)
+                            OrderType::StopLossShort(_, _) => TriangleMarker::new(
+                                (date, order.target_price),
+                                -orders_size,
+                                RED_LINE.mix(0.5),
+                            ),
                         }
                     }),
             )
