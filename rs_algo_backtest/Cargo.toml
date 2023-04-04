@@ -19,10 +19,10 @@ futures = "0.3.21"
 reqwest = { version = "0.11.11", features = ["json"] }
 openssl = { version = "0.10.41", features = ["vendored"] }
 dyn-clone = "1.0.11"
-env_logger = "0.9.0"
+env_logger = "0.10.0"
 log = "0.4"
 
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "c5fa52c" }
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "c13ceda" }
 #rs_algo_shared = { path = "../../rs_algo_shared" }
 # [profile.release]
 # strip = true

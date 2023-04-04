@@ -312,7 +312,6 @@ pub async fn find_prices(state: &web::Data<AppState>) -> Result<Vec<Pricing>, Er
             _ => {}
         }
     }
-    log::info!("111 {:?}", prices.len());
     Ok(prices)
 }
 

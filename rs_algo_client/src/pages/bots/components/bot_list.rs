@@ -45,13 +45,7 @@ pub fn bot_list(props: &Props) -> Html {
             let profit_status = get_profit_per_status(stats.net_profit_per);
             let profit_factor_status = get_profit_factor_status(stats.profit_factor);
             let profitable_trades_status = get_profitable_trades_status(stats.profitable_trades);
-            //let profit_status = get_profit_status(stats.net_profit_per, stats.avg_buy_hold);
             let max_drawdown_status = get_max_drawdown_status(stats.max_drawdown);
-            // let avg_won_status = get_won_per_trade_status(stats.won_per_trade_per);
-            // let avg_lost_status = get_lost_per_trade_status(stats.lost_per_trade_per);
-
-            log::info!("{:?}", stats.lost_per_trade_per);
-
             let avg_won_lost_status = match stats.won_per_trade_per {
                 _ if stats.won_per_trade_per > (stats.lost_per_trade_per * -1.) => Status::Bullish,
                 _ if stats.won_per_trade_per < (stats.lost_per_trade_per * -1.) => Status::Bearish,

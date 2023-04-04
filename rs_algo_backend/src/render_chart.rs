@@ -470,6 +470,12 @@ impl Backend {
             _ => 6,
         };
 
+        let stops_size = match mode {
+            ExecutionMode::Scanner => 0,
+            ExecutionMode::Bot => 5,
+            _ => 5,
+        };
+
         //TRADES_IN
 
         chart
@@ -534,7 +540,10 @@ impl Backend {
             .draw_series(
                 trades_out
                     .iter()
-                    .filter(|x| x.date_out > to_dbtime(data.first().unwrap().date()))
+                    .filter(|x| {
+                        x.date_out > to_dbtime(data.first().unwrap().date())
+                            && !x.trade_type.is_stop()
+                    })
                     .enumerate()
                     .map(|(i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);
@@ -581,7 +590,6 @@ impl Backend {
                     .map(|(_i, order)| {
                         let date = from_dbtime(&order.created_at);
 
-                        log::info!("111111111 {:?}", date);
                         let order_opacity = match order.status {
                             OrderStatus::Pending => 1.1,
                             OrderStatus::Fulfilled => 1.5,
@@ -616,44 +624,60 @@ impl Backend {
                                 -orders_size,
                                 ORANGE_LINE.mix(order_opacity),
                             ),
-                            OrderType::StopLossLong(_, _) => TriangleMarker::new(
+                            _ => TriangleMarker::new(
                                 (date, order.target_price),
                                 orders_size,
-                                RED_LINE.mix(0.5),
+                                TRANSPARENT.mix(0.0),
                             ),
+                            // OrderType::StopLossLong(_, _) => TriangleMarker::new(
+                            //     (date, order.target_price),
+                            //     orders_size,
+                            //     RED_LINE.mix(0.5),
+                            // ),
 
-                            OrderType::StopLossShort(_, _) => TriangleMarker::new(
-                                (date, order.target_price),
-                                -orders_size,
-                                RED_LINE.mix(0.5),
-                            ),
+                            // OrderType::StopLossShort(_, _) => TriangleMarker::new(
+                            //     (date, order.target_price),
+                            //     -orders_size,
+                            //     RED_LINE.mix(0.5),
+                            // ),
                         }
                     }),
             )
             .unwrap();
 
         //STOPLOSS
-        // chart
-        //     .draw_series(
-        //         orders
-        //             .iter()
-        //             .filter(|x| x.order_type.is_stop())
-        //             //.filter(|x| x.created_at > to_dbtime(data.first().unwrap().date()))
-        //             .enumerate()
-        //             .map(|(_i, order)| {
-        //                 let date = from_dbtime(&order.created_at);
-        //                 let price = order.target_price;
-        //                 match order.order_type.is_long() {
-        //                     true => {
-        //                         TriangleMarker::new((date, price), -trades_size, RED_LINE2.mix(5.))
-        //                     }
-        //                     false => {
-        //                         TriangleMarker::new((date, price), trades_size, RED_LINE2.mix(5.))
-        //                     }
-        //                 }
-        //             }),
-        //     )
-        //     .unwrap();
+        chart
+            .draw_series(
+                orders
+                    .iter()
+                    .filter(|x| x.order_type.is_stop())
+                    //.filter(|x| x.created_at > to_dbtime(data.first().unwrap().date()))
+                    .enumerate()
+                    .map(|(_i, order)| {
+                        let date = from_dbtime(&order.created_at);
+                        let price = order.target_price;
+                        Circle::new((date, price), stops_size, RED_LINE2.mix(0.8).filled())
+                    }),
+            )
+            .unwrap();
+
+        //ACTIVE STOPLOSS
+        chart
+            .draw_series(
+                trades_out
+                    .iter()
+                    .filter(|x| {
+                        x.date_out > to_dbtime(data.first().unwrap().date())
+                            && x.trade_type.is_stop()
+                    })
+                    .enumerate()
+                    .map(|(i, trade_out)| {
+                        let date = from_dbtime(&trade_out.date_out);
+                        let price = trade_out.price_out;
+                        Circle::new((date, price), stops_size, RED_LINE2.mix(5.).filled())
+                    }),
+            )
+            .unwrap();
 
         //BOLLINGER BANDS
 

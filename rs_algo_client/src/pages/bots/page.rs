@@ -28,6 +28,9 @@ pub fn bots() -> Html {
     let use_bot = use_state(|| String::from(""));
     let use_loading = use_state(|| true);
     let use_chart_url = use_state(|| String::from(""));
+    let polling_seconds_list = [0, 5, 30];
+    let polling_seconds_chart = [0, 5, 10, 20, 30, 40, 50];
+
     {
         let use_bots = use_bots.clone();
         let use_loading = use_loading.clone();
@@ -53,10 +56,16 @@ pub fn bots() -> Html {
                     let date = Local::now();
                     let seconds = date.second();
                     if seconds >= 1 && seconds <= 5 {
+                        // if polling_seconds_list.contains(&seconds)
+                        //     || polling_seconds_list
+                        //         .iter()
+                        //         .any(|&n| seconds >= n + 1 && seconds <= n + 5)
+                        // {
+                        log::info!("[CLIENT] Polling API... {}", seconds);
+
                         wasm_bindgen_futures::spawn_local({
                             let use_bots = use_bots.clone();
                             async move {
-                                log::info!("[CLIENT] Polling call...");
                                 let bots = api::get_bots2().await.unwrap();
                                 use_bots.set(bots);
                             }
@@ -83,14 +92,15 @@ pub fn bots() -> Html {
                 let seconds = date.second();
                 let chart_url = chart_url.clone();
                 let use_chart_url = use_chart_url.clone();
-
                 if seconds >= 1 && seconds <= 5 {
+                    //if polling_seconds_chart.contains(&seconds) {
+                    log::info!("[CLIENT] Polling chart... {}", seconds);
+
                     wasm_bindgen_futures::spawn_local({
                         async move {
                             let date = Local::now();
                             let url = [&chart_url, "?ts=", &date.timestamp().to_string()].concat();
                             use_chart_url.set(url.clone());
-                            log::info!("[CLIENT] Polling call...");
                             // let bots = api::get_bots2().await.unwrap();
                             // use_bots.set(bots);
                         }

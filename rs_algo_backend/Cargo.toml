@@ -11,6 +11,7 @@ actix-web-actors = "4.1.0"
 actix-http = "3.2.1"
 actix-cors = "0.6.1"
 actix-files = "0.6.1"
+actix-web-httpauth = "3.1.0"
 anyhow = "1.0.58"
 thiserror = "1.0.31"
 serde = { version = "1.0.139", features = ["derive"] }
@@ -27,7 +28,7 @@ bson = "2.3.0"
 openssl = { version = "0.10.41", features = ["vendored"] }
 
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "c5fa52c"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "c13ceda"}
 #rs_algo_shared = { path = "../../rs_algo_shared" }
 
 # [profile.release]
