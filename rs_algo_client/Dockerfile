@@ -20,7 +20,6 @@ ARG APP_DIR=/usr/share/nginx/www
 COPY --from=dist $APP_NAME/dist $APP_DIR 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY .htpasswd /etc/nginx/.htpasswd
-COPY health.html $APP_DIR
 
 EXPOSE 8000
 CMD ["nginx", "-g", "daemon off;"]

@@ -590,13 +590,13 @@ impl Backend {
                     .map(|(_i, order)| {
                         let date = from_dbtime(&order.created_at);
 
-                        let order_opacity = match order.status {
-                            OrderStatus::Pending => 1.1,
-                            OrderStatus::Fulfilled => 1.5,
-                            _ => 0.6,
-                        };
+                        // let order_opacity = match order.status {
+                        //     OrderStatus::Pending => 1.1,
+                        //     OrderStatus::Fulfilled => 1.5,
+                        //     _ => 0.6,
+                        // };
 
-                        let order_opacity = 1.1;
+                        let order_opacity = 0.8;
                         match order.order_type {
                             OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
                                 (date, order.target_price),
@@ -674,7 +674,7 @@ impl Backend {
                     .map(|(i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);
                         let price = trade_out.price_out;
-                        Circle::new((date, price), stops_size, RED_LINE2.mix(5.).filled())
+                        Circle::new((date, price), stops_size, RED_LINE2.mix(4.8).filled())
                     }),
             )
             .unwrap();

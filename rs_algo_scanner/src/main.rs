@@ -108,7 +108,7 @@ async fn main() -> Result<()> {
             }
         }
 
-        if !backtest_mode || (backtest_mode && (is_forex || is_crypto)) {
+        if !backtest_mode || (backtest_mode && (is_forex)) {
             log::info!("processing {} ...", &s.symbol);
 
             screener

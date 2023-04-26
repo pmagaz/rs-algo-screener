@@ -3,7 +3,7 @@ use super::components::bot_list::BotList;
 use crate::components::chart::Chart;
 use crate::components::loading::Loading;
 
-use rs_algo_shared::helpers::date::{DateTime, Local, Timelike};
+use rs_algo_shared::helpers::date::{Local, Timelike};
 use rs_algo_shared::models::bot::CompactBotData;
 
 use gloo::timers::callback::Interval;
@@ -55,7 +55,7 @@ pub fn bots() -> Html {
                 Interval::new(2_500, move || {
                     let date = Local::now();
                     let seconds = date.second();
-                    if seconds >= 1 && seconds <= 5 {
+                    if seconds >= 1 && seconds <= 7 {
                         // if polling_seconds_list.contains(&seconds)
                         //     || polling_seconds_list
                         //         .iter()
@@ -92,7 +92,7 @@ pub fn bots() -> Html {
                 let seconds = date.second();
                 let chart_url = chart_url.clone();
                 let use_chart_url = use_chart_url.clone();
-                if seconds >= 1 && seconds <= 5 {
+                if seconds >= 1 && seconds <= 7 {
                     //if polling_seconds_chart.contains(&seconds) {
                     log::info!("[CLIENT] Polling chart... {}", seconds);
 
@@ -129,7 +129,6 @@ pub fn bots() -> Html {
            <div class="container">
                 <div class="notification is-fluid ">
                     <BotList on_bot_click={ on_bot_click.clone()}  bots={(*use_bots).clone()} />
-
             </div>
             </div>
         </div>

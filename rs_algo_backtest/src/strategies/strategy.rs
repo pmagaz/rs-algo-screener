@@ -250,16 +250,6 @@ pub trait Strategy: DynClone {
                         }
                         PositionResult::PendingOrder(new_orders) => {
                             if !open_positions {
-                                // match overwrite_orders {
-                                //     true => {
-                                //         order::cancel_pending_expired_orders(
-                                //             index,
-                                //             instrument,
-                                //             &mut orders,
-                                //         );
-                                //     }
-                                //     false => (),
-                                // }
 
                                 orders = order::add_pending(orders, new_orders);
                             }
@@ -267,7 +257,9 @@ pub trait Strategy: DynClone {
                         _ => (),
                     };
                 }
-                orders = order::cancel_pending_expired_orders(index, instrument, &mut orders);
+                if !open_positions {
+                    orders = order::cancel_pending_expired_orders(index, instrument, &mut orders);
+                }
             }
         }
 
