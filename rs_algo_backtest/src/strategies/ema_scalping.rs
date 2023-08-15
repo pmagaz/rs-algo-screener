@@ -117,9 +117,11 @@ impl<'a> Strategy for EmaScalping<'a> {
                 let htf_ema_a = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
                 let htf_ema_b = htf_inst.indicators.ema_b.get_data_a().get(idx).unwrap();
                 let htf_ema_c = htf_inst.indicators.ema_c.get_data_a().get(idx).unwrap();
+                let high_price = &htf_inst.data().get(idx).unwrap().high();
+                let low_price = &htf_inst.data().get(idx).unwrap().low();
 
-                let is_long = htf_ema_a > htf_ema_b && close_price > htf_ema_c;
-                let is_short = htf_ema_b < htf_ema_a && close_price < htf_ema_c;
+                let is_long = htf_ema_a > htf_ema_c && low_price > htf_ema_c;
+                let is_short = htf_ema_a < htf_ema_c && high_price < htf_ema_c;
 
                 if is_long {
                     TradeDirection::Long
@@ -137,17 +139,23 @@ impl<'a> Strategy for EmaScalping<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        _htf_instrument: &HTFInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let spread = 0.;
         let close_price = &instrument.data.get(index).unwrap().close();
+        let spread = 0.;
+
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
         let trigger_price = &candle.low();
         let low_price = &candle.low();
         let prev_close_price = &data.get(prev_index).unwrap().close();
+
+        let ema_a = instrument.indicators.ema_a.get_data_a().get(index).unwrap();
+        let ema_b = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
+        let ema_c = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
+
         let prev_ema_a = instrument
             .indicators
             .ema_a
@@ -155,18 +163,22 @@ impl<'a> Strategy for EmaScalping<'a> {
             .get(prev_index)
             .unwrap();
 
-        let ema_a = instrument.indicators.ema_a.get_data_a().get(index).unwrap();
-        let ema_b = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
-        let ema_c = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
+        let prev_ema_b = instrument
+            .indicators
+            .ema_b
+            .get_data_a()
+            .get(prev_index)
+            .unwrap();
 
-        let entry_condition = self.trading_direction == TradeDirection::Long
-            && (low_price < ema_a
-                && prev_close_price >= prev_ema_a
-                && close_price > ema_c
-                && ema_a > ema_b
-                && ema_b > ema_c);
+        let prev_ema_c = instrument
+            .indicators
+            .ema_c
+            .get_data_a()
+            .get(prev_index)
+            .unwrap();
 
-        let pips_margin = 5.;
+        let entry_condition = trigger_price < ema_a && close_price > ema_c;
+        let pips_margin = 3.;
         let previous_bars = 5;
 
         let highest_bar = data[index - previous_bars..index + 1]
@@ -180,13 +192,10 @@ impl<'a> Strategy for EmaScalping<'a> {
         let risk = buy_price + spread - stop_loss_price;
         let sell_price = buy_price + (risk * self.risk_reward_ratio);
 
-        //log::info!("EMA SCALPING {:?}", (buy_price, sell_price));
-
         match entry_condition {
             true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
                 OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
-                //OrderType::StopLoss(OrderDirection::Down, StopLossType::Atr(atr_value)),
                 OrderType::StopLossLong(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
             ]),
 
@@ -209,10 +218,10 @@ impl<'a> Strategy for EmaScalping<'a> {
         &mut self,
         index: usize,
         instrument: &Instrument,
-        _htf_instrument: &HTFInstrument,
+        htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let _close_price = &instrument.data.get(index).unwrap().close();
+        let close_price = &instrument.data.get(index).unwrap().close();
         let spread = 0.;
 
         let prev_index = calc::get_prev_index(index);
@@ -223,23 +232,38 @@ impl<'a> Strategy for EmaScalping<'a> {
         let close_price = &candle.close();
         let prev_close_price = &prev_candle.close();
         let ema_a = instrument.indicators.ema_a.get_data_a().get(index).unwrap();
+        let ema_b = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
+        let ema_c = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
+
         let prev_ema_a = instrument
             .indicators
             .ema_a
             .get_data_a()
             .get(prev_index)
             .unwrap();
-        let _ema_5 = instrument.indicators.ema_b.get_data_a().get(index).unwrap();
-        let ema_b = instrument.indicators.ema_c.get_data_a().get(index).unwrap();
 
-        let entry_condition = self.trading_direction == TradeDirection::Short
-            && (trigger_price > ema_a
-                && prev_close_price <= prev_ema_a
-                && close_price < ema_b
-                && ema_a < ema_b
-                && ema_b < ema_b);
+        let prev_ema_b = instrument
+            .indicators
+            .ema_b
+            .get_data_a()
+            .get(prev_index)
+            .unwrap();
 
-        let pips_margin = 5.;
+        let prev_ema_c = instrument
+            .indicators
+            .ema_c
+            .get_data_a()
+            .get(prev_index)
+            .unwrap();
+
+        // let entry_condition = trigger_price > ema_b
+        //     && prev_close_price <= prev_ema_b
+        //     && close_price < ema_c
+        //     && ema_b < ema_c
+        //     && ema_c < ema_c;
+
+        let entry_condition = trigger_price > ema_a && close_price < ema_c;
+        let pips_margin = 3.;
         let previous_bars = 5;
 
         let lowest_bar = data[index - previous_bars..index + 1]
