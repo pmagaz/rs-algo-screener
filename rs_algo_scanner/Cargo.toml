@@ -5,25 +5,25 @@ authors = ["pmagaz <magazpablo@gmail.com>"]
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.58"
-thiserror = "1.0.31"
-tokio = { version = "1.20", features = ["rt-multi-thread", "macros"] }
-serde = { version = "1.0.139", features = ["derive"] }
-serde_json = "1.0.82"
-serde_qs = "0.10.1"
+anyhow = "1.0.75"
+thiserror = "1.0.47"
+tokio = { version = "1.32.0", features = ["rt-multi-thread", "macros"] }
+serde = { version = "1.0.188", features = ["derive"] }
+serde_json = "1.0.105"
+serde_qs = "0.12.0"
 dotenv = "0.15.0"
 find_peaks = "0.1.5"
 polyfit-rs="0.2.0"
-chrono = {version = "0.4.19",  features = ["serde"] }
+chrono = {version = "0.4.26",  features = ["serde"] }
 round = "0.1.2"
 libm ="0.2.2"
-reqwest = { version = "0.11.11", features = ["json"] }
+reqwest = { version = "0.11.20", features = ["json"] }
 env_logger = "0.10.0"
 log = "0.4"
 
 ta = {git = "https://github.com/pmagaz/ta-rs", features = ["serde"], rev="3b2d78c"}
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "5e9cdb9", features = ["broker","websocket"]}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "35d1f97", features = ["broker","websocket"]}
 #rs_algo_shared = { path = "../../rs_algo_shared", features = ["websocket","broker"] }
 
 # [profile.release]

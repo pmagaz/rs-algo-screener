@@ -143,7 +143,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         pricing: &Pricing,
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
-        let spread = 0.;
+        let spread = pricing.spread();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -222,7 +222,7 @@ impl<'a> Strategy for EmaScalping<'a> {
         pricing: &Pricing,
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
-        let spread = 0.;
+        let spread = pricing.spread();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -255,12 +255,6 @@ impl<'a> Strategy for EmaScalping<'a> {
             .get_data_a()
             .get(prev_index)
             .unwrap();
-
-        // let entry_condition = trigger_price > ema_b
-        //     && prev_close_price <= prev_ema_b
-        //     && close_price < ema_c
-        //     && ema_b < ema_c
-        //     && ema_c < ema_c;
 
         let entry_condition = trigger_price > ema_a && close_price < ema_c;
         let pips_margin = 3.;

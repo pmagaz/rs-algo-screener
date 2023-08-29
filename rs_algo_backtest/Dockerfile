@@ -6,6 +6,8 @@ FROM messense/rust-musl-cross:aarch64-musl as builder
 ARG APP_NAME
 ARG TARGET
 
+RUN rustup toolchain install 1.70.0
+RUN rustup default 1.70
 RUN rustup target add $TARGET
 
 RUN USER=root cargo new --bin $APP_NAME

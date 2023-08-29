@@ -145,17 +145,28 @@ pub async fn upsert(
 
     let mut instrument: Instrument = serde_json::from_str(&instrument).unwrap();
     let symbol = instrument.symbol.clone();
-    let backtest_market = env::var("BACKTEST_MARKET").unwrap();
+    //let execution_mode = env::var("EXECUTION_MODE").unwrap();
+    //let backtest_market = env::var("BACKTEST_MARKET").unwrap_or("".to_string());
 
-    match backtest_market.as_ref() {
-        "Forex" | "Crypto" => {
-            let symbol_str: Vec<&str> = symbol.split('_').collect();
-            instrument.symbol = symbol_str[0].to_owned();
-        }
-        &_ => {
-            log::warn!("Change fucking xtb");
-        }
-    };
+    // match execution_mode.as_ref() {
+    //     "Scanner" | "ScannerBackTest" | "BackTest" => {
+    //         let symbol_str: Vec<&str> = symbol.split('_').collect();
+    //         instrument.symbol = symbol_str[0].to_owned();
+    //     }
+    //     &_ => {
+    //         log::warn!("Change fucking xtb");
+    //     }
+    // };
+
+    // match backtest_market.as_ref() {
+    //     "Forex" | "Crypto" => {
+    //         let symbol_str: Vec<&str> = symbol.split('_').collect();
+    //         instrument.symbol = symbol_str[0].to_owned();
+    //     }
+    //     &_ => {
+    //         log::warn!("Change fucking xtb");
+    //     }
+    // };
 
     log::info!(
         "[INSTRUMENT] Received {} {:?} in {} mode at {:?}",
@@ -164,6 +175,9 @@ pub async fn upsert(
         mode,
         Local::now(),
     );
+
+    let symbol_str: Vec<&str> = symbol.split('_').collect();
+    instrument.symbol = symbol_str[0].to_owned();
 
     let insert_compact_instruments_detail = env::var("INSERT_COMPACT_INSTRUMENTS_DETAIL")
         .unwrap()
