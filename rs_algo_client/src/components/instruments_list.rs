@@ -29,10 +29,11 @@ pub enum ListType {
     WatchList,
     Strategy,
     NewPatterns,
+    Candles,
     Activated,
     Commodities,
     Crypto,
-    forex,
+    Forex,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -62,7 +63,7 @@ pub fn pattern_info(pattern: &Option<&Pattern>) -> PatternInfo  {
             // .parse::<i64>()
             // .unwrap();
    
-            let max_pattern_days = 5;
+            let max_pattern_days = 3;
             
             let pattern_direction = match pattern {
                 //Some(val) => val.active.pattern_direction.clone(),
@@ -240,7 +241,7 @@ pub fn instrument_list(props: &Props
 
             let divergence_status = get_divergence_status(divergence_type);
 
-            let target_status = get_target_status(current_pattern.unwrap().target); 
+            //let target_status = get_target_status(current_pattern.unwrap().target); 
 
             let divergence_str = match divergence_type {
                 DivergenceType::Bullish => divergence_type.to_string(),

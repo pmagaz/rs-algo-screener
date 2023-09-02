@@ -3,6 +3,7 @@ use rs_algo_shared::models::status::Status;
 use rs_algo_shared::scanner::divergence::DivergenceType;
 use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::scanner::pattern::*;
+use rs_algo_shared::scanner::candle::*;
 
 use bson::{doc, Document};
 use chrono::Duration;
@@ -58,10 +59,17 @@ impl General {
         "$and": [
             {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
             {"$or": [
-                //    {"$and": [
-                //         {"current_candle": { "$in": ["Karakasa","Engulfing","BullishGap"] }},
-                //         {"$expr": {"$lte": ["$indicators.rsi.current_a", 30]}},
-                //    ]},
+                   {"$and": [
+                    
+                        {"current_candle": { "$in": ["Karakasa","Engulfing","BullishGap"] }},
+                        {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
+                        {"symbol": {"$regex" : ".*.US"}},
+                   ]},
+                    {"$and": [
+                        {"current_candle": { "$in": ["BearishKarakasa"] }},
+                        {"$expr": {"$gte": ["$indicators.rsi.current_a", 65]}},
+                        {"symbol": {"$regex" : ".*.US"}},
+                   ]},
                 {"$or": [
                     {"$and": [
                         {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
@@ -75,7 +83,7 @@ impl General {
                             ],
                         //"pattern_type": { "$in": ["ChannelUp","TriangleUp","TriangleDown","TriangleSym","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
                         }}},
-                        // {"symbol": {"$regex" : ".*.US.*"}},
+                        {"symbol": {"$regex" : ".*.US"}},
                         // {"symbol": {"$regex" : ".*.ES.*"}},
                     ]},
                 //  {"or": [
@@ -98,7 +106,7 @@ impl General {
                                 {"pattern_type": { "$in": ["DoubleTop","DoubleBottom","HeadAndShoulders"] }},
                             ],
                         }}},
-                        // {"symbol": {"$regex" : ".*.US"}},
+                        {"symbol": {"$regex" : ".*.US"}},
                         // {"symbol": {"$regex" : ".*.ES"}},
                     ]},
                     ]
@@ -106,34 +114,28 @@ impl General {
                 {"$and": [
                     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
                     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
-                    // {"$or": [
-                    //   //  {"symbol": {"$regex" : ".*.US"}},
-                    // // {"symbol": {"$regex" : ".*.DK.*"}},
-                    // // {"symbol": {"$regex" : ".*.DE.*"}},
-                    // // {"symbol": {"$regex" : ".*.ES.*"}},
-                    // // {"symbol": {"$regex" : ".*.CH.*"}},
-                    // ]},
+                    {"symbol": {"$regex" : ".*.US"}},
                     {"$or": [
-                        {"$expr": {"$lte": ["$indicators.bbw.current_a", 0.2]}},
                         {"$and": [
                             {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
+                            {"$expr": {"$lte": ["$prev_price","$indicators.bb.current_c"]}},
                             {"$expr": {"$gte": ["$prev_price","$indicators.bb.prev_b"]}},
                         ]},
                     ]},
-                    {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
-                    {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
-                    {"$and": [
-                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
-                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
-                    ]},
+                    // {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
+                    // {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
+                    // {"$and": [
+                    //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                    //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
+                    // ]},
                 ]},
-                {"$and": [
-                    {"$expr": {"$gte": [{ "$last": "$divergences.data.date" }, self.max_pattern_date ] }},
-                    {"$expr": {"$in": [{ "$last": "$divergences.data.divergence_type" }, ["Bullish", "Bearish"]] }},
-                ]},
+                // {"$and": [
+                //     {"$expr": {"$gte": [{ "$last": "$divergences.data.date" }, self.max_pattern_date ] }},
+                //     {"$expr": {"$in": [{ "$last": "$divergences.data.divergence_type" }, ["Bullish", "Bearish"]] }},
+                // ]},
                 { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","CARDANO","BINANCECOIN","SOLANA","STELLAR","POLKADOT"] } },
                 { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
-                { "symbol": { "$in": [ "EURUSD","USDJPY","GBPUSD","USDCHF","USDCAD","CHFJPY","CADCHF","AUDUSD"] } },
+                { "symbol": { "$in": [ "AUDCAD","AUDCHF","EURUSD","AUDNZD","AUDUSD","CADCHF","CADJPY","CHFJPY","EURAUD","EURCAD","EURCHF","EURGBP","EURUSD","GBPUSD","USDCHF","USDJPY","NZDUSD"] } },
             ]}]}
     }
 
@@ -218,37 +220,56 @@ impl General {
                     instrument.indicators.macd.status = get_macd_status(&macd);
                     instrument.indicators.rsi.status = get_rsi_status(&rsi);
                     instrument.indicators.bb.status = get_bb_status(&bb, &instrument);
+
+                   if ((instrument.current_candle != CandleType::BearishKarakasa ||  (instrument.current_candle == CandleType::BearishKarakasa && instrument.indicators.rsi.current_a > 67.))) 
+                   && (instrument.current_candle != CandleType::Karakasa ||  (instrument.current_candle == CandleType::Karakasa && instrument.indicators.rsi.current_a < 50.))
+                   {
+
                     docs.push(instrument);
+
+                   }
                 }
                 _ => {}
             }
         }
-        docs.sort_by(|a, b| {
-            let a_last_pattern_target = match a.patterns.local_patterns.last() {
-                Some(val) => match val.active.active {
-                    true => round(val.active.target, 0),
-                    false => round(val.target, 0),
-                },
-                None => 0.,
-            };
+        // docs.sort_by(|a, b| {
+        //     // let a_last_pattern_target = match a.patterns.local_patterns.last() {
+        //     //     Some(val) => match val.active.active {
+        //     //         true => round(val.active.target, 0),
+        //     //         false => round(val.target, 0),
+        //     //     },
+        //     //     None => 0.,
+        //     // };
 
-            let b_last_pattern_target = match b.patterns.local_patterns.last() {
-                Some(val) => match val.active.active {
-                    true => round(val.active.target, 0),
-                    false => round(val.target, 0),
-                },
-                None => 0.,
-            };
+        //     // let b_last_pattern_target = match b.patterns.local_patterns.last() {
+        //     //     Some(val) => match val.active.active {
+        //     //         true => round(val.active.target, 0),
+        //     //         false => round(val.target, 0),
+        //     //     },
+        //     //     None => 0.,
+        //     // };
 
-            b_last_pattern_target
-                .partial_cmp(&a_last_pattern_target)
-                .unwrap()
+        //     a.symbol
+        //     // b_last_pattern_target
+        //     //     .partial_cmp(&a_last_pattern_target)
+        //     //     .unwrap()
 
-            // let a_band = percentage_change(a.indicators.bb.current_b, a.indicators.bb.current_a);
-            // let b_band = percentage_change(b.indicators.bb.current_b, b.indicators.bb.current_a);
-            // b_band.partial_cmp(&a_band).unwrap()
-        });
+        //     // let a_band = percentage_change(a.indicators.bb.current_b, a.indicators.bb.current_a);
+        //     // let b_band = percentage_change(b.indicators.bb.current_b, b.indicators.bb.current_a);
+        //     // b_band.partial_cmp(&a_band).unwrap()
+        // });
+        
+        docs.sort_by(|a, b| a.symbol.cmp(&b.symbol));
 
+        
+        // .iter()
+        // .filter(x.current_candle != CandleType::BearishKarakasa
+        //     || (x.current_candle == CandleType::BearishKarakasa && x.indicators.rsi.current_a > 65.)
+        //     || x.current_candle == CandleType::Engulfing || x.current_candle == CandleType::BullishGap)
+        // .map(|x| x.clone())
+        // .collect();
         docs
+
+    
     }
 }

@@ -11,6 +11,6 @@
     - { role: "rs_algo_scanner/deployment/daily/roles/" }
     #- { role: "rs_algo_scanner/deployment/backtest/D/roles/" }
     #- { role: "rs_algo_scanner/deployment/backtest/W/roles/" }
-    - { role: "rs_algo_backtest/deployment/forex/roles/" }
-    - { role: "rs_algo_backtest/deployment/crypto/roles/" }
+    # - { role: "rs_algo_backtest/deployment/forex/roles/" }
+    # - { role: "rs_algo_backtest/deployment/crypto/roles/" }
     #- { role: "rs_algo_backtest/deployment/stock/roles/" }

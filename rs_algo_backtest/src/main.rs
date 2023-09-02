@@ -41,14 +41,14 @@ async fn main() {
                 .unwrap(),
             ),
             
-            // Box::new(
-            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-            //         Some("H1"),
-            //         Some("H4"),
-            //         Some(StrategyType::LongShortMTF),
-            //     )
-            //     .unwrap(),
-            // ),
+            Box::new(
+                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+                    Some("H1"),
+                    Some("H4"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
             // Box::new(
             //     strategies::bollinger_bands_middle_band::BollingerBandsMiddleBand::new(
             //         Some("H1"),

@@ -2,13 +2,12 @@ use super::api;
 use crate::components::chart::Chart;
 use crate::components::instruments_list::*;
 use crate::components::loading::Loading;
-
 use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use rs_algo_shared::models::watch_instrument::*;
 use rs_algo_shared::scanner::instrument::*;
-
+use rs_algo_shared::scanner::candle::*;
 use wasm_bindgen::prelude::*;
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
 
@@ -170,11 +169,34 @@ pub fn home() -> Html {
         )
     };
 
-    let suggested: Vec<CompactInstrument> = use_instruments
+    fn candle_type_to_string(candle_type: &CandleType) -> u8 {
+    match candle_type {
+        CandleType::Karakasa => 1,
+        CandleType::BearishKarakasa => 4,
+        CandleType::Engulfing => 2,
+        CandleType::BullishGap => 3,
+        _ => 0, 
+        // Add more cases for other candle types if needed
+    }
+}
+
+    let mut candles: Vec<CompactInstrument> = use_instruments
+        .iter()
+        .filter(|x| x.current_candle == CandleType::Karakasa
+            || x.current_candle == CandleType::BearishKarakasa
+            || x.current_candle == CandleType::Engulfing
+            || x.current_candle == CandleType::BullishGap)
+        .cloned()
+        .collect();
+
+   candles.sort_by_key(|x| candle_type_to_string(&x.current_candle));
+
+        
+    let mut suggested: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| match x.patterns.local_patterns.last() {
             Some(last_pat) => {
-                last_pat.date > to_dbtime(Local::now() - Duration::days(5))
+                last_pat.date > to_dbtime(Local::now() - Duration::days(3))
                     && !last_pat.active.active
             }
             None => false,
@@ -182,7 +204,10 @@ pub fn home() -> Html {
         .map(|x| x.clone())
         .collect();
 
-    let activated: Vec<CompactInstrument> = use_instruments
+    suggested.retain(|x| !candles.contains(x));
+
+
+    let mut activated: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| match x.patterns.local_patterns.last() {
             Some(last_pat) => {
@@ -194,13 +219,19 @@ pub fn home() -> Html {
         .map(|x| x.clone())
         .collect();
 
-    let strategy: Vec<CompactInstrument> = use_instruments
+        activated.retain(|x| !candles.contains(x));
+
+
+    let mut strategy: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| {
             x.current_price <= x.indicators.bb.current_b && x.prev_price >= x.indicators.bb.prev_b
         })
         .map(|x| x.clone())
         .collect();
+
+            strategy.retain(|x| !candles.contains(x));
+
 
     let commodities: Vec<CompactInstrument> = use_instruments
         .iter()
@@ -226,7 +257,7 @@ pub fn home() -> Html {
         .map(|x| x.clone())
         .collect();
 
-    html! {
+    html! { 
         <div class="tile is-ancestor is-vertical ">
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
@@ -248,12 +279,14 @@ pub fn home() -> Html {
                     <InstrumentsList list_type={ ListType::WatchList } on_symbol_click={ on_symbol_click.clone()} on_action_click={ on_action_click.clone()} instruments={(*use_watch_instruments).clone()} />
                     <h2 class="navbar-item is-size-3">{ "Strategy" }</h2>
                     <InstrumentsList list_type={ ListType::Strategy } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={strategy} />
+                    <h2 class="navbar-item is-size-3">{ "Candles" }</h2>
+                    <InstrumentsList list_type={ ListType::Candles } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={candles} />
                     <h2 class="navbar-item is-size-3">{ "New patterns" }</h2>
                     <InstrumentsList list_type={ ListType::NewPatterns } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={suggested} />
                     <h2 class="navbar-item is-size-3">{ "Pattern activated" }</h2>
                     <InstrumentsList list_type={ ListType::Activated } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={activated} />
                     <h2 class="navbar-item is-size-3">{ "Forex" }</h2>
-                    <InstrumentsList list_type={ ListType::forex } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={forex} />
+                    <InstrumentsList list_type={ ListType::Forex } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={forex} />
                     <h2 class="navbar-item is-size-3">{ "Crypto" }</h2>
                     <InstrumentsList list_type={ ListType::Crypto } on_symbol_click={ on_symbol_click.clone() } on_action_click={ on_action_click.clone() } instruments={crypto} />
                     <h2 class="navbar-item is-size-3">{ "Commodities " }</h2>
