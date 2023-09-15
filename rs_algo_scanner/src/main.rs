@@ -108,10 +108,7 @@ async fn main() -> Result<()> {
             }
         }
 
-        if !backtest_mode
-            //&& (s.symbol.contains(".US") || !s.symbol.contains(".")))
-            || 
-            (backtest_mode && (is_sp500 || is_forex || is_crypto)) {
+        if !backtest_mode || (backtest_mode && (is_sp500 || is_forex || is_crypto)) {
             log::info!("processing {} ...", &s.symbol);
 
             screener
