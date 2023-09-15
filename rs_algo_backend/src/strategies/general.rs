@@ -62,12 +62,12 @@ impl General {
                    {"$and": [
                     
                         {"current_candle": { "$in": ["Karakasa","Engulfing","BullishGap"] }},
-                        {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
+                        //{"$expr": {"$lte": ["$indicators.rsi.current_a", 60]}},
                         {"symbol": {"$regex" : ".*.US"}},
                    ]},
                     {"$and": [
                         {"current_candle": { "$in": ["BearishKarakasa"] }},
-                        {"$expr": {"$gte": ["$indicators.rsi.current_a", 65]}},
+                        {"$expr": {"$gte": ["$indicators.rsi.current_a", 67]}},
                         {"symbol": {"$regex" : ".*.US"}},
                    ]},
                 {"$or": [
@@ -221,13 +221,13 @@ impl General {
                     instrument.indicators.rsi.status = get_rsi_status(&rsi);
                     instrument.indicators.bb.status = get_bb_status(&bb, &instrument);
 
-                   if ((instrument.current_candle != CandleType::BearishKarakasa ||  (instrument.current_candle == CandleType::BearishKarakasa && instrument.indicators.rsi.current_a > 67.))) 
-                   && (instrument.current_candle != CandleType::Karakasa ||  (instrument.current_candle == CandleType::Karakasa && instrument.indicators.rsi.current_a < 50.))
-                   {
+                //    if ((instrument.current_candle != CandleType::BearishKarakasa ||  (instrument.current_candle == CandleType::BearishKarakasa && instrument.indicators.rsi.current_a > 67.))) 
+                //    && (instrument.current_candle != CandleType::Karakasa ||  (instrument.current_candle == CandleType::Karakasa && instrument.indicators.rsi.current_a < 50.))
+                //    {
 
                     docs.push(instrument);
 
-                   }
+                   //}
                 }
                 _ => {}
             }
