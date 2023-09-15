@@ -51,15 +51,15 @@ ingress:
 resources:
   requests:
     cpu: 50m
-    memory: 1Mi 
+    memory: 1Mi
   limits:
-    cpu: 800m
+    cpu: 1024m
     ephemeral-storage: 256Mi
     memory: 512Mi
 
 autoscaling:
   enabled: true
-  minReplicas: 1
+  minReplicas: 2
   maxReplicas: 2
   targetCPUUtilizationPercentage: 40
   # targetMemoryUtilizationPercentage: 80
