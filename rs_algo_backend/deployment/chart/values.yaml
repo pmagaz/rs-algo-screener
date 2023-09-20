@@ -78,5 +78,6 @@ affinity:
 
 tolerations: []
 
-podSecurityContext: 
+podSecurityContext: {}
+securityContext: 
   allowPrivilegeEscalation: true
