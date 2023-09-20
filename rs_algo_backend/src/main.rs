@@ -63,7 +63,7 @@ async fn main() -> Result<()> {
             .unwrap();
 
     log::info!("Starting {} on port {} !", app_name, port.clone());
-    let payload_limit = 1024 * 1024 * 64;
+    let payload_limit = 2048 * 2048 * 64;
 
     HttpServer::new(move || {
         App::new()
