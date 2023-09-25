@@ -171,10 +171,12 @@ pub fn home() -> Html {
 
     fn candle_type_to_string(candle_type: &CandleType) -> u8 {
     match candle_type {
-        CandleType::Karakasa => 1,
-        CandleType::BearishKarakasa => 4,
-        CandleType::Engulfing => 2,
+        CandleType::Reversal => 1,
+        CandleType::Karakasa => 2,
         CandleType::BullishGap => 3,
+        CandleType::Engulfing => 4,
+        CandleType::BearishKarakasa => 5,
+    
         _ => 0, 
         // Add more cases for other candle types if needed
     }
@@ -182,7 +184,8 @@ pub fn home() -> Html {
 
     let mut candles: Vec<CompactInstrument> = use_instruments
         .iter()
-        .filter(|x| x.current_candle == CandleType::Karakasa
+        .filter(|x| x.current_candle == CandleType::Reversal
+            || x.current_candle == CandleType::Karakasa
             || x.current_candle == CandleType::BearishKarakasa
             || x.current_candle == CandleType::Engulfing
             || x.current_candle == CandleType::BullishGap)

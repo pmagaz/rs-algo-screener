@@ -61,7 +61,7 @@ impl General {
             {"$or": [
                    {"$and": [
                     
-                        {"current_candle": { "$in": ["Karakasa","Engulfing","BullishGap"] }},
+                        {"current_candle": { "$in": ["Reversal","Karakasa","Engulfing","BullishGap"] }},
                         //{"$expr": {"$lte": ["$indicators.rsi.current_a", 60]}},
                         {"symbol": {"$regex" : ".*.US"}},
                    ]},
