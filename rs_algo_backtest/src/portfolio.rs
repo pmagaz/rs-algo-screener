@@ -132,13 +132,18 @@ impl PortFolio {
                     match backtest_result {
                         BackTestResult::BackTestInstrumentResult(mut result) => {
                             result.market = market.to_owned();
-                            let _send_instrument_result: BackTestInstrumentResult =
+
+                            let response =
                                 request(&instrument_result_endpoint, &result, HttpMethod::Put)
                                     .await
-                                    .unwrap()
-                                    .json()
-                                    .await
                                     .unwrap();
+
+                            if response.status().is_success() {
+                                let _send_instrument_result: BackTestInstrumentResult =
+                                    response.json().await.unwrap();
+                            } else {
+                                log::error!("[BACKTEST] Response Error: {:?}", response);
+                            }
 
                             log::info!(
                                 "[BACKTEST] Strategy {} tested for {} instruments",

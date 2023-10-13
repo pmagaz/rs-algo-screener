@@ -33,9 +33,9 @@ pub async fn find_one(
     let collection = get_collection::<Instrument>(&state.db_mem, collection_name).await;
 
     let instrument = collection
-        .find_one(doc! { "symbol": symbol}, FindOneOptions::builder().build())
+        .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())
         .await
-        .unwrap();
+        .map_err(|e| Error::from(e))?; // Handle the find_one error
 
     Ok(instrument)
 }
@@ -219,16 +219,26 @@ pub async fn upsert_instruments_result(
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION").unwrap();
     let collection =
         get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
-
-    collection
+    log::info!("111111");
+    let result = collection
         .find_one_and_replace(
-            doc! { "strategy": doc.strategy.clone(), "strategy_type": doc.strategy_type.to_string(), "time_frame": doc.time_frame.to_string(), "higher_time_frame": doc.higher_time_frame.clone().unwrap().to_string(), "market": doc.market.to_string(),  "instrument.symbol": doc.instrument.symbol.clone() },
+            doc! {
+                "strategy": doc.strategy.clone(),
+                "strategy_type": doc.strategy_type.to_string(),
+                "time_frame": doc.time_frame.to_string(),
+                "higher_time_frame": doc.higher_time_frame.clone().unwrap().to_string(),
+                "market": doc.market.to_string(),
+                "instrument.symbol": doc.instrument.symbol.clone()
+            },
             doc,
             FindOneAndReplaceOptions::builder()
                 .upsert(Some(true))
                 .build(),
         )
         .await
+        .map_err(|e| Error::from(e))?; // Handle the find_one_and_replace error
+
+    Ok(result)
 }
 
 pub async fn upsert_strategies_result(
@@ -313,19 +323,4 @@ pub async fn find_prices(state: &web::Data<AppState>) -> Result<Vec<Pricing>, Er
         }
     }
     Ok(prices)
-}
-
-pub async fn find_price(
-    symbol: &str,
-    state: &web::Data<AppState>,
-) -> Result<Option<Pricing>, Error> {
-    let collection_name = &env::var("DB_PRICING_COLLECTION").unwrap();
-    let collection = get_collection::<Pricing>(&state.db_mem, collection_name).await;
-
-    let instrument = collection
-        .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())
-        .await
-        .unwrap();
-
-    Ok(instrument)
 }

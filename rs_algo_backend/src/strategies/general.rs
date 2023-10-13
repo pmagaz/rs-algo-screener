@@ -1,9 +1,9 @@
 use rs_algo_shared::helpers::status::*;
 use rs_algo_shared::models::status::Status;
+use rs_algo_shared::scanner::candle::*;
 use rs_algo_shared::scanner::divergence::DivergenceType;
 use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::scanner::pattern::*;
-use rs_algo_shared::scanner::candle::*;
 
 use bson::{doc, Document};
 use chrono::Duration;
@@ -60,8 +60,8 @@ impl General {
             {"$expr": {"$gte": ["$avg_volume",min_volume,]}},
             {"$or": [
                    {"$and": [
-                    
-                        {"current_candle": { "$in": ["Reversal","Karakasa","Engulfing","BullishGap"] }},
+
+                        {"current_candle": { "$in": ["Reversal","ThreeInRow","Karakasa","Engulfing","BullishGap"] }},
                         //{"$expr": {"$lte": ["$indicators.rsi.current_a", 60]}},
                         {"symbol": {"$regex" : ".*.US"}},
                    ]},
@@ -111,24 +111,24 @@ impl General {
                     ]},
                     ]
                 },
-                {"$and": [
-                    {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
-                    {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
-                    {"symbol": {"$regex" : ".*.US"}},
-                    {"$or": [
-                        {"$and": [
-                            {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
-                            {"$expr": {"$lte": ["$prev_price","$indicators.bb.current_c"]}},
-                            {"$expr": {"$gte": ["$prev_price","$indicators.bb.prev_b"]}},
-                        ]},
-                    ]},
-                    // {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
-                    // {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
-                    // {"$and": [
-                    //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
-                    //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
-                    // ]},
-                ]},
+                // {"$and": [
+                //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
+                //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                //     {"symbol": {"$regex" : ".*.US"}},
+                //     {"$or": [
+                //         {"$and": [
+                //             {"$expr": {"$lte": ["$current_price","$indicators.bb.current_b"]}},
+                //             {"$expr": {"$lte": ["$prev_price","$indicators.bb.current_c"]}},
+                //             {"$expr": {"$gte": ["$prev_price","$indicators.bb.prev_b"]}},
+                //         ]},
+                //     ]},
+                //     // {"$expr": {"$gte": ["$indicators.rsi.current_a", 30]}},
+                //     // {"$expr": {"$lte": ["$indicators.rsi.current_a", 40]}},
+                //     // {"$and": [
+                //     //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                //     //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
+                //     // ]},
+                // ]},
                 // {"$and": [
                 //     {"$expr": {"$gte": [{ "$last": "$divergences.data.date" }, self.max_pattern_date ] }},
                 //     {"$expr": {"$in": [{ "$last": "$divergences.data.divergence_type" }, ["Bullish", "Bearish"]] }},
@@ -221,13 +221,13 @@ impl General {
                     instrument.indicators.rsi.status = get_rsi_status(&rsi);
                     instrument.indicators.bb.status = get_bb_status(&bb, &instrument);
 
-                //    if ((instrument.current_candle != CandleType::BearishKarakasa ||  (instrument.current_candle == CandleType::BearishKarakasa && instrument.indicators.rsi.current_a > 67.))) 
-                //    && (instrument.current_candle != CandleType::Karakasa ||  (instrument.current_candle == CandleType::Karakasa && instrument.indicators.rsi.current_a < 50.))
-                //    {
+                    //    if ((instrument.current_candle != CandleType::BearishKarakasa ||  (instrument.current_candle == CandleType::BearishKarakasa && instrument.indicators.rsi.current_a > 67.)))
+                    //    && (instrument.current_candle != CandleType::Karakasa ||  (instrument.current_candle == CandleType::Karakasa && instrument.indicators.rsi.current_a < 50.))
+                    //    {
 
                     docs.push(instrument);
 
-                   //}
+                    //}
                 }
                 _ => {}
             }
@@ -258,10 +258,9 @@ impl General {
         //     // let b_band = percentage_change(b.indicators.bb.current_b, b.indicators.bb.current_a);
         //     // b_band.partial_cmp(&a_band).unwrap()
         // });
-        
+
         docs.sort_by(|a, b| a.symbol.cmp(&b.symbol));
 
-        
         // .iter()
         // .filter(x.current_candle != CandleType::BearishKarakasa
         //     || (x.current_candle == CandleType::BearishKarakasa && x.indicators.rsi.current_a > 65.)
@@ -269,7 +268,5 @@ impl General {
         // .map(|x| x.clone())
         // .collect();
         docs
-
-    
     }
 }

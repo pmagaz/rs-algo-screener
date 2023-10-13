@@ -45,7 +45,7 @@ pub async fn find_one(
 
     let instrument = db::back_test::find_one(&symbol, &time_frame, &state)
         .await
-        .unwrap();
+        .expect("Error while finding one instrument");
 
     log::info!(
         "[FINDONE] {} {} {} {:?}",
@@ -71,7 +71,7 @@ pub async fn find_instruments(
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "development" => doc! {"market": &market, "symbol": "ETHEREUM"},
+        "development" => doc! {"market": &market, "symbol": "USDJPY"},
         _ => doc! { "market": &market},
     };
 
@@ -203,7 +203,7 @@ pub async fn upsert_instruments_result(
     let now = Instant::now();
     let _upsert = db::back_test::upsert_instruments_result(&backtested_result, &state)
         .await
-        .unwrap();
+        .expect("Error while upserting instruments result into the database");
 
     log::info!(
         "[BACKTEST RESULT UPSERTED] instrument {} at {:?} in {:?}",

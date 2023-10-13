@@ -166,10 +166,12 @@ pub trait Strategy: DynClone {
         for (index, _candle) in data.iter().enumerate() {
             if index < len - 1 && index >= 10 {
                 let current_candle = instrument.data().get(index).unwrap();
+
                 let current_close = current_candle.close();
                 let pricing = pricing.calculate_spread(current_close);
 
                 let pending_orders = order::get_pending(&orders);
+
                 let active_orders_result = self.resolve_pending_orders(
                     index,
                     instrument,
@@ -250,7 +252,6 @@ pub trait Strategy: DynClone {
                         }
                         PositionResult::PendingOrder(new_orders) => {
                             if !open_positions {
-
                                 orders = order::add_pending(orders, new_orders);
                             }
                         }

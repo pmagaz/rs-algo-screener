@@ -14,8 +14,8 @@ use std::time::Instant;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    //env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-    env_logger::init_from_env(env_logger::Env::new().filter("WARN"));
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    //env_logger::init_from_env(env_logger::Env::new().filter("WARN"));
 
     let start = Instant::now();
     let env = env::var("ENV").unwrap();
@@ -31,7 +31,22 @@ async fn main() {
         instruments: vec![],
         strategies: vec![
             // LONG-SHORT
-         
+            Box::new(
+                strategies::num_bars::NumBars::new(
+                    Some("M15"),
+                    Some("H1"),
+                    Some(StrategyType::LongShortMTF),
+                )
+                .unwrap(),
+            ),
+            Box::new(
+                strategies::num_bars::NumBars::new(
+                    Some("M15"),
+                    Some("H1"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
             Box::new(
                 strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
                     Some("M15"),
@@ -40,15 +55,14 @@ async fn main() {
                 )
                 .unwrap(),
             ),
-            
-            Box::new(
-                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-                    Some("H1"),
-                    Some("H4"),
-                    Some(StrategyType::LongShortMTF),
-                )
-                .unwrap(),
-            ),
+            // // Box::new(
+            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+            //         Some("H1"),
+            //         Some("H4"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
             // Box::new(
             //     strategies::bollinger_bands_middle_band::BollingerBandsMiddleBand::new(
             //         Some("H1"),
@@ -73,7 +87,6 @@ async fn main() {
             //     )
             //     .unwrap(),
             // ),
-           
         ],
     };
 

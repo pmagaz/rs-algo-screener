@@ -15,7 +15,7 @@ use rs_algo_shared::models::{backtest_instrument::*, time_frame};
 use rs_algo_shared::scanner::instrument::*;
 
 #[derive(Clone)]
-pub struct BollingerBandsReversals<'a> {
+pub struct NumBars<'a> {
     name: &'a str,
     time_frame: TimeFrameType,
     higher_time_frame: Option<TimeFrameType>,
@@ -26,7 +26,7 @@ pub struct BollingerBandsReversals<'a> {
     profit_target: f64,
 }
 
-impl<'a> Strategy for BollingerBandsReversals<'a> {
+impl<'a> Strategy for NumBars<'a> {
     fn new(
         time_frame: Option<&str>,
         higher_time_frame: Option<&str>,
@@ -75,7 +75,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let trading_direction = TradeDirection::Long;
 
         Ok(Self {
-            name: "Bollinger_Bands_Reversals",
+            name: "Three_Bars",
             time_frame,
             higher_time_frame,
             order_size,
@@ -119,9 +119,9 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
                 let is_long = htf_ema_a > htf_ema_b;
                 let is_short = htf_ema_a < htf_ema_b;
 
-                if is_long && !is_short {
+                if is_long {
                     TradeDirection::Long
-                } else if is_short && !is_long {
+                } else if is_short {
                     TradeDirection::Short
                 } else {
                     TradeDirection::None
@@ -143,42 +143,33 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .parse::<f64>()
             .unwrap();
 
-        let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
-        let prev_candle = &data.get(prev_index).unwrap();
-        let close_price = &candle.close();
-        let high_price = &candle.high();
         let is_closed: bool = candle.is_closed();
+        let last_candles = &data[index - 3..=index];
+        let all_bearish = last_candles.iter().all(|candle| candle.is_bearish());
 
-        let prev_candle = &data.get(prev_index).unwrap();
-        let prev_close = &prev_candle.close();
+        let pips_margin = 1.;
+        let pips_profit = 50.;
+        let pips_stop_loss = 50.;
 
-        let low_band = instrument.indicators.bb.get_data_b().get(index).unwrap();
-        let mid_band = instrument.indicators.bb.get_data_c().get(index).unwrap();
-        let prev_low_band = instrument
-            .indicators
-            .bb
-            .get_data_b()
-            .get(prev_index)
-            .unwrap();
+        let entry_condition =
+            self.trading_direction == TradeDirection::Long && is_closed && all_bearish;
 
-        let pips_margin = 0.1;
-
-        let entry_condition = self.trading_direction == TradeDirection::Long
-            && is_closed
-            && close_price < low_band
-            && close_price < mid_band
-            && (prev_close >= prev_low_band);
-
-        let buy_price = candle.close() + calc::to_pips(pips_margin, pricing);
+        let buy_price = candle.high() + calc::to_pips(pips_margin, pricing);
+        let sell_price = buy_price + pricing.spread() + calc::to_pips(pips_profit, pricing);
 
         match entry_condition {
-            true => Position::Order(vec![
-                OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
-                OrderType::StopLossLong(OrderDirection::Down, StopLossType::Atr(atr_value)),
-            ]),
-
+            // true => Position::Order(vec![
+            //     OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
+            //     OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
+            //     OrderType::StopLossLong(OrderDirection::Down, StopLossType::Pips(pips_stop_loss)),
+            // ]),
+            true => Position::MarketIn(Some(vec![
+                //OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
+                OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
+                OrderType::StopLossLong(OrderDirection::Down, StopLossType::Pips(pips_stop_loss)),
+            ])),
             false => Position::None,
         }
     }
@@ -191,24 +182,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         _trade_in: &TradeIn,
         _pricing: &Pricing,
     ) -> Position {
-        let prev_index = calc::get_prev_index(index);
-        let data = &instrument.data();
-        let candle = data.get(index).unwrap();
-        let prev_candle = &data.get(prev_index).unwrap();
-        let close_price = &candle.close();
-        let prev_high = &prev_candle.high();
-        let is_closed = candle.is_closed();
-
-        let top_band = instrument.indicators.bb.get_data_a().get(index).unwrap();
-        let prev_top_band = instrument
-            .indicators
-            .bb
-            .get_data_a()
-            .get(prev_index)
-            .unwrap();
-
-        let exit_condition = self.trading_direction == TradeDirection::Short
-            || (is_closed && close_price < top_band && (prev_high > prev_top_band));
+        let exit_condition = self.trading_direction == TradeDirection::Short;
 
         match exit_condition {
             true => Position::MarketOut(None),
@@ -228,41 +202,31 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
             .parse::<f64>()
             .unwrap();
 
-        let prev_index = calc::get_prev_index(index);
-        let data = &instrument.data();
+        let data = instrument.data();
         let candle = data.get(index).unwrap();
-        let close_price = &candle.close();
-        let low_price = &candle.low();
-        let is_closed = candle.is_closed();
+        let is_closed: bool = candle.is_closed();
+        let last_candles = &data[index - 3..=index];
+        let all_bullish = last_candles.iter().all(|candle| candle.is_bullish());
 
-        let prev_candle = &data.get(prev_index).unwrap();
-        let prev_high = &prev_candle.high();
+        let pips_margin = 1.;
+        let pips_profit = 50.;
+        let pips_stop_loss = 50.;
 
-        let pips_margin = 0.1;
-        let top_band = instrument.indicators.bb.get_data_a().get(index).unwrap();
-        let mid_band = instrument.indicators.bb.get_data_c().get(index).unwrap();
-
-        let prev_top_band = instrument
-            .indicators
-            .bb
-            .get_data_a()
-            .get(prev_index)
-            .unwrap();
-
-        let entry_condition = self.trading_direction == TradeDirection::Short
-            && is_closed
-            && close_price < top_band
-            && close_price > mid_band
-            && (prev_high >= prev_top_band);
-
-        let buy_price = candle.close() - calc::to_pips(pips_margin, pricing);
+        let entry_condition =
+            self.trading_direction == TradeDirection::Short && is_closed && all_bullish;
+        let buy_price = candle.low() - calc::to_pips(pips_margin, pricing);
+        let sell_price = buy_price - pricing.spread() - calc::to_pips(pips_profit, pricing);
 
         match entry_condition {
-            true => Position::Order(vec![
-                OrderType::BuyOrderShort(OrderDirection::Down, self.order_size, buy_price),
-                OrderType::StopLossShort(OrderDirection::Up, StopLossType::Atr(atr_value)),
-            ]),
-
+            // true => Position::Order(vec![
+            //     OrderType::BuyOrderShort(OrderDirection::Down, self.order_size, buy_price),
+            //     OrderType::SellOrderShort(OrderDirection::Down, self.order_size, sell_price),
+            //     OrderType::StopLossShort(OrderDirection::Up, StopLossType::Pips(pips_stop_loss)),
+            // ]),
+            true => Position::MarketIn(Some(vec![
+                OrderType::SellOrderShort(OrderDirection::Down, self.order_size, sell_price),
+                OrderType::StopLossShort(OrderDirection::Up, StopLossType::Pips(pips_stop_loss)),
+            ])),
             false => Position::None,
         }
     }
@@ -275,24 +239,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         _trade_in: &TradeIn,
         _pricing: &Pricing,
     ) -> Position {
-        let prev_index = calc::get_prev_index(index);
-        let data = &instrument.data();
-        let candle = data.get(index).unwrap();
-        let prev_candle = &data.get(prev_index).unwrap();
-        let close_price = &candle.close();
-        let prev_close = &prev_candle.close();
-        let is_closed = candle.is_closed();
-
-        let low_band = instrument.indicators.bb.get_data_b().get(index).unwrap();
-        let prev_low_band = instrument
-            .indicators
-            .bb
-            .get_data_b()
-            .get(prev_index)
-            .unwrap();
-
-        let exit_condition = self.trading_direction == TradeDirection::Long
-            || (is_closed && close_price < low_band && (prev_close >= prev_low_band));
+        let exit_condition = self.trading_direction == TradeDirection::Long;
 
         match exit_condition {
             true => Position::MarketOut(None),

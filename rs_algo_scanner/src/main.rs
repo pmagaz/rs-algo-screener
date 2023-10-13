@@ -61,7 +61,7 @@ async fn main() -> Result<()> {
 
     if env == "development" {
         symbols = vec![Symbol {
-            symbol: "BITCOIN".to_owned(),
+            symbol: "FI.US_4".to_owned(),
             category: "".to_owned(),
             description: "".to_owned(),
             currency: "".to_owned(),
@@ -108,7 +108,7 @@ async fn main() -> Result<()> {
             }
         }
 
-        if !backtest_mode || (backtest_mode && (is_sp500 || is_forex || is_crypto)) {
+        if !backtest_mode || (backtest_mode && (is_forex || is_crypto)) {
             log::info!("processing {} ...", &s.symbol);
 
             screener
@@ -121,16 +121,16 @@ async fn main() -> Result<()> {
                         let endpoint = env::var("BACKEND_INSTRUMENTS_ENDPOINT").unwrap().clone();
                         let time_frame = &env::var("TIME_FRAME").unwrap();
 
-                    if let Some(first_data) = instrument.data().first() {
-                        log::info!(
-                            "{} scanned {} from {} to {} in {:?}",
-                            &instrument.symbol(),
-                            &time_frame,
-                            &first_data.date(),
-                            &instrument.date(),
-                            now.elapsed(),
-                        );
-                    }
+                        if let Some(first_data) = instrument.data().first() {
+                            log::info!(
+                                "{} scanned {} from {} to {} in {:?}",
+                                &instrument.symbol(),
+                                &time_frame,
+                                &first_data.date(),
+                                &instrument.date(),
+                                now.elapsed(),
+                            );
+                        }
 
                         let url = match backtest_mode {
                             true => [
@@ -156,9 +156,8 @@ async fn main() -> Result<()> {
                             Local::now(),
                             now.elapsed()
                         );
-                    
-                    Ok(())
 
+                        Ok(())
                     },
                 )
                 .await?;

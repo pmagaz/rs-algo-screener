@@ -36,7 +36,6 @@ RUN apk update \
   && cp /usr/share/zoneinfo/Europe/Madrid /etc/localtime && echo Europe/Madrid > /etc/timezone \
   && apk add --no-cache fontconfig \
   && apk add --no-cache ttf-opensans \
-  && apk add --no-cache tcpdump \
   && apk add --no-cache su-exec sudo \
   && rm -rf /var/cache/apk/*
 
@@ -57,6 +56,6 @@ COPY --from=builder /home/rust/src/$APP_NAME/target/$TARGET/release/$APP_NAME ${
 
 RUN chown -R $APP_USER:$APP_USER ${APP_DIR}
 
-USER root
+USER $APP_USER
 WORKDIR ${APP_DIR}
 CMD ["./rs_algo_backend"]

@@ -6,8 +6,8 @@ use rs_algo_shared::helpers::comp::*;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use rs_algo_shared::models::watch_instrument::*;
-use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::scanner::candle::*;
+use rs_algo_shared::scanner::instrument::*;
 use wasm_bindgen::prelude::*;
 use yew::{function_component, html, use_effect_with_deps, use_state, Callback, Properties};
 
@@ -170,31 +170,32 @@ pub fn home() -> Html {
     };
 
     fn candle_type_to_string(candle_type: &CandleType) -> u8 {
-    match candle_type {
-        CandleType::Reversal => 1,
-        CandleType::Karakasa => 2,
-        CandleType::BullishGap => 3,
-        CandleType::Engulfing => 4,
-        CandleType::BearishKarakasa => 5,
-    
-        _ => 0, 
-        // Add more cases for other candle types if needed
+        match candle_type {
+            //CandleType::Reversal => 1,
+            CandleType::Karakasa => 2,
+            CandleType::BullishGap => 3,
+            CandleType::Engulfing => 4,
+            CandleType::BearishKarakasa => 5,
+
+            _ => 0,
+            // Add more cases for other candle types if needed
+        }
     }
-}
 
     let mut candles: Vec<CompactInstrument> = use_instruments
         .iter()
-        .filter(|x| x.current_candle == CandleType::Reversal
-            || x.current_candle == CandleType::Karakasa
-            || x.current_candle == CandleType::BearishKarakasa
-            || x.current_candle == CandleType::Engulfing
-            || x.current_candle == CandleType::BullishGap)
+        .filter(|x| {
+            //x.current_candle == CandleType::Reversal ||
+            x.current_candle == CandleType::Karakasa
+                || x.current_candle == CandleType::BearishKarakasa
+                || x.current_candle == CandleType::Engulfing
+                || x.current_candle == CandleType::BullishGap
+        })
         .cloned()
         .collect();
 
-   candles.sort_by_key(|x| candle_type_to_string(&x.current_candle));
+    candles.sort_by_key(|x| candle_type_to_string(&x.current_candle));
 
-        
     let mut suggested: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| match x.patterns.local_patterns.last() {
@@ -209,7 +210,6 @@ pub fn home() -> Html {
 
     suggested.retain(|x| !candles.contains(x));
 
-
     let mut activated: Vec<CompactInstrument> = use_instruments
         .iter()
         .filter(|x| match x.patterns.local_patterns.last() {
@@ -222,8 +222,7 @@ pub fn home() -> Html {
         .map(|x| x.clone())
         .collect();
 
-        activated.retain(|x| !candles.contains(x));
-
+    activated.retain(|x| !candles.contains(x));
 
     let mut strategy: Vec<CompactInstrument> = use_instruments
         .iter()
@@ -233,8 +232,7 @@ pub fn home() -> Html {
         .map(|x| x.clone())
         .collect();
 
-            strategy.retain(|x| !candles.contains(x));
-
+    strategy.retain(|x| !candles.contains(x));
 
     let commodities: Vec<CompactInstrument> = use_instruments
         .iter()
@@ -260,7 +258,7 @@ pub fn home() -> Html {
         .map(|x| x.clone())
         .collect();
 
-    html! { 
+    html! {
         <div class="tile is-ancestor is-vertical ">
             <div class="section is-child hero">
                 <div class="hero-body container pb-0">
