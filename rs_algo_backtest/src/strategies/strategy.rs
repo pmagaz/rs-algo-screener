@@ -211,7 +211,7 @@ pub trait Strategy: DynClone {
                         instrument,
                         htf_instrument,
                         pricing,
-                        &trade_in,
+                        trade_in,
                     );
 
                     match exit_result {

@@ -1,7 +1,7 @@
 use actix_web::middleware::Logger;
-use env_logger::{self, Builder, WriteStyle};
-use log::LevelFilter;
-use std::env;
+use env_logger::{self};
+
+
 
 pub fn logger_middleware() -> Logger {
     //env::set_var("RUST_LOG", "actix_web=info");

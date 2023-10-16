@@ -3,7 +3,7 @@ use crate::helpers::backtest::resolve_backtest;
 
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::calc;
-use rs_algo_shared::helpers::comp;
+
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
 use rs_algo_shared::models::pricing::Pricing;
@@ -146,9 +146,9 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
-        let prev_candle = &data.get(prev_index).unwrap();
+        let _prev_candle = &data.get(prev_index).unwrap();
         let close_price = &candle.close();
-        let high_price = &candle.high();
+        let _high_price = &candle.high();
         let is_closed: bool = candle.is_closed();
 
         let prev_candle = &data.get(prev_index).unwrap();
@@ -232,7 +232,7 @@ impl<'a> Strategy for BollingerBandsReversals<'a> {
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
         let close_price = &candle.close();
-        let low_price = &candle.low();
+        let _low_price = &candle.low();
         let is_closed = candle.is_closed();
 
         let prev_candle = &data.get(prev_index).unwrap();

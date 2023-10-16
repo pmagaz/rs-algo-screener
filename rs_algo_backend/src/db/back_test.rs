@@ -34,8 +34,7 @@ pub async fn find_one(
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())
-        .await
-        .map_err(|e| Error::from(e))?; // Handle the find_one error
+        .await?; // Handle the find_one error
 
     Ok(instrument)
 }
@@ -235,8 +234,7 @@ pub async fn upsert_instruments_result(
                 .upsert(Some(true))
                 .build(),
         )
-        .await
-        .map_err(|e| Error::from(e))?; // Handle the find_one_and_replace error
+        .await?; // Handle the find_one_and_replace error
 
     Ok(result)
 }

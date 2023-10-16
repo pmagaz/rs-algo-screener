@@ -2,10 +2,10 @@ use crate::error::Result;
 
 use chrono::{DateTime, Local};
 use rs_algo_shared::helpers::date::{from_dbtime, to_dbtime};
-use rs_algo_shared::helpers::uuid;
+
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::mode::*;
-use rs_algo_shared::models::order::{Order, OrderStatus, OrderType};
+use rs_algo_shared::models::order::{Order, OrderType};
 use rs_algo_shared::models::stop_loss::StopLossType;
 use rs_algo_shared::models::time_frame;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
@@ -671,7 +671,7 @@ impl Backend {
                             && x.trade_type.is_stop()
                     })
                     .enumerate()
-                    .map(|(i, trade_out)| {
+                    .map(|(_i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);
                         let price = trade_out.price_out;
                         Circle::new((date, price), stops_size, RED_LINE2.mix(4.8).filled())

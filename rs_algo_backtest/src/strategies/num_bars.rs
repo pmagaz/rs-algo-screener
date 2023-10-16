@@ -138,7 +138,7 @@ impl<'a> Strategy for NumBars<'a> {
         _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let atr_value = std::env::var("ATR_STOP_LOSS")
+        let _atr_value = std::env::var("ATR_STOP_LOSS")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -166,8 +166,8 @@ impl<'a> Strategy for NumBars<'a> {
 
     fn exit_long(
         &mut self,
-        index: usize,
-        instrument: &Instrument,
+        _index: usize,
+        _instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
         _trade_in: &TradeIn,
         _pricing: &Pricing,
@@ -187,7 +187,7 @@ impl<'a> Strategy for NumBars<'a> {
         _htf_instrument: &HTFInstrument,
         pricing: &Pricing,
     ) -> Position {
-        let atr_value = std::env::var("ATR_STOP_LOSS")
+        let _atr_value = std::env::var("ATR_STOP_LOSS")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -215,8 +215,8 @@ impl<'a> Strategy for NumBars<'a> {
 
     fn exit_short(
         &mut self,
-        index: usize,
-        instrument: &Instrument,
+        _index: usize,
+        _instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
         _trade_in: &TradeIn,
         _pricing: &Pricing,

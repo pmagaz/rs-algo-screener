@@ -1,6 +1,6 @@
 use rs_algo_shared::helpers::status::*;
 use rs_algo_shared::models::status::Status;
-use rs_algo_shared::scanner::candle::*;
+
 use rs_algo_shared::scanner::divergence::DivergenceType;
 use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::scanner::pattern::*;

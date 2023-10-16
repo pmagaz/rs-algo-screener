@@ -71,7 +71,7 @@ async fn main() -> Result<()> {
         App::new()
             .wrap(cors_middleware())
             .wrap(logger_middleware())
-            .app_data(web::JsonConfig::default().error_handler(|err, req| json_error(err, req)))
+            .app_data(web::JsonConfig::default().error_handler(json_error))
             .data(AppState {
                 app_name: String::from(&app_name),
                 db_bot: Db {

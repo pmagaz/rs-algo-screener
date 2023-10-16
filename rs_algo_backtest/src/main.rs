@@ -92,7 +92,7 @@ async fn main() {
 
     let backtest_market = env::var("BACKTEST_MARKET").unwrap();
     if env == "development" {
-        let backtest_markets = vec!["Forex", "Crypto", "Stock"];
+        let backtest_markets = ["Forex", "Crypto", "Stock"];
         for market in backtest_markets.iter() {
             portfolio.backtest(market.to_string()).await;
         }
