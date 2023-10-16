@@ -1,4 +1,5 @@
 use rs_algo_shared::error::Result;
+use rs_algo_shared::helpers::http::{request, HttpMethod};
 use rs_algo_shared::models::bot::CompactBotData;
 
 use reqwest::Client;
