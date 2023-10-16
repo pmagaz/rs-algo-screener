@@ -71,15 +71,11 @@ pub async fn find_instruments(
     let limit = query.limit;
 
     let query = match env.as_ref() {
-        "development" => doc! {"market": &market, "symbol": "USDJPY"},
+        "development" => doc! {"market": &market, "symbol": "AUDCHF"},
         _ => doc! { "market": &market},
     };
 
-    log::info!(
-        "[BACK TEST INSTRUMENTS] Request {:} for {}",
-        time_frame,
-        market,
-    );
+    log::info!(" Request {:} for {}", time_frame, market,);
 
     let backtest_instruments: Vec<Instrument> =
         db::back_test::find_instruments(query, offset, limit, time_frame, &state)
@@ -87,7 +83,7 @@ pub async fn find_instruments(
             .unwrap();
 
     log::info!(
-        "[BACK TEST INSTRUMENTS] {:?} instruments returned at {:?} {:?}",
+        " {:?} instruments returned at {:?} {:?}",
         backtest_instruments.len(),
         Local::now(),
         now.elapsed()
@@ -104,7 +100,7 @@ pub async fn find_compact_instruments(
 
     let query = doc! {};
 
-    log::info!("[BACK TEST INSTRUMENTS] All");
+    log::info!(" All");
 
     let backtest_instruments: Vec<CompactInstrument> =
         db::back_test::find_backtest_compact_instruments(query, 0, 5000, &state)
@@ -112,7 +108,7 @@ pub async fn find_compact_instruments(
             .unwrap();
 
     log::info!(
-        "[BACK TEST INSTRUMENTS] {:?} instruments returned at {:?} {:?}",
+        " {:?} instruments returned at {:?} {:?}",
         backtest_instruments.len(),
         Local::now(),
         now.elapsed()
@@ -126,18 +122,14 @@ pub async fn find_instruments_result(
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    log::info!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
+    log::info!("Request at {:?}", Local::now());
     let query = doc! {};
     let backtest_instruments_result: Vec<BackTestInstrumentResult> =
         db::back_test::find_backtest_instruments_result(query, 50, &state)
             .await
             .unwrap();
 
-    log::info!(
-        "[BACK TEST INSTRUMENTS] {:?} {:?}",
-        Local::now(),
-        now.elapsed()
-    );
+    log::info!(" {:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(backtest_instruments_result))
 }
@@ -157,7 +149,7 @@ pub async fn find_instruments_result_by_strategy(
             .unwrap();
 
     log::info!(
-        "[BACK TEST STRATEGIES] For {:?} Request at {:?}",
+        "For {:?} Request at {:?}",
         (
             &strategy_result.market,
             &strategy_result.strategy,
@@ -175,7 +167,7 @@ pub async fn find_instruments_result_by_strategy(
             .unwrap();
 
     log::info!(
-        "[BACK TEST INSTRUMENTS] {} {:?} {:?}",
+        " {} {:?} {:?}",
         backtest_instruments_result.len(),
         Local::now(),
         now.elapsed()
@@ -192,6 +184,12 @@ pub async fn upsert_instruments_result(
     let now = Instant::now();
 
     let symbol = backtested_result.instrument.symbol.clone();
+
+    // Log the incoming JSON data
+    log::info!(
+        "[BACKTEST INSTRUMENT] Received JSON data: {:?}",
+        backtested_result
+    );
 
     log::info!(
         "[BACKTEST INSTRUMENT] instrument {} received at {:?} in {:?}",
@@ -244,7 +242,7 @@ pub async fn find_strategies_result(
 ) -> Result<HttpResponse, RsAlgoError> {
     let now = Instant::now();
 
-    log::info!("[BACK TEST STRATEGIES] Request at {:?}", Local::now());
+    log::info!("Request at {:?}", Local::now());
 
     let query = doc! {};
 
@@ -253,11 +251,7 @@ pub async fn find_strategies_result(
             .await
             .unwrap();
 
-    log::info!(
-        "[BACK TEST STRATEGIES] {:?} {:?}",
-        Local::now(),
-        now.elapsed()
-    );
+    log::info!("{:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(backtest_instruments))
 }
@@ -283,11 +277,7 @@ pub async fn find_strategies_result_instruments(
             .await
             .unwrap();
 
-    log::info!(
-        "[BACK TEST STRATEGIES] {:?} {:?}",
-        Local::now(),
-        now.elapsed()
-    );
+    log::info!("{:?} {:?}", Local::now(), now.elapsed());
 
     Ok(HttpResponse::Ok().json(backtest_instruments))
 }
@@ -295,7 +285,7 @@ pub async fn find_strategies_result_instruments(
 pub async fn find_prices(state: web::Data<AppState>) -> Result<HttpResponse, RsAlgoError> {
     let _now = Instant::now();
 
-    log::info!("[BACK TEST PRICING] Request for at {:?}", Local::now());
+    log::info!("Request for at {:?}", Local::now());
 
     let prices: Vec<Pricing> = db::back_test::find_prices(&state).await.unwrap();
 

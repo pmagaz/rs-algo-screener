@@ -4,6 +4,7 @@ use std::io::Result;
 
 mod db;
 mod error;
+mod errors;
 mod middleware;
 mod models;
 mod render_chart;
@@ -12,6 +13,7 @@ mod strategies;
 
 use db::mongo;
 use error::RsAlgoError;
+use errors::json_error::json_error;
 use middleware::cors::cors_middleware;
 use middleware::logger::logger_middleware;
 use models::app_state::AppState;
@@ -63,12 +65,13 @@ async fn main() -> Result<()> {
             .unwrap();
 
     log::info!("Starting {} on port {} !", app_name, port.clone());
-    let payload_limit = 2048 * 2048 * 2048;
+    let payload_limit = 128 * 1024 * 1024; // 128 megabytes in bytes
 
     HttpServer::new(move || {
         App::new()
             .wrap(cors_middleware())
             .wrap(logger_middleware())
+            .app_data(web::JsonConfig::default().error_handler(|err, req| json_error(err, req)))
             .data(AppState {
                 app_name: String::from(&app_name),
                 db_bot: Db {

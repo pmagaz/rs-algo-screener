@@ -16,13 +16,12 @@ chrono = {version = "0.4.26",  features = ["serde"] }
 async-trait = "0.1.73"
 round = "0.1.2"
 futures = "0.3.28"
-reqwest = { version = "0.11.20", features = ["json"] }
 openssl = { version = "0.10.57", features = ["vendored"] }
 dyn-clone = "1.0.13"
 env_logger = "0.10.0"
 log = "0.4"
 
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "bb635cf"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "57258b6"}
 #rs_algo_shared = { path = "../../rs_algo_shared" }
 # [profile.release]
 # strip = true

@@ -3,7 +3,6 @@ use crate::helpers::backtest::resolve_backtest;
 
 use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::calc;
-use rs_algo_shared::helpers::comp;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
 use rs_algo_shared::models::pricing::Pricing;
@@ -12,6 +11,7 @@ use rs_algo_shared::models::strategy::StrategyType;
 use rs_algo_shared::models::time_frame::{TimeFrame, TimeFrameType};
 use rs_algo_shared::models::trade::{Position, TradeDirection, TradeIn, TradeOut};
 use rs_algo_shared::models::{backtest_instrument::*, time_frame};
+use rs_algo_shared::scanner::candle::CandleType;
 use rs_algo_shared::scanner::instrument::*;
 
 #[derive(Clone)]
@@ -146,27 +146,17 @@ impl<'a> Strategy for NumBars<'a> {
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
         let is_closed: bool = candle.is_closed();
-        let last_candles = &data[index - 3..=index];
-        let all_bearish = last_candles.iter().all(|candle| candle.is_bearish());
 
         let pips_margin = 1.;
         let pips_profit = 50.;
         let pips_stop_loss = 50.;
 
-        let entry_condition =
-            self.trading_direction == TradeDirection::Long && is_closed && all_bearish;
-
+        let entry_condition = candle.candle_type() == &CandleType::BearishThreeInRow && is_closed;
         let buy_price = candle.high() + calc::to_pips(pips_margin, pricing);
         let sell_price = buy_price + pricing.spread() + calc::to_pips(pips_profit, pricing);
 
         match entry_condition {
-            // true => Position::Order(vec![
-            //     OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
-            //     OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
-            //     OrderType::StopLossLong(OrderDirection::Down, StopLossType::Pips(pips_stop_loss)),
-            // ]),
             true => Position::MarketIn(Some(vec![
-                //OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
                 OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
                 OrderType::StopLossLong(OrderDirection::Down, StopLossType::Pips(pips_stop_loss)),
             ])),
@@ -205,24 +195,16 @@ impl<'a> Strategy for NumBars<'a> {
         let data = instrument.data();
         let candle = data.get(index).unwrap();
         let is_closed: bool = candle.is_closed();
-        let last_candles = &data[index - 3..=index];
-        let all_bullish = last_candles.iter().all(|candle| candle.is_bullish());
 
         let pips_margin = 1.;
         let pips_profit = 50.;
         let pips_stop_loss = 50.;
 
-        let entry_condition =
-            self.trading_direction == TradeDirection::Short && is_closed && all_bullish;
+        let entry_condition = candle.candle_type() == &CandleType::ThreeInRow && is_closed;
         let buy_price = candle.low() - calc::to_pips(pips_margin, pricing);
         let sell_price = buy_price - pricing.spread() - calc::to_pips(pips_profit, pricing);
 
         match entry_condition {
-            // true => Position::Order(vec![
-            //     OrderType::BuyOrderShort(OrderDirection::Down, self.order_size, buy_price),
-            //     OrderType::SellOrderShort(OrderDirection::Down, self.order_size, sell_price),
-            //     OrderType::StopLossShort(OrderDirection::Up, StopLossType::Pips(pips_stop_loss)),
-            // ]),
             true => Position::MarketIn(Some(vec![
                 OrderType::SellOrderShort(OrderDirection::Down, self.order_size, sell_price),
                 OrderType::StopLossShort(OrderDirection::Up, StopLossType::Pips(pips_stop_loss)),

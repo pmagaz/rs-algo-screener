@@ -219,7 +219,7 @@ pub async fn upsert_instruments_result(
     let collection_name = &env::var("DB_BACKTEST_INSTRUMENT_RESULT_COLLECTION").unwrap();
     let collection =
         get_collection::<BackTestInstrumentResult>(&state.db_mem, collection_name).await;
-    log::info!("111111");
+
     let result = collection
         .find_one_and_replace(
             doc! {

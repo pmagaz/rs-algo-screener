@@ -39,22 +39,22 @@ async fn main() {
                 )
                 .unwrap(),
             ),
-            Box::new(
-                strategies::num_bars::NumBars::new(
-                    Some("M15"),
-                    Some("H1"),
-                    Some(StrategyType::OnlyLongMTF),
-                )
-                .unwrap(),
-            ),
-            Box::new(
-                strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
-                    Some("M15"),
-                    Some("H1"),
-                    Some(StrategyType::LongShortMTF),
-                )
-                .unwrap(),
-            ),
+            // Box::new(
+            //     strategies::num_bars::NumBars::new(
+            //         Some("M15"),
+            //         Some("H1"),
+            //         Some(StrategyType::OnlyLongMTF),
+            //     )
+            //     .unwrap(),
+            // ),
+            // Box::new(
+            //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
+            //         Some("M15"),
+            //         Some("H1"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
             // // Box::new(
             //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
             //         Some("H1"),

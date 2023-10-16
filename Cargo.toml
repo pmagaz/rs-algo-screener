@@ -1,4 +1,5 @@
 [workspace]
+workspace.resolver = "1"
 members = [
     "rs_algo_scanner",
     "rs_algo_backend",
