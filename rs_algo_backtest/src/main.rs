@@ -32,13 +32,38 @@ async fn main() {
         strategies: vec![
             // LONG-SHORT
             Box::new(
-                strategies::num_bars::NumBars::new(
+                strategies::num_bars_atr::NumBars::new(
                     Some("M15"),
                     Some("H1"),
                     Some(StrategyType::LongShortMTF),
                 )
                 .unwrap(),
             ),
+            Box::new(
+                strategies::num_bars_atr::NumBars::new(
+                    Some("M15"),
+                    Some("H1"),
+                    Some(StrategyType::OnlyLongMTF),
+                )
+                .unwrap(),
+            ),
+            // Box::new(
+            //     strategies::num_bars::NumBars::new(
+            //         Some("M15"),
+            //         Some("H1"),
+            //         Some(StrategyType::LongShortMTF),
+            //     )
+            //     .unwrap(),
+            // ),
+            // Box::new(
+            //     strategies::num_bars::NumBars::new(
+            //         Some("M15"),
+            //         Some("H1"),
+            //         Some(StrategyType::OnlyLongMTF),
+            //     )
+            //     .unwrap(),
+            // ),
+
             // Box::new(
             //     strategies::num_bars::NumBars::new(
             //         Some("M15"),

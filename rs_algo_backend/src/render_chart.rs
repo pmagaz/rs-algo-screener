@@ -545,35 +545,45 @@ impl Backend {
                             && !x.trade_type.is_stop()
                     })
                     .enumerate()
-                    .map(|(i, trade_out)| {
+                    .filter_map(|(i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);
-                        let trade_in = trades_in.get(i).unwrap();
-                        let price = trade_out.price_out;
-                        match trade_out.profit > 0. {
-                            true => match trade_out.trade_type.is_long() {
-                                true => TriangleMarker::new(
-                                    (date, price),
-                                    -trades_size,
-                                    GREEN_LINE2.mix(5.),
-                                ),
-                                false => TriangleMarker::new(
-                                    (date, price),
-                                    trades_size,
-                                    GREEN_LINE2.mix(5.),
-                                ),
-                            },
-                            false => match trade_in.trade_type.is_long() {
-                                true => TriangleMarker::new(
-                                    (date, price),
-                                    trades_size,
-                                    RED_LINE2.mix(5.),
-                                ),
-                                false => TriangleMarker::new(
-                                    (date, price),
-                                    -trades_size,
-                                    RED_LINE2.mix(5.),
-                                ),
-                            },
+                        if let Some(trade_in) = trades_in.get(i) {
+                            let price = trade_out.price_out;
+                            let is_profitable = trade_out.profit > 0.;
+
+                            let marker = if is_profitable {
+                                if trade_out.trade_type.is_long() {
+                                    TriangleMarker::new(
+                                        (date, price),
+                                        -trades_size,
+                                        GREEN_LINE2.mix(5.),
+                                    )
+                                } else {
+                                    TriangleMarker::new(
+                                        (date, price),
+                                        trades_size,
+                                        GREEN_LINE2.mix(5.),
+                                    )
+                                }
+                            } else {
+                                if trade_in.trade_type.is_long() {
+                                    TriangleMarker::new(
+                                        (date, price),
+                                        trades_size,
+                                        RED_LINE2.mix(5.),
+                                    )
+                                } else {
+                                    TriangleMarker::new(
+                                        (date, price),
+                                        -trades_size,
+                                        RED_LINE2.mix(5.),
+                                    )
+                                }
+                            };
+
+                            Some(marker)
+                        } else {
+                            None
                         }
                     }),
             )

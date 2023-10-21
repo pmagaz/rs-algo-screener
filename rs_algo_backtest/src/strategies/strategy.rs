@@ -291,10 +291,10 @@ pub trait Strategy: DynClone {
             .parse::<bool>()
             .unwrap();
 
-        let wait_for_opening_trade = self.waits_for_next_trade(index, instrument, trades_out);
+        let wait_for_new_trade = trade::wait_for_new_trade(index, instrument, trades_out);
 
-        match wait_for_opening_trade {
-            true => match trade_direction.is_long() || !trading_direction {
+        match wait_for_new_trade {
+            false => match trade_direction.is_long() || !trading_direction {
                 true => match self.is_long_strategy() {
                     true => match self.entry_long(index, instrument, htf_instrument, pricing) {
                         Position::MarketIn(order_types) => {
@@ -417,7 +417,7 @@ pub trait Strategy: DynClone {
                 },
                 false => PositionResult::None,
             },
-            false => PositionResult::None,
+            true => PositionResult::None,
         }
     }
 
@@ -533,59 +533,6 @@ pub trait Strategy: DynClone {
                 PositionResult::MarketOutOrder(trade_out_result, order)
             }
             _ => PositionResult::None,
-        }
-    }
-
-    fn waits_for_next_trade(
-        &self,
-        index: usize,
-        instrument: &Instrument,
-        trades_out: &Vec<TradeOut>,
-    ) -> bool {
-        let wait_for_new_entry = env::var("WAIT_FOR_NEW_ENTRY")
-            .unwrap()
-            .parse::<bool>()
-            .unwrap();
-
-        match wait_for_new_entry {
-            true => {
-                let execution_mode = mode::from_str(&env::var("EXECUTION_MODE").unwrap());
-
-                let candles_until_new_entry = env::var("CANDLES_UNTIL_NEW_ENTRY")
-                    .unwrap()
-                    .parse::<i64>()
-                    .unwrap();
-
-                let time_frame = instrument.time_frame();
-
-                let current_date = match execution_mode.is_back_test() {
-                    true => instrument.data().get(index).unwrap().date(),
-                    false => Local::now(),
-                };
-
-                match trades_out.last() {
-                    Some(trade_out) => {
-                        let next_entry_date = match instrument.time_frame().is_minutely_time_frame()
-                        {
-                            true => {
-                                date::from_dbtime(&trade_out.date_out)
-                                    + date::Duration::minutes(
-                                        candles_until_new_entry * time_frame.to_minutes(),
-                                    )
-                            }
-                            false => {
-                                date::from_dbtime(&trade_out.date_out)
-                                    + date::Duration::hours(
-                                        candles_until_new_entry * time_frame.to_hours(),
-                                    )
-                            }
-                        };
-                        next_entry_date <= current_date
-                    }
-                    None => true,
-                }
-            }
-            false => true,
         }
     }
 
