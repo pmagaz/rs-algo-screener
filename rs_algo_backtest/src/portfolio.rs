@@ -6,7 +6,7 @@ use rs_algo_shared::helpers::{date::*, uuid};
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::*;
 use rs_algo_shared::models::market::*;
-use rs_algo_shared::models::pricing::*;
+use rs_algo_shared::models::tick::*;
 use rs_algo_shared::models::time_frame::TimeFrame;
 use rs_algo_shared::scanner::instrument::Instrument;
 use std::env;
@@ -36,7 +36,7 @@ impl PortFolio {
 
         let endpoint = env::var("BACKEND_BACKTEST_INSTRUMENTS_ENDPOINT").unwrap();
         let instrument_result_endpoint = env::var("BACKEND_BACKTEST_ENDPOINT").unwrap().clone();
-        let pricing_endpoint = env::var("BACKEND_BACKTEST_PRICING_ENDPOINT")
+        let tick_endpoint = env::var("BACKEND_BACKTEST_PRICING_ENDPOINT")
             .unwrap()
             .clone();
 
@@ -46,10 +46,10 @@ impl PortFolio {
         //     .parse::<String>()
         //     .unwrap();
 
-        log::info!("[BACKTEST] Requesting Pricing");
+        log::info!("[BACKTEST] Requesting InstrumentTick");
 
-        let prices: Vec<Pricing> =
-            request(&pricing_endpoint, &String::from("all"), HttpMethod::Get)
+        let prices: Vec<InstrumentTick> =
+            request(&tick_endpoint, &String::from("all"), HttpMethod::Get)
                 .await
                 .unwrap()
                 .json()
@@ -109,20 +109,23 @@ impl PortFolio {
                 offset += limit;
                 for instrument in &instruments_to_test {
                     log::info!("[BACKTEST] Testing {}... ", instrument.symbol);
-                    let mut pricing = match prices
+                    let mut tick = match prices
                         .iter()
-                        .position(|pricing| pricing.symbol() == instrument.symbol)
+                        .position(|tick| tick.symbol() == instrument.symbol)
                     {
                         Some(idx) => prices.get(idx).unwrap().clone(),
                         None => {
-                            panic!("[PANIC] Pricing not found for {:?}", instrument.symbol);
+                            panic!(
+                                "[PANIC] InstrumentTick not found for {:?}",
+                                instrument.symbol
+                            );
                         }
                     };
 
                     let backtest_result = dyn_clone::clone_box(strategy)
                         .test(
                             instrument,
-                            &mut pricing,
+                            &mut tick,
                             self.trade_size,
                             self.equity,
                             self.commission,

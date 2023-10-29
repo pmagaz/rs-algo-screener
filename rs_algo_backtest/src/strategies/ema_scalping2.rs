@@ -5,9 +5,9 @@ use rs_algo_shared::error::Result;
 use rs_algo_shared::helpers::calc;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
-use rs_algo_shared::models::pricing::Pricing;
 use rs_algo_shared::models::stop_loss::*;
 use rs_algo_shared::models::strategy::StrategyType;
+use rs_algo_shared::models::tick::InstrumentTick;
 use rs_algo_shared::models::time_frame::{TimeFrame, TimeFrameType};
 use rs_algo_shared::models::trade::{Position, TradeDirection, TradeIn, TradeOut};
 use rs_algo_shared::models::{backtest_instrument::*, time_frame};
@@ -140,10 +140,10 @@ impl<'a> Strategy for EmaScalping2<'a> {
         index: usize,
         instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
-        pricing: &Pricing,
+        tick: &InstrumentTick,
     ) -> Position {
         let close_price = &instrument.data.get(index).unwrap().close();
-        let spread = pricing.spread();
+        let spread = tick.spread();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -188,10 +188,10 @@ impl<'a> Strategy for EmaScalping2<'a> {
             .map(|x| x.high())
             .unwrap();
 
-        let buy_price = highest_bar + calc::to_pips(pips_margin, pricing);
-        let stop_loss_price = trigger_price - calc::to_pips(pips_margin, pricing);
+        let buy_price = highest_bar + calc::to_pips(pips_margin, tick);
+        let stop_loss_price = trigger_price - calc::to_pips(pips_margin, tick);
         let _risk = buy_price + spread - stop_loss_price;
-        let sell_price = buy_price + calc::to_pips(pips_profit, pricing);
+        let sell_price = buy_price + calc::to_pips(pips_profit, tick);
 
         match entry_condition {
             true => Position::Order(vec![
@@ -210,7 +210,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
         _instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
         _trade_in: &TradeIn,
-        _pricing: &Pricing,
+        _tick: &InstrumentTick,
     ) -> Position {
         Position::None
     }
@@ -220,10 +220,10 @@ impl<'a> Strategy for EmaScalping2<'a> {
         index: usize,
         instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
-        pricing: &Pricing,
+        tick: &InstrumentTick,
     ) -> Position {
         let _close_price = &instrument.data.get(index).unwrap().close();
-        let spread = pricing.spread();
+        let spread = tick.spread();
 
         let prev_index = calc::get_prev_index(index);
         let data = &instrument.data();
@@ -268,10 +268,10 @@ impl<'a> Strategy for EmaScalping2<'a> {
             .map(|x| x.low())
             .unwrap();
 
-        let buy_price = lowest_bar - calc::to_pips(pips_margin, pricing);
-        let stop_loss_price = trigger_price + calc::to_pips(pips_margin, pricing);
+        let buy_price = lowest_bar - calc::to_pips(pips_margin, tick);
+        let stop_loss_price = trigger_price + calc::to_pips(pips_margin, tick);
         let _risk = stop_loss_price + spread - buy_price;
-        let sell_price = buy_price - calc::to_pips(pips_profit, pricing);
+        let sell_price = buy_price - calc::to_pips(pips_profit, tick);
 
         match entry_condition {
             true => Position::Order(vec![
@@ -290,7 +290,7 @@ impl<'a> Strategy for EmaScalping2<'a> {
         _instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
         _trade_in: &TradeIn,
-        _pricing: &Pricing,
+        _tick: &InstrumentTick,
     ) -> Position {
         Position::None
     }

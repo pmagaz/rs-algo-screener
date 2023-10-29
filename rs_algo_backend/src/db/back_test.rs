@@ -6,7 +6,7 @@ use crate::models::backtest_strategy::BackTestStrategyResult;
 
 use rs_algo_shared::helpers::symbols::{crypto, forex, sp500};
 use rs_algo_shared::helpers::{comp::*, uuid};
-use rs_algo_shared::models::pricing::*;
+use rs_algo_shared::models::tick::*;
 use rs_algo_shared::scanner::instrument::*;
 
 use actix_web::web;
@@ -299,9 +299,9 @@ pub async fn find_htf_backtest_instrument_by_symbol_time_frame(
     Ok(instrument)
 }
 
-pub async fn find_prices(state: &web::Data<AppState>) -> Result<Vec<Pricing>, Error> {
+pub async fn find_prices(state: &web::Data<AppState>) -> Result<Vec<InstrumentTick>, Error> {
     let collection_name = &env::var("DB_PRICING_COLLECTION").unwrap();
-    let collection = get_collection::<Pricing>(&state.db_mem, collection_name).await;
+    let collection = get_collection::<InstrumentTick>(&state.db_mem, collection_name).await;
     let mut cursor = collection
         .find(
             doc! {},
@@ -313,10 +313,10 @@ pub async fn find_prices(state: &web::Data<AppState>) -> Result<Vec<Pricing>, Er
         .await
         .unwrap();
 
-    let mut prices: Vec<Pricing> = vec![];
+    let mut prices: Vec<InstrumentTick> = vec![];
     while let Some(result) = cursor.next().await {
         match result {
-            Ok(pricing) => prices.push(pricing),
+            Ok(tick) => prices.push(tick),
             _ => {}
         }
     }

@@ -8,7 +8,7 @@ use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::models::mode::*;
 use rs_algo_shared::models::order::Order;
-use rs_algo_shared::models::pricing::Pricing;
+use rs_algo_shared::models::tick::InstrumentTick;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
@@ -100,8 +100,6 @@ pub async fn find_compact_instruments(
 
     let query = doc! {};
 
-    log::info!(" All");
-
     let backtest_instruments: Vec<CompactInstrument> =
         db::back_test::find_backtest_compact_instruments(query, 0, 5000, &state)
             .await
@@ -184,12 +182,6 @@ pub async fn upsert_instruments_result(
     let now = Instant::now();
 
     let symbol = backtested_result.instrument.symbol.clone();
-
-    // Log the incoming JSON data
-    log::info!(
-        "[BACKTEST INSTRUMENT] Received JSON data: {:?}",
-        backtested_result
-    );
 
     log::info!(
         "[BACKTEST INSTRUMENT] instrument {} received at {:?} in {:?}",
@@ -287,7 +279,7 @@ pub async fn find_prices(state: web::Data<AppState>) -> Result<HttpResponse, RsA
 
     log::info!("Request for at {:?}", Local::now());
 
-    let prices: Vec<Pricing> = db::back_test::find_prices(&state).await.unwrap();
+    let prices: Vec<InstrumentTick> = db::back_test::find_prices(&state).await.unwrap();
 
     Ok(HttpResponse::Ok().json(prices))
 }

@@ -3,7 +3,7 @@ mod portfolio;
 mod strategies;
 
 use portfolio::PortFolio;
-use rs_algo_shared::helpers::date::Local;
+use rs_algo_shared::helpers::date::{self, Local};
 use rs_algo_shared::models::strategy::StrategyType;
 use strategies::strategy::Strategy;
 
@@ -63,7 +63,6 @@ async fn main() {
             //     )
             //     .unwrap(),
             // ),
-
             // Box::new(
             //     strategies::num_bars::NumBars::new(
             //         Some("M15"),

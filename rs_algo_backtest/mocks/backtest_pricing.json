@@ -1,0 +1,312 @@
+[
+  {
+    "symbol": "AUDCAD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00021,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "AUDCHF",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00016,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "AUDJPY",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.018,
+    "pip_size": 0.01,
+    "time": 0
+  },
+  {
+    "symbol": "AUDNZD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00024,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "AUDUSD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00014,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "CADCHF",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00025,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "CADJPY",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.021,
+    "pip_size": 0.01,
+    "time": 0
+  },
+  {
+    "symbol": "CHFJPY",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.024,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "EURAUD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00022,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "EURCAD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00026,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "EURCHF",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00017,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "EURGBP",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00015,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "EURUSD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00001,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "GBPUSD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00015,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "GBPAUD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00028,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "GBPCAD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00033,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "USDCHF",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00017,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "USDJPY",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.015,
+    "pip_size": 0.01,
+    "time": 0
+  },
+  {
+    "symbol": "NZDUSD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00017,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "USDCAD",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.00019,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "EURCNH",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0024,
+    "pip_size": 0.0001,
+    "time": 0
+  },
+  {
+    "symbol": "BITCOIN",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.01,
+    "percentage": 0.35
+  },
+  {
+    "symbol": "ETHEREUM",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.001,
+    "percentage": 0.35
+  },
+  {
+    "symbol": "LITECOIN",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.001,
+    "percentage": 0.75
+  },
+  {
+    "symbol": "RIPPLE",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.0001,
+    "percentage": 0.75
+  },
+  {
+    "symbol": "BINANCECOIN",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.01,
+    "percentage": 1.5
+  },
+  {
+    "symbol": "BITCOINCASH",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.01,
+    "percentage": 0.75
+  },
+  {
+    "symbol": "CARDANO",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.0001,
+    "percentage": 0.75
+  },
+  {
+    "symbol": "STELLAR",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.00001,
+    "percentage": 1.5
+  },
+  {
+    "symbol": "SOLANA",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.01,
+    "percentage": 1.25
+  },
+  {
+    "symbol": "DOGECOIN",
+    "ask": 0.0,
+    "bid": 0.0,
+    "high": 0.0,
+    "low": 0.0,
+    "spread": 0.0,
+    "pip_size": 0.00001,
+    "percentage": 1.75
+  }
+]

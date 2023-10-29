@@ -87,25 +87,25 @@ pub fn bots() -> Html {
             let use_chart_url = use_chart_url.clone();
             use_chart_url.set(chart_url.clone());
 
-            Interval::new(2_500, move || {
+            Interval::new(5000, move || {
                 let date = Local::now();
                 let seconds = date.second();
                 let chart_url = chart_url.clone();
                 let use_chart_url = use_chart_url.clone();
-                if seconds >= 1 && seconds <= 7 {
-                    //if polling_seconds_chart.contains(&seconds) {
-                    log::info!("[CLIENT] Polling chart... {}", seconds);
+                //if seconds >= 1 && seconds <= 7 {
+                //if polling_seconds_chart.contains(&seconds) {
+                log::info!("[CLIENT] Polling chart... {}", seconds);
 
-                    wasm_bindgen_futures::spawn_local({
-                        async move {
-                            let date = Local::now();
-                            let url = [&chart_url, "?ts=", &date.timestamp().to_string()].concat();
-                            use_chart_url.set(url.clone());
-                            // let bots = api::get_bots2().await.unwrap();
-                            // use_bots.set(bots);
-                        }
-                    });
-                }
+                wasm_bindgen_futures::spawn_local({
+                    async move {
+                        let date = Local::now();
+                        let url = [&chart_url, "?ts=", &date.timestamp().to_string()].concat();
+                        use_chart_url.set(url.clone());
+                        // let bots = api::get_bots2().await.unwrap();
+                        // use_bots.set(bots);
+                    }
+                });
+                // }
             })
             .forget();
 
