@@ -61,7 +61,7 @@ autoscaling:
   enabled: true
   minReplicas: 1
   maxReplicas: 2
-  targetMemoryUtilizationPercentage: 90
+  targetMemoryUtilizationPercentage: 95
 
 nodeSelector:
   nodeType: storage

@@ -284,6 +284,19 @@ pub async fn find_prices(state: web::Data<AppState>) -> Result<HttpResponse, RsA
     Ok(HttpResponse::Ok().json(prices))
 }
 
+pub async fn find_price(
+    path: web::Path<(String)>,
+    state: web::Data<AppState>,
+) -> Result<HttpResponse, RsAlgoError> {
+    let _now = Instant::now();
+    let (symbol) = path.into_inner();
+    log::info!("Request for at {:?}", Local::now());
+
+    let price = db::back_test::find_price(&symbol, &state).await.unwrap();
+
+    Ok(HttpResponse::Ok().json(price))
+}
+
 pub async fn chart(
     params: web::Path<(String, String)>,
     state: web::Data<AppState>,

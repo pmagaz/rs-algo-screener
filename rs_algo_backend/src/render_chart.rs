@@ -183,12 +183,12 @@ impl Backend {
         let _ema_b = &instrument.indicators.ema_b.get_data_a();
         let _ema_c = &instrument.indicators.ema_c.get_data_a();
 
-        let bb_a = &instrument.indicators.bb.get_data_a();
-        let bb_b = &instrument.indicators.bb.get_data_b();
-        let bb_c = &instrument.indicators.bb.get_data_c();
+        // let bb_a = &instrument.indicators.bb.get_data_a();
+        // let bb_b = &instrument.indicators.bb.get_data_b();
+        // let bb_c = &instrument.indicators.bb.get_data_c();
 
         let root = BitMapBackend::new(&output_file, (1821, 865)).into_drawing_area();
-        let (upper, lower) = root.split_vertically((90).percent());
+        let (upper, lower) = root.split_vertically((91).percent());
 
         root.fill(BACKGROUND).unwrap();
 
@@ -691,34 +691,34 @@ impl Backend {
 
         //BOLLINGER BANDS
 
-        if !bb_a.is_empty() {
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .map(|(id, candle)| (candle.date, bb_a[id])),
-                    &BLUE_LINE2,
-                ))
-                .unwrap();
+        // if !bb_a.is_empty() {
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(data.iter())
+        //                 .map(|(id, candle)| (candle.date, bb_a[id])),
+        //             &BLUE_LINE2,
+        //         ))
+        //         .unwrap();
 
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .map(|(id, candle)| (candle.date, bb_b[id])),
-                    &BLUE_LINE2,
-                ))
-                .unwrap();
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(data.iter())
+        //                 .map(|(id, candle)| (candle.date, bb_b[id])),
+        //             &BLUE_LINE2,
+        //         ))
+        //         .unwrap();
 
-            chart
-                .draw_series(LineSeries::new(
-                    (0..)
-                        .zip(data.iter())
-                        .map(|(id, candle)| (candle.date, bb_c[id])),
-                    &BLUE_LINE2,
-                ))
-                .unwrap();
-        }
+        //     chart
+        //         .draw_series(LineSeries::new(
+        //             (0..)
+        //                 .zip(data.iter())
+        //                 .map(|(id, candle)| (candle.date, bb_c[id])),
+        //             &BLUE_LINE2,
+        //         ))
+        //         .unwrap();
+        // }
 
         // //HTF INDICATORS
         match htf_instrument {

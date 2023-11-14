@@ -34,7 +34,7 @@ pub async fn find_one(
 
     let instrument = collection
         .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())
-        .await?; // Handle the find_one error
+        .await?;
 
     Ok(instrument)
 }
@@ -321,4 +321,17 @@ pub async fn find_prices(state: &web::Data<AppState>) -> Result<Vec<InstrumentTi
         }
     }
     Ok(prices)
+}
+
+pub async fn find_price(
+    symbol: &str,
+    state: &web::Data<AppState>,
+) -> Result<Option<InstrumentTick>, Error> {
+    let collection_name = &env::var("DB_PRICING_COLLECTION").unwrap();
+    let collection = get_collection::<InstrumentTick>(&state.db_mem, collection_name).await;
+    let tick = collection
+        .find_one(doc! { "symbol": symbol }, FindOneOptions::builder().build())
+        .await?;
+
+    Ok(tick)
 }

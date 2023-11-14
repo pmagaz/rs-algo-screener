@@ -2,7 +2,6 @@ use super::strategy::*;
 use crate::helpers::backtest::resolve_backtest;
 
 use rs_algo_shared::error::Result;
-use rs_algo_shared::helpers::calc;
 use rs_algo_shared::indicators::Indicator;
 use rs_algo_shared::models::order::{Order, OrderDirection, OrderType};
 use rs_algo_shared::models::stop_loss::*;
@@ -75,7 +74,7 @@ impl<'a> Strategy for NumBars<'a> {
         let trading_direction = TradeDirection::Long;
 
         Ok(Self {
-            name: "Num_Bars_3_Atr_ac",
+            name: "Num_Bars_3_Atr68",
             time_frame,
             higher_time_frame,
             order_size,
@@ -113,11 +112,45 @@ impl<'a> Strategy for NumBars<'a> {
             instrument,
             htf_instrument,
             |(idx, _prev_idx, htf_inst)| {
+                // let prev_htf_ema_a = if let Some(value) = htf_inst
+                //     .indicators
+                //     .ema_a
+                //     .get_data_a()
+                //     .get(idx.checked_sub(1).unwrap_or_default())
+                // {
+                //     *value
+                // } else {
+                //     0.
+                // };
+
+                // let prev_htf_ema_b = if let Some(value) = htf_inst
+                //     .indicators
+                //     .ema_b
+                //     .get_data_a()
+                //     .get(idx.checked_sub(1).unwrap_or_default())
+                // {
+                //     *value
+                // } else {
+                //     0.
+                // };
+
+                let ema_percentage_dis = std::env::var("EMA_PERCENTAGE_DIS")
+                    .unwrap()
+                    .parse::<f64>()
+                    .unwrap();
+
                 let htf_ema_a = htf_inst.indicators.ema_a.get_data_a().get(idx).unwrap();
                 let htf_ema_b = htf_inst.indicators.ema_b.get_data_a().get(idx).unwrap();
 
-                let is_long = htf_ema_a > htf_ema_b;
-                let is_short = htf_ema_a < htf_ema_b;
+                let percentage_diff = {
+                    let numerator = (htf_ema_a - htf_ema_b).abs();
+                    let denominator = ((htf_ema_a + htf_ema_b) / 2.0).abs();
+                    (numerator / denominator) * 100.0
+                };
+
+                let has_min_distance = true; //percentage_diff > ema_percentage_dis;
+                let is_long = htf_ema_a > htf_ema_b && has_min_distance;
+                let is_short = htf_ema_a < htf_ema_b && has_min_distance;
 
                 if is_long {
                     TradeDirection::Long
@@ -169,14 +202,13 @@ impl<'a> Strategy for NumBars<'a> {
 
     fn exit_long(
         &mut self,
-        _index: usize,
-        _instrument: &Instrument,
+        index: usize,
+        instrument: &Instrument,
         _htf_instrument: &HTFInstrument,
-        _trade_in: &TradeIn,
+        trade_in: &TradeIn,
         _tick: &InstrumentTick,
     ) -> Position {
         let exit_condition = self.trading_direction == TradeDirection::Short;
-
         match exit_condition {
             true => Position::MarketOut(None),
             false => Position::None,
@@ -228,7 +260,6 @@ impl<'a> Strategy for NumBars<'a> {
         _tick: &InstrumentTick,
     ) -> Position {
         let exit_condition = self.trading_direction == TradeDirection::Long;
-
         match exit_condition {
             true => Position::MarketOut(None),
             false => Position::None,

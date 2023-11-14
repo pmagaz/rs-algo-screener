@@ -137,6 +137,10 @@ async fn main() -> Result<()> {
                     )
                     .route("/backtest/prices", web::get().to(back_test::find_prices))
                     .route(
+                        "/backtest/price/{symbol}",
+                        web::get().to(back_test::find_price),
+                    )
+                    .route(
                         "/backtest/strategies/{uuid}",
                         web::get().to(back_test::find_instruments_result_by_strategy),
                     )

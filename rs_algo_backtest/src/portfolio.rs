@@ -46,16 +46,6 @@ impl PortFolio {
         //     .parse::<String>()
         //     .unwrap();
 
-        log::info!("[BACKTEST] Requesting InstrumentTick");
-
-        let prices: Vec<InstrumentTick> =
-            request(&tick_endpoint, &String::from("all"), HttpMethod::Get)
-                .await
-                .unwrap()
-                .json()
-                .await
-                .unwrap();
-
         for strategy in &self.strategies {
             let mut avg_sessions = vec![];
             let mut avg_trades = vec![];
@@ -109,18 +99,22 @@ impl PortFolio {
                 offset += limit;
                 for instrument in &instruments_to_test {
                     log::info!("[BACKTEST] Testing {}... ", instrument.symbol);
-                    let mut tick = match prices
-                        .iter()
-                        .position(|tick| tick.symbol() == instrument.symbol)
-                    {
-                        Some(idx) => prices.get(idx).unwrap().clone(),
-                        None => {
-                            panic!(
-                                "[PANIC] InstrumentTick not found for {:?}",
-                                instrument.symbol
-                            );
-                        }
-                    };
+
+                    log::info!("[BACKTEST] Requesting Instrument Tick");
+
+                    let tick_endpoint = format!(
+                        "{}{}",
+                        env::var("BACKEND_BACKTEST_PRICING_ENDPOINT").unwrap(),
+                        instrument.symbol
+                    );
+
+                    let mut tick: InstrumentTick =
+                        request(&tick_endpoint, &String::from("all"), HttpMethod::Get)
+                            .await
+                            .unwrap()
+                            .json()
+                            .await
+                            .unwrap();
 
                     let backtest_result = dyn_clone::clone_box(strategy)
                         .test(

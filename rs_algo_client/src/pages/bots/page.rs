@@ -87,7 +87,7 @@ pub fn bots() -> Html {
             let use_chart_url = use_chart_url.clone();
             use_chart_url.set(chart_url.clone());
 
-            Interval::new(5000, move || {
+            Interval::new(2000, move || {
                 let date = Local::now();
                 let seconds = date.second();
                 let chart_url = chart_url.clone();
