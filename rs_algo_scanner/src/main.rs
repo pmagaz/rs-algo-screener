@@ -37,7 +37,7 @@ async fn main() -> Result<()> {
     let password = &env::var("BROKER_PASSWORD").unwrap();
     let sleep_time = &env::var("SLEEP_TIME").unwrap().parse::<u64>().unwrap();
     let time_frame_str = &env::var("TIME_FRAME").unwrap();
-    let execution_mode = mode::from_str(&env::var("EXECUTION_MODE").unwrap());
+    let execution_mode: ExecutionMode = mode::from_str(&env::var("EXECUTION_MODE").unwrap());
 
     let sleep = time::Duration::from_millis(*sleep_time);
     let time_frame = TimeFrame::new(time_frame_str);

@@ -35,6 +35,17 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactBotData>
             _ => {}
         }
     }
+
+    bots.sort_by(|a, b| {
+        if a.strategy_name.contains("Back") && !b.strategy_name.contains("Back") {
+            std::cmp::Ordering::Greater
+        } else if !a.strategy_name.contains("Back") && b.strategy_name.contains("Back") {
+            std::cmp::Ordering::Less
+        } else {
+            std::cmp::Ordering::Equal
+        }
+    });
+
     Ok(bots)
 }
 

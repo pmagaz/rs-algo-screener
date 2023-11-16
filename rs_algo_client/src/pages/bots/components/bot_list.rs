@@ -1,9 +1,16 @@
+use std::collections::HashMap;
 
-use rs_algo_shared::{models::{bot::CompactBotData, status::Status}, helpers::{status::*, date::{Local, Duration, self}}};
+use rs_algo_shared::{
+    helpers::{
+        date::{self, Duration, Local},
+        status::*,
+    },
+    models::{bot::CompactBotData, status::Status},
+};
 
-use wasm_bindgen::prelude::*;
-use yew::{function_component, html, Callback, Html, Properties};
 use round::round;
+use wasm_bindgen::prelude::*;
+use yew::{function_component, html, virtual_dom::VNode, Callback, Html, Properties};
 
 use crate::helpers::status::get_status_class;
 
@@ -40,69 +47,153 @@ pub fn bot_list(props: &Props) -> Html {
     let mut total_losing_trades = 0;
     let mut total_stop_losses = 0;
 
-    let  updated_timeout = Local::now() - Duration::seconds(70);
+    let updated_timeout = Local::now() - Duration::seconds(70);
+    let mut strategy_totals: HashMap<
+        String,
+        (
+            f64,
+            f64,
+            f64,
+            usize,
+            f64,
+            f64,
+            f64,
+            f64,
+            usize,
+            usize,
+            usize,
+        ),
+    > = HashMap::new();
+    let mut last_strategy = String::new();
+    let mut bot_list: Vec<VNode> = vec![];
+    let mut strategy_order: Vec<(String, f64)> = vec![];
 
-    let instrument_list: Html = bots
-        .iter()
-        .map(|bot| {
-            let on_bot_select = {
-                let on_bot_click = on_bot_click.clone();
-                let id = bot._id.clone();
-                let url = [url.clone(),id.to_string()].concat();
-                Callback::from(move |_| on_bot_click.emit(url.clone()))
-            };
+    for bot in bots.iter() {
+        let on_bot_select = {
+            let on_bot_click = on_bot_click.clone();
+            let id = bot._id.clone();
+            let bot_url = [url.clone(), id.to_string()].concat();
+            Callback::from(move |_| on_bot_click.emit(bot_url.clone()))
+        };
 
-            let stats = bot.strategy_stats.clone(); 
-            let num_trades = bot.strategy_stats.trades;
+        let stats = bot.strategy_stats.clone();
+        let num_trades = bot.strategy_stats.trades;
+        let profit_status = get_profit_per_status(stats.net_profit_per);
 
-            let profit_status = get_profit_per_status(stats.net_profit_per);
-
-            let (profit_factor_status, profitable_trades_status, max_drawdown_status) = match num_trades.cmp(&0) {
+        let (profit_factor_status, profitable_trades_status, max_drawdown_status) =
+            match num_trades.cmp(&0) {
                 std::cmp::Ordering::Greater => (
                     match stats.profitable_trades {
-                         x if x == 100. => Status::Neutral,
-                         _  => get_profit_factor_status(stats.profit_factor)
+                        x if x == 100. => Status::Neutral,
+                        _ => get_profit_factor_status(stats.profit_factor),
                     },
                     get_profitable_trades_status(stats.profitable_trades),
-                    get_max_drawdown_status(stats.max_drawdown)
+                    get_max_drawdown_status(stats.max_drawdown),
                 ),
-                _ => (Status::Neutral, Status::Neutral,Status::Neutral),
+                _ => (Status::Neutral, Status::Neutral, Status::Neutral),
             };
 
-            let avg_won_lost_status = match stats.won_per_trade_per {
-                _ if stats.won_per_trade_per > (stats.lost_per_trade_per * -1.) => Status::Bullish,
-                _ if stats.won_per_trade_per < (stats.lost_per_trade_per * -1.) => Status::Bearish,
-                _  => Status::Neutral
-            };
+        let avg_won_lost_status = match stats.won_per_trade_per {
+            _ if stats.won_per_trade_per > (stats.lost_per_trade_per * -1.) => Status::Bullish,
+            _ if stats.won_per_trade_per < (stats.lost_per_trade_per * -1.) => Status::Bearish,
+            _ => Status::Neutral,
+        };
 
-            let higher_time_frame = match &bot.higher_time_frame{
-                Some(htf) => htf.to_string(),
-                None => "".to_string()
-            };
+        let higher_time_frame = match &bot.higher_time_frame {
+            Some(htf) => htf.to_string(),
+            None => "".to_string(),
+        };
 
-            let last_updated = date::from_dbtime(&bot.last_update);
+        let last_updated = date::from_dbtime(&bot.last_update);
 
-            let updated_status = match last_updated.cmp(&updated_timeout){
-                    std::cmp::Ordering::Less => Status::Bearish,
-                    _ => Status::Default,
-            };
+        let updated_status = match last_updated.cmp(&updated_timeout) {
+            std::cmp::Ordering::Less => Status::Bearish,
+            _ => Status::Default,
+        };
 
-            total_profit += bot.strategy_stats.net_profit;
-            total_profit_per += bot.strategy_stats.net_profit_per;
-            total_profit_factor += bot.strategy_stats.profit_factor;
-            total_profitable_trades += bot.strategy_stats.profitable_trades;
-            total_max_drawdown += bot.strategy_stats.max_drawdown;
-            total_won_per_trade_per += bot.strategy_stats.won_per_trade_per;
-            total_lost_per_trade_per += bot.strategy_stats.lost_per_trade_per;
-            total_trades += num_trades;
-            total_winning_trades += bot.strategy_stats.wining_trades;
-            total_losing_trades += bot.strategy_stats.losing_trades;
-            total_stop_losses += bot.strategy_stats.stop_losses;
+        let strategy_entry = strategy_totals
+            .entry(bot.strategy_name.clone())
+            .or_insert((0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0., 0, 0, 0));
 
-      
+        strategy_entry.0 += bot.strategy_stats.net_profit;
+        strategy_entry.1 += bot.strategy_stats.net_profit_per;
+        strategy_entry.2 += bot.strategy_stats.profit_factor;
+        strategy_entry.3 += bot.strategy_stats.trades;
+        strategy_entry.4 += bot.strategy_stats.profitable_trades;
+        strategy_entry.5 += bot.strategy_stats.max_drawdown;
+        strategy_entry.6 += bot.strategy_stats.won_per_trade_per;
+        strategy_entry.7 += bot.strategy_stats.lost_per_trade_per;
+        strategy_entry.8 += bot.strategy_stats.wining_trades;
+        strategy_entry.9 += bot.strategy_stats.losing_trades;
+        strategy_entry.10 += bot.strategy_stats.stop_losses;
 
-            html! {
-                <tr  onclick={ on_bot_select }>
+        if last_strategy != bot.strategy_name {
+            if !last_strategy.is_empty() {
+                // Retrieve the subtotal data for the previous strategy
+                let (
+                    subtotal_profit,
+                    subtotal_profit_per,
+                    subtotal_profit_factor,
+                    subtotal_trades,
+                    subtotal_profitable_trades,
+                    subtotal_max_drawdown,
+                    subtotal_won_per_trade_per,
+                    subtotal_lost_per_trade_per,
+                    subtotal_winning_trades,
+                    subtotal_losing_trades,
+                    subtotal_stop_losses,
+                ) = strategy_totals[&last_strategy];
+
+                let profit_status = get_profit_per_status(subtotal_profit);
+                let total_profit_per_status = get_profit_per_status(subtotal_profit_per);
+                let profit_factor_status = get_profit_factor_status(subtotal_profit_factor);
+                let profitable_trades_status =
+                    get_profitable_trades_status(subtotal_profitable_trades);
+                let profitable_trades_status =
+                    get_profitable_trades_status(subtotal_profitable_trades);
+                let max_drawdown_status = get_max_drawdown_status(subtotal_max_drawdown);
+                // let avg_won_lost_status = match subtotal_won_per_trade_per {
+                //     _ if subtotal_won_per_trade_per > (subtotal_lost_per_trade_per * -1.) => {
+                //         Status::Bullish
+                //     }
+                //     _ if subtotal_won_per_trade_per < (subtotal_lost_per_trade_per * -1.) => {
+                //         Status::Bearish
+                //     }
+                //     _ => Status::Neutral,
+                // };
+
+                let num_strategy_items = bots
+                    .iter()
+                    .filter(|item| item.strategy_name == last_strategy)
+                    .count() as f64;
+
+                bot_list.push(html! {
+                        <tr>
+                        <td>{ "TOTAL" }</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class={get_status_class(&profit_status)}> {format!("{} €", round(subtotal_profit, 2))}</td>
+                        <td class={get_status_class(&total_profit_per_status)}>  {format!("{}%", round(subtotal_profit_per, 2))}</td>
+                        <td class={get_status_class(&profit_factor_status)}> {round(subtotal_profit_factor / num_strategy_items, 2)}</td>
+                        <td class={get_status_class(&profitable_trades_status)}>{ format!("{} %", round(subtotal_profitable_trades / num_strategy_items, 2)) }</td>
+                        <td class={get_status_class(&max_drawdown_status)}> {format!("{}%", round(subtotal_max_drawdown, 2))}</td>
+                        <td> {format!("{}%", round(subtotal_won_per_trade_per / num_strategy_items, 2))}</td>
+                        <td> {format!("{}%", round(subtotal_lost_per_trade_per / num_strategy_items, 2))}</td>
+                         <td>{ subtotal_trades }</td>
+                        <td> {format!("{} / {} / {}", subtotal_winning_trades, subtotal_losing_trades, subtotal_stop_losses )}</td>
+                        <td></td>
+                    </tr>
+                });
+
+                strategy_order.push((last_strategy, subtotal_profit_factor));
+            }
+
+            last_strategy = bot.strategy_name.clone();
+        }
+
+        bot_list.push(html! {
+                    <tr style="opacity: 0.7;" onclick={ on_bot_select }>
                     <td> { bot.symbol.clone() } </td>
                     <td> { bot.strategy_name.clone() } </td>
                     <td> { bot.strategy_type.clone() } </td>
@@ -118,9 +209,24 @@ pub fn bot_list(props: &Props) -> Html {
                     <td> {format!("{} / {} / {}", bot.strategy_stats.wining_trades, bot.strategy_stats.losing_trades, bot.strategy_stats.stop_losses )}</td>
                     <td class={get_status_class(&updated_status)}> {format!("{}", bot.last_update.to_chrono().format("%H:%M:%S"))}</td>
                 </tr>
-            }
-        })
-        .collect();
+            });
+
+        if !bot.strategy_name.contains("Back") {
+            total_profit += bot.strategy_stats.net_profit;
+            total_profit_per += bot.strategy_stats.net_profit_per;
+            total_profit_factor += bot.strategy_stats.profit_factor;
+            total_profitable_trades += bot.strategy_stats.profitable_trades;
+            total_max_drawdown += bot.strategy_stats.max_drawdown;
+            total_won_per_trade_per += bot.strategy_stats.won_per_trade_per;
+            total_lost_per_trade_per += bot.strategy_stats.lost_per_trade_per;
+            total_trades += num_trades;
+            total_winning_trades += bot.strategy_stats.wining_trades;
+            total_losing_trades += bot.strategy_stats.losing_trades;
+            total_stop_losses += bot.strategy_stats.stop_losses;
+        }
+    }
+
+    strategy_order.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
 
     let total_profit_status = get_profit_per_status(total_profit);
     let total_profit_per_status = get_profit_per_status(total_profit_per);
@@ -129,42 +235,42 @@ pub fn bot_list(props: &Props) -> Html {
     let total_max_drawdown_status = get_max_drawdown_status(total_max_drawdown);
 
     let table = html! {
-        <table class="table is-bordered">
+          <table class="table is-bordered">
             <thead class="has-background-grey-lighter">
                 <tr>
-                <th>{ "Symbol" }</th>
-                <th>{ "Strategy" }</th>
-                <th>{ "Type" }</th>
-                <th>{ "T.Frame" }</th>
-                <th>{ "Profit" }</th>
-                <th>{ "% Profit" }</th>
-                <th>{ "P. Factor" }</th>
-                <th>{ "WinRate" }</th>
-                <th>{ "Drawdown" }</th>
-                <th>{ "Avg Won" }</th>
-                <th>{ "Avg Lost" }</th>
-                <th>{ "Trades" }</th>
-                <th>{ "Wo. / Lo. / St" }</th>
-                <th>{ "Updated" }</th>
+                    <th>{ "Symbol" }</th>
+                    <th>{ "Strategy" }</th>
+                    <th>{ "Type" }</th>
+                    <th>{ "T.Frame" }</th>
+                    <th>{ "Profit" }</th>
+                    <th>{ "% Profit" }</th>
+                    <th>{ "P. Factor" }</th>
+                    <th>{ "WinRate" }</th>
+                    <th>{ "Drawdown" }</th>
+                    <th>{ "Avg Won" }</th>
+                    <th>{ "Avg Lost" }</th>
+                    <th>{ "Trades" }</th>
+                    <th>{ "Wo. / Lo. / St" }</th>
+                    <th>{ "Updated" }</th>
                 </tr>
             </thead>
             <tbody>
-                { instrument_list }
+                { bot_list }
                 <tr>
-                <td>{ "TOTAL" }</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class={get_status_class(&total_profit_status)}>{ format!("{} €", round(total_profit,2)) }</td>
-                <td class={get_status_class(&total_profit_per_status)}>{ format!("{} %", round(total_profit_per,2)) }</td>
-                <td class={get_status_class(&total_profit_factor_status)}>{ round(total_profit_factor / bots.len() as f64, 2)}</td>
-                <td class={get_status_class(&total_profitable_trades_status)}>{ format!("{} %", round(total_profitable_trades / bots.len() as f64, 2)) }</td>
-                <td class={get_status_class(&total_max_drawdown_status)}>{ format!("{} %", round(total_max_drawdown, 2)) }</td>
-                <td>{ round(total_won_per_trade_per / bots.len() as f64, 2)}</td>
-                <td>{ round(total_lost_per_trade_per / bots.len() as f64, 2)}</td>
-                <td>{ total_trades }</td>
-                <td> {format!("{} / {} / {}", total_winning_trades, total_losing_trades, total_stop_losses )}</td>
-                <td></td>
+                    <td>{ "TOTAL" }</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class={get_status_class(&total_profit_status)}>{ format!("{} €", round(total_profit,2)) }</td>
+                    <td class={get_status_class(&total_profit_per_status)}>{ format!("{} %", round(total_profit_per,2)) }</td>
+                    <td class={get_status_class(&total_profit_factor_status)}>{ round(total_profit_factor / bots.len() as f64, 2)}</td>
+                    <td class={get_status_class(&total_profitable_trades_status)}>{ format!("{} %", round(total_profitable_trades / bots.len() as f64, 2)) }</td>
+                    <td class={get_status_class(&total_max_drawdown_status)}>{ format!("{} %", round(total_max_drawdown, 2)) }</td>
+                    <td>{ round(total_won_per_trade_per / bots.len() as f64, 2)}</td>
+                    <td>{ round(total_lost_per_trade_per / bots.len() as f64, 2)}</td>
+                    <td>{ total_trades }</td>
+                    <td> {format!("{} / {} / {}", total_winning_trades, total_losing_trades, total_stop_losses )}</td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
