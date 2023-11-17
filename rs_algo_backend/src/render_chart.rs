@@ -177,15 +177,9 @@ impl Backend {
         let macd_a = &macd.get_data_a();
         let macd_b = &macd.get_data_b();
 
-        let _rsi = &instrument.indicators.rsi.get_data_a();
-
-        let _ema_a = &instrument.indicators.ema_a.get_data_a();
-        let _ema_b = &instrument.indicators.ema_b.get_data_a();
-        let _ema_c = &instrument.indicators.ema_c.get_data_a();
-
-        // let bb_a = &instrument.indicators.bb.get_data_a();
-        // let bb_b = &instrument.indicators.bb.get_data_b();
-        // let bb_c = &instrument.indicators.bb.get_data_c();
+        let bb_a = &instrument.indicators.bb.get_data_a();
+        let bb_b = &instrument.indicators.bb.get_data_b();
+        let bb_c = &instrument.indicators.bb.get_data_c();
 
         let root = BitMapBackend::new(&output_file, (1821, 865)).into_drawing_area();
         let (upper, lower) = root.split_vertically((91).percent());
@@ -691,49 +685,49 @@ impl Backend {
 
         //BOLLINGER BANDS
 
-        // if !bb_a.is_empty() {
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(data.iter())
-        //                 .map(|(id, candle)| (candle.date, bb_a[id])),
-        //             &BLUE_LINE2,
-        //         ))
-        //         .unwrap();
+        if !bb_a.is_empty() {
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_a[id])),
+                    &BLUE_LINE2,
+                ))
+                .unwrap();
 
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(data.iter())
-        //                 .map(|(id, candle)| (candle.date, bb_b[id])),
-        //             &BLUE_LINE2,
-        //         ))
-        //         .unwrap();
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_b[id])),
+                    &BLUE_LINE2,
+                ))
+                .unwrap();
 
-        //     chart
-        //         .draw_series(LineSeries::new(
-        //             (0..)
-        //                 .zip(data.iter())
-        //                 .map(|(id, candle)| (candle.date, bb_c[id])),
-        //             &BLUE_LINE2,
-        //         ))
-        //         .unwrap();
-        // }
+            chart
+                .draw_series(LineSeries::new(
+                    (0..)
+                        .zip(data.iter())
+                        .map(|(id, candle)| (candle.date, bb_c[id])),
+                    &BLUE_LINE2,
+                ))
+                .unwrap();
+        }
 
         // //HTF INDICATORS
         match htf_instrument {
             HTFInstrument::HTFInstrument(htf_instrument) => {
-                let macd = &htf_instrument.indicators().macd();
+                let atr = &htf_instrument.indicators().atr();
+                let atr_a = &atr.get_data_a();
                 let htf_ema_a = &htf_instrument.indicators().ema_a().get_data_a();
                 let htf_ema_b = &htf_instrument.indicators().ema_b().get_data_a();
-                let _htf_ema_c = &htf_instrument.indicators().ema_c().get_data_a();
-                let htf_macd_a = macd.get_data_a();
-                let htf_macd_b = macd.get_data_b();
-                let max_macd = htf_macd_a
+                // let htf_macd_b = macd.get_data_b();
+                let min_atr = atr_a
                     .iter()
                     .max_by(|x, y| x.partial_cmp(y).unwrap())
                     .unwrap();
-                let min_macd = htf_macd_a
+
+                let max_atr = atr_a
                     .iter()
                     .min_by(|x, y| x.partial_cmp(y).unwrap())
                     .unwrap();
@@ -741,7 +735,7 @@ impl Backend {
                 let mut indicator_panel = ChartBuilder::on(&lower)
                     .x_label_area_size(40)
                     .y_label_area_size(40)
-                    .build_cartesian_2d(from_date..to_date, *min_macd..*max_macd)
+                    .build_cartesian_2d(from_date..to_date, *min_atr..*max_atr)
                     .unwrap();
 
                 let mut result: Vec<(DateTime<Local>, usize)> = vec![];
@@ -765,20 +759,20 @@ impl Backend {
                     }
                 }
 
-                indicator_panel
-                    .draw_series(LineSeries::new(
-                        (0..)
-                            .zip(result.iter())
-                            .map(|(_id, data)| (data.0, htf_macd_a[data.1])),
-                        BLUE_LINE3.mix(0.6),
-                    ))
-                    .unwrap();
+                // indicator_panel
+                //     .draw_series(LineSeries::new(
+                //         (0..)
+                //             .zip(result.iter())
+                //             .map(|(_id, data)| (data.0, atr_a[data.1])),
+                //         BLUE_LINE3.mix(0.6),
+                //     ))
+                //     .unwrap();
 
                 indicator_panel
                     .draw_series(LineSeries::new(
                         (0..)
                             .zip(result.iter())
-                            .map(|(_id, data)| (data.0, htf_macd_b[data.1])),
+                            .map(|(_id, data)| (data.0, atr_a[data.1])),
                         RED_LINE.mix(0.6),
                     ))
                     .unwrap();

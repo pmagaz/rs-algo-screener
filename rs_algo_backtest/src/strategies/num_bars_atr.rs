@@ -148,9 +148,8 @@ impl<'a> Strategy for NumBars<'a> {
                     (numerator / denominator) * 100.0
                 };
 
-                let has_min_distance = true; //percentage_diff > ema_percentage_dis;
-                let is_long = htf_ema_a > htf_ema_b && has_min_distance;
-                let is_short = htf_ema_a < htf_ema_b && has_min_distance;
+                let is_long = htf_ema_a > htf_ema_b;
+                let is_short = htf_ema_a < htf_ema_b;
 
                 if is_long {
                     TradeDirection::Long
