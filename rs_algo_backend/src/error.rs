@@ -25,6 +25,8 @@ pub enum RsAlgoError {
     NoDbConnection,
     #[error("Invalid Token")]
     InvalidToken,
+    #[error("Error reading file")]
+    File,
 }
 
 impl RsAlgoError {
@@ -36,6 +38,7 @@ impl RsAlgoError {
             Self::NoUserFound => "NoUserFound".to_string(),
             Self::NoDbConnection => "NoDbConnection".to_string(),
             Self::InvalidToken => "InvalidToken".to_string(),
+            Self::File => "File".to_string(),
         }
     }
 }
@@ -48,6 +51,7 @@ impl ResponseError for RsAlgoError {
             Self::Unknown => StatusCode::INTERNAL_SERVER_ERROR,
             Self::NoUserFound => StatusCode::FORBIDDEN,
             Self::NoDbConnection => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::File => StatusCode::INTERNAL_SERVER_ERROR,
             Self::InvalidToken => StatusCode::UNAUTHORIZED,
         }
     }
