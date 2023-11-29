@@ -206,7 +206,10 @@ pub fn bot_list(props: &Props) -> Html {
     }
 
     strategy_order.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-    let num_bots = bots.len();
+    let num_bots = bots
+        .iter()
+        .filter(|bot| !bot.strategy_name.contains("Back"))
+        .count();
     let total_profit_factor = total_profit_factor / num_bots as f64;
     let total_profitable_trades = total_profitable_trades / num_bots as f64;
     let total_won_per_trade_per = total_won_per_trade_per / num_bots as f64;

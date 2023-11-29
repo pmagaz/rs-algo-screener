@@ -135,7 +135,7 @@ impl General {
                 // ]},
                 { "symbol": { "$in": [ "BITCOIN","ETHEREUM","RIPPLE","DOGECOIN","CARDANO","BINANCECOIN","SOLANA","STELLAR","POLKADOT"] } },
                 { "symbol": { "$in": [ "US500","US100","GOLD","OIL","SILVER"] } },
-                { "symbol": { "$in": [ "AUDCAD","AUDCHF","EURUSD","AUDNZD","AUDUSD","CADCHF","CADJPY","CHFJPY","EURAUD","EURCAD","EURCHF","EURGBP","EURUSD","GBPUSD","USDCHF","USDJPY","NZDUSD"] } },
+                { "symbol": { "$in": [ "AUDCAD","AUDCHF","EURUSD","AUDNZD","AUDUSD","CADCHF","CADJPY","CHFJPY","EURAUD","EURCAD","AUDNZD","EURGBP","EURUSD","GBPUSD","USDCHF","USDJPY","NZDUSD"] } },
             ]}]}
     }
 

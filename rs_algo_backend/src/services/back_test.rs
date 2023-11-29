@@ -3,15 +3,12 @@ use crate::error::RsAlgoError;
 use crate::models::app_state::AppState;
 use crate::render_chart::Backend;
 
-use csv::{ReaderBuilder, StringRecord};
-use rs_algo_shared::broker::DOHLC;
 use rs_algo_shared::helpers::date::*;
 use rs_algo_shared::models::backtest_instrument::*;
 use rs_algo_shared::models::backtest_strategy::BackTestStrategyResult;
 use rs_algo_shared::models::mode::*;
 use rs_algo_shared::models::order::Order;
 use rs_algo_shared::models::tick::InstrumentTick;
-use rs_algo_shared::models::time_frame::TimeFrameType;
 use rs_algo_shared::models::trade::{TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 
@@ -19,10 +16,7 @@ use actix_files as fs;
 use actix_web::{web, HttpResponse};
 use bson::doc;
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
 use std::env;
-use std::fs::File;
-use std::path::Path;
 use std::path::PathBuf;
 use std::time::Instant;
 
@@ -394,107 +388,113 @@ pub async fn chart(
     Ok(file.use_last_modified(true))
 }
 
-pub async fn find_mock(
-    path: web::Path<(String, String, u32)>,
-    state: web::Data<AppState>,
-) -> Result<HttpResponse, RsAlgoError> {
-    let now = Instant::now();
-    let (symbol, time_frame, limit) = path.into_inner();
+// pub async fn find_mock(
+//     path: web::Path<(String, String, u32)>,
+//     state: web::Data<AppState>,
+// ) -> Result<HttpResponse, RsAlgoError> {
+//     let now = Instant::now();
+//     let (symbol, time_frame, limit) = path.into_inner();
 
-    let time_frame = TimeFrameType::from_str(&time_frame);
-    let instrument = read_csv(&symbol, &time_frame, limit).await?;
+//     let time_frame = TimeFrameType::from_str(&time_frame);
+//     let instrument = read_csv(&symbol, &time_frame, limit).await?;
 
-    Ok(HttpResponse::Ok().json(instrument))
-}
+//     Ok(HttpResponse::Ok().json(instrument))
+// }
 
-fn round_down_to_interval(time: DateTime<Local>, time_frame: &TimeFrameType) -> DateTime<Local> {
-    match time_frame {
-        TimeFrameType::M5 => {
-            time - Duration::minutes(time.minute() as i64 % 5)
-                - Duration::seconds(time.second() as i64)
-                - Duration::nanoseconds(time.nanosecond() as i64)
-        }
-        TimeFrameType::M15 => {
-            time - Duration::minutes(time.minute() as i64 % 15)
-                - Duration::seconds(time.second() as i64)
-                - Duration::nanoseconds(time.nanosecond() as i64)
-        }
-        TimeFrameType::M30 => {
-            time - Duration::minutes(time.minute() as i64 % 30)
-                - Duration::seconds(time.second() as i64)
-                - Duration::nanoseconds(time.nanosecond() as i64)
-        }
-        TimeFrameType::H1 => time
-            .with_minute(0)
-            .unwrap()
-            .with_second(0)
-            .unwrap()
-            .with_nanosecond(0)
-            .unwrap(),
-        TimeFrameType::H4 => {
-            let hour_rounded = time.hour() - (time.hour() % 4);
-            time.with_hour(hour_rounded)
-                .unwrap()
-                .with_minute(0)
-                .unwrap()
-                .with_second(0)
-                .unwrap()
-                .with_nanosecond(0)
-                .unwrap()
-        }
-        _ => time,
-    }
-}
+// fn round_down_to_interval(time: DateTime<Local>, time_frame: &TimeFrameType) -> DateTime<Local> {
+//     match time_frame {
+//         TimeFrameType::M5 => {
+//             time - Duration::minutes(time.minute() as i64 % 5)
+//                 - Duration::seconds(time.second() as i64)
+//                 - Duration::nanoseconds(time.nanosecond() as i64)
+//         }
+//         TimeFrameType::M15 => {
+//             time - Duration::minutes(time.minute() as i64 % 15)
+//                 - Duration::seconds(time.second() as i64)
+//                 - Duration::nanoseconds(time.nanosecond() as i64)
+//         }
+//         TimeFrameType::M30 => {
+//             time - Duration::minutes(time.minute() as i64 % 30)
+//                 - Duration::seconds(time.second() as i64)
+//                 - Duration::nanoseconds(time.nanosecond() as i64)
+//         }
+//         TimeFrameType::H1 => time
+//             .with_minute(0)
+//             .unwrap()
+//             .with_second(0)
+//             .unwrap()
+//             .with_nanosecond(0)
+//             .unwrap(),
+//         TimeFrameType::H4 => {
+//             let hour_rounded = time.hour() - (time.hour() % 4);
+//             time.with_hour(hour_rounded)
+//                 .unwrap()
+//                 .with_minute(0)
+//                 .unwrap()
+//                 .with_second(0)
+//                 .unwrap()
+//                 .with_nanosecond(0)
+//                 .unwrap()
+//         }
+//         _ => time,
+//     }
+// }
 
-async fn read_csv(
-    symbol: &str,
-    time_frame: &TimeFrameType,
-    records_limit: u32,
-) -> Result<Vec<DOHLC>, RsAlgoError> {
-    let file_path = format!("rs_algo_backend/data/{}_{}.csv", symbol, "M1");
-    let file = File::open(Path::new(&file_path)).map_err(|_| RsAlgoError::File)?;
+// async fn read_csv(
+//     symbol: &str,
+//     time_frame: &TimeFrameType,
+//     records_limit: u32,
+// ) -> Result<Vec<DOHLC>, RsAlgoError> {
+//     let file_path = &format!(
+//         "{}{}_{}.csv",
+//         env::var("BACKEND_HISTORIC_DATA_FOLDER").unwrap(),
+//         symbol,
+//         "M1",
+//     );
 
-    let mut rdr = ReaderBuilder::new().has_headers(false).from_reader(file);
+//     let file = File::open(Path::new(&file_path)).map_err(|_| RsAlgoError::File)?;
 
-    let mut count = 0;
-    let mut data: BTreeMap<DateTime<Local>, (f64, f64, f64, f64, f64)> = BTreeMap::new();
-    for result in rdr.records() {
-        if records_limit != 0 && count >= records_limit {
-            break;
-        }
-        let record: StringRecord = result.map_err(|_| RsAlgoError::File)?;
-        let date_str = format!("{} {}", &record[0], &record[1]);
-        let date_time = Local
-            .datetime_from_str(&date_str, "%Y.%m.%d %H:%M")
-            .map_err(|_| RsAlgoError::File)?;
+//     let mut rdr = ReaderBuilder::new().has_headers(false).from_reader(file);
 
-        let open = record[2].parse::<f64>().map_err(|_| RsAlgoError::File)?;
-        let high = record[3].parse::<f64>().map_err(|_| RsAlgoError::File)?;
-        let low = record[4].parse::<f64>().map_err(|_| RsAlgoError::File)?;
-        let close = record[5].parse::<f64>().map_err(|_| RsAlgoError::File)?;
-        let volume = record[6].parse::<f64>().map_err(|_| RsAlgoError::File)?;
+//     let mut count = 0;
+//     let mut data: BTreeMap<DateTime<Local>, (f64, f64, f64, f64, f64)> = BTreeMap::new();
+//     for result in rdr.records() {
+//         if records_limit != 0 && count >= records_limit {
+//             break;
+//         }
+//         let record: StringRecord = result.map_err(|_| RsAlgoError::File)?;
+//         let date_str = format!("{} {}", &record[0], &record[1]);
+//         let date_time = Local
+//             .datetime_from_str(&date_str, "%Y.%m.%d %H:%M")
+//             .map_err(|_| RsAlgoError::File)?;
 
-        let rounded_datetime = round_down_to_interval(date_time, time_frame);
-        data.entry(rounded_datetime)
-            .and_modify(|e| {
-                e.0 = if e.0 == 0.0 { open } else { e.0 };
-                e.1 = e.1.max(high);
-                e.2 = e.2.min(low);
-                e.3 = close;
-                e.4 += volume;
-            })
-            .or_insert((open, high, low, close, volume));
+//         let open = record[2].parse::<f64>().map_err(|_| RsAlgoError::File)?;
+//         let high = record[3].parse::<f64>().map_err(|_| RsAlgoError::File)?;
+//         let low = record[4].parse::<f64>().map_err(|_| RsAlgoError::File)?;
+//         let close = record[5].parse::<f64>().map_err(|_| RsAlgoError::File)?;
+//         let volume = record[6].parse::<f64>().map_err(|_| RsAlgoError::File)?;
 
-        count += 1;
-    }
+//         let rounded_datetime = round_down_to_interval(date_time, time_frame);
+//         data.entry(rounded_datetime)
+//             .and_modify(|e| {
+//                 e.0 = if e.0 == 0.0 { open } else { e.0 };
+//                 e.1 = e.1.max(high);
+//                 e.2 = e.2.min(low);
+//                 e.3 = close;
+//                 e.4 += volume;
+//             })
+//             .or_insert((open, high, low, close, volume));
 
-    let final_data = data
-        .into_iter()
-        .map(|(dt, ohlc)| (dt, ohlc.0, ohlc.1, ohlc.2, ohlc.3, ohlc.4))
-        .collect();
+//         count += 1;
+//     }
 
-    Ok(final_data)
-}
+//     let final_data = data
+//         .into_iter()
+//         .map(|(dt, ohlc)| (dt, ohlc.0, ohlc.1, ohlc.2, ohlc.3, ohlc.4))
+//         .collect();
+
+//     Ok(final_data)
+// }
 
 // fn convert_m1(
 //     symbol: &str,

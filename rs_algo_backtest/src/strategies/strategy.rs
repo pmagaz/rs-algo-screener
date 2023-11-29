@@ -171,16 +171,16 @@ pub trait Strategy: DynClone {
 
                 let pending_orders = order::get_pending(&orders);
 
-                let active_orders_result = self.resolve_pending_orders(
+                let active_orders_result = self.pending_orders_activated(
                     index,
                     instrument,
-                    tick,
-                    trade_size,
                     &pending_orders,
                     &trades_in,
+                    Some(tick),
+                    false,
                 );
 
-                let trading_direction = &self
+                let trade_direction = &self
                     .trading_direction(index, instrument, htf_instrument)
                     .clone();
 
@@ -210,8 +210,8 @@ pub trait Strategy: DynClone {
                         index,
                         instrument,
                         htf_instrument,
-                        tick,
                         trade_in,
+                        tick,
                     );
 
                     match exit_result {
@@ -232,11 +232,10 @@ pub trait Strategy: DynClone {
                         index,
                         instrument,
                         htf_instrument,
-                        tick,
                         &orders,
                         &trades_out,
-                        trade_size,
-                        trading_direction,
+                        trade_direction,
+                        tick,
                     );
 
                     match entry_position_result {
@@ -273,13 +272,12 @@ pub trait Strategy: DynClone {
         index: usize,
         instrument: &Instrument,
         htf_instrument: &HTFInstrument,
-        tick: &InstrumentTick,
         orders: &Vec<Order>,
         trades_out: &Vec<TradeOut>,
-        trade_size: f64,
         trade_direction: &TradeDirection,
+        tick: &InstrumentTick,
     ) -> PositionResult {
-        let pending_orders = order::get_pending(orders);
+        let trade_size = env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
         let overwrite_orders = env::var("OVERWRITE_ORDERS")
             .unwrap()
@@ -291,8 +289,9 @@ pub trait Strategy: DynClone {
             .parse::<bool>()
             .unwrap();
 
-        let wait_for_new_trade = trade::wait_for_new_trade(index, instrument, trades_out);
+        let pending_orders = order::get_pending(orders);
 
+        let wait_for_new_trade = trade::wait_for_new_trade(index, instrument, trades_out);
         match wait_for_new_trade {
             false => match trade_direction.is_long() || !trading_direction {
                 true => match self.is_long_strategy() {
@@ -303,13 +302,13 @@ pub trait Strategy: DynClone {
                                 index,
                                 trade_size,
                                 instrument,
-                                tick,
                                 &trade_type,
                                 None,
+                                tick,
                             );
 
                             let prepared_orders = order_types.map(|orders| {
-                                order::prepare_orders(index, instrument, tick, &trade_type, &orders)
+                                order::prepare_orders(index, instrument, &trade_type, &orders, tick)
                             });
 
                             let new_orders = match overwrite_orders {
@@ -320,6 +319,8 @@ pub trait Strategy: DynClone {
                                 },
                             };
 
+                            log::info!("New Position: {:?}", trade_type);
+
                             PositionResult::MarketIn(trade_in_result, new_orders)
                         }
                         Position::Order(order_types) => {
@@ -328,9 +329,9 @@ pub trait Strategy: DynClone {
                             let prepared_orders = order::prepare_orders(
                                 index,
                                 instrument,
-                                tick,
                                 &trade_type,
                                 &order_types,
+                                tick,
                             );
 
                             let new_orders = match overwrite_orders {
@@ -340,6 +341,8 @@ pub trait Strategy: DynClone {
                                     _ => vec![],
                                 },
                             };
+
+                            log_created_orders(&new_orders);
 
                             PositionResult::PendingOrder(new_orders)
                         }
@@ -358,13 +361,13 @@ pub trait Strategy: DynClone {
                                 index,
                                 trade_size,
                                 instrument,
-                                tick,
                                 &trade_type,
                                 None,
+                                tick,
                             );
 
                             let prepared_orders = order_types.map(|orders| {
-                                order::prepare_orders(index, instrument, tick, &trade_type, &orders)
+                                order::prepare_orders(index, instrument, &trade_type, &orders, tick)
                             });
 
                             let new_orders = match overwrite_orders {
@@ -375,6 +378,8 @@ pub trait Strategy: DynClone {
                                 },
                             };
 
+                            log::info!("New Position: {:?}", trade_type);
+
                             PositionResult::MarketIn(trade_in_result, new_orders)
                         }
                         Position::Order(order_types) => {
@@ -383,9 +388,9 @@ pub trait Strategy: DynClone {
                             let prepared_orders = order::prepare_orders(
                                 index,
                                 instrument,
-                                tick,
                                 &trade_type,
                                 &order_types,
+                                tick,
                             );
 
                             let new_orders = match overwrite_orders {
@@ -395,6 +400,8 @@ pub trait Strategy: DynClone {
                                     _ => vec![],
                                 },
                             };
+
+                            log_created_orders(&new_orders);
 
                             PositionResult::PendingOrder(new_orders)
                         }
@@ -414,82 +421,101 @@ pub trait Strategy: DynClone {
         index: usize,
         instrument: &Instrument,
         htf_instrument: &HTFInstrument,
-        tick: &InstrumentTick,
         trade_in: &TradeIn,
+        tick: &InstrumentTick,
     ) -> PositionResult {
-        match trade_in.trade_type.is_long_entry() {
-            //match self.is_long_strategy() {
-            true => match self.exit_long(index, instrument, htf_instrument, trade_in, tick) {
-                Position::MarketOut(_) => {
-                    let trade_type = TradeType::MarketOutLong;
-                    let trade_out_result = trade::resolve_trade_out(
-                        index,
-                        instrument,
-                        tick,
-                        trade_in,
-                        &trade_type,
-                        None,
-                    );
-                    PositionResult::MarketOut(trade_out_result)
-                }
-                Position::Order(order_types) => {
-                    let trade_type = TradeType::OrderOutLong;
-                    let orders =
-                        order::prepare_orders(index, instrument, tick, &trade_type, &order_types);
-                    PositionResult::PendingOrder(orders)
-                }
-                _ => PositionResult::None,
-            },
-            false => match self.exit_short(index, instrument, htf_instrument, trade_in, tick) {
-                Position::MarketOut(_) => {
-                    let trade_type = TradeType::MarketOutShort;
-                    let trade_out_result = trade::resolve_trade_out(
-                        index,
-                        instrument,
-                        tick,
-                        trade_in,
-                        &trade_type,
-                        None,
-                    );
+        let wait_for_closing_trade = trade::wait_for_closing_trade(index, instrument, trade_in);
 
-                    PositionResult::MarketOut(trade_out_result)
-                }
-                Position::Order(order_types) => {
-                    let trade_type = TradeType::OrderOutShort;
-                    let orders =
-                        order::prepare_orders(index, instrument, tick, &trade_type, &order_types);
-                    PositionResult::PendingOrder(orders)
-                }
-                _ => PositionResult::None,
+        match wait_for_closing_trade {
+            true => match trade_in.trade_type.is_long_entry() {
+                true => match self.exit_long(index, instrument, htf_instrument, trade_in, tick) {
+                    Position::MarketOut(_) => {
+                        let trade_type = TradeType::MarketOutLong;
+                        let trade_out_result = trade::resolve_trade_out(
+                            index,
+                            instrument,
+                            trade_in,
+                            &trade_type,
+                            None,
+                            tick,
+                        );
+                        PositionResult::MarketOut(trade_out_result)
+                    }
+                    Position::Order(order_types) => {
+                        let trade_type = TradeType::OrderOutLong;
+                        let orders = order::prepare_orders(
+                            index,
+                            instrument,
+                            &trade_type,
+                            &order_types,
+                            tick,
+                        );
+                        PositionResult::PendingOrder(orders)
+                    }
+                    _ => PositionResult::None,
+                },
+                false => match self.exit_short(index, instrument, htf_instrument, trade_in, tick) {
+                    Position::MarketOut(_) => {
+                        let trade_type = TradeType::MarketOutShort;
+                        let trade_out_result = trade::resolve_trade_out(
+                            index,
+                            instrument,
+                            trade_in,
+                            &trade_type,
+                            None,
+                            tick,
+                        );
+
+                        PositionResult::MarketOut(trade_out_result)
+                    }
+                    Position::Order(order_types) => {
+                        let trade_type = TradeType::OrderOutShort;
+                        let orders = order::prepare_orders(
+                            index,
+                            instrument,
+                            &trade_type,
+                            &order_types,
+                            tick,
+                        );
+                        PositionResult::PendingOrder(orders)
+                    }
+                    _ => PositionResult::None,
+                },
             },
+            false => PositionResult::None,
         }
     }
 
-    fn resolve_pending_orders(
+    fn pending_orders_activated(
         &mut self,
         index: usize,
         instrument: &Instrument,
-        tick: &InstrumentTick,
-        trade_size: f64,
         pending_orders: &Vec<Order>,
         trades_in: &Vec<TradeIn>,
+        tick: Option<&InstrumentTick>,
+        use_tick_price: bool,
     ) -> PositionResult {
-        match resolve_active_orders(index, instrument, pending_orders, tick) {
+        let tick = tick.expect("Failed to unwrap Tick: None");
+        match order::resolve_active_orders(index, instrument, pending_orders, tick, use_tick_price)
+        {
             Position::MarketInOrder(mut order) => {
+                let order_size = order.size();
                 let trade_type = order.to_trade_type();
+
                 let trade_in_result = trade::resolve_trade_in(
                     index,
-                    trade_size,
+                    order_size,
                     instrument,
-                    tick,
                     &trade_type,
                     Some(&order),
+                    tick,
                 );
 
                 let trade_id = match &trade_in_result {
                     TradeResult::TradeIn(trade_in) => trade_in.id,
                     _ => 0,
                 };
+                log::info!("Order activated: {:?} ", order.order_type);
 
                 order.set_trade_id(trade_id);
                 PositionResult::MarketInOrder(trade_in_result, order)
@@ -500,13 +526,15 @@ pub trait Strategy: DynClone {
                     Some(trade_in) => trade::resolve_trade_out(
                         index,
                         instrument,
-                        tick,
                         trade_in,
                         &trade_type,
                         Some(&order),
+                        tick,
                     ),
                     None => TradeResult::None,
                 };
+
+                log::info!("Order activated: {:?} ", order.order_type);
 
                 PositionResult::MarketOutOrder(trade_out_result, order)
             }
@@ -517,6 +545,22 @@ pub trait Strategy: DynClone {
     fn there_are_funds(&mut self, trades_out: &Vec<TradeOut>) -> bool {
         let profit: f64 = trades_out.iter().map(|trade| trade.profit_per).sum();
         profit > -90.
+    }
+}
+fn log_created_orders(orders: &[Order]) {
+    let orders_created: Vec<&OrderType> =
+        orders
+            .iter()
+            .map(|order| &order.order_type)
+            .fold(Vec::new(), |mut acc, order_type| {
+                if !acc.contains(&order_type) {
+                    acc.push(order_type);
+                }
+                acc
+            });
+
+    if orders_created.len() > 0 {
+        log::info!("Orders created: {:?}", orders_created);
     }
 }
 

@@ -53,7 +53,7 @@ pub fn resolve_backtest(
         let initial_order_amount = (first.price_in * first.quantity).ceil();
         let profit_factor = total_profit_factor(gross_profits, gross_loses);
 
-        let net_profit_per = total_profit_per(equity, net_profit, &trades_in, &trades_out);
+        let net_profit_per = total_profit_per(&trades_out);
         //let net_profit_per = total_profit_per(equity, net_profit);
         let profitable_trades = total_profitable_trades(wining_trades, trades);
         let max_drawdown = match instrument.market() {

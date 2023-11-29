@@ -116,10 +116,6 @@ async fn main() -> Result<()> {
                         web::get().to(back_test::find_one),
                     )
                     .route(
-                        "/backtest/historic/{symbol}/{time_frame}/{limit}",
-                        web::get().to(back_test::find_mock),
-                    )
-                    .route(
                         "/backtest/instruments/compact",
                         web::get().to(back_test::find_compact_instruments),
                     )
