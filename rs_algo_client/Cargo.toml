@@ -6,20 +6,20 @@ edition = "2021"
 [dependencies]
 yew = "0.19.3"
 yew-router = "0.16"
-gloo = "0.8.0"
-wasm-bindgen = "0.2.81"
-wasm-logger = "0.2"
-wasm-bindgen-futures = "0.4.33"
+gloo = "0.10.0"
+wasm-bindgen = "0.2.89"
+wasm-logger = "0.2.0"
+wasm-bindgen-futures = "0.4.39"
 log = "0.4"
-web-sys= { version= "0.3.60", features = ["Window", "Document", "Element", "HtmlElement", "HtmlFormElement", "HtmlInputElement", "Node"]}
-serde_json = "1.0.89"
-serde = {version = "1.0.148", features = ["derive"] }
+web-sys= { version= "0.3.66", features = ["Window", "Document", "Element", "HtmlElement", "HtmlFormElement", "HtmlInputElement", "Node"]}
+serde_json = "1.0.108"
+serde = {version = "1.0.193", features = ["derive"] }
 anyhow = "1.0.66"
 round = "0.1.2"
 dotenv = "0.15.0"
 reqwest = { version = "0.11.20", features = ["json"] }
 uuid = { version = "0.8.2", features = ["wasm-bindgen"] }
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "d2afb0e"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "7bde43f"}
 #rs_algo_shared = { path = "../../rs_algo_shared" }
 
 # [profile.release]

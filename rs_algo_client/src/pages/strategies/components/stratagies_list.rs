@@ -51,15 +51,15 @@ pub fn strategy_list(props: &Props) -> Html {
                     </td>
                     <td>{ format!(" {} ", strategy.strategy_type )}</td>
                     <td>{ format!(" {} / {} ", strategy.time_frame, higher_time_frame)}</td>
-                    <td class={get_status_class(&profit_status)}> { format!("{}%", round(strategy.avg_net_profit_per,2))}</td>
-                    <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,2)}</td>
-                    <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,2))}</td>
-                    <td class={get_status_class(&max_drawdown_status)}> { format!("{}%", round(strategy.avg_max_drawdown,2))}</td>
-                    <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(strategy.avg_won_per_trade,2))}</td>
-                    <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(strategy.avg_lost_per_trade,2))}</td>
+                    <td class={get_status_class(&profit_status)}> { format!("{}%", round(strategy.avg_net_profit_per,3))}</td>
+                    <td class={get_status_class(&profit_factor_status)}> { round(strategy.avg_profit_factor,3)}</td>
+                    <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(strategy.avg_profitable_trades,3))}</td>
+                    <td class={get_status_class(&max_drawdown_status)}> { format!("{}%", round(strategy.avg_max_drawdown,3))}</td>
+                    <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(strategy.avg_won_per_trade,3))}</td>
+                    <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(strategy.avg_lost_per_trade,3))}</td>
                     <td>{ strategy.avg_trades}</td>
                     <td>{ format!("{} / {} / {}", strategy.avg_wining_trades, strategy.avg_losing_trades, strategy.avg_stop_losses)} </td>
-                    <td>{ format!("{}%", round(strategy.avg_buy_hold,2))}</td>
+                    <td>{ format!("{}%", round(strategy.avg_buy_hold,3))}</td>
                     <td> {format!("{}", strategy.date.to_chrono().format("%d/%m %H:%M"))}</td>
                 </tr>
             }

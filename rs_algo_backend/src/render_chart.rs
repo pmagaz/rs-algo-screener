@@ -190,6 +190,7 @@ impl Backend {
             HTFInstrument::HTFInstrument(htf_ins) => htf_ins.time_frame().to_string(),
             HTFInstrument::None => "".to_owned(),
         };
+
         let mut chart = ChartBuilder::on(&upper)
             .x_label_area_size(40)
             .y_label_area_size(40)
@@ -248,6 +249,7 @@ impl Backend {
                     _ => (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled()),
                 };
 
+                log::info!("000000 {:?}", (candle.date));
                 CandleStick::new(
                     candle.date,
                     candle.open,
@@ -460,7 +462,7 @@ impl Backend {
 
         let trades_size = match mode {
             ExecutionMode::Scanner => 0,
-            ExecutionMode::Bot => 8,
+            ExecutionMode::Bot => 7,
             _ => 6,
         };
 
@@ -486,12 +488,12 @@ impl Backend {
                             true => TriangleMarker::new(
                                 (date, trade_in.price_in - trade_in.spread),
                                 trades_size,
-                                ORANGE_LINE.mix(5.),
+                                ORANGE_LINE.mix(3.5),
                             ),
                             false => TriangleMarker::new(
                                 (date, trade_in.price_in),
                                 -trades_size,
-                                ORANGE_LINE.mix(5.),
+                                ORANGE_LINE.mix(3.5),
                             ),
                         }
                     }),
@@ -550,13 +552,13 @@ impl Backend {
                                     TriangleMarker::new(
                                         (date, price),
                                         -trades_size,
-                                        GREEN_LINE2.mix(5.),
+                                        GREEN_LINE2.mix(3.5),
                                     )
                                 } else {
                                     TriangleMarker::new(
-                                        (date, price),
+                                        (date, price + trade_out.spread_out),
                                         trades_size,
-                                        GREEN_LINE2.mix(5.),
+                                        GREEN_LINE2.mix(3.5),
                                     )
                                 }
                             } else {
@@ -564,13 +566,13 @@ impl Backend {
                                     TriangleMarker::new(
                                         (date, price),
                                         trades_size,
-                                        RED_LINE2.mix(5.),
+                                        RED_LINE2.mix(3.5),
                                     )
                                 } else {
                                     TriangleMarker::new(
-                                        (date, price),
-                                        -trades_size,
-                                        RED_LINE2.mix(5.),
+                                        (date, price + trade_out.spread_out),
+                                        trades_size,
+                                        RED_LINE2.mix(3.5),
                                     )
                                 }
                             };
@@ -578,6 +580,37 @@ impl Backend {
                             Some(marker)
                         } else {
                             None
+                        }
+                    }),
+            )
+            .unwrap();
+
+        //TRADES_OUT SPREAD
+
+        chart
+            .draw_series(
+                trades_out
+                    .iter()
+                    .filter(|x| x.date_out >= to_dbtime(data.first().unwrap().date()))
+                    .enumerate()
+                    .map(|(_i, trade_out)| {
+                        let date = from_dbtime(&trade_out.date_out);
+                        let price = trade_out.price_out;
+                        let is_profitable = trade_out.profit > 0.;
+                        match trade_out.trade_type.is_exit() && trade_out.trade_type.is_long() {
+                            true => TriangleMarker::new((date, price), trades_size, TRANSPARENT),
+                            false => match is_profitable {
+                                true => TriangleMarker::new(
+                                    (date, price),
+                                    trades_size,
+                                    GREEN_LINE2.mix(1.8),
+                                ),
+                                false => TriangleMarker::new(
+                                    (date, price),
+                                    trades_size,
+                                    RED_LINE.mix(1.8),
+                                ),
+                            },
                         }
                     }),
             )

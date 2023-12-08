@@ -188,6 +188,7 @@ impl PortFolio {
             };
 
             let seed = [
+                &env::var("ENV").unwrap(),
                 &strategy.name().to_string(),
                 &strategy.strategy_type().to_string(),
                 &time_frame.clone(),

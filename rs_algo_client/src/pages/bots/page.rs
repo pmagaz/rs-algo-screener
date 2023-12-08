@@ -113,6 +113,24 @@ pub fn bots() -> Html {
         })
     };
 
+    let prod_bots: Vec<CompactBotData> = use_bots
+        .iter()
+        .filter(|x| x.env.is_prod())
+        .map(|x| x.clone())
+        .collect();
+
+    let dev_bots: Vec<CompactBotData> = use_bots
+        .iter()
+        .filter(|x| x.env.is_dev())
+        .map(|x| x.clone())
+        .collect();
+
+    let backtest_bots: Vec<CompactBotData> = use_bots
+        .iter()
+        .filter(|x| x.env.is_backtest())
+        .map(|x| x.clone())
+        .collect();
+
     html! {
         <div class="tile is-ancestor is-vertical ">
             <div class="section is-child hero">
@@ -128,7 +146,13 @@ pub fn bots() -> Html {
             <Chart url={(*use_chart_url).clone()}/>
            <div class="container">
                 <div class="notification is-fluid ">
-                    <BotList on_bot_click={ on_bot_click.clone()}  bots={(*use_bots).clone()} />
+                    <h3 class="navbar-item is-size-2">{ "Prod" }</h3>
+                    <BotList on_bot_click={ on_bot_click.clone()}  bots={(prod_bots).clone()} />
+                    <h3 class="navbar-item is-size-2">{ "Dev" }</h3>
+                    <BotList on_bot_click={ on_bot_click.clone()}  bots={(dev_bots).clone()} />
+                    <h3 class="navbar-item is-size-2">{ "Backtest" }</h3>
+                    <BotList on_bot_click={ on_bot_click.clone()}  bots={(backtest_bots).clone()} />
+
             </div>
             </div>
         </div>

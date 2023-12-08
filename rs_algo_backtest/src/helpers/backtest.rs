@@ -50,7 +50,7 @@ pub fn resolve_backtest(
         let net_profit = gross_profit - commissions;
         let first = trades_in.first().unwrap();
 
-        let initial_order_amount = (first.price_in * first.quantity).ceil();
+        let initial_order_amount = (first.price_in * first.size).ceil();
         let profit_factor = total_profit_factor(gross_profits, gross_loses);
 
         let net_profit_per = total_profit_per(&trades_out);

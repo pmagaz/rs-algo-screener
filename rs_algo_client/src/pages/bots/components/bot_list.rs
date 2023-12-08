@@ -155,32 +155,32 @@ pub fn bot_list(props: &Props) -> Html {
                     <td> { bot.strategy_name.clone() } </td>
                     <td> { bot.strategy_type.clone() } </td>
                     <td>{ format!(" {} / {} ", bot.time_frame.clone(), higher_time_frame)}</td>
-                    <td class={get_status_class(&profit_status)}>  { format!("{} €", round(bot.strategy_stats.net_profit,2)) } </td>
-                    <td class={get_status_class(&profit_status)}> { format!("{}%", round(bot.strategy_stats.net_profit_per,2) ) }</td>
-                    <td class={get_status_class(&profit_factor_status)}>  { round(bot.strategy_stats.profit_factor,2) } </td>
-                    <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(bot.strategy_stats.profitable_trades,2))}</td>
-                    <td class={get_status_class(&max_drawdown_status)}>  { format!("{}%", round(bot.strategy_stats.max_drawdown,2) ) } </td>
-                    <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(bot.strategy_stats.won_per_trade_per,2))}</td>
-                    <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(bot.strategy_stats.lost_per_trade_per,2))}</td>
+                    <td class={get_status_class(&profit_status)}>  { format!("{} €", round(bot.strategy_stats.net_profit,3)) } </td>
+                    <td class={get_status_class(&profit_status)}> { format!("{}%", round(bot.strategy_stats.net_profit_per,3) ) }</td>
+                    <td class={get_status_class(&profit_factor_status)}>  { round(bot.strategy_stats.profit_factor,3) } </td>
+                    <td class={get_status_class(&profitable_trades_status)}> { format!("{}%", round(bot.strategy_stats.profitable_trades,3))}</td>
+                    <td class={get_status_class(&max_drawdown_status)}>  { format!("{}%", round(bot.strategy_stats.max_drawdown,3) ) } </td>
+                    <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(bot.strategy_stats.won_per_trade_per,3))}</td>
+                    <td class={get_status_class(&avg_won_lost_status)}>{ format!("{}%", round(bot.strategy_stats.lost_per_trade_per,3))}</td>
                     <td>{ num_trades }</td>
                     <td> {format!("{} / {} / {}", bot.strategy_stats.wining_trades, bot.strategy_stats.losing_trades, bot.strategy_stats.stop_losses )}</td>
                     <td class={get_status_class(&updated_status)}> {format!("{}", bot.last_update.to_chrono().format("%H:%M:%S"))}</td>
                 </tr>
             });
 
-        if !bot.strategy_name.contains("Back") {
-            total_profit += bot.strategy_stats.net_profit;
-            total_profit_per += bot.strategy_stats.net_profit_per;
-            total_profit_factor += bot.strategy_stats.profit_factor;
-            total_profitable_trades += bot.strategy_stats.profitable_trades;
-            total_max_drawdown += bot.strategy_stats.max_drawdown;
-            total_won_per_trade_per += bot.strategy_stats.won_per_trade_per;
-            total_lost_per_trade_per += bot.strategy_stats.lost_per_trade_per;
-            total_trades += num_trades;
-            total_winning_trades += bot.strategy_stats.wining_trades;
-            total_losing_trades += bot.strategy_stats.losing_trades;
-            total_stop_losses += bot.strategy_stats.stop_losses;
-        }
+        //if !bot.strategy_name.contains("Back") {
+        total_profit += bot.strategy_stats.net_profit;
+        total_profit_per += bot.strategy_stats.net_profit_per;
+        total_profit_factor += bot.strategy_stats.profit_factor;
+        total_profitable_trades += bot.strategy_stats.profitable_trades;
+        total_max_drawdown += bot.strategy_stats.max_drawdown;
+        total_won_per_trade_per += bot.strategy_stats.won_per_trade_per;
+        total_lost_per_trade_per += bot.strategy_stats.lost_per_trade_per;
+        total_trades += num_trades;
+        total_winning_trades += bot.strategy_stats.wining_trades;
+        total_losing_trades += bot.strategy_stats.losing_trades;
+        total_stop_losses += bot.strategy_stats.stop_losses;
+        //  }
 
         if num_bots == bot_num {
             let subtotal_totals =
@@ -205,11 +205,9 @@ pub fn bot_list(props: &Props) -> Html {
         bot_num += 1;
     }
 
-    strategy_order.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-    let num_bots = bots
-        .iter()
-        .filter(|bot| !bot.strategy_name.contains("Back"))
-        .count();
+    //strategy_order.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
+    let num_bots = bots.len();
+
     let total_profit_factor = total_profit_factor / num_bots as f64;
     let total_profitable_trades = total_profitable_trades / num_bots as f64;
     let total_won_per_trade_per = total_won_per_trade_per / num_bots as f64;
@@ -247,13 +245,13 @@ pub fn bot_list(props: &Props) -> Html {
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td class={get_status_class(&total_profit_status)}>{ format!("{} €", round(total_profit,2)) }</td>
-                    <td class={get_status_class(&total_profit_per_status)}>{ format!("{} %", round(total_profit_per,2)) }</td>
-                    <td class={get_status_class(&total_profit_factor_status)}>{ round(total_profit_factor , 2)}</td>
-                    <td class={get_status_class(&total_profitable_trades_status)}>{ format!("{} %", round(total_profitable_trades, 2)) }</td>
-                    <td class={get_status_class(&total_max_drawdown_status)}>{ format!("{} %", round(total_max_drawdown, 2)) }</td>
-                    <td>{ round(total_won_per_trade_per, 2)}</td>
-                    <td>{ round(total_lost_per_trade_per, 2)}</td>
+                    <td class={get_status_class(&total_profit_status)}>{ format!("{} €", round(total_profit,3)) }</td>
+                    <td class={get_status_class(&total_profit_per_status)}>{ format!("{} %", round(total_profit_per,3)) }</td>
+                    <td class={get_status_class(&total_profit_factor_status)}>{ round(total_profit_factor , 3)}</td>
+                    <td class={get_status_class(&total_profitable_trades_status)}>{ format!("{} %", round(total_profitable_trades, 3)) }</td>
+                    <td class={get_status_class(&total_max_drawdown_status)}>{ format!("{} %", round(total_max_drawdown, 3)) }</td>
+                    <td>{ round(total_won_per_trade_per, 3)}</td>
+                    <td>{ round(total_lost_per_trade_per, 3)}</td>
                     <td>{ total_trades }</td>
                     <td> {format!("{} / {} / {}", total_winning_trades, total_losing_trades, total_stop_losses )}</td>
                     <td></td>
@@ -309,13 +307,13 @@ fn create_total_row(
             <td></td>
             <td></td>
             <td></td>
-            <td class={get_status_class(&profit_status)}>{ format!("{} €", round(subtotal_profit, 2)) }</td>
-            <td class={get_status_class(&total_profit_per_status)}>{ format!("{}%", round(subtotal_profit_per, 2)) }</td>
-            <td class={get_status_class(&profit_factor_status)}>{ round(subtotal_profit_factor, 2) }</td>
-            <td class={get_status_class(&profitable_trades_status)}>{ format!("{} %", round(subtotal_profitable_trades, 2)) }</td>
-            <td class={get_status_class(&max_drawdown_status)}>{ format!("{}%", round(subtotal_max_drawdown, 2)) }</td>
-            <td>{ format!("{}%", round(subtotal_won_per_trade_per, 2)) }</td>
-            <td>{ format!("{}%", round(subtotal_lost_per_trade_per, 2)) }</td>
+            <td class={get_status_class(&profit_status)}>{ format!("{} €", round(subtotal_profit, 3)) }</td>
+            <td class={get_status_class(&total_profit_per_status)}>{ format!("{}%", round(subtotal_profit_per, 3)) }</td>
+            <td class={get_status_class(&profit_factor_status)}>{ round(subtotal_profit_factor, 3) }</td>
+            <td class={get_status_class(&profitable_trades_status)}>{ format!("{} %", round(subtotal_profitable_trades, 3)) }</td>
+            <td class={get_status_class(&max_drawdown_status)}>{ format!("{}%", round(subtotal_max_drawdown, 3)) }</td>
+            <td>{ format!("{}%", round(subtotal_won_per_trade_per, 3)) }</td>
+            <td>{ format!("{}%", round(subtotal_lost_per_trade_per, 3)) }</td>
             <td>{ subtotal_trades }</td>
             <td>{ format!("{} / {} / {}", subtotal_winning_trades, subtotal_losing_trades, subtotal_stop_losses) }</td>
             <td></td>
