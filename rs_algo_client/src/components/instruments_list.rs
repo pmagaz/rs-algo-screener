@@ -294,13 +294,10 @@ pub fn instrument_list(props: &Props
                     <td> {format!("{}%", price_display)}</td>
                     <td class={get_status_class(&candle_status)}> {format!("{:?}", instrument.current_candle)}</td>
                     <td class={get_status_class(&local_pattern.status)}> {local_pattern.info.0}</td>
-                    <td class={get_status_class(&band_direction_status)}> {local_pattern.info.1}</td>
                     <td> {local_pattern.info.2}</td>
                     <td> {local_pattern.info.3}</td>
-                    <td class={get_status_class(&bb.status)}> {format!("{} / {}%", round(bb_width,2), round(bb_size, 1))}</td>
                     //<td class={get_status_class(&macd.status)}>{format!("{:?} / {:?}", round(instrument.indicators.macd.current_a, 1), round(instrument.indicators.macd.current_b, 1))}</td>
                     <td class={get_status_class(&rsi.status)}>  {format!("{:?}", round(instrument.indicators.rsi.current_a, 1))}</td>
-                    <td class={get_status_class(&divergence_status)}> {divergence_str}</td>
                     <td> {format!("{}", date.format("%d/%m %H:%M"))}</td>
                     <td  onclick={ on_watch_select }><a href={"javascript:void(0);"}><img src={ icon_watchlist } class="action_icon" /></a></td>
                     <td  onclick={ on_portfolio_select }><a href={"javascript:void(0);"}><img src={ icon_portfolio } class="action_icon" /></a></td>
@@ -319,13 +316,10 @@ pub fn instrument_list(props: &Props
                 <th>{ "Chg%" }</th>
                 <th>{ "Candle" }</th>
                 <th>{ "Pattern" }</th>
-                <th>{ "Band" }</th>
                 <th>{ "Target" }</th>
                 <th>{ "Activated" }</th>
-                <th>{ "B.Bands" }</th>
                // <th>{ "Stoch" }</th>
                 <th>{ "Rsi" }</th>
-                <th>{ "Divergence" }</th>
                 <th>{ "Updated" }</th>
                 <th>{ "W" }</th>
                 <th>{ "P" }</th>

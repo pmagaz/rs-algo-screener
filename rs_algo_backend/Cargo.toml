@@ -26,7 +26,7 @@ mongodb = "2.2.2"
 bson = "2.3.0"
 openssl = { version = "0.10.57", features = ["vendored"] }
 plotters = {git = "https://github.com/pmagaz/plotters", features = ["all_series"]}
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "7bde43f"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "54af13d"}
 
 #rs_algo_shared = { path = "../../rs_algo_shared" }
 

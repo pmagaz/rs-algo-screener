@@ -66,26 +66,26 @@ impl General {
                         {"symbol": {"$regex" : ".*.US"}},
                    ]},
                     {"$and": [
-                        {"current_candle": { "$in": ["BearishKarakasa"] }},
-                        {"$expr": {"$gte": ["$indicators.rsi.current_a", 67]}},
+                        //{"$expr": {"$gte": ["$indicators.ema_a.current_a", "$indicators.ema_b.current_a"]}},
                         {"symbol": {"$regex" : ".*.US"}},
+                //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
                    ]},
-                {"$or": [
-                    {"$and": [
-                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
-                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
-                        {"patterns.local_patterns": {"$elemMatch" : {
-                            "active.active": false ,
-                            "date": { "$gte" : self.max_pattern_date },
-                            "$or": [
-                                {"target": { "$gte" : minimum_pattern_target }},
-                                {"pattern_type": { "$in": ["DoubleTop","DoubleBottom","HeadAndShoulders"] }},
-                            ],
-                        //"pattern_type": { "$in": ["ChannelUp","TriangleUp","TriangleDown","TriangleSym","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
-                        }}},
-                        {"symbol": {"$regex" : ".*.US"}},
-                        // {"symbol": {"$regex" : ".*.ES.*"}},
-                    ]},
+                //{"$or": [
+                    // {"$and": [
+                    //     //{"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
+                    //     //{"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                    //     {"patterns.local_patterns": {"$elemMatch" : {
+                    //         "active.active": false ,
+                    //         "date": { "$gte" : self.max_pattern_date },
+                    //         "$or": [
+                    //             {"target": { "$gte" : minimum_pattern_target }},
+                    //             {"pattern_type": { "$in": ["DoubleTop","DoubleBottom","HeadAndShoulders"] }},
+                    //         ],
+                    //     //"pattern_type": { "$in": ["ChannelUp","TriangleUp","TriangleDown","TriangleSym","Rectangle","BroadeningUp","DoubleBottom","HeadShoulders"] },
+                    //     }}},
+                    //     {"symbol": {"$regex" : ".*.US"}},
+                    //     // {"symbol": {"$regex" : ".*.ES.*"}},
+                    // ]},
                 //  {"or": [
                         // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "ChannelUp"] }},
                         // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "TriangleUp"] }},
@@ -95,22 +95,22 @@ impl General {
                         // {"$expr": {"$eq": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HeadShoulders"] }},
 
                 //  ]},
-                    {"$and": [
-                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
-                        {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
-                        {"patterns.local_patterns": {"$elemMatch" : {
-                            "active.active": true ,
-                            "active.date": { "$gte" : self.max_activated_date },
-                            "$or": [
-                                {"active.target": { "$gte" : minimum_pattern_target }},
-                                {"pattern_type": { "$in": ["DoubleTop","DoubleBottom","HeadAndShoulders"] }},
-                            ],
-                        }}},
-                        {"symbol": {"$regex" : ".*.US"}},
-                        // {"symbol": {"$regex" : ".*.ES"}},
-                    ]},
-                    ]
-                },
+                    // {"$and": [
+                    //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
+                    //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
+                    //     {"patterns.local_patterns": {"$elemMatch" : {
+                    //         "active.active": true ,
+                    //         "active.date": { "$gte" : self.max_activated_date },
+                    //         "$or": [
+                    //             {"active.target": { "$gte" : minimum_pattern_target }},
+                    //             {"pattern_type": { "$in": ["DoubleTop","DoubleBottom","HeadAndShoulders"] }},
+                    //         ],
+                    //     }}},
+                    //     {"symbol": {"$regex" : ".*.US"}},
+                    //     // {"symbol": {"$regex" : ".*.ES"}},
+                    // ]},
+                //     ]
+                // },
                 // {"$and": [
                 //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "HigherHighsHigherLows"] }},
                 //     {"$expr": {"$ne": [{ "$last": "$patterns.local_patterns.pattern_type" }, "LowerHighsLowerLows"] }},
