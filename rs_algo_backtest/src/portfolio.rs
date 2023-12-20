@@ -103,7 +103,7 @@ impl PortFolio {
                     log::info!("[BACKTEST] Requesting Instrument Tick");
 
                     let tick_endpoint = format!(
-                        "{}{}",
+                        "{}/{}",
                         env::var("BACKEND_BACKTEST_PRICING_ENDPOINT").unwrap(),
                         instrument.symbol
                     );

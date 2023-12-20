@@ -237,8 +237,8 @@ impl<'a> Strategy for NumBars<'a> {
         let candle = data.get(index).unwrap();
         let is_closed: bool = candle.is_closed();
 
-        let buy_price = candle.close() - tick.spread();
-        let sell_price = buy_price - (atr_profit_value * atr_value);
+        let buy_price = candle.close();
+        let sell_price = buy_price - (atr_profit_value * atr_value) - tick.spread();
         let entry_condition = candle.candle_type() == &CandleType::ThreeInRow && is_closed;
 
         match entry_condition {

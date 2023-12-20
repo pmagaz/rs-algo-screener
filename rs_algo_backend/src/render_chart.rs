@@ -249,7 +249,6 @@ impl Backend {
                     _ => (CANDLE_BULLISH.filled(), CANDLE_BULLISH.filled()),
                 };
 
-                log::info!("000000 {:?}", (candle.date));
                 CandleStick::new(
                     candle.date,
                     candle.open,
@@ -544,19 +543,22 @@ impl Backend {
                     .filter_map(|(i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);
                         if let Some(trade_in) = trades_in.get(i) {
-                            let price = trade_out.price_out;
+                            let price_out = trade_out.price_out;
                             let is_profitable = trade_out.profit > 0.;
-
+                            let price_out = match trade_out.trade_type.is_long() {
+                                true => trade_out.price_out,
+                                false => trade_out.price_out,
+                            };
                             let marker = if is_profitable {
                                 if trade_out.trade_type.is_long() {
                                     TriangleMarker::new(
-                                        (date, price),
+                                        (date, price_out),
                                         -trades_size,
                                         GREEN_LINE2.mix(3.5),
                                     )
                                 } else {
                                     TriangleMarker::new(
-                                        (date, price + trade_out.spread_out),
+                                        (date, price_out - trade_out.spread_out),
                                         trades_size,
                                         GREEN_LINE2.mix(3.5),
                                     )
@@ -564,13 +566,13 @@ impl Backend {
                             } else {
                                 if trade_in.trade_type.is_long() {
                                     TriangleMarker::new(
-                                        (date, price),
+                                        (date, price_out),
                                         trades_size,
                                         RED_LINE2.mix(3.5),
                                     )
                                 } else {
                                     TriangleMarker::new(
-                                        (date, price + trade_out.spread_out),
+                                        (date, price_out + trade_out.spread_out),
                                         trades_size,
                                         RED_LINE2.mix(3.5),
                                     )
