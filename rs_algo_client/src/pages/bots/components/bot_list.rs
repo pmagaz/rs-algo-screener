@@ -130,20 +130,22 @@ pub fn bot_list(props: &Props) -> Html {
                         num_strategy_items as f64,
                     );
 
-                    let total_row = create_total_row(
-                        subtotal_totals.0,
-                        subtotal_totals.1,
-                        subtotal_totals.2,
-                        subtotal_totals.3,
-                        subtotal_totals.4,
-                        subtotal_totals.5,
-                        subtotal_totals.6,
-                        subtotal_totals.7,
-                        subtotal_totals.8,
-                        subtotal_totals.9,
-                        subtotal_totals.10,
-                    );
-                    bot_list.push(total_row);
+                    if !bot.env.is_backtest() {
+                        let total_row = create_total_row(
+                            subtotal_totals.0,
+                            subtotal_totals.1,
+                            subtotal_totals.2,
+                            subtotal_totals.3,
+                            subtotal_totals.4,
+                            subtotal_totals.5,
+                            subtotal_totals.6,
+                            subtotal_totals.7,
+                            subtotal_totals.8,
+                            subtotal_totals.9,
+                            subtotal_totals.10,
+                        );
+                        bot_list.push(total_row);
+                    }
                 }
                 last_strategy = bot.strategy_name.clone();
             }

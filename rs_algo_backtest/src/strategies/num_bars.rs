@@ -152,14 +152,18 @@ impl<'a> Strategy for NumBars<'a> {
         let candle = data.get(index).unwrap();
         let is_closed: bool = candle.is_closed();
 
-        let buy_price = candle.close() + tick.spread();
-        let sell_price = buy_price + calc::to_pips(pips_profit, tick);
+        let buy_price = candle.close();
+        let sell_price = buy_price + calc::to_pips(pips_profit, tick) + tick.spread();
         let entry_condition = candle.candle_type() == &CandleType::BearishThreeInRow && is_closed;
 
         match entry_condition {
             true => Position::MarketIn(Some(vec![
                 OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
-                OrderType::StopLossLong(OrderDirection::Down, StopLossType::Pips(pips_stop_loss)),
+                OrderType::StopLossLong(
+                    OrderDirection::Down,
+                    buy_price,
+                    StopLossType::Pips(pips_stop_loss),
+                ),
             ])),
             false => Position::None,
         }
@@ -209,7 +213,11 @@ impl<'a> Strategy for NumBars<'a> {
         match entry_condition {
             true => Position::MarketIn(Some(vec![
                 OrderType::SellOrderShort(OrderDirection::Down, self.order_size, sell_price),
-                OrderType::StopLossShort(OrderDirection::Up, StopLossType::Pips(pips_stop_loss)),
+                OrderType::StopLossShort(
+                    OrderDirection::Up,
+                    buy_price,
+                    StopLossType::Pips(pips_stop_loss),
+                ),
             ])),
             false => Position::None,
         }

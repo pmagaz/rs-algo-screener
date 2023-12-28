@@ -8,7 +8,7 @@ use rs_algo_shared::models::mode::*;
 use rs_algo_shared::models::order::{Order, OrderType};
 use rs_algo_shared::models::stop_loss::StopLossType;
 use rs_algo_shared::models::time_frame;
-use rs_algo_shared::models::trade::{TradeIn, TradeOut};
+use rs_algo_shared::models::trade::{Trade, TradeIn, TradeOut};
 use rs_algo_shared::scanner::instrument::*;
 use rs_algo_shared::scanner::pattern::{PatternDirection, PatternType};
 
@@ -483,16 +483,21 @@ impl Backend {
                         let date = from_dbtime(&trade_in.date_in);
                         let _price = trade_in.price_in;
 
+                        let opacity = match trade_in.is_fulfilled() {
+                            true => 3.5,
+                            false => 1.,
+                        };
+
                         match trade_in.trade_type.is_long() {
                             true => TriangleMarker::new(
                                 (date, trade_in.price_in - trade_in.spread),
                                 trades_size,
-                                ORANGE_LINE.mix(3.5),
+                                ORANGE_LINE.mix(opacity),
                             ),
                             false => TriangleMarker::new(
                                 (date, trade_in.price_in),
                                 -trades_size,
-                                ORANGE_LINE.mix(3.5),
+                                ORANGE_LINE.mix(opacity),
                             ),
                         }
                     }),
@@ -510,17 +515,22 @@ impl Backend {
                     .map(|(_i, trade_in)| {
                         let date = from_dbtime(&trade_in.date_in);
                         let price = trade_in.price_in;
+
+                        let opacity = match trade_in.is_fulfilled() {
+                            true => 1.8,
+                            false => 0.5,
+                        };
                         match trade_in.trade_type.is_entry() {
                             true => match trade_in.trade_type.is_long() {
                                 true => TriangleMarker::new(
                                     (date, price),
                                     trades_size,
-                                    ORANGE_LINE.mix(1.8),
+                                    ORANGE_LINE.mix(opacity),
                                 ),
                                 false => TriangleMarker::new(
                                     (date, price),
                                     -trades_size,
-                                    ORANGE_LINE.mix(1.8),
+                                    ORANGE_LINE.mix(opacity),
                                 ),
                             },
                             false => todo!(),
@@ -542,25 +552,28 @@ impl Backend {
                     .enumerate()
                     .filter_map(|(i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);
+                        let opacity = match trade_out.is_fulfilled() {
+                            true => 3.5,
+                            false => 1.5,
+                        };
                         if let Some(trade_in) = trades_in.get(i) {
-                            let price_out = trade_out.price_out;
                             let is_profitable = trade_out.profit > 0.;
                             let price_out = match trade_out.trade_type.is_long() {
-                                true => trade_out.price_out,
-                                false => trade_out.price_out,
+                                true => trade_out.bid,
+                                false => trade_out.bid,
                             };
                             let marker = if is_profitable {
                                 if trade_out.trade_type.is_long() {
                                     TriangleMarker::new(
                                         (date, price_out),
                                         -trades_size,
-                                        GREEN_LINE2.mix(3.5),
+                                        GREEN_LINE2.mix(opacity),
                                     )
                                 } else {
                                     TriangleMarker::new(
-                                        (date, price_out - trade_out.spread_out),
+                                        (date, price_out),
                                         trades_size,
-                                        GREEN_LINE2.mix(3.5),
+                                        GREEN_LINE2.mix(opacity),
                                     )
                                 }
                             } else {
@@ -568,13 +581,13 @@ impl Backend {
                                     TriangleMarker::new(
                                         (date, price_out),
                                         trades_size,
-                                        RED_LINE2.mix(3.5),
+                                        RED_LINE2.mix(opacity),
                                     )
                                 } else {
                                     TriangleMarker::new(
-                                        (date, price_out + trade_out.spread_out),
+                                        (date, price_out),
                                         trades_size,
-                                        RED_LINE2.mix(3.5),
+                                        RED_LINE2.mix(opacity),
                                     )
                                 }
                             };
@@ -597,20 +610,30 @@ impl Backend {
                     .enumerate()
                     .map(|(_i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);
-                        let price = trade_out.price_out;
+                        let price_out = match trade_out.trade_type.is_long() {
+                            true => trade_out.ask,
+                            false => trade_out.ask,
+                        };
+
+                        let opacity = match trade_out.is_fulfilled() {
+                            true => 1.8,
+                            false => 0.5,
+                        };
                         let is_profitable = trade_out.profit > 0.;
                         match trade_out.trade_type.is_exit() && trade_out.trade_type.is_long() {
-                            true => TriangleMarker::new((date, price), trades_size, TRANSPARENT),
+                            true => {
+                                TriangleMarker::new((date, price_out), trades_size, TRANSPARENT)
+                            }
                             false => match is_profitable {
                                 true => TriangleMarker::new(
-                                    (date, price),
+                                    (date, price_out),
                                     trades_size,
-                                    GREEN_LINE2.mix(1.8),
+                                    GREEN_LINE2.mix(opacity),
                                 ),
                                 false => TriangleMarker::new(
-                                    (date, price),
+                                    (date, price_out),
                                     trades_size,
-                                    RED_LINE.mix(1.8),
+                                    RED_LINE2.mix(opacity),
                                 ),
                             },
                         }
@@ -637,32 +660,33 @@ impl Backend {
 
                         let order_opacity = 0.8;
                         match order.order_type {
-                            OrderType::BuyOrderLong(_, _, _) => TriangleMarker::new(
+                            OrderType::BuyOrderLong(_, _) => TriangleMarker::new(
                                 (date, order.target_price),
                                 orders_size,
                                 ORANGE_LINE.mix(order_opacity),
                             ),
-                            OrderType::BuyOrderShort(_, _, _) => TriangleMarker::new(
+                            OrderType::BuyOrderShort(_, _) => TriangleMarker::new(
                                 (date, order.target_price),
                                 -orders_size,
                                 ORANGE_LINE.mix(order_opacity),
                             ),
-                            OrderType::SellOrderLong(_, _, _) => TriangleMarker::new(
+                            OrderType::SellOrderLong(_, _) => TriangleMarker::new(
                                 (date, order.target_price),
                                 -orders_size,
                                 ORANGE_LINE.mix(order_opacity),
                             ),
-                            OrderType::SellOrderShort(_, _, _) => TriangleMarker::new(
+                            OrderType::SellOrderShort(_, _) => TriangleMarker::new(
                                 (date, order.target_price),
                                 orders_size,
                                 ORANGE_LINE.mix(order_opacity),
                             ),
-                            OrderType::TakeProfitLong(_, _, _)
-                            | OrderType::TakeProfitShort(_, _, _) => TriangleMarker::new(
-                                (date, order.target_price),
-                                -orders_size,
-                                ORANGE_LINE.mix(order_opacity),
-                            ),
+                            OrderType::TakeProfitLong(_, _) | OrderType::TakeProfitShort(_, _) => {
+                                TriangleMarker::new(
+                                    (date, order.target_price),
+                                    -orders_size,
+                                    ORANGE_LINE.mix(order_opacity),
+                                )
+                            }
                             _ => TriangleMarker::new(
                                 (date, order.target_price),
                                 orders_size,

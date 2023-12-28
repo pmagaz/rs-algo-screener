@@ -106,7 +106,7 @@ pub async fn find_compact_instruments(
             .unwrap();
 
     log::info!(
-        " {:?} instruments returned at {:?} {:?}",
+        " {:?} compact instruments returned at {:?} {:?}",
         backtest_instruments.len(),
         Local::now(),
         now.elapsed()

@@ -229,6 +229,8 @@ impl PortFolio {
                 .unwrap()
                 .clone();
 
+            log::info!("{:?}", strategy_result);
+
             let _send_strategy_results =
                 request(&strategy_result_endpoint, &strategy_result, HttpMethod::Put)
                     .await

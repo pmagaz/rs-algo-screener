@@ -170,7 +170,7 @@ impl<'a> Strategy for NumBars<'a> {
         _htf_instrument: &HTFInstrument,
         tick: &InstrumentTick,
     ) -> Position {
-        let atr_stop_value = std::env::var("ATR_STOP_LOSS")
+        let atr_stop_value = std::env::var("ATR_STOPLOSS")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -180,20 +180,24 @@ impl<'a> Strategy for NumBars<'a> {
             .parse::<f64>()
             .unwrap();
 
-        let atr_value = instrument.indicators.atr.get_data_a().get(index).unwrap();
-
         let data = &instrument.data();
         let candle = data.get(index).unwrap();
         let is_closed: bool = candle.is_closed();
 
-        let buy_price = candle.close() + tick.spread();
-        let sell_price = buy_price + (atr_profit_value * atr_value);
+        let atr_value = instrument.indicators.atr.get_data_a().get(index).unwrap();
+
+        let buy_price = candle.close();
+        let sell_price = buy_price + (atr_profit_value * atr_value) + tick.spread();
         let entry_condition = candle.candle_type() == &CandleType::BearishThreeInRow && is_closed;
 
         match entry_condition {
             true => Position::MarketIn(Some(vec![
                 OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
-                OrderType::StopLossLong(OrderDirection::Down, StopLossType::Atr(atr_stop_value)),
+                OrderType::StopLossLong(
+                    OrderDirection::Down,
+                    buy_price,
+                    StopLossType::Atr(atr_stop_value),
+                ),
             ])),
             false => Position::None,
         }
@@ -221,7 +225,7 @@ impl<'a> Strategy for NumBars<'a> {
         _htf_instrument: &HTFInstrument,
         tick: &InstrumentTick,
     ) -> Position {
-        let atr_stop_value = std::env::var("ATR_STOP_LOSS")
+        let atr_stop_value = std::env::var("ATR_STOPLOSS")
             .unwrap()
             .parse::<f64>()
             .unwrap();
@@ -244,7 +248,11 @@ impl<'a> Strategy for NumBars<'a> {
         match entry_condition {
             true => Position::MarketIn(Some(vec![
                 OrderType::SellOrderShort(OrderDirection::Down, self.order_size, sell_price),
-                OrderType::StopLossLong(OrderDirection::Up, StopLossType::Atr(atr_stop_value)),
+                OrderType::StopLossLong(
+                    OrderDirection::Down,
+                    buy_price,
+                    StopLossType::Atr(atr_stop_value),
+                ),
             ])),
             false => Position::None,
         }

@@ -22,7 +22,7 @@ pub struct Ema<'a> {
 #[async_trait]
 impl<'a> Strategy for Ema<'a> {
     fn new() -> Result<Self> {
-        let stop_loss = std::env::var("ATR_STOP_LOSS")
+        let stop_loss = std::env::var("ATR_STOPLOSS")
             .unwrap()
             .parse::<f64>()
             .unwrap();

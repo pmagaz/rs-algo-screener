@@ -188,7 +188,7 @@ pub trait Strategy: DynClone {
                     PositionResult::MarketInOrder(TradeResult::TradeIn(trade_in), order) => {
                         if !open_positions {
                             order::fulfill_trade_order(index, &trade_in, &order, &mut orders);
-                            order::extend_all_pending_orders(&mut orders);
+                            order::update_trade_pending_orders(&mut orders & trade_in);
                             trades_in.push(trade_in);
                             open_positions = true;
                         }

@@ -197,7 +197,11 @@ impl<'a> Strategy for EmaScalping2<'a> {
             true => Position::Order(vec![
                 OrderType::BuyOrderLong(OrderDirection::Up, self.order_size, buy_price),
                 OrderType::SellOrderLong(OrderDirection::Up, self.order_size, sell_price),
-                OrderType::StopLossLong(OrderDirection::Down, StopLossType::Price(stop_loss_price)),
+                OrderType::StopLossLong(
+                    OrderDirection::Down,
+                    buy_price,
+                    StopLossType::Price(stop_loss_price),
+                ),
             ]),
 
             false => Position::None,
@@ -277,7 +281,11 @@ impl<'a> Strategy for EmaScalping2<'a> {
             true => Position::Order(vec![
                 OrderType::BuyOrderShort(OrderDirection::Down, self.order_size, buy_price),
                 OrderType::SellOrderShort(OrderDirection::Down, self.order_size, sell_price),
-                OrderType::StopLossShort(OrderDirection::Up, StopLossType::Price(stop_loss_price)),
+                OrderType::StopLossShort(
+                    OrderDirection::Up,
+                    buy_price,
+                    StopLossType::Price(stop_loss_price),
+                ),
             ]),
 
             false => Position::None,
