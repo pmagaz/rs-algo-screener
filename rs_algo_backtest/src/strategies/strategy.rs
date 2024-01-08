@@ -188,7 +188,7 @@ pub trait Strategy: DynClone {
                     PositionResult::MarketInOrder(TradeResult::TradeIn(trade_in), order) => {
                         if !open_positions {
                             order::fulfill_trade_order(index, &trade_in, &order, &mut orders);
-                            order::update_trade_pending_orders(&mut orders & trade_in);
+                            order::update_trade_pending_orders(&mut orders, &trade_in);
                             trades_in.push(trade_in);
                             open_positions = true;
                         }
@@ -196,7 +196,7 @@ pub trait Strategy: DynClone {
                     PositionResult::MarketOutOrder(TradeResult::TradeOut(trade_out), order) => {
                         if open_positions {
                             order::fulfill_trade_order(index, &trade_out, &order, &mut orders);
-                            order::cancel_trade_pending_orders(&trade_out, &mut orders);
+                            order::update_state_pending_orders(&trade_out, &mut orders);
                             trades_out.push(trade_out);
                             open_positions = false;
                         }
@@ -217,7 +217,7 @@ pub trait Strategy: DynClone {
                     match exit_result {
                         PositionResult::MarketOut(TradeResult::TradeOut(trade_out)) => {
                             open_positions = false;
-                            order::cancel_trade_pending_orders(&trade_out, &mut orders);
+                            order::update_state_pending_orders(&trade_out, &mut orders);
                             trades_out.push(trade_out.clone());
                         }
                         PositionResult::PendingOrder(new_orders) => {

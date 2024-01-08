@@ -5,8 +5,7 @@ image:
   pullPolicy: Always 
   tag: "latest"
 
-imagePullSecrets:
- - name: docker-credentials 
+imagePullSecrets: {}
 
 envSecretName: rs-algo-screener-secrets
 

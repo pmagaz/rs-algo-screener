@@ -52,7 +52,7 @@ pub fn bots() -> Html {
                     }
                 });
 
-                Interval::new(2_500, move || {
+                Interval::new(5000, move || {
                     let date = Local::now();
                     let seconds = date.second();
                     if seconds >= 1 && seconds <= 7 {
@@ -87,7 +87,7 @@ pub fn bots() -> Html {
             let use_chart_url = use_chart_url.clone();
             use_chart_url.set(chart_url.clone());
 
-            Interval::new(3000, move || {
+            Interval::new(5000, move || {
                 let date = Local::now();
                 let seconds = date.second();
                 let chart_url = chart_url.clone();

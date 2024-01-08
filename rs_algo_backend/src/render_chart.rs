@@ -606,7 +606,10 @@ impl Backend {
             .draw_series(
                 trades_out
                     .iter()
-                    .filter(|x| x.date_out >= to_dbtime(data.first().unwrap().date()))
+                    .filter(|x| {
+                        x.date_out > to_dbtime(data.first().unwrap().date())
+                            && !x.trade_type.is_stop()
+                    })
                     .enumerate()
                     .map(|(_i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);

@@ -30,31 +30,6 @@ async fn main() {
         equity,
         instruments: vec![],
         strategies: vec![
-            // LONG-SHORT
-            Box::new(
-                strategies::num_bars_atr::NumBars::new(
-                    Some("M15"),
-                    Some("H1"),
-                    Some(StrategyType::LongShortMTF),
-                )
-                .unwrap(),
-            ),
-            Box::new(
-                strategies::num_bars_atr::NumBars::new(
-                    Some("M15"),
-                    Some("H4"),
-                    Some(StrategyType::LongShortMTF),
-                )
-                .unwrap(),
-            ),
-            Box::new(
-                strategies::num_bars_atr::NumBars::new(
-                    Some("M30"),
-                    Some("H4"),
-                    Some(StrategyType::LongShortMTF),
-                )
-                .unwrap(),
-            ),
             // Box::new(
             //     strategies::bollinger_bands_reversals::BollingerBandsReversals::new(
             //         Some("M15"),

@@ -21,7 +21,7 @@ dyn-clone = "1.0.13"
 env_logger = "0.10.0"
 log = "0.4"
 
-rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "82e6bc8"}
+rs_algo_shared = {git = "https://github.com/pmagaz/rs_algo_shared", rev = "8afcb2f"}
 #rs_algo_shared = { path = "../../rs_algo_shared" }
 # [profile.release]
 # strip = true
