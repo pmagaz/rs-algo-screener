@@ -2,7 +2,7 @@
 ARG APP_NAME=rs_algo_client
 ARG TARGET=wasm32-unknown-unknown
 # BUILDER
-FROM rust:1-buster as dist
+FROM rust:1-buster as builder
 ARG APP_NAME
 ARG TARGET
 
@@ -17,7 +17,7 @@ FROM nginx:stable-alpine
 ARG APP_NAME
 ARG APP_DIR=/usr/share/nginx/www
 
-COPY --from=dist $APP_NAME/dist $APP_DIR 
+COPY --from=builder $APP_NAME/dist $APP_DIR 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY .htpasswd /etc/nginx/.htpasswd
 

@@ -43,10 +43,22 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
         //FIXME ADD ARRAY
         indicators: CompactIndicators {
             macd: CompactIndicator {
-                current_a: *doc.indicators.macd.get_data_a().last().unwrap(),
-                current_b: *doc.indicators.macd.get_data_b().last().unwrap(),
-                prev_a: *doc.indicators.macd.get_data_a().get(second_last).unwrap(),
-                prev_b: *doc.indicators.macd.get_data_b().get(second_last).unwrap(),
+                current_a: match doc.indicators.macd.as_ref() {
+                    Some(macd) => *macd.get_data_a().last().unwrap(),
+                    None => 0.,
+                },
+                current_b: match doc.indicators.macd.as_ref() {
+                    Some(macd) => *macd.get_data_b().last().unwrap(),
+                    None => 0.,
+                },
+                prev_a: match doc.indicators.macd.as_ref() {
+                    Some(macd) => *macd.get_data_a().get(second_last).unwrap(),
+                    None => 0.,
+                },
+                prev_b: match doc.indicators.macd.as_ref() {
+                    Some(macd) => *macd.get_data_b().get(second_last).unwrap(),
+                    None => 0.,
+                },
                 current_c: 0.,
                 prev_c: 0.,
                 status: Status::Default,
@@ -61,8 +73,14 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
             //     status: Status::Default,
             // },
             atr: CompactIndicator {
-                current_a: *doc.indicators.atr.get_data_a().last().unwrap(),
-                prev_a: *doc.indicators.atr.get_data_a().get(second_last).unwrap(),
+                current_a: match doc.indicators.atr.as_ref() {
+                    Some(atr) => *atr.get_data_a().last().unwrap(),
+                    None => 0.,
+                },
+                prev_a: match doc.indicators.atr.as_ref() {
+                    Some(atr) => *atr.get_data_a().get(second_last).unwrap(),
+                    None => 0.,
+                },
                 current_b: 0.,
                 prev_b: 0.,
                 current_c: 0.,
@@ -81,55 +99,102 @@ pub fn compact_instrument(doc: Instrument) -> Result<CompactInstrument> {
             //     status: Status::Default,
             // },
             bb: CompactIndicator {
-                current_a: *doc.indicators.bb.get_data_a().last().unwrap(),
-                current_b: *doc.indicators.bb.get_data_b().last().unwrap(),
-                current_c: *doc.indicators.bb.get_data_c().last().unwrap(),
-                prev_a: *doc.indicators.bb.get_data_a().get(second_last).unwrap(),
-                prev_b: *doc.indicators.bb.get_data_b().get(second_last).unwrap(),
-                prev_c: *doc.indicators.bb.get_data_c().get(second_last).unwrap(),
+                current_a: match doc.indicators.bb.as_ref() {
+                    Some(bb) => *bb.get_data_a().last().unwrap(),
+                    None => 0.,
+                },
+                current_b: match doc.indicators.bb.as_ref() {
+                    Some(bb) => *bb.get_data_b().last().unwrap(),
+                    None => 0.,
+                },
+                current_c: match doc.indicators.bb.as_ref() {
+                    Some(bb) => *bb.get_data_c().last().unwrap(),
+                    None => 0.,
+                },
+                prev_a: match doc.indicators.bb.as_ref() {
+                    Some(bb) => *bb.get_data_a().get(second_last).unwrap(),
+                    None => 0.,
+                },
+                prev_b: match doc.indicators.bb.as_ref() {
+                    Some(bb) => *bb.get_data_b().get(second_last).unwrap(),
+                    None => 0.,
+                },
+                prev_c: match doc.indicators.bb.as_ref() {
+                    Some(bb) => *bb.get_data_c().get(second_last).unwrap(),
+                    None => 0.,
+                },
                 status: Status::Default,
             },
             bbw: CompactIndicator {
-                current_a: *doc.indicators.bbw.get_data_a().last().unwrap(),
+                current_a: match doc.indicators.bbw.as_ref() {
+                    Some(bbw) => *bbw.get_data_a().last().unwrap(),
+                    None => 0.,
+                },
                 current_b: 0.,
-                prev_a: *doc.indicators.bbw.get_data_a().get(second_last).unwrap(),
+                prev_a: match doc.indicators.bbw.as_ref() {
+                    Some(bbw) => *bbw.get_data_a().get(second_last).unwrap(),
+                    None => 0.,
+                },
                 prev_b: 0.,
                 current_c: 0.,
                 prev_c: 0.,
                 status: Status::Default,
             },
             rsi: CompactIndicator {
-                current_a: *doc.indicators.rsi.get_data_a().last().unwrap(),
+                current_a: match doc.indicators.rsi.as_ref() {
+                    Some(rsi) => *rsi.get_data_a().last().unwrap(),
+                    None => 0.,
+                },
                 current_b: 0.,
-                prev_a: *doc.indicators.rsi.get_data_a().get(second_last).unwrap(),
+                prev_a: match doc.indicators.rsi.as_ref() {
+                    Some(rsi) => *rsi.get_data_a().get(second_last).unwrap(),
+                    None => 0.,
+                },
                 prev_b: 0.,
                 current_c: 0.,
                 prev_c: 0.,
                 status: Status::Default,
             },
-
             ema_a: CompactIndicator {
-                current_a: *doc.indicators.ema_a.get_data_a().last().unwrap(),
+                current_a: match doc.indicators.ema_a.as_ref() {
+                    Some(ema) => *ema.get_data_a().last().unwrap(),
+                    None => 0.,
+                },
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_a.get_data_a().get(second_last).unwrap(),
+                prev_a: match doc.indicators.ema_a.as_ref() {
+                    Some(ema) => *ema.get_data_a().get(second_last).unwrap(),
+                    None => 0.,
+                },
                 prev_b: 0.,
                 current_c: 0.,
                 prev_c: 0.,
                 status: Status::Default,
             },
             ema_b: CompactIndicator {
-                current_a: *doc.indicators.ema_b.get_data_a().last().unwrap(),
+                current_a: match doc.indicators.ema_b.as_ref() {
+                    Some(ema) => *ema.get_data_a().last().unwrap(),
+                    None => 0.,
+                },
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_b.get_data_a().get(second_last).unwrap(),
+                prev_a: match doc.indicators.ema_b.as_ref() {
+                    Some(ema) => *ema.get_data_a().get(second_last).unwrap(),
+                    None => 0.,
+                },
                 prev_b: 0.,
                 current_c: 0.,
                 prev_c: 0.,
                 status: Status::Default,
             },
             ema_c: CompactIndicator {
-                current_a: *doc.indicators.ema_c.get_data_a().last().unwrap(),
+                current_a: match doc.indicators.ema_c.as_ref() {
+                    Some(ema) => *ema.get_data_a().last().unwrap(),
+                    None => 0.,
+                },
                 current_b: 0.,
-                prev_a: *doc.indicators.ema_c.get_data_a().get(second_last).unwrap(),
+                prev_a: match doc.indicators.ema_c.as_ref() {
+                    Some(ema) => *ema.get_data_a().get(second_last).unwrap(),
+                    None => 0.,
+                },
                 prev_b: 0.,
                 current_c: 0.,
                 prev_c: 0.,

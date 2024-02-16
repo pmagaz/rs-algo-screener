@@ -20,7 +20,7 @@ pub async fn find_all(state: &web::Data<AppState>) -> Result<Vec<CompactBotData>
         .find(
             doc! {},
             FindOptions::builder()
-                .sort(doc! {"env":-1, "market":-1, "strategy_name":1, "symbol":1, "strategy_stats.profit_factor":-1, "time_frame": -1, "strategy_type":1, })
+                .sort(doc! {"env":-1, "market":-1, "strategy_name":1, "time_frame": 1, "symbol":1, "strategy_stats.profit_factor":-1, "strategy_type":1, })
                 .build(),
         )
         .await

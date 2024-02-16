@@ -141,7 +141,7 @@ pub trait Strategy: DynClone {
             None => "".to_string(),
         };
 
-        let _overwrite_orders = env::var("OVERWRITE_ORDERS")
+        let _overwrite_orders = env::var("ORDERS_OVERWRITE")
             .unwrap()
             .parse::<bool>()
             .unwrap();
@@ -279,7 +279,7 @@ pub trait Strategy: DynClone {
     ) -> PositionResult {
         let trade_size = env::var("ORDER_SIZE").unwrap().parse::<f64>().unwrap();
 
-        let overwrite_orders = env::var("OVERWRITE_ORDERS")
+        let overwrite_orders = env::var("ORDERS_OVERWRITE")
             .unwrap()
             .parse::<bool>()
             .unwrap();

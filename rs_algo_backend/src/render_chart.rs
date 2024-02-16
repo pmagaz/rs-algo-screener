@@ -168,18 +168,49 @@ impl Backend {
         };
 
         let _stop_loss_color = MAGENTA.mix(0.8);
+        let empty_vec: Vec<f64> = Vec::new();
 
-        let _rsi = &instrument.indicators.rsi.get_data_a();
+        //let _rsi = &instrument.indicators.rsi.get_data_a();
+
+        let _rsi = match &instrument.indicators.rsi {
+            Some(rsi) => rsi.get_data_a(),
+            None => &empty_vec,
+        };
 
         let patterns = local_patterns;
 
-        let macd = &instrument.indicators.macd;
-        let macd_a = &macd.get_data_a();
-        let macd_b = &macd.get_data_b();
+        //let macd = &instrument.indicators.macd;
+        // let macd_a = &macd.get_data_a();
+        // let macd_b = &macd.get_data_b();
 
-        let bb_a = &instrument.indicators.bb.get_data_a();
-        let bb_b = &instrument.indicators.bb.get_data_b();
-        let bb_c = &instrument.indicators.bb.get_data_c();
+        let macd_a = match &instrument.indicators.macd {
+            Some(macd) => macd.get_data_a(),
+            None => &empty_vec,
+        };
+
+        let macd_b = match &instrument.indicators.macd {
+            Some(macd) => macd.get_data_a(),
+            None => &empty_vec,
+        };
+
+        // let bb_a = &instrument.indicators.bb.get_data_a();
+        // let bb_b = &instrument.indicators.bb.get_data_b();
+        // let bb_c = &instrument.indicators.bb.get_data_c();
+
+        let bb_a = match &instrument.indicators.bb {
+            Some(bb) => bb.get_data_a(),
+            None => &empty_vec,
+        };
+
+        let bb_b = match &instrument.indicators.bb {
+            Some(bb) => bb.get_data_b(),
+            None => &empty_vec,
+        };
+
+        let bb_c = match &instrument.indicators.bb {
+            Some(bb) => bb.get_data_c(),
+            None => &empty_vec,
+        };
 
         let root = BitMapBackend::new(&output_file, (1821, 865)).into_drawing_area();
         let (upper, lower) = root.split_vertically((91).percent());
@@ -558,10 +589,7 @@ impl Backend {
                         };
                         if let Some(trade_in) = trades_in.get(i) {
                             let is_profitable = trade_out.profit > 0.;
-                            let price_out = match trade_out.trade_type.is_long() {
-                                true => trade_out.bid,
-                                false => trade_out.bid,
-                            };
+                            let price_out = trade_out.price_out;
                             let marker = if is_profitable {
                                 if trade_out.trade_type.is_long() {
                                     TriangleMarker::new(
@@ -613,10 +641,7 @@ impl Backend {
                     .enumerate()
                     .map(|(_i, trade_out)| {
                         let date = from_dbtime(&trade_out.date_out);
-                        let price_out = match trade_out.trade_type.is_long() {
-                            true => trade_out.ask,
-                            false => trade_out.ask,
-                        };
+                        let price_out = trade_out.price_out;
 
                         let opacity = match trade_out.is_fulfilled() {
                             true => 1.8,
@@ -779,20 +804,30 @@ impl Backend {
         // //HTF INDICATORS
         match htf_instrument {
             HTFInstrument::HTFInstrument(htf_instrument) => {
-                let atr = &htf_instrument.indicators().atr();
-                let atr_a = &atr.get_data_a();
-                let htf_ema_a = &htf_instrument.indicators().ema_a().get_data_a();
-                let htf_ema_b = &htf_instrument.indicators().ema_b().get_data_a();
-                // let htf_macd_b = macd.get_data_b();
-                let min_atr = atr_a
-                    .iter()
-                    .max_by(|x, y| x.partial_cmp(y).unwrap())
-                    .unwrap();
+                // let atr = &htf_instrument.indicators().atr().unwrap().get_data_a();
+                // let htf_ema_a = &htf_instrument.indicators().ema_a().unwrap().get_data_a();
+                // let htf_ema_b = &htf_instrument.indicators().ema_b().unwrap().get_data_a();
+                let empty_vec: Vec<f64> = Vec::new();
 
-                let max_atr = atr_a
-                    .iter()
-                    .min_by(|x, y| x.partial_cmp(y).unwrap())
-                    .unwrap();
+                let atr = match &instrument.indicators.atr {
+                    Some(ema) => ema.get_data_a(),
+                    None => &empty_vec,
+                };
+
+                let htf_ema_a = match &instrument.indicators.ema_a {
+                    Some(ema) => ema.get_data_a(),
+                    None => &empty_vec,
+                };
+
+                let htf_ema_b = match &instrument.indicators.ema_b {
+                    Some(ema) => ema.get_data_a(),
+                    None => &empty_vec,
+                };
+
+                // let htf_macd_b = macd.get_data_b();
+                let min_atr = atr.iter().max_by(|x, y| x.partial_cmp(y).unwrap()).unwrap();
+
+                let max_atr = atr.iter().min_by(|x, y| x.partial_cmp(y).unwrap()).unwrap();
 
                 let mut indicator_panel = ChartBuilder::on(&lower)
                     .x_label_area_size(40)
@@ -834,7 +869,7 @@ impl Backend {
                     .draw_series(LineSeries::new(
                         (0..)
                             .zip(result.iter())
-                            .map(|(_id, data)| (data.0, atr_a[data.1])),
+                            .map(|(_id, data)| (data.0, atr[data.1])),
                         RED_LINE.mix(0.6),
                     ))
                     .unwrap();

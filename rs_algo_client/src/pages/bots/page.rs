@@ -30,6 +30,7 @@ pub fn bots() -> Html {
     let use_chart_url = use_state(|| String::from(""));
     let polling_seconds_list = [0, 5, 30];
     let polling_seconds_chart = [0, 5, 10, 20, 30, 40, 50];
+    let interval_task = use_state(|| None);
 
     {
         let use_bots = use_bots.clone();
@@ -81,13 +82,14 @@ pub fn bots() -> Html {
     }
 
     let on_bot_click = {
+        let interval_task = interval_task.clone();
         let use_chart_url = use_chart_url.clone();
         Callback::from(move |chart_url: String| {
             log::info!("[CLIENT] Selecting {}", &chart_url);
             let use_chart_url = use_chart_url.clone();
             use_chart_url.set(chart_url.clone());
 
-            Interval::new(5000, move || {
+            let new_task = Interval::new(5000, move || {
                 let date = Local::now();
                 let seconds = date.second();
                 let chart_url = chart_url.clone();
@@ -106,8 +108,9 @@ pub fn bots() -> Html {
                     }
                 });
                 // }
-            })
-            .forget();
+            });
+            //.forget();
+            interval_task.set(Some(new_task));
 
             open_modal();
         })
