@@ -809,17 +809,17 @@ impl Backend {
                 // let htf_ema_b = &htf_instrument.indicators().ema_b().unwrap().get_data_a();
                 let empty_vec: Vec<f64> = Vec::new();
 
-                let atr = match &instrument.indicators.atr {
+                let atr = match &htf_instrument.indicators.atr {
+                    Some(atr) => atr.get_data_a(),
+                    None => &empty_vec,
+                };
+
+                let htf_ema_a = match &htf_instrument.indicators.ema_a {
                     Some(ema) => ema.get_data_a(),
                     None => &empty_vec,
                 };
 
-                let htf_ema_a = match &instrument.indicators.ema_a {
-                    Some(ema) => ema.get_data_a(),
-                    None => &empty_vec,
-                };
-
-                let htf_ema_b = match &instrument.indicators.ema_b {
+                let htf_ema_b = match &htf_instrument.indicators.ema_b {
                     Some(ema) => ema.get_data_a(),
                     None => &empty_vec,
                 };
@@ -897,6 +897,8 @@ impl Backend {
                         ))
                         .unwrap();
                 }
+
+                //log::info!("{:?}, {:?}", htf_ema_a, htf_ema_b);
 
                 // if htf_ema_c.len() > 0 {
                 //     chart
